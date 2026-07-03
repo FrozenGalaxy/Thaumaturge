@@ -24,3 +24,6 @@ run
 
 # Reference sources (decompiled, not part of build)
 sources/
+
+# Python files
+*.py
