@@ -37,10 +37,7 @@ public final class FocusFX {
 
     private static Vec3 casterVelocity(FocusPackage focusPackage) {
         LivingEntity caster = focusPackage.getCaster();
-        if (caster == null) {
-            return Vec3.ZERO;
-        }
-        return caster.position().subtract(new Vec3(caster.xOld, caster.yOld, caster.zOld));
+        return caster == null ? Vec3.ZERO : caster.getKnownMovement();
     }
 
     private static void send(ServerLevel level, ClientboundFocusImpactPayload payload) {
