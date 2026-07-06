@@ -1,6 +1,5 @@
 package com.leclowndu93150.thaumcraft.content.focus;
 
-import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEffect;
 import com.leclowndu93150.thaumcraft.api.casters.FocusPackage;
 import com.leclowndu93150.thaumcraft.network.fx.ClientboundFocusImpactPayload;
@@ -33,8 +32,6 @@ public final class FocusFX {
         }
         LivingEntity caster = focusPackage.getCaster();
         int casterId = caster != null ? caster.getId() : ClientboundFocusImpactPayload.NO_CASTER;
-        Thaumcraft.LOGGER.info("[burst-debug] server: source={} halfDir={} casterId={} caster={}",
-                source, halfDirection, casterId, caster);
         send(level, new ClientboundFocusImpactPayload(source.x, source.y, source.z,
                 (float) halfDirection.x, (float) halfDirection.y, (float) halfDirection.z, true, casterId, parts));
     }

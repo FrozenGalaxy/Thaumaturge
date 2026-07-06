@@ -1,6 +1,5 @@
 package com.leclowndu93150.thaumcraft.client.fx.network;
 
-import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEffect;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;
 import com.leclowndu93150.thaumcraft.api.casters.IFocusElement;
@@ -39,12 +38,6 @@ public final class FocusImpactClientHandler {
                 origin = caster.position().add(0.0, caster.getEyeHeight() - SOURCE_EYE_OFFSET, 0.0);
                 casterVelocity = caster.position().subtract(new Vec3(caster.xOld, caster.yOld, caster.zOld));
             }
-            Thaumcraft.LOGGER.info("[burst-debug] client: payloadPos=({}, {}, {}) payloadMotion=({}, {}, {}) casterId={} resolved={} origin={} casterVelocity={}",
-                    payload.x(), payload.y(), payload.z(), payload.mx(), payload.my(), payload.mz(),
-                    payload.casterId(), caster, origin, casterVelocity);
-        } else if (payload.burst()) {
-            Thaumcraft.LOGGER.info("[burst-debug] client: burst with NO caster id, payloadPos=({}, {}, {})",
-                    payload.x(), payload.y(), payload.z());
         }
         int budget = payload.burst() ? BURST_PARTICLE_BUDGET : IMPACT_PARTICLE_BUDGET;
         int amount = Math.max(1, budget / payload.parts().size());
