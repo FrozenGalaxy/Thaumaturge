@@ -20,6 +20,7 @@ import com.leclowndu93150.thaumcraft.client.color.AspectFilterTint;
 import com.leclowndu93150.thaumcraft.client.color.FocusColorTint;
 import com.leclowndu93150.thaumcraft.client.color.GolemMaterialTint;
 import com.leclowndu93150.thaumcraft.client.model.CentrifugeItemSpecialRenderer;
+import com.leclowndu93150.thaumcraft.client.model.WandItemSpecialRenderer;
 import com.leclowndu93150.thaumcraft.client.model.DeconTableItemSpecialRenderer;
 import com.leclowndu93150.thaumcraft.client.model.GolemBuilderItemSpecialRenderer;
 import com.mojang.math.Axis;
@@ -145,7 +146,10 @@ public final class TCModelProvider extends ModelProvider {
         horizontalBlock(blockModels, itemModels, TCBlocks.SMELTER_VENT.get(), "smelter_vent");
         itemModels.generateFlatItem(TCItems.THAUMONOMICON.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(TCItems.SALIS_MUNDUS.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(TCItems.WAND.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModels.itemModelOutput.accept(TCItems.WAND.get(), new SpecialModelWrapper.Unbaked(
+                TCIds.rl("item/wand_base"),
+                Optional.empty(),
+                new WandItemSpecialRenderer.Unbaked()));
         itemModels.generateFlatItem(TCItems.WAND_CAP_IRON.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(TCItems.WAND_CAP_COPPER.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(TCItems.WAND_CAP_GOLD.get(), ModelTemplates.FLAT_ITEM);

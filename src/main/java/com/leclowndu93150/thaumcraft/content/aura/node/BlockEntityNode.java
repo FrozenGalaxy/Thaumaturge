@@ -13,6 +13,8 @@ import com.leclowndu93150.thaumcraft.api.nodes.NodeType;
 import com.leclowndu93150.thaumcraft.api.taint.TaintApi;
 import com.leclowndu93150.thaumcraft.content.aspect.EntityAspects;
 import com.leclowndu93150.thaumcraft.content.entity.EntityBrainyZombie;
+import com.leclowndu93150.thaumcraft.content.fx.FX;
+import com.leclowndu93150.thaumcraft.content.fx.TCParticleDispatch;
 import com.leclowndu93150.thaumcraft.content.wands.EntityAspectOrb;
 import com.leclowndu93150.thaumcraft.content.wands.WandChargingEvents;
 import com.leclowndu93150.thaumcraft.content.wands.WandParts;
@@ -24,10 +26,14 @@ import com.leclowndu93150.thaumcraft.registry.TCWandParts;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -81,6 +87,7 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
     private static final float PURE_FLUX_CLEANSE = 0.25F;
     private static final int NODE_DRAIN_INTERVAL = 5;
     private static final int ORB_BURST_MAX_PER_ASPECT = 10;
+    private static final float ZAP_WIDTH = 0.3F;
     private static final int LOCK_BASIC = 1;
     private static final int LOCK_ADVANCED = 2;
     private static final int LOCK_BASIC_REGEN_FACTOR = 2;
@@ -102,6 +109,22 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
     private int wait;
     private int starvation;
     private int lock;
+    private @Nullable UUID drainPlayer;
+    private int drainColor = 0xFFFFFF;
+    private int drainTicks;
+    public int clientDrainRed = 255;
+    public int clientDrainGreen = 255;
+    public int clientDrainBlue = 255;
+
+    private static final int DRAIN_LINGER_TICKS = 12;
+
+    public @Nullable UUID getDrainPlayer() {
+        return drainPlayer;
+    }
+
+    public int getDrainColor() {
+        return drainColor;
+    }
 
     public BlockEntityNode(BlockPos pos, BlockState state) {
         this(TCBlockEntities.NODE.get(), pos, state);
@@ -226,6 +249,10 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         change = handleDecay(serverLevel, pos, change);
         change = handleStability(serverLevel, pos, change);
         change = handleTypeBehavior(serverLevel, pos, change);
+        if (drainTicks > 0 && --drainTicks == 0) {
+            drainPlayer = null;
+            change = true;
+        }
         if (change) {
             setChanged();
             serverLevel.sendBlockUpdated(pos, getBlockState(), getBlockState(), 3);
@@ -450,6 +477,10 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
             other.wait = other.regeneration / 2;
             other.setChanged();
             serverLevel.sendBlockUpdated(otherPos, other.getBlockState(), other.getBlockState(), 3);
+            FX.arcBolt(serverLevel, Vec3.atCenterOf(otherPos))
+                    .to(Vec3.atCenterOf(pos))
+                    .width(ZAP_WIDTH)
+                    .send();
             return true;
         }
         return change;
@@ -685,9 +716,45 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
             return false;
         }
         takeFromContainer(chosen, moved);
+        drainPlayer = player.getUUID();
+        drainColor = chosen.value().color();
+        drainTicks = DRAIN_LINGER_TICKS;
+        TCParticleDispatch.spawnVisSparkle(serverLevel, Vec3.atCenterOf(worldPosition),
+                player.getEyePosition(), drainColor);
         setChanged();
         serverLevel.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
         return true;
+    }
+
+    public void clientTick(Level clientLevel, BlockPos pos) {
+        if (nodeType != NodeType.HUNGRY || !allowTypeBehavior()) {
+            return;
+        }
+        RandomSource random = clientLevel.getRandom();
+        int tx = pos.getX() + random.nextInt(HUNGRY_REACH) - random.nextInt(HUNGRY_REACH);
+        int ty = pos.getY() + random.nextInt(HUNGRY_REACH) - random.nextInt(HUNGRY_REACH);
+        int tz = pos.getZ() + random.nextInt(HUNGRY_REACH) - random.nextInt(HUNGRY_REACH);
+        Vec3 from = Vec3.atCenterOf(pos);
+        Vec3 to = new Vec3(tx + 0.5, ty + 0.5, tz + 0.5);
+        BlockHitResult hit = clientLevel.clip(new ClipContext(from, to,
+                ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, CollisionContext.empty()));
+        if (hit.getType() != HitResult.Type.BLOCK) {
+            return;
+        }
+        BlockPos target = hit.getBlockPos();
+        if (target.equals(pos) || target.distSqr(pos) > 256.0) {
+            return;
+        }
+        BlockState state = clientLevel.getBlockState(target);
+        if (state.isAir()) {
+            return;
+        }
+        Vec3 pull = from.subtract(Vec3.atCenterOf(target)).normalize().scale(0.3);
+        for (int i = 0; i < 3; i++) {
+            clientLevel.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, state),
+                    target.getX() + random.nextFloat(), target.getY() + random.nextFloat(),
+                    target.getZ() + random.nextFloat(), pull.x, pull.y + 0.05, pull.z);
+        }
     }
 
     @Override
@@ -699,6 +766,10 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         }
         output.store("Aspects", AspectList.CODEC, aspects);
         output.store("AspectsBase", AspectList.CODEC, aspectsBase);
+        if (drainPlayer != null) {
+            output.store("DrainPlayer", UUIDUtil.CODEC, drainPlayer);
+            output.putInt("DrainColor", drainColor);
+        }
     }
 
     @Override
@@ -708,6 +779,8 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         nodeModifier = input.read("Modifier", NodeModifier.CODEC).orElse(null);
         aspects = input.read("Aspects", AspectList.CODEC).orElse(AspectList.EMPTY);
         aspectsBase = input.read("AspectsBase", AspectList.CODEC).orElse(AspectList.EMPTY);
+        drainPlayer = input.read("DrainPlayer", UUIDUtil.CODEC).orElse(null);
+        drainColor = input.getIntOr("DrainColor", 0xFFFFFF);
         regeneration = -1;
     }
 

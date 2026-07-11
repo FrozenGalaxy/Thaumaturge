@@ -5,6 +5,7 @@ import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.items.GogglesAccess;
 import com.leclowndu93150.thaumcraft.api.nodes.NodeModifier;
 import com.leclowndu93150.thaumcraft.api.nodes.NodeType;
+import com.leclowndu93150.thaumcraft.client.fx.render.FloatyLineRenderer;
 import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
 import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityJarNode;
 import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityNode;
@@ -13,6 +14,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -70,6 +72,8 @@ public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode, 
     private static final float ROTATION_PERIOD_BASE = 500.0F;
     private static final float ROTATION_PERIOD_STEP = 50.0F;
     private static final float WHITE_ALPHA_CLAMP = 1.0F;
+    private static final float DRAIN_LINE_SPEED = -0.02F;
+    private static final float DRAIN_LINE_WIDTH = 0.15F;
 
     public NodeRenderer(BlockEntityRendererProvider.Context context) {}
 
@@ -123,6 +127,34 @@ public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode, 
         state.ticks = player.tickCount + partialTicks;
         state.time = player.level().getGameTime();
         state.frameSeed = node.getBlockPos().getX();
+        state.draining = false;
+        if (node.getDrainPlayer() != null && player.level().getPlayerByUUID(node.getDrainPlayer())
+                instanceof Player drainer && drainer.isUsingItem()) {
+            float useTicks = drainer.getTicksUsingItem() + partialTicks;
+            float wave = Mth.sin(useTicks / 10.0F) * 10.0F;
+            float pitch = Mth.lerp(partialTicks, drainer.xRotO, drainer.getXRot());
+            float yaw = Mth.lerp(partialTicks, drainer.yRotO, drainer.getYRot());
+            Vec3 offset = new Vec3(-0.1, -0.1, 0.5)
+                    .xRot(-pitch * Mth.DEG_TO_RAD)
+                    .yRot(-yaw * Mth.DEG_TO_RAD)
+                    .yRot(-wave * 0.01F)
+                    .xRot(-wave * 0.015F);
+            double eye = drainer == player ? 0.0 : drainer.getEyeHeight();
+            Vec3 hand = new Vec3(
+                    Mth.lerp(partialTicks, drainer.xo, drainer.getX()),
+                    Mth.lerp(partialTicks, drainer.yo, drainer.getY()) + eye,
+                    Mth.lerp(partialTicks, drainer.zo, drainer.getZ())).add(offset);
+            Vec3 nodeCenter = Vec3.atCenterOf(node.getBlockPos());
+            state.draining = true;
+            state.drainFromX = hand.x - nodeCenter.x;
+            state.drainFromY = hand.y - nodeCenter.y;
+            state.drainFromZ = hand.z - nodeCenter.z;
+            state.drainTime = Math.min(drainer.getTicksUsingItem() + partialTicks, 10.0F) / 10.0F;
+            node.clientDrainRed = (((node.getDrainColor() >> 16) & 0xFF) + node.clientDrainRed * 4) / 5;
+            node.clientDrainGreen = (((node.getDrainColor() >> 8) & 0xFF) + node.clientDrainGreen * 4) / 5;
+            node.clientDrainBlue = ((node.getDrainColor() & 0xFF) + node.clientDrainBlue * 4) / 5;
+            state.drainColor = (node.clientDrainRed << 16) | (node.clientDrainGreen << 8) | node.clientDrainBlue;
+        }
         for (AspectInstance entry : node.getAspects().entries()) {
             NodeRenderState.AspectLayer layer = new NodeRenderState.AspectLayer();
             layer.color = entry.aspect().value().color();
@@ -134,6 +166,15 @@ public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode, 
     @Override
     public void submit(NodeRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         int frame = (int) ((state.ticks * FRAME_ADVANCE_PER_TICK + state.frameSeed) % GRID + GRID) % GRID;
+        if (state.draining) {
+            poseStack.pushPose();
+            poseStack.translate(0.5F, 0.5F, 0.5F);
+            FloatyLineRenderer.submit(poseStack, collector,
+                    new Vec3(state.drainFromX, state.drainFromY, state.drainFromZ),
+                    FloatyLineRenderer.time(state.time, state.ticks % 1.0F),
+                    state.drainColor, DRAIN_LINE_SPEED, state.drainTime, DRAIN_LINE_WIDTH);
+            poseStack.popPose();
+        }
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
         poseStack.mulPose(camera.orientation);

@@ -21,6 +21,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.world.phys.Vec3;
 
 public final class BlockEntityRechargePedestal extends BlockEntityPedestal {
@@ -31,6 +34,19 @@ public final class BlockEntityRechargePedestal extends BlockEntityPedestal {
     private static final int NODE_DRAW_RANGE = 8;
 
     private int counter;
+    private @Nullable BlockPos drainPos;
+    private int drainColor = 0xFFFFFF;
+    private int drainTicks;
+
+    private static final int DRAIN_LINGER_TICKS = 10;
+
+    public @Nullable BlockPos getDrainPos() {
+        return drainPos;
+    }
+
+    public int getDrainColor() {
+        return drainColor;
+    }
 
     public BlockEntityRechargePedestal(BlockPos pos, BlockState state) {
         super(TCBlockEntities.RECHARGE_PEDESTAL.get(), pos, state);
@@ -44,6 +60,11 @@ public final class BlockEntityRechargePedestal extends BlockEntityPedestal {
 
     private void tickServer(ServerLevel level) {
         counter++;
+        if (drainTicks > 0 && --drainTicks == 0) {
+            drainPos = null;
+            setChanged();
+            syncToClient();
+        }
         if (getItem().isEmpty()) {
             return;
         }
@@ -90,6 +111,9 @@ public final class BlockEntityRechargePedestal extends BlockEntityPedestal {
                             WandVisHelper.addVis(wand, key, 1, true);
                             node.setChanged();
                             level.sendBlockUpdated(cursor.immutable(), node.getBlockState(), node.getBlockState(), 3);
+                            drainPos = cursor.immutable();
+                            drainColor = entry.aspect().value().color();
+                            drainTicks = DRAIN_LINGER_TICKS;
                             return true;
                         }
                     }
@@ -97,6 +121,22 @@ public final class BlockEntityRechargePedestal extends BlockEntityPedestal {
             }
         }
         return false;
+    }
+
+    @Override
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        if (drainPos != null) {
+            output.store("DrainPos", BlockPos.CODEC, drainPos);
+            output.putInt("DrainColor", drainColor);
+        }
+    }
+
+    @Override
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        drainPos = input.read("DrainPos", BlockPos.CODEC).orElse(null);
+        drainColor = input.getIntOr("DrainColor", 0xFFFFFF);
     }
 
     private void sendSparkle(ServerLevel level) {

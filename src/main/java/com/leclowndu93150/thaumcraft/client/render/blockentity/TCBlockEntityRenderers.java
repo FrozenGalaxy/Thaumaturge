@@ -26,7 +26,7 @@ public final class TCBlockEntityRenderers {
         event.registerBlockEntityRenderer(TCBlockEntities.FOCAL_MANIPULATOR.get(), FocalManipulatorRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.PEDESTAL.get(), PedestalRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.RECHARGE_PEDESTAL.get(),
-                context -> new PedestalRenderer<>(context, RECHARGE_PEDESTAL_ITEM_SCALE));
+                context -> new RechargePedestalRenderer(context, RECHARGE_PEDESTAL_ITEM_SCALE));
         event.registerBlockEntityRenderer(TCBlockEntities.JAR.get(), JarRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.JAR_VOID.get(), JarRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.JAR_BRAIN.get(), JarBrainRenderer::new);
@@ -54,6 +54,7 @@ public final class TCBlockEntityRenderers {
         event.registerBlockEntityRenderer(TCBlockEntities.PATTERN_CRAFTER.get(), PatternCrafterRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.NODE.get(), NodeRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.JAR_NODE.get(), NodeRenderer::new);
+        event.registerBlockEntityRenderer(TCBlockEntities.NODE_STABILIZER.get(), NodeStabilizerRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.MIRROR.get(), MirrorRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.MIRROR_ESSENTIA.get(), MirrorRenderer::new);
     }

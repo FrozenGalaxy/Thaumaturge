@@ -23,4 +23,10 @@ public final class NodeRenderState extends BlockEntityRenderState {
     public long time;
     public int frameSeed;
     public float size = 1.0F;
+    public boolean draining;
+    public double drainFromX;
+    public double drainFromY;
+    public double drainFromZ;
+    public int drainColor = 0xFFFFFF;
+    public float drainTime;
 }

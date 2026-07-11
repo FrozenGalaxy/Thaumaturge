@@ -62,8 +62,11 @@ public final class BlockNode extends Block implements EntityBlock {
     @Override
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state,
                                                                             BlockEntityType<T> type) {
-        if (level.isClientSide() || type != TCBlockEntities.NODE.get()) {
+        if (type != TCBlockEntities.NODE.get()) {
             return null;
+        }
+        if (level.isClientSide()) {
+            return (tickLevel, pos, tickState, node) -> ((BlockEntityNode) node).clientTick(tickLevel, pos);
         }
         return (tickLevel, pos, tickState, node) -> ((BlockEntityNode) node).serverTick(tickLevel, pos);
     }

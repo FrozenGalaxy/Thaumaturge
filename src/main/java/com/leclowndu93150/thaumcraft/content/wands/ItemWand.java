@@ -14,6 +14,7 @@ import com.leclowndu93150.thaumcraft.api.items.IArchitect;
 import com.leclowndu93150.thaumcraft.api.wands.IWandRodOnUpdate;
 import com.leclowndu93150.thaumcraft.content.casters.CasterManager;
 import com.leclowndu93150.thaumcraft.content.casters.ItemFocus;
+import com.leclowndu93150.thaumcraft.content.fx.TCParticleDispatch;
 import com.leclowndu93150.thaumcraft.api.wands.WandCap;
 import com.leclowndu93150.thaumcraft.api.wands.WandRod;
 import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityNode;
@@ -48,10 +49,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.HitResult;
 import org.jspecify.annotations.Nullable;
 
 public class ItemWand extends Item implements ICaster, IArchitect {
+    private static final float REFINE_SPARKLE_SPREAD = 2.0F;
     private static final DecimalFormat VIS_FORMAT = new DecimalFormat("#######.##");
     private static final String STAFF_ROD_SUFFIX = "_staff";
 
@@ -324,7 +327,21 @@ public class ItemWand extends Item implements ICaster, IArchitect {
         int gained = (int) (drained * WandEconomy.CENTIVIS_PER_VIS / WandEconomy.RAW_TO_PRIMAL_RATIO);
         if (gained > 0) {
             WandVisHelper.addRealVis(stack, target, gained, true);
+            sendRefineSparkle((ServerLevel) level, player, target);
         }
+    }
+
+    private static void sendRefineSparkle(ServerLevel level, Player player, ResourceKey<IAspect> aspect) {
+        int color = level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).get(aspect)
+                .map(holder -> holder.value().color())
+                .orElse(0xFFFFFF);
+        Vec3 origin = player.getEyePosition().add(
+                (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * REFINE_SPARKLE_SPREAD,
+                level.getRandom().nextFloat() * REFINE_SPARKLE_SPREAD,
+                (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * REFINE_SPARKLE_SPREAD);
+        Vec3 hand = player.getEyePosition().add(player.getLookAngle().scale(0.5))
+                .add(0.0, -0.3, 0.0);
+        TCParticleDispatch.spawnVisSparkle(level, origin, hand, color);
     }
 
     private @Nullable ResourceKey<IAspect> refineTarget(Player player, ItemStack stack) {
