@@ -3,15 +3,29 @@ package com.leclowndu93150.thaumcraft.content.wands;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aspect.TCAspects;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
+import com.leclowndu93150.thaumcraft.api.casters.CasterTriggerRegistry;
+import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;
+import com.leclowndu93150.thaumcraft.api.casters.FocusPackage;
+import com.leclowndu93150.thaumcraft.api.casters.ICaster;
+import com.leclowndu93150.thaumcraft.api.casters.IFocusBlockPicker;
+import com.leclowndu93150.thaumcraft.api.casters.IFocusElement;
+import com.leclowndu93150.thaumcraft.api.casters.IInteractWithCaster;
+import com.leclowndu93150.thaumcraft.api.items.IArchitect;
 import com.leclowndu93150.thaumcraft.api.wands.IWandRodOnUpdate;
+import com.leclowndu93150.thaumcraft.content.casters.CasterManager;
+import com.leclowndu93150.thaumcraft.content.casters.ItemFocus;
 import com.leclowndu93150.thaumcraft.api.wands.WandCap;
 import com.leclowndu93150.thaumcraft.api.wands.WandRod;
 import com.leclowndu93150.thaumcraft.content.world.crystal.BlockCrystal;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCWandParts;
 import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -24,15 +38,19 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.jspecify.annotations.Nullable;
 
-public class ItemWand extends Item {
+public class ItemWand extends Item implements ICaster, IArchitect {
     private static final DecimalFormat VIS_FORMAT = new DecimalFormat("#######.##");
     private static final String STAFF_ROD_SUFFIX = "_staff";
 
@@ -80,8 +98,191 @@ public class ItemWand extends Item {
 
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
+        ItemStack wandStack = player.getItemInHand(hand);
+        ItemStack focusStack = getFocusStack(wandStack);
+        if (focusStack.getItem() instanceof ItemFocus focus) {
+            if (CasterManager.isOnCooldown(player)) {
+                return InteractionResult.PASS;
+            }
+            FocusPackage core = ItemFocus.getPackage(focusStack);
+            if (core == null) {
+                return InteractionResult.PASS;
+            }
+            CasterManager.setCooldown(player, focus.getActivationTime(focusStack));
+            if (player.isShiftKeyDown()) {
+                for (IFocusElement element : core.getNodes()) {
+                    if (element instanceof IFocusBlockPicker) {
+                        return InteractionResult.PASS;
+                    }
+                }
+            }
+            if (level.isClientSide()) {
+                return InteractionResult.SUCCESS;
+            }
+            if (consumeVis(wandStack, player, focus.getVisCost(focusStack), false, false)) {
+                FocusEngine.castFocusPackage(player, core);
+                player.swing(hand);
+                return InteractionResult.SUCCESS;
+            }
+            return InteractionResult.FAIL;
+        }
         player.startUsingItem(hand);
         return InteractionResult.CONSUME;
+    }
+
+    public @Nullable ItemFocus getFocus(ItemStack stack) {
+        return getFocusStack(stack).getItem() instanceof ItemFocus focus ? focus : null;
+    }
+
+    @Override
+    public ItemStack getFocusStack(ItemStack stack) {
+        ItemStackTemplate template = stack.get(TCDataComponents.SOCKETED_FOCUS.get());
+        return template == null ? ItemStack.EMPTY : template.create();
+    }
+
+    @Override
+    public void setFocus(ItemStack stack, ItemStack focus) {
+        if (focus == null || focus.isEmpty()) {
+            stack.remove(TCDataComponents.SOCKETED_FOCUS.get());
+        } else {
+            stack.set(TCDataComponents.SOCKETED_FOCUS.get(), ItemStackTemplate.fromNonEmptyStack(focus));
+        }
+    }
+
+    @Override
+    public float getConsumptionModifier(ItemStack stack, Player player, boolean crafting) {
+        WandParts parts = getParts(stack);
+        float modifier = parts.cap().baseCostModifier();
+        if (player != null) {
+            modifier -= CasterManager.getTotalVisDiscount(player);
+        }
+        if (parts.sceptre()) {
+            modifier -= WandEconomy.SCEPTRE_DISCOUNT;
+        }
+        return Math.max(modifier, WandEconomy.MIN_CONSUMPTION_MODIFIER);
+    }
+
+    @Override
+    public boolean consumeVis(ItemStack stack, Player player, float amount, boolean crafting, boolean simulate) {
+        if (amount <= 0.0F) {
+            return true;
+        }
+        Map<ResourceKey<IAspect>, Integer> split =
+                WandVisHelper.evenSplit(Math.round(amount * WandEconomy.CENTIVIS_PER_VIS));
+        return WandVisHelper.consumeAllVis(stack, player, split, !simulate, crafting);
+    }
+
+    @Override
+    public @Nullable BlockState getPickedBlock(ItemStack stack) {
+        FocusPackage core = ItemFocus.getPackage(getFocusStack(stack));
+        if (core == null) {
+            return null;
+        }
+        for (IFocusElement element : core.getNodes()) {
+            if (element instanceof IFocusBlockPicker) {
+                return stack.get(TCDataComponents.PICKED_BLOCK.get());
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        Level level = context.getLevel();
+        Player player = context.getPlayer();
+        if (player == null) {
+            return InteractionResult.PASS;
+        }
+        BlockPos pos = context.getClickedPos();
+        Direction side = context.getClickedFace();
+        InteractionHand hand = context.getHand();
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof IInteractWithCaster target
+                && target.onCasterRightClick(level, stack, player, pos, side, hand)) {
+            return InteractionResult.SUCCESS;
+        }
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof IInteractWithCaster target
+                && target.onCasterRightClick(level, stack, player, pos, side, hand)) {
+            return InteractionResult.SUCCESS;
+        }
+        if (CasterTriggerRegistry.hasTrigger(state)) {
+            return CasterTriggerRegistry.performTrigger(level, stack, player, pos, side, state)
+                    ? InteractionResult.SUCCESS
+                    : InteractionResult.FAIL;
+        }
+        ItemStack focusStack = getFocusStack(stack);
+        if (!focusStack.isEmpty() && player.isShiftKeyDown() && blockEntity == null) {
+            FocusPackage core = ItemFocus.getPackage(focusStack);
+            if (core != null) {
+                for (IFocusElement element : core.getNodes()) {
+                    if (element instanceof IFocusBlockPicker) {
+                        if (!level.isClientSide()) {
+                            if (!state.isAir()) {
+                                stack.set(TCDataComponents.PICKED_BLOCK.get(), state);
+                            }
+                            return InteractionResult.SUCCESS;
+                        }
+                        player.swing(hand);
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+            }
+        }
+        return InteractionResult.PASS;
+    }
+
+    private @Nullable IArchitect architectElement(ItemStack stack) {
+        FocusPackage core = ItemFocus.getPackage(getFocusStack(stack));
+        if (core == null) {
+            return null;
+        }
+        for (IFocusElement element : core.getNodes()) {
+            if (element instanceof IArchitect architect) {
+                return architect;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public @Nullable HitResult getArchitectMOP(ItemStack stack, Level level, LivingEntity caster) {
+        IArchitect architect = architectElement(stack);
+        return architect == null ? null : architect.getArchitectMOP(stack, level, caster);
+    }
+
+    @Override
+    public boolean useBlockHighlight(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public List<BlockPos> getArchitectBlocks(ItemStack stack, Level level, BlockPos pos, Direction side, Player player) {
+        IArchitect architect = architectElement(stack);
+        return architect == null ? List.of() : architect.getArchitectBlocks(stack, level, pos, side, player);
+    }
+
+    @Override
+    public boolean showAxis(ItemStack stack, Level level, Player player, Direction side, EnumAxis axis) {
+        IArchitect architect = architectElement(stack);
+        return architect != null && architect.showAxis(stack, level, player, side, axis);
+    }
+
+    @Override
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        if (oldStack.getItem() == this && newStack.getItem() == this) {
+            return sortingHash(oldStack) != sortingHash(newStack);
+        }
+        return oldStack.getItem() != newStack.getItem();
+    }
+
+    private int sortingHash(ItemStack wandStack) {
+        ItemFocus focus = getFocus(wandStack);
+        if (focus == null) {
+            return 0;
+        }
+        String sortKey = focus.getSortingHelper(getFocusStack(wandStack));
+        return sortKey != null ? sortKey.hashCode() : 0;
     }
 
     @Override
@@ -159,9 +360,6 @@ public class ItemWand extends Item {
                         WandVisHelper.getMaxVis(stack) / WandEconomy.CENTIVIS_PER_VIS)
                 .withStyle(ChatFormatting.GOLD));
         WandVis vis = WandVisHelper.getAllVis(stack);
-        if (vis.isEmpty()) {
-            return;
-        }
         HolderLookup.Provider registries = context.registries();
         for (ResourceKey<IAspect> primal : TCAspects.PRIMALS) {
             int amount = vis.amount(primal);
@@ -175,6 +373,15 @@ public class ItemWand extends Item {
                     name,
                     VIS_FORMAT.format(amount / (float) WandEconomy.CENTIVIS_PER_VIS),
                     VIS_FORMAT.format(modifier * 100.0F)));
+        }
+        ItemStack focusStack = getFocusStack(stack);
+        if (focusStack.getItem() instanceof ItemFocus focus) {
+            builder.accept(Component.translatable("tooltip.thaumcraft.caster.vis_cost",
+                            ItemFocus.formatVis(focus.getVisCost(focusStack)))
+                    .withStyle(ChatFormatting.ITALIC, ChatFormatting.AQUA));
+            builder.accept(focusStack.getHoverName().copy()
+                    .withStyle(ChatFormatting.BOLD, ChatFormatting.ITALIC, ChatFormatting.GREEN));
+            focus.addFocusInformation(focusStack, builder);
         }
     }
 

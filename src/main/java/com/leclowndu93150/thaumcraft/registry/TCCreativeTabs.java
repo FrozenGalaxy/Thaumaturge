@@ -49,7 +49,6 @@ public final class TCCreativeTabs {
                             output.accept(CelestialNotesItem.stackOf(body));
                         }
                         output.accept(TCItems.GOGGLES_REVEALING.get());
-                        output.accept(TCItems.CASTER_BASIC.get());
                         output.accept(chargedWand(TCWandParts.CAP_IRON.get(), TCWandParts.ROD_WOOD.get(), false));
                         output.accept(chargedWand(TCWandParts.CAP_GOLD.get(), TCWandParts.ROD_GREATWOOD.get(), false));
                         output.accept(chargedWand(TCWandParts.CAP_THAUMIUM.get(), TCWandParts.ROD_SILVERWOOD.get(), false));

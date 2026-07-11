@@ -4,7 +4,6 @@ import com.leclowndu93150.thaumcraft.content.research.note.ItemResearchNote;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.essentia.jar.JarBraceItem;
 import com.leclowndu93150.thaumcraft.content.essentia.jar.JarItem;
-import com.leclowndu93150.thaumcraft.content.casters.ItemCaster;
 import com.leclowndu93150.thaumcraft.content.casters.ItemFocus;
 import com.leclowndu93150.thaumcraft.content.wands.ItemPrimalCharm;
 import com.leclowndu93150.thaumcraft.content.wands.ItemWand;
@@ -614,11 +613,6 @@ public final class TCItems {
     public static final int FOCUS_LESSER_COMPLEXITY = 15;
     public static final int FOCUS_ADVANCED_COMPLEXITY = 25;
     public static final int FOCUS_GREATER_COMPLEXITY = 50;
-
-    public static final DeferredItem<ItemCaster> CASTER_BASIC = ITEMS.registerItem(
-            "caster_basic",
-            props -> new ItemCaster(props, ItemCaster.AREA_SINGLE_CHUNK),
-            props -> props.stacksTo(1).rarity(Rarity.UNCOMMON));
 
     public static final DeferredItem<ItemWand> WAND = ITEMS.registerItem(
             "wand",

@@ -103,6 +103,33 @@ public final class WandVisHelper {
 
     private static final int HOTBAR_SIZE = 9;
 
+    public static Map<ResourceKey<IAspect>, Integer> evenSplit(int centivis) {
+        Map<ResourceKey<IAspect>, Integer> split = new LinkedHashMap<>();
+        int base = centivis / WandEconomy.PRIMAL_COUNT;
+        int remainder = centivis % WandEconomy.PRIMAL_COUNT;
+        for (int i = 0; i < TCAspects.PRIMALS.size(); i++) {
+            int share = base + (i < remainder ? 1 : 0);
+            if (share > 0) {
+                split.put(TCAspects.PRIMALS.get(i), share);
+            }
+        }
+        return split;
+    }
+
+    public static boolean consumeVisFromHotbar(Player player, float vis, boolean doit) {
+        if (vis <= 0.0F) {
+            return true;
+        }
+        Map<ResourceKey<IAspect>, Integer> split = evenSplit(Math.round(vis * WandEconomy.CENTIVIS_PER_VIS));
+        for (int slot = 0; slot < HOTBAR_SIZE; slot++) {
+            ItemStack stack = player.getInventory().getItem(slot);
+            if (stack.getItem() instanceof ItemWand && consumeAllVis(stack, player, split, doit, false)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static ItemStack findWandInHotbarWithRoom(Player player, ResourceKey<IAspect> aspect, int vis) {
         for (int slot = 0; slot < HOTBAR_SIZE; slot++) {
             ItemStack stack = player.getInventory().getItem(slot);

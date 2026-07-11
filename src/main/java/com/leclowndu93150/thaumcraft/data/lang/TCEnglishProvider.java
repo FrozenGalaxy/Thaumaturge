@@ -783,7 +783,6 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("key.category.thaumcraft.main", "Thaumcraft");
         add("key.thaumcraft.change_focus", "Change Caster Focus");
         add("key.thaumcraft.misc_toggle", "Misc Caster Toggle");
-        add("item.thaumcraft.caster_basic", "Caster's Gauntlet");
         add("item.thaumcraft.wand", "Wand");
         add("item.thaumcraft.wand.named", "%1$s %2$s Wand");
         add("item.thaumcraft.wand.sceptre", "%1$s %2$s Scepter");
