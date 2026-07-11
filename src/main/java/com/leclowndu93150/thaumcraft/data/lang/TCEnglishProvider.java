@@ -264,7 +264,8 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("tc.addendumtext", "§oAddendum %1$s§r");
 
         add("jei.thaumcraft.category.arcane_workbench", "Arcane Workbench");
-        add("jei.thaumcraft.arcane_workbench.vis_cost", "Vis Cost");
+        add("jei.thaumcraft.arcane_workbench.vis_cost", "Vis Cost (paid by the wand on the workbench)");
+        add("jei.thaumcraft.arcane_workbench.vis_cost_aura", "Without a wand: %s vis drained from the aura, no discounts");
         add("jei.thaumcraft.category.crucible", "Crucible");
         add("jei.thaumcraft.category.dust_trigger", "Salis Mundus Trigger");
         add("jei.thaumcraft.category.multiblock_dust_trigger", "Multiblock Trigger");
