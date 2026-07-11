@@ -16,6 +16,7 @@ import com.leclowndu93150.thaumcraft.content.casters.CasterManager;
 import com.leclowndu93150.thaumcraft.content.casters.ItemFocus;
 import com.leclowndu93150.thaumcraft.api.wands.WandCap;
 import com.leclowndu93150.thaumcraft.api.wands.WandRod;
+import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityNode;
 import com.leclowndu93150.thaumcraft.content.world.crystal.BlockCrystal;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCWandParts;
@@ -298,6 +299,12 @@ public class ItemWand extends Item implements ICaster, IArchitect {
     @Override
     public void onUseTick(Level level, LivingEntity entity, ItemStack stack, int ticksRemaining) {
         if (!(level instanceof ServerLevel) || !(entity instanceof Player player)) {
+            return;
+        }
+        HitResult nodeHit = player.pick(WandEconomy.CRUDE_REFINE_TARGET_RANGE, 0.0F, false);
+        if (nodeHit instanceof BlockHitResult nodeBlockHit
+                && level.getBlockEntity(nodeBlockHit.getBlockPos()) instanceof BlockEntityNode node) {
+            node.drainToWand((ServerLevel) level, player, stack, ticksRemaining);
             return;
         }
         if (ticksRemaining % WandEconomy.CRUDE_REFINE_INTERVAL_TICKS != 0) {

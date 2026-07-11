@@ -31,6 +31,7 @@ import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchStructu
 import com.leclowndu93150.thaumcraft.content.device.mirror.BlockMirror;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchTrap;
 import com.leclowndu93150.thaumcraft.content.decor.BlockEffectShock;
+import com.leclowndu93150.thaumcraft.content.aura.node.BlockNode;
 import com.leclowndu93150.thaumcraft.content.decor.BlockBarrier;
 import com.leclowndu93150.thaumcraft.content.decor.BlockPavingStone;
 import com.leclowndu93150.thaumcraft.content.equipment.BlockEffectGlimmer;
@@ -1312,6 +1313,11 @@ public final class TCBlocks {
             "barrier", BlockBarrier::new,
             props -> props.mapColor(MapColor.NONE).strength(-1.0F, 999.0F).noOcclusion().noLootTable()
                     .dynamicShape().isValidSpawn((state, level, pos, type) -> false));
+
+    public static final DeferredBlock<BlockNode> NODE = BLOCKS.registerBlock(
+            "node", BlockNode::new,
+            props -> props.mapColor(MapColor.NONE).instabreak().noOcclusion().noLootTable()
+                    .isValidSpawn((state, level, pos, type) -> false));
 
     public static final DeferredBlock<Block> AMBER_BRICK = BLOCKS.registerBlock(
             "amber_brick",

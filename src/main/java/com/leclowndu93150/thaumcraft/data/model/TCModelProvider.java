@@ -106,6 +106,7 @@ public final class TCModelProvider extends ModelProvider {
         blockModels.registerSimpleItemModel(TCBlocks.FLESH_BLOCK.get().asItem(), ModelLocationUtils.getModelLocation(TCBlocks.FLESH_BLOCK.get()));
         registerInvisibleBlock(blockModels, TCBlocks.EFFECT_SHOCK.get());
         registerInvisibleBlock(blockModels, TCBlocks.BARRIER.get());
+        registerInvisibleBlock(blockModels, TCBlocks.NODE.get());
         registerJar(blockModels, itemModels, TCBlocks.JAR_NORMAL.get(), "jar_normal");
         registerJar(blockModels, itemModels, TCBlocks.JAR_VOID.get(), "jar_void");
         registerJarBrain(blockModels, itemModels);
