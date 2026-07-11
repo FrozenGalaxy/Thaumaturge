@@ -6,6 +6,8 @@ import com.leclowndu93150.thaumcraft.content.essentia.jar.JarBraceItem;
 import com.leclowndu93150.thaumcraft.content.essentia.jar.JarItem;
 import com.leclowndu93150.thaumcraft.content.casters.ItemCaster;
 import com.leclowndu93150.thaumcraft.content.casters.ItemFocus;
+import com.leclowndu93150.thaumcraft.content.wands.ItemPrimalCharm;
+import com.leclowndu93150.thaumcraft.content.wands.ItemWand;
 import com.leclowndu93150.thaumcraft.content.item.CausalityCollapserItem;
 import com.leclowndu93150.thaumcraft.content.item.CelestialBody;
 import com.leclowndu93150.thaumcraft.content.item.CelestialNotesItem;
@@ -616,6 +618,48 @@ public final class TCItems {
     public static final DeferredItem<ItemCaster> CASTER_BASIC = ITEMS.registerItem(
             "caster_basic",
             props -> new ItemCaster(props, ItemCaster.AREA_SINGLE_CHUNK),
+            props -> props.stacksTo(1).rarity(Rarity.UNCOMMON));
+
+    public static final DeferredItem<ItemWand> WAND = ITEMS.registerItem(
+            "wand",
+            ItemWand::new,
+            props -> props.stacksTo(1).rarity(Rarity.UNCOMMON));
+
+    public static final DeferredItem<Item> WAND_CAP_IRON = ITEMS.registerSimpleItem("wand_cap_iron");
+    public static final DeferredItem<Item> WAND_CAP_COPPER = ITEMS.registerSimpleItem("wand_cap_copper");
+    public static final DeferredItem<Item> WAND_CAP_GOLD = ITEMS.registerSimpleItem("wand_cap_gold");
+    public static final DeferredItem<Item> WAND_CAP_SILVER_INERT = ITEMS.registerSimpleItem("wand_cap_silver_inert");
+    public static final DeferredItem<Item> WAND_CAP_SILVER = ITEMS.registerSimpleItem("wand_cap_silver");
+    public static final DeferredItem<Item> WAND_CAP_THAUMIUM_INERT = ITEMS.registerSimpleItem("wand_cap_thaumium_inert");
+    public static final DeferredItem<Item> WAND_CAP_THAUMIUM = ITEMS.registerSimpleItem("wand_cap_thaumium");
+    public static final DeferredItem<Item> WAND_CAP_VOID_INERT = ITEMS.registerSimpleItem("wand_cap_void_inert");
+    public static final DeferredItem<Item> WAND_CAP_VOID = ITEMS.registerSimpleItem("wand_cap_void");
+
+    public static final DeferredItem<Item> WAND_ROD_GREATWOOD = ITEMS.registerSimpleItem("wand_rod_greatwood");
+    public static final DeferredItem<Item> WAND_ROD_OBSIDIAN = ITEMS.registerSimpleItem("wand_rod_obsidian");
+    public static final DeferredItem<Item> WAND_ROD_BLAZE = ITEMS.registerSimpleItem("wand_rod_blaze");
+    public static final DeferredItem<Item> WAND_ROD_ICE = ITEMS.registerSimpleItem("wand_rod_ice");
+    public static final DeferredItem<Item> WAND_ROD_QUARTZ = ITEMS.registerSimpleItem("wand_rod_quartz");
+    public static final DeferredItem<Item> WAND_ROD_BONE = ITEMS.registerSimpleItem("wand_rod_bone");
+    public static final DeferredItem<Item> WAND_ROD_REED = ITEMS.registerSimpleItem("wand_rod_reed");
+    public static final DeferredItem<Item> WAND_ROD_SILVERWOOD = ITEMS.registerSimpleItem("wand_rod_silverwood");
+
+    public static final DeferredItem<Item> STAFF_ROD_GREATWOOD = ITEMS.registerSimpleItem("staff_rod_greatwood");
+    public static final DeferredItem<Item> STAFF_ROD_OBSIDIAN = ITEMS.registerSimpleItem("staff_rod_obsidian");
+    public static final DeferredItem<Item> STAFF_ROD_BLAZE = ITEMS.registerSimpleItem("staff_rod_blaze");
+    public static final DeferredItem<Item> STAFF_ROD_ICE = ITEMS.registerSimpleItem("staff_rod_ice");
+    public static final DeferredItem<Item> STAFF_ROD_QUARTZ = ITEMS.registerSimpleItem("staff_rod_quartz");
+    public static final DeferredItem<Item> STAFF_ROD_BONE = ITEMS.registerSimpleItem("staff_rod_bone");
+    public static final DeferredItem<Item> STAFF_ROD_REED = ITEMS.registerSimpleItem("staff_rod_reed");
+    public static final DeferredItem<Item> STAFF_ROD_SILVERWOOD = ITEMS.registerSimpleItem("staff_rod_silverwood");
+    public static final DeferredItem<Item> STAFF_ROD_PRIMAL = ITEMS.registerItem(
+            "staff_rod_primal",
+            Item::new,
+            props -> props.rarity(Rarity.RARE));
+
+    public static final DeferredItem<ItemPrimalCharm> PRIMAL_CHARM = ITEMS.registerItem(
+            "primal_charm",
+            ItemPrimalCharm::new,
             props -> props.stacksTo(1).rarity(Rarity.UNCOMMON));
 
     public static final DeferredItem<ItemFocus> FOCUS_1 = ITEMS.registerItem(
