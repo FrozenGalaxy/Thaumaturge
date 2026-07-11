@@ -850,6 +850,9 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("entity.thaumcraft.spell_bat", "Spellbat");
 
         add("block.thaumcraft.node", "Aura Node");
+        add("block.thaumcraft.jar_node", "Node in a Jar");
+        add("block.thaumcraft.node_stabilizer", "Node Stabilizer");
+        add("block.thaumcraft.node_stabilizer_advanced", "Advanced Node Stabilizer");
         add("block.thaumcraft.hole", "Dimensional Tear");
         add("block.thaumcraft.effect_sap", "Sapping Field");
 

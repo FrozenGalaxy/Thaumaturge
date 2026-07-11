@@ -4,6 +4,7 @@ import com.leclowndu93150.thaumcraft.content.research.decon.BlockEntityDeconstru
 import com.leclowndu93150.thaumcraft.content.device.patterncrafter.BlockEntityPatternCrafter;
 import com.leclowndu93150.thaumcraft.content.device.sprayer.BlockEntityPotionSprayer;
 import com.leclowndu93150.thaumcraft.TCIds;
+import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityJarNode;
 import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityNode;
 import com.leclowndu93150.thaumcraft.content.decor.BlockEntityBarrierStone;
 import com.leclowndu93150.thaumcraft.content.device.mirror.BlockEntityMirror;
@@ -95,6 +96,12 @@ public final class TCBlockEntities {
             BLOCK_ENTITIES.register(
                     "node",
                     () -> new BlockEntityType<>(BlockEntityNode::new, Set.of(TCBlocks.NODE.get()))
+            );
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BlockEntityJarNode>> JAR_NODE =
+            BLOCK_ENTITIES.register(
+                    "jar_node",
+                    () -> new BlockEntityType<>(BlockEntityJarNode::new, Set.of(TCBlocks.JAR_NODE.get()))
             );
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BlockEntityFocalManipulator>> FOCAL_MANIPULATOR =

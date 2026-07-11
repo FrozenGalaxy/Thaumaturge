@@ -656,6 +656,10 @@ public final class TCItems {
             ItemPrimalCharm::new,
             props -> props.stacksTo(1).rarity(Rarity.UNCOMMON));
 
+    public static final DeferredItem<BlockItem> NODE_STABILIZER = ITEMS.registerSimpleBlockItem(TCBlocks.NODE_STABILIZER);
+    public static final DeferredItem<BlockItem> NODE_STABILIZER_ADVANCED = ITEMS.registerSimpleBlockItem(TCBlocks.NODE_STABILIZER_ADVANCED);
+    public static final DeferredItem<BlockItem> JAR_NODE = ITEMS.registerSimpleBlockItem(TCBlocks.JAR_NODE);
+
     public static final DeferredItem<ItemFocus> FOCUS_1 = ITEMS.registerItem(
             "focus_1",
             props -> new ItemFocus(props, FOCUS_LESSER_COMPLEXITY),

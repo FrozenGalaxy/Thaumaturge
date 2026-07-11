@@ -31,7 +31,9 @@ import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchStructu
 import com.leclowndu93150.thaumcraft.content.device.mirror.BlockMirror;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchTrap;
 import com.leclowndu93150.thaumcraft.content.decor.BlockEffectShock;
+import com.leclowndu93150.thaumcraft.content.aura.node.BlockJarNode;
 import com.leclowndu93150.thaumcraft.content.aura.node.BlockNode;
+import com.leclowndu93150.thaumcraft.content.aura.node.BlockNodeStabilizer;
 import com.leclowndu93150.thaumcraft.content.decor.BlockBarrier;
 import com.leclowndu93150.thaumcraft.content.decor.BlockPavingStone;
 import com.leclowndu93150.thaumcraft.content.equipment.BlockEffectGlimmer;
@@ -1318,6 +1320,18 @@ public final class TCBlocks {
             "node", BlockNode::new,
             props -> props.mapColor(MapColor.NONE).instabreak().noOcclusion().noLootTable()
                     .isValidSpawn((state, level, pos, type) -> false));
+
+    public static final DeferredBlock<BlockJarNode> JAR_NODE = BLOCKS.registerBlock(
+            "jar_node", BlockJarNode::new,
+            props -> props.mapColor(MapColor.NONE).strength(0.3F).sound(SoundType.GLASS).noOcclusion());
+
+    public static final DeferredBlock<BlockNodeStabilizer> NODE_STABILIZER = BLOCKS.registerBlock(
+            "node_stabilizer", props -> new BlockNodeStabilizer(props, false),
+            props -> props.mapColor(MapColor.STONE).strength(2.0F, 10.0F).noOcclusion());
+
+    public static final DeferredBlock<BlockNodeStabilizer> NODE_STABILIZER_ADVANCED = BLOCKS.registerBlock(
+            "node_stabilizer_advanced", props -> new BlockNodeStabilizer(props, true),
+            props -> props.mapColor(MapColor.STONE).strength(2.0F, 10.0F).noOcclusion());
 
     public static final DeferredBlock<Block> AMBER_BRICK = BLOCKS.registerBlock(
             "amber_brick",

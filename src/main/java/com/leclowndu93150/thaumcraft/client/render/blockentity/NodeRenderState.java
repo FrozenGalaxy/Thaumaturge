@@ -22,4 +22,5 @@ public final class NodeRenderState extends BlockEntityRenderState {
     public float ticks;
     public long time;
     public int frameSeed;
+    public float size = 1.0F;
 }

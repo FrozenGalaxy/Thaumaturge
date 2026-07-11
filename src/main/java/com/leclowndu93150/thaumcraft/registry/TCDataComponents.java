@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.registry;
 
+import com.leclowndu93150.thaumcraft.content.aura.node.NodeData;
 import com.leclowndu93150.thaumcraft.content.research.note.ResearchNoteData;
 import com.leclowndu93150.thaumcraft.content.wands.WandParts;
 import com.leclowndu93150.thaumcraft.content.wands.WandVis;
@@ -158,6 +159,11 @@ public final class TCDataComponents {
             DATA_COMPONENTS.registerComponentType("research_note", builder -> builder
                     .persistent(ResearchNoteData.CODEC)
                     .networkSynchronized(ResearchNoteData.STREAM_CODEC));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<NodeData>> NODE_DATA =
+            DATA_COMPONENTS.registerComponentType("node_data", builder -> builder
+                    .persistent(NodeData.CODEC)
+                    .networkSynchronized(NodeData.STREAM_CODEC));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<WandParts>> WAND_PARTS =
             DATA_COMPONENTS.registerComponentType("wand_parts", builder -> builder

@@ -116,6 +116,17 @@ public final class WandVisHelper {
         return split;
     }
 
+    public static boolean consumeSpecificFromHotbar(Player player,
+            Map<ResourceKey<IAspect>, Integer> centivisCosts, boolean doit) {
+        for (int slot = 0; slot < HOTBAR_SIZE; slot++) {
+            ItemStack stack = player.getInventory().getItem(slot);
+            if (stack.getItem() instanceof ItemWand && consumeAllVis(stack, player, centivisCosts, doit, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean consumeVisFromHotbar(Player player, float vis, boolean doit) {
         if (vis <= 0.0F) {
             return true;

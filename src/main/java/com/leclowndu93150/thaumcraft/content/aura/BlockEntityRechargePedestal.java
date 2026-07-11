@@ -1,7 +1,14 @@
 package com.leclowndu93150.thaumcraft.content.aura;
 
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
+import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.items.RechargeAccess;
+import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityJarNode;
+import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityNode;
+import com.leclowndu93150.thaumcraft.content.wands.ItemWand;
+import com.leclowndu93150.thaumcraft.content.wands.WandParts;
+import com.leclowndu93150.thaumcraft.content.wands.WandVisHelper;
+import com.leclowndu93150.thaumcraft.registry.TCWandParts;
 import com.leclowndu93150.thaumcraft.content.fx.TCParticleDispatch;
 import com.leclowndu93150.thaumcraft.content.infusion.BlockEntityPedestal;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
@@ -11,6 +18,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -18,6 +27,8 @@ public final class BlockEntityRechargePedestal extends BlockEntityPedestal {
     private static final int RECHARGE_INTERVAL_TICKS = 10;
     private static final int RECHARGE_AMOUNT = 5;
     private static final int SPARKLE_SPREAD = 3;
+    private static final int NODE_DRAW_INTERVAL_TICKS = 5;
+    private static final int NODE_DRAW_RANGE = 8;
 
     private int counter;
 
@@ -32,7 +43,19 @@ public final class BlockEntityRechargePedestal extends BlockEntityPedestal {
     }
 
     private void tickServer(ServerLevel level) {
-        if (counter++ % RECHARGE_INTERVAL_TICKS != 0 || getItem().isEmpty()) {
+        counter++;
+        if (getItem().isEmpty()) {
+            return;
+        }
+        if (getItem().getItem() instanceof ItemWand) {
+            if (counter % NODE_DRAW_INTERVAL_TICKS == 0 && drawFromNodes(level)) {
+                setChanged();
+                syncToClient();
+                sendSparkle(level);
+            }
+            return;
+        }
+        if (counter % RECHARGE_INTERVAL_TICKS != 0) {
             return;
         }
         if (RechargeAccess.rechargeItem(level, getItem(), worldPosition, null, RECHARGE_AMOUNT) > 0.0F) {
@@ -40,6 +63,40 @@ public final class BlockEntityRechargePedestal extends BlockEntityPedestal {
             syncToClient();
             sendSparkle(level);
         }
+    }
+
+    private boolean drawFromNodes(ServerLevel level) {
+        ItemStack wand = getItem();
+        WandParts parts = WandVisHelper.getParts(wand);
+        int min = parts.rod() == TCWandParts.ROD_WOOD.get() || parts.cap() == TCWandParts.CAP_IRON.get() ? 0 : 1;
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+        for (int xx = -NODE_DRAW_RANGE; xx <= NODE_DRAW_RANGE; xx++) {
+            for (int yy = -NODE_DRAW_RANGE; yy <= NODE_DRAW_RANGE; yy++) {
+                for (int zz = -NODE_DRAW_RANGE; zz <= NODE_DRAW_RANGE; zz++) {
+                    cursor.setWithOffset(worldPosition, xx, yy, zz);
+                    if (!(level.getBlockEntity(cursor) instanceof BlockEntityNode node)
+                            || node instanceof BlockEntityJarNode) {
+                        continue;
+                    }
+                    for (AspectInstance entry : node.getAspects().entries()) {
+                        if (!entry.aspect().value().isPrimal() || entry.amount() <= min) {
+                            continue;
+                        }
+                        ResourceKey<IAspect> key = entry.aspect().unwrapKey().orElseThrow();
+                        if (WandVisHelper.getVis(wand, key) >= WandVisHelper.getMaxVis(wand)) {
+                            continue;
+                        }
+                        if (node.takeFromContainer(entry.aspect(), 1)) {
+                            WandVisHelper.addVis(wand, key, 1, true);
+                            node.setChanged();
+                            level.sendBlockUpdated(cursor.immutable(), node.getBlockState(), node.getBlockState(), 3);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private void sendSparkle(ServerLevel level) {

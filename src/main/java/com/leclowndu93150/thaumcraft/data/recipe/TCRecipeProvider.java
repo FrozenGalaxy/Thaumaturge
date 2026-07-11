@@ -121,6 +121,7 @@ public final class TCRecipeProvider extends RecipeProvider {
         buildBaubleRecipes();
         buildWearableInfusionRecipes();
         buildWandRecipes();
+        buildNodeHusbandryRecipes();
 
         shapeless(RecipeCategory.MISC,TCItems.SCRIBING_TOOLS)
                 .requires(TCItems.PHIAL)
@@ -2319,6 +2320,42 @@ public final class TCRecipeProvider extends RecipeProvider {
                 }
             }
         }
+    }
+
+    private static final int NODE_STABILIZER_VIS = 96;
+
+    private void buildNodeHusbandryRecipes() {
+        HolderLookup<IAspect> aspects = registries.lookupOrThrow(IAspect.REGISTRY_KEY);
+
+        arcaneShaped(new ItemStackTemplate(TCItems.NODE_STABILIZER.get()), NODE_STABILIZER_VIS)
+                .pattern(" G ")
+                .pattern("QPQ")
+                .pattern("SNS")
+                .define('G', Tags.Items.INGOTS_GOLD)
+                .define('Q', Blocks.QUARTZ_BLOCK)
+                .define('P', Blocks.PISTON)
+                .define('S', TCItems.STONE_ARCANE_BRICK)
+                .define('N', TCItemTags.NITORS)
+                .gate(gate(INTERIM_WAND_GATE))
+                .unlockedBy("has", has(TCItemTags.NITORS))
+                .save(output, TCIds.MODID + ":node_stabilizer");
+
+        new InfusionRecipeBuilder(aspects, RecipeCategory.MISC,
+                new ItemStackTemplate(TCItems.NODE_STABILIZER_ADVANCED.get()),
+                Ingredient.of(TCItems.NODE_STABILIZER.get()))
+                .component(Ingredient.of(items.getOrThrow(TCItemTags.NITORS)))
+                .component(Ingredient.of(Blocks.REDSTONE_BLOCK))
+                .component(Ingredient.of(TCItems.ALUMENTUM.get()))
+                .component(Ingredient.of(Blocks.REDSTONE_BLOCK))
+                .component(Ingredient.of(items.getOrThrow(TCItemTags.NITORS)))
+                .component(Ingredient.of(Blocks.REDSTONE_BLOCK))
+                .component(Ingredient.of(TCItems.ALUMENTUM.get()))
+                .component(Ingredient.of(Blocks.REDSTONE_BLOCK))
+                .aspect(TCAspects.AURAM, 32).aspect(TCAspects.PRAECANTATIO, 16)
+                .aspect(TCAspects.ORDO, 16).aspect(TCAspects.POTENTIA, 16)
+                .instability(10).gate(gate(INTERIM_WAND_GATE))
+                .unlockedBy("has", has(TCItems.NODE_STABILIZER.get()))
+                .save(output);
     }
 
     private void elementalRodInfusion(HolderLookup<IAspect> aspects, DeferredItem<Item> rod, Ingredient catalyst,

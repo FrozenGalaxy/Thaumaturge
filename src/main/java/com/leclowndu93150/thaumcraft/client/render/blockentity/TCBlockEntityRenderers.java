@@ -53,6 +53,7 @@ public final class TCBlockEntityRenderers {
         event.registerBlockEntityRenderer(TCBlockEntities.ELDRITCH_LOCK.get(), EldritchLockRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.PATTERN_CRAFTER.get(), PatternCrafterRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.NODE.get(), NodeRenderer::new);
+        event.registerBlockEntityRenderer(TCBlockEntities.JAR_NODE.get(), NodeRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.MIRROR.get(), MirrorRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.MIRROR_ESSENTIA.get(), MirrorRenderer::new);
     }

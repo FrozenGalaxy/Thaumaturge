@@ -81,6 +81,8 @@ public final class TCCreativeTabs {
                         output.accept(TCItems.STAFF_ROD_SILVERWOOD.get());
                         output.accept(TCItems.STAFF_ROD_PRIMAL.get());
                         output.accept(TCItems.PRIMAL_CHARM.get());
+                        output.accept(TCItems.NODE_STABILIZER.get());
+                        output.accept(TCItems.NODE_STABILIZER_ADVANCED.get());
                         output.accept(TCItems.FOCUS_1.get());
                         output.accept(TCItems.FOCUS_2.get());
                         output.accept(TCItems.FOCUS_3.get());

@@ -6,6 +6,7 @@ import com.leclowndu93150.thaumcraft.api.items.GogglesAccess;
 import com.leclowndu93150.thaumcraft.api.nodes.NodeModifier;
 import com.leclowndu93150.thaumcraft.api.nodes.NodeType;
 import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
+import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityJarNode;
 import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityNode;
 import com.leclowndu93150.thaumcraft.content.item.ThaumometerItem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -56,6 +57,7 @@ public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode, 
     private static final float BASE_LAYER_SCALE = 0.25F;
     private static final float FAINT_ALPHA = 0.1F;
     private static final float FAINT_SCALE = 0.5F;
+    private static final float JARRED_SIZE = 0.7F;
     private static final int STRIP_ASPECT = 0;
     private static final int STRIP_NORMAL = 1;
     private static final int STRIP_DARK = 2;
@@ -93,7 +95,11 @@ public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode, 
         Vec3 center = Vec3.atCenterOf(node.getBlockPos());
         double distance = Math.sqrt(player.distanceToSqr(center));
         double viewDistance = VIEW_DISTANCE;
-        if (GogglesAccess.revealsNodes(player)) {
+        state.size = 1.0F;
+        if (node instanceof BlockEntityJarNode) {
+            state.visible = true;
+            state.size = JARRED_SIZE;
+        } else if (GogglesAccess.revealsNodes(player)) {
             state.visible = true;
             state.depthIgnore = true;
         } else if (player.getMainHandItem().getItem() instanceof ThaumometerItem
@@ -144,7 +150,7 @@ public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode, 
         for (NodeRenderState.AspectLayer layer : state.layers) {
             average += layer.amount;
             float scale = Mth.sin(state.ticks / (14.0F - count)) * BASE_LAYER_SCALE + BASE_LAYER_SCALE * 2.0F;
-            scale = 0.2F + scale * (layer.amount / 50.0F);
+            scale = (0.2F + scale * (layer.amount / 50.0F)) * state.size;
             float period = (ROTATION_PERIOD_BASE + ROTATION_PERIOD_STEP * count) / 10.0F;
             float angle = (state.time % (long) (period * 20)) / (period * 20.0F) * Mth.TWO_PI;
             submitLayer(poseStack, collector, aspectType, angle, scale, layerAlpha, layer.color,
@@ -152,7 +158,7 @@ public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode, 
             count++;
         }
         average /= state.layers.size();
-        float coreScale = 0.1F + average / 150.0F;
+        float coreScale = (0.1F + average / 150.0F) * state.size;
         float coreAngle = Mth.TWO_PI * ((state.time % 100L) / 100.0F);
         int strip = switch (state.type) {
             case NORMAL -> STRIP_NORMAL;

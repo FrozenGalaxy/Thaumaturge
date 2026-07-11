@@ -45,6 +45,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
@@ -80,21 +81,41 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
     private static final float PURE_FLUX_CLEANSE = 0.25F;
     private static final int NODE_DRAIN_INTERVAL = 5;
     private static final int ORB_BURST_MAX_PER_ASPECT = 10;
+    private static final int LOCK_BASIC = 1;
+    private static final int LOCK_ADVANCED = 2;
+    private static final int LOCK_BASIC_REGEN_FACTOR = 2;
+    private static final int LOCK_ADVANCED_REGEN_FACTOR = 20;
+    private static final int UNSTABLE_CURE_ROLL = 10000;
+    private static final int UNSTABLE_CURE_MAGIC = 42;
+    private static final int FADING_CURE_ROLL = 12500;
+    private static final int FADING_CURE_MAGIC = 69;
     private static final Identifier RESEARCH_NODE_TAPPER_1 = TCIds.rl("node_tapper_1");
     private static final Identifier RESEARCH_NODE_TAPPER_2 = TCIds.rl("node_tapper_2");
     private static final Identifier RESEARCH_NODE_PRESERVE = TCIds.rl("node_preserve");
 
     private NodeType nodeType = NodeType.NORMAL;
     private @Nullable NodeModifier nodeModifier;
-    private AspectList aspects = AspectList.EMPTY;
-    private AspectList aspectsBase = AspectList.EMPTY;
+    protected AspectList aspects = AspectList.EMPTY;
+    protected AspectList aspectsBase = AspectList.EMPTY;
     private int count;
     private int regeneration = -1;
     private int wait;
     private int starvation;
+    private int lock;
 
     public BlockEntityNode(BlockPos pos, BlockState state) {
-        super(TCBlockEntities.NODE.get(), pos, state);
+        this(TCBlockEntities.NODE.get(), pos, state);
+    }
+
+    protected BlockEntityNode(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
+    }
+
+    public void applyNodeData(NodeData data) {
+        setNodeType(data.type());
+        setNodeModifier(data.modifier().orElse(null));
+        this.aspects = data.aspects();
+        this.aspectsBase = data.aspectsBase();
     }
 
     public NodeType getNodeType() {
@@ -197,6 +218,7 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
             return;
         }
         count++;
+        checkLock(serverLevel, pos);
         boolean change = false;
         change = handleHungryNode(serverLevel, pos, change);
         change = handleDischarge(serverLevel, pos, change);
@@ -220,6 +242,7 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
                     case FADING -> 0;
                 };
             }
+            regeneration *= feedingIntervalFactor();
         }
         if (wait > 0) {
             wait--;
@@ -337,8 +360,46 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         return change;
     }
 
+    protected int feedingIntervalFactor() {
+        if (lock == LOCK_BASIC) {
+            return LOCK_BASIC_REGEN_FACTOR;
+        }
+        if (lock == LOCK_ADVANCED) {
+            return LOCK_ADVANCED_REGEN_FACTOR;
+        }
+        return 1;
+    }
+
+    public int getLock() {
+        return lock;
+    }
+
+    private void checkLock(ServerLevel serverLevel, BlockPos pos) {
+        if (count > 1 && count % BEHAVIOR_INTERVAL != 0) {
+            return;
+        }
+        int oldLock = lock;
+        lock = 0;
+        BlockPos below = pos.below();
+        if (!serverLevel.hasNeighborSignal(below)
+                && serverLevel.getBlockState(below).getBlock() instanceof BlockNodeStabilizer stabilizer) {
+            lock = stabilizer.isAdvanced() ? LOCK_ADVANCED : LOCK_BASIC;
+        }
+        if (oldLock != lock) {
+            regeneration = -1;
+        }
+    }
+
+    protected boolean allowDischarge() {
+        return true;
+    }
+
+    protected boolean allowTypeBehavior() {
+        return true;
+    }
+
     private boolean handleDischarge(ServerLevel serverLevel, BlockPos pos, boolean change) {
-        if (nodeModifier == NodeModifier.FADING) {
+        if (nodeModifier == NodeModifier.FADING || !allowDischarge() || lock == LOCK_BASIC) {
             return change;
         }
         boolean shiny = nodeType == NodeType.HUNGRY || nodeModifier == NodeModifier.BRIGHT;
@@ -357,7 +418,8 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
             return change;
         }
         BlockPos otherPos = pos.offset(x, y, z);
-        if (!(serverLevel.getBlockEntity(otherPos) instanceof BlockEntityNode other)) {
+        if (!(serverLevel.getBlockEntity(otherPos) instanceof BlockEntityNode other)
+                || !other.allowDischarge() || other.lock > 0) {
             return change;
         }
         int otherAvg = (other.aspects.totalAmount() + other.aspectsBase.totalAmount()) / 2;
@@ -399,13 +461,25 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         }
         RandomSource random = serverLevel.getRandom();
         if (nodeType == NodeType.UNSTABLE && random.nextBoolean()) {
-            Holder<IAspect> primal = randomStoredPrimal(random);
-            if (primal != null && takeFromContainer(primal, 1)) {
-                ResourceKey<IAspect> key = primal.unwrapKey().orElseThrow();
-                serverLevel.addFreshEntity(new EntityAspectOrb(serverLevel,
-                        pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, key, 1));
+            if (lock == 0) {
+                Holder<IAspect> primal = randomStoredPrimal(random);
+                if (primal != null && takeFromContainer(primal, 1)) {
+                    ResourceKey<IAspect> key = primal.unwrapKey().orElseThrow();
+                    serverLevel.addFreshEntity(new EntityAspectOrb(serverLevel,
+                            pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, key, 1));
+                    return true;
+                }
+            } else if (random.nextInt(UNSTABLE_CURE_ROLL / lock) == UNSTABLE_CURE_MAGIC) {
+                nodeType = NodeType.NORMAL;
+                nodeChange();
                 return true;
             }
+        }
+        if (nodeModifier == NodeModifier.FADING && lock > 0
+                && random.nextInt(FADING_CURE_ROLL / lock) == FADING_CURE_MAGIC) {
+            nodeModifier = NodeModifier.PALE;
+            nodeChange();
+            return true;
         }
         return change;
     }
@@ -421,7 +495,7 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
     }
 
     private boolean handleTypeBehavior(ServerLevel serverLevel, BlockPos pos, boolean change) {
-        if (count % BEHAVIOR_INTERVAL != 0) {
+        if (count % BEHAVIOR_INTERVAL != 0 || !allowTypeBehavior()) {
             return change;
         }
         RandomSource random = serverLevel.getRandom();
@@ -472,7 +546,7 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
     }
 
     private boolean handleHungryNode(ServerLevel serverLevel, BlockPos pos, boolean change) {
-        if (nodeType != NodeType.HUNGRY) {
+        if (nodeType != NodeType.HUNGRY || !allowTypeBehavior()) {
             return change;
         }
         Vec3 center = Vec3.atCenterOf(pos);
