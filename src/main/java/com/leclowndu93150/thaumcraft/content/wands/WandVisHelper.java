@@ -101,6 +101,18 @@ public final class WandVisHelper {
         return true;
     }
 
+    private static final int HOTBAR_SIZE = 9;
+
+    public static ItemStack findWandInHotbarWithRoom(Player player, ResourceKey<IAspect> aspect, int vis) {
+        for (int slot = 0; slot < HOTBAR_SIZE; slot++) {
+            ItemStack stack = player.getInventory().getItem(slot);
+            if (stack.getItem() instanceof ItemWand && addVis(stack, aspect, vis, false) < vis) {
+                return stack;
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
     public static void fill(ItemStack stack) {
         int max = getMaxVis(stack);
         WandVis vis = WandVis.EMPTY;

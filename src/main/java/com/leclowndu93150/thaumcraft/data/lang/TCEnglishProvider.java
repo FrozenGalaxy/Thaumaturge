@@ -843,6 +843,7 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("item.thaumcraft.focus_3", "Blank Greater Focus");
         add("tooltip.thaumcraft.caster.vis_cost", "Vis cost: %s Vis per cast");
         add("tooltip.thaumcraft.focus.vis_cost", "%s Vis per cast");
+        add("entity.thaumcraft.aspect_orb", "Aspect Orb");
         add("entity.thaumcraft.focus_projectile", "Focus Projectile");
         add("entity.thaumcraft.focus_cloud", "Focus Cloud");
         add("entity.thaumcraft.focus_mine", "Focus Mine");
