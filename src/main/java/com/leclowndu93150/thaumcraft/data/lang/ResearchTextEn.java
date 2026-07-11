@@ -503,6 +503,10 @@ public final class ResearchTextEn {
     }
 
     private static void part4(BiConsumer<String, String> add) {
+        add.accept("research.thaumcraft.focus_hellbat.title", "Focus Effect: Nine Hells");
+        add.accept("research.thaumcraft.focus_hellbat.stage_0", "Your trips into the Nether have taught you to fear the tiny terrors known as firebats. Now you have discovered a way to summon the little terrors and send them after your enemies. Excellent.<BR>The Nine Hells effect can be worked into a focus at the focal manipulator. Whatever the focus strikes, summoned firebats will harry - and the more power behind the cast, the harder they bite. The summons are short-lived, crumbling to ash after half a minute.");
+        add.accept("research.thaumcraft.focus_primal.title", "Focus Effect: Primal");
+        add.accept("research.thaumcraft.focus_primal.stage_0", "What madness possessed you to create this thing? This effect seems wildly dangerous and only a lunatic would attempt to use it anywhere but the most controlled environments.<BR>Granted, the burst of raw primal energy it creates is quite devastating, but the energies involved are erratic at best and downright malicious at worst. Once in a great while the detonation tears at the aura itself - sometimes leaving a smear of flux, and sometimes, remarkably, condensing into a small aura node. It exhibits energy patterns you have only seen in wisps and aura nodes, and it begs further study.");
         add.accept("research.thaumcraft.cap_gold.title", "Gold Wand Caps");
         add.accept("research.thaumcraft.cap_gold.stage_0", "Gold is a far superior focusing agent than iron, and wands capped with this material take no penalty when used to channel vis.");
         add.accept("research.thaumcraft.cap_copper.title", "Copper Wand Caps");

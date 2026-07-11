@@ -870,6 +870,11 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("focus.thaumcraft.cloud.text", "Creates a lingering cloud of magical energy that effects anything inside.");
         add("focus.thaumcraft.mine.name", "Arcane Mine");
         add("focus.thaumcraft.mine.text", "Creates a mystical construct that detonates when a hostile entity passes nearby, releasing the effects upon it.");
+        add("focus.thaumcraft.hellbat.name", "Nine Hells");
+        add("focus.thaumcraft.hellbat.text", "Summons vicious hellbats that harry the target with fire and fury.");
+        add("focus.hellbat.bats", "Bats");
+        add("focus.thaumcraft.primal.name", "Primal");
+        add("focus.thaumcraft.primal.text", "Unleashes a burst of raw primal energy. Devastating, erratic and occasionally... generative.");
         add("focus.thaumcraft.spellbat.name", "Summon Spellbat");
         add("focus.thaumcraft.spellbat.text", "Conjures a mystical bat that will hunt down enemies and inflict them with the focus's effects.");
 
