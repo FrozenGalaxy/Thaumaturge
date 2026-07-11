@@ -33,10 +33,10 @@ repositories {
 }
 
 base {
-    archivesName = mod_id+"-26.1.2-NeoForge-BETA"
+    archivesName = mod_id+"-1.21.1-NeoForge-BETA"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 neoForge {
     version = project.neo_version
@@ -66,7 +66,7 @@ neoForge {
         }
 
         data {
-            clientData()
+            data()
 
             programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
@@ -88,7 +88,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
 dependencies {
-    implementation "curse.maven:terrablender-neoforge-940057:8046313"
+    implementation "curse.maven:terrablender-neoforge-940057:6054947"
 
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
