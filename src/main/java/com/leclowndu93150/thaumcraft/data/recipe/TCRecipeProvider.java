@@ -2077,7 +2077,6 @@ public final class TCRecipeProvider extends RecipeProvider {
                 new AspectInstance(aspects.getOrThrow(aspect), 1), TCItems.ESSENTIA_CRYSTAL.get());
     }
 
-    private static final String INTERIM_WAND_GATE = "unlock_auromancy";
     private static final TagKey<Item> NUGGETS_COPPER =
             TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "nuggets/copper"));
     private static final TagKey<Item> NUGGETS_SILVER =
@@ -2092,6 +2091,19 @@ public final class TCRecipeProvider extends RecipeProvider {
     private static final int STAFF_ELEMENTAL_VIS = 14;
     private static final int STAFF_SILVERWOOD_VIS = 24;
     private static final int PRIMAL_CHARM_VIS = 150;
+
+    private static String rodGate(String rodName) {
+        if ("wood".equals(rodName)) {
+            return "unlock_auromancy";
+        }
+        if ("primal_staff".equals(rodName)) {
+            return "staff_primal";
+        }
+        if (rodName.endsWith("_staff")) {
+            return "staves";
+        }
+        return "rod_" + rodName;
+    }
 
     private ItemStackTemplate wandResult(WandCap cap, WandRod rod, boolean sceptre) {
         DataComponentPatch patch = DataComponentPatch.builder()
@@ -2123,14 +2135,14 @@ public final class TCRecipeProvider extends RecipeProvider {
         arcaneShaped(new ItemStackTemplate(TCItems.WAND_CAP_GOLD.get()), WAND_CAP_GOLD_VIS)
                 .pattern("NNN").pattern("N N")
                 .define('N', Tags.Items.NUGGETS_GOLD)
-                .gate(gate(INTERIM_WAND_GATE))
+                .gate(gate("cap_gold"))
                 .unlockedBy("has", has(Tags.Items.NUGGETS_GOLD))
                 .save(output, TCIds.MODID + ":wand/part/wand_cap_gold");
 
         arcaneShaped(new ItemStackTemplate(TCItems.WAND_CAP_COPPER.get()), WAND_CAP_COPPER_VIS)
                 .pattern("NNN").pattern("N N")
                 .define('N', NUGGETS_COPPER)
-                .gate(gate(INTERIM_WAND_GATE))
+                .gate(gate("cap_copper"))
                 .unlockedBy("has", has(NUGGETS_COPPER))
                 .save(output.withConditions(new NotCondition(new TagEmptyCondition<>(NUGGETS_COPPER))),
                         TCIds.MODID + ":wand/part/wand_cap_copper");
@@ -2138,7 +2150,7 @@ public final class TCRecipeProvider extends RecipeProvider {
         arcaneShaped(new ItemStackTemplate(TCItems.WAND_CAP_SILVER_INERT.get()), WAND_CAP_SILVER_VIS)
                 .pattern("NNN").pattern("N N")
                 .define('N', NUGGETS_SILVER)
-                .gate(gate(INTERIM_WAND_GATE))
+                .gate(gate("cap_silver"))
                 .unlockedBy("has", has(NUGGETS_SILVER))
                 .save(output.withConditions(new NotCondition(new TagEmptyCondition<>(NUGGETS_SILVER))),
                         TCIds.MODID + ":wand/part/wand_cap_silver_inert");
@@ -2146,14 +2158,14 @@ public final class TCRecipeProvider extends RecipeProvider {
         arcaneShaped(new ItemStackTemplate(TCItems.WAND_CAP_THAUMIUM_INERT.get()), WAND_CAP_THAUMIUM_VIS)
                 .pattern("NNN").pattern("N N")
                 .define('N', TCItemTags.NUGGETS_THAUMIUM)
-                .gate(gate(INTERIM_WAND_GATE))
+                .gate(gate("cap_thaumium"))
                 .unlockedBy("has", has(TCItemTags.NUGGETS_THAUMIUM))
                 .save(output, TCIds.MODID + ":wand/part/wand_cap_thaumium_inert");
 
         arcaneShaped(new ItemStackTemplate(TCItems.WAND_CAP_VOID_INERT.get()), WAND_CAP_VOID_VIS)
                 .pattern("NNN").pattern("N N")
                 .define('N', TCItemTags.NUGGETS_VOID_METAL)
-                .gate(gate(INTERIM_WAND_GATE))
+                .gate(gate("cap_void"))
                 .unlockedBy("has", has(TCItemTags.NUGGETS_VOID_METAL))
                 .save(output, TCIds.MODID + ":wand/part/wand_cap_void_inert");
 
@@ -2162,7 +2174,7 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .component(Ingredient.of(TCItems.SALIS_MUNDUS.get()))
                 .component(Ingredient.of(TCItems.SALIS_MUNDUS.get()))
                 .aspect(TCAspects.POTENTIA, 8).aspect(TCAspects.AURAM, 4)
-                .instability(4).gate(gate(INTERIM_WAND_GATE))
+                .instability(4).gate(gate("cap_silver"))
                 .unlockedBy("has", has(TCItems.WAND_CAP_SILVER_INERT.get()))
                 .save(output);
 
@@ -2172,7 +2184,7 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .component(Ingredient.of(TCItems.SALIS_MUNDUS.get()))
                 .component(Ingredient.of(TCItems.SALIS_MUNDUS.get()))
                 .aspect(TCAspects.POTENTIA, 12).aspect(TCAspects.AURAM, 6)
-                .instability(5).gate(gate(INTERIM_WAND_GATE))
+                .instability(5).gate(gate("cap_thaumium"))
                 .unlockedBy("has", has(TCItems.WAND_CAP_THAUMIUM_INERT.get()))
                 .save(output);
 
@@ -2184,29 +2196,29 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .component(Ingredient.of(TCItems.SALIS_MUNDUS.get()))
                 .aspect(TCAspects.POTENTIA, 18).aspect(TCAspects.VACUOS, 18)
                 .aspect(TCAspects.ALIENIS, 18).aspect(TCAspects.AURAM, 18)
-                .instability(8).gate(gate(INTERIM_WAND_GATE))
+                .instability(8).gate(gate("cap_void"))
                 .unlockedBy("has", has(TCItems.WAND_CAP_VOID_INERT.get()))
                 .save(output);
 
         arcaneShaped(new ItemStackTemplate(TCItems.WAND_ROD_GREATWOOD.get()), WAND_ROD_GREATWOOD_VIS)
                 .pattern(" G").pattern("G ")
                 .define('G', TCItems.LOG_GREATWOOD)
-                .gate(gate(INTERIM_WAND_GATE))
+                .gate(gate("rod_greatwood"))
                 .unlockedBy("has", has(TCItems.LOG_GREATWOOD))
                 .save(output, TCIds.MODID + ":wand/part/wand_rod_greatwood");
 
         elementalRodInfusion(aspects, TCItems.WAND_ROD_OBSIDIAN, Ingredient.of(Blocks.OBSIDIAN),
-                TCAspects.TERRA, TCAspects.TENEBRAE);
+                TCAspects.TERRA, TCAspects.TENEBRAE, "rod_obsidian");
         elementalRodInfusion(aspects, TCItems.WAND_ROD_ICE, Ingredient.of(Blocks.ICE),
-                TCAspects.AQUA, TCAspects.GELUM);
+                TCAspects.AQUA, TCAspects.GELUM, "rod_ice");
         elementalRodInfusion(aspects, TCItems.WAND_ROD_QUARTZ, Ingredient.of(Blocks.QUARTZ_BLOCK),
-                TCAspects.ORDO, TCAspects.VITREUS);
+                TCAspects.ORDO, TCAspects.VITREUS, "rod_quartz");
         elementalRodInfusion(aspects, TCItems.WAND_ROD_REED, Ingredient.of(Items.SUGAR_CANE),
-                TCAspects.AER, TCAspects.MOTUS);
+                TCAspects.AER, TCAspects.MOTUS, "rod_reed");
         elementalRodInfusion(aspects, TCItems.WAND_ROD_BLAZE, Ingredient.of(Items.BLAZE_ROD),
-                TCAspects.IGNIS, TCAspects.BESTIA);
+                TCAspects.IGNIS, TCAspects.BESTIA, "rod_blaze");
         elementalRodInfusion(aspects, TCItems.WAND_ROD_BONE, Ingredient.of(Items.BONE),
-                TCAspects.PERDITIO, TCAspects.EXANIMIS);
+                TCAspects.PERDITIO, TCAspects.EXANIMIS, "rod_bone");
 
         InfusionRecipeBuilder silverwoodRod = new InfusionRecipeBuilder(aspects, RecipeCategory.MISC,
                 new ItemStackTemplate(TCItems.WAND_ROD_SILVERWOOD.get()), Ingredient.of(TCItems.LOG_SILVERWOOD.get()))
@@ -2215,7 +2227,7 @@ public final class TCRecipeProvider extends RecipeProvider {
             silverwoodRod.component(crystal(primal)).aspect(primal, 9);
         }
         silverwoodRod.aspect(TCAspects.PRAECANTATIO, 9)
-                .instability(5).gate(gate(INTERIM_WAND_GATE))
+                .instability(5).gate(gate("rod_silverwood"))
                 .unlockedBy("has", has(TCItems.LOG_SILVERWOOD.get()))
                 .save(output);
 
@@ -2242,7 +2254,7 @@ public final class TCRecipeProvider extends RecipeProvider {
             primalStaff.aspect(primal, 32);
         }
         primalStaff.aspect(TCAspects.PRAECANTATIO, 64)
-                .instability(8).gate(gate(INTERIM_WAND_GATE))
+                .instability(8).gate(gate("staff_primal"))
                 .unlockedBy("has", has(TCItems.WAND_ROD_SILVERWOOD.get()))
                 .save(output);
 
@@ -2302,7 +2314,7 @@ public final class TCRecipeProvider extends RecipeProvider {
                             .pattern("  C").pattern(" R ").pattern("C  ")
                             .define('C', capEntry.getValue())
                             .define('R', rodEntry.getValue())
-                            .gate(gate(INTERIM_WAND_GATE))
+                            .gate(gate(rodGate(rodName)))
                             .unlockedBy("has", has(capEntry.getValue()))
                             .save(output, TCIds.MODID + ":wand/assembly/" + capName + "_" + rodName);
                 }
@@ -2314,7 +2326,7 @@ public final class TCRecipeProvider extends RecipeProvider {
                             .define('C', capEntry.getValue())
                             .define('R', rodEntry.getValue())
                             .define('P', TCItems.PRIMAL_CHARM)
-                            .gate(gate(INTERIM_WAND_GATE))
+                            .gate(gate("sceptre"))
                             .unlockedBy("has", has(TCItems.PRIMAL_CHARM))
                             .save(output, TCIds.MODID + ":wand/sceptre/" + capName + "_" + rodName);
                 }
@@ -2336,7 +2348,7 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .define('P', Blocks.PISTON)
                 .define('S', TCItems.STONE_ARCANE_BRICK)
                 .define('N', TCItemTags.NITORS)
-                .gate(gate(INTERIM_WAND_GATE))
+                .gate(gate("node_stabilizer"))
                 .unlockedBy("has", has(TCItemTags.NITORS))
                 .save(output, TCIds.MODID + ":node_stabilizer");
 
@@ -2353,19 +2365,19 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .component(Ingredient.of(Blocks.REDSTONE_BLOCK))
                 .aspect(TCAspects.AURAM, 32).aspect(TCAspects.PRAECANTATIO, 16)
                 .aspect(TCAspects.ORDO, 16).aspect(TCAspects.POTENTIA, 16)
-                .instability(10).gate(gate(INTERIM_WAND_GATE))
+                .instability(10).gate(gate("node_stabilizer_advanced"))
                 .unlockedBy("has", has(TCItems.NODE_STABILIZER.get()))
                 .save(output);
     }
 
     private void elementalRodInfusion(HolderLookup<IAspect> aspects, DeferredItem<Item> rod, Ingredient catalyst,
-                                      ResourceKey<IAspect> primal, ResourceKey<IAspect> flavor) {
+                                      ResourceKey<IAspect> primal, ResourceKey<IAspect> flavor, String gateEntry) {
         new InfusionRecipeBuilder(aspects, RecipeCategory.MISC,
                 new ItemStackTemplate(rod.get()), catalyst)
                 .component(Ingredient.of(TCItems.SALIS_MUNDUS.get()))
                 .component(crystal(primal))
                 .aspect(primal, 12).aspect(TCAspects.PRAECANTATIO, 6).aspect(flavor, 6)
-                .instability(3).gate(gate(INTERIM_WAND_GATE))
+                .instability(3).gate(gate(gateEntry))
                 .unlockedBy("has", has(TCItems.SALIS_MUNDUS.get()))
                 .save(output);
     }
@@ -2375,7 +2387,7 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .pattern("  S").pattern(" G ").pattern("G  ")
                 .define('S', TCItems.PRIMAL_CHARM)
                 .define('G', rod)
-                .gate(gate(INTERIM_WAND_GATE))
+                .gate(gate("staves"))
                 .unlockedBy("has", has(TCItems.PRIMAL_CHARM))
                 .save(output, TCIds.MODID + ":wand/part/" + core.getId().getPath());
     }
