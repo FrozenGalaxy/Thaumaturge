@@ -18,9 +18,8 @@ public final class WandTipTracker {
 
     public static void capture(PoseStack poseStack, float tipModelY) {
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
-        Vector3f local = poseStack.last().pose().transformPosition(new Vector3f(0.0F, tipModelY, 0.0F));
-        Vector3f world = camera.rotation().transform(local, new Vector3f());
-        tip = camera.position().add(world.x, world.y, world.z);
+        Vector3f offset = poseStack.last().pose().transformPosition(new Vector3f(0.0F, tipModelY, 0.0F));
+        tip = camera.position().add(offset.x, offset.y, offset.z);
         captureTime = Util.getMillis();
     }
 
