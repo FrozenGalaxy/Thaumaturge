@@ -45,7 +45,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
     private static final int TEX_W = 64;
     private static final int TEX_H = 32;
     private static final int EMISSIVE_LIGHT = 0x00F000F0;
-    private static final float MODEL_LIFT = 1.125F;
+    private static final float MODEL_LIFT = 0.5F;
     private static final float FOCUS_ALPHA = 0.95F;
     private static final int SCEPTRE_RUNE_COUNT = 10;
     private static final int STAFF_RUNE_SIDES = 4;
@@ -58,13 +58,19 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
         if (arg == null) {
             return;
         }
+        poseStack.pushPose();
+        poseStack.translate(0.5F, MODEL_LIFT, 0.5F);
+        poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+        submitParts(arg, poseStack, collector, light);
+        poseStack.popPose();
+    }
+
+    public static void submitParts(WandArg arg, PoseStack poseStack, SubmitNodeCollector collector, int light) {
         boolean staff = arg.rod().staff();
         boolean runes = arg.rod().runes();
         float ticks = clientTicks();
 
         poseStack.pushPose();
-        poseStack.translate(0.5F, MODEL_LIFT, 0.5F);
-        poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
         if (staff) {
             poseStack.translate(0.0F, 0.2F, 0.0F);
         }
@@ -158,7 +164,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
         return player == null ? 0.0F : player.tickCount + Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
     }
 
-    private void submitCap(PoseStack poseStack, SubmitNodeCollector collector, RenderType type,
+    private static void submitCap(PoseStack poseStack, SubmitNodeCollector collector, RenderType type,
                            float rotationPointY, int light) {
         poseStack.pushPose();
         poseStack.translate(0.0F, rotationPointY * PX, 0.0F);
@@ -168,7 +174,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
         poseStack.popPose();
     }
 
-    private void submitRune(PoseStack poseStack, SubmitNodeCollector collector,
+    private static void submitRune(PoseStack poseStack, SubmitNodeCollector collector,
                             float x, float y, float z, int rune, float ticks) {
         float r = Mth.sin((ticks + rune * 5) / 5.0F) * 0.1F + 0.88F;
         float g = Mth.sin((ticks + rune * 5) / 7.0F) * 0.1F + 0.63F;
@@ -251,6 +257,10 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
 
     @Override
     public @Nullable WandArg extractArgument(ItemStack stack) {
+        return extract(stack);
+    }
+
+    public static WandArg extract(ItemStack stack) {
         WandParts parts = WandVisHelper.getParts(stack);
         ItemStack focusStack = ItemStack.EMPTY;
         var template = stack.get(TCDataComponents.SOCKETED_FOCUS.get());

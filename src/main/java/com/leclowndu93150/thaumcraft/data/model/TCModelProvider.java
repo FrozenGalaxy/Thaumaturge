@@ -29,6 +29,7 @@ import com.mojang.math.Transformation;
 import net.minecraft.client.renderer.special.ChestSpecialRenderer;
 import com.leclowndu93150.thaumcraft.client.model.JarBrainItemSpecialRenderer;
 import com.leclowndu93150.thaumcraft.client.model.JarItemSpecialRenderer;
+import com.leclowndu93150.thaumcraft.client.model.NodeStabilizerItemSpecialRenderer;
 import com.leclowndu93150.thaumcraft.content.essentia.jar.BlockJar;
 import com.leclowndu93150.thaumcraft.content.essentia.smeltery.BlockSmelter;
 import com.leclowndu93150.thaumcraft.content.essentia.tube.BlockEssentiaTransport;
@@ -133,6 +134,16 @@ public final class TCModelProvider extends ModelProvider {
         blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(TCBlocks.ARCANE_WORKBENCH_CHARGER.get(), BlockModelGenerators.plainVariant(ModelLocationUtils.getModelLocation(TCBlocks.ARCANE_WORKBENCH_CHARGER.get()))));
         blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(TCBlocks.NODE_STABILIZER.get(), BlockModelGenerators.plainVariant(ModelLocationUtils.getModelLocation(TCBlocks.NODE_STABILIZER.get()))));
         blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(TCBlocks.NODE_STABILIZER_ADVANCED.get(), BlockModelGenerators.plainVariant(ModelLocationUtils.getModelLocation(TCBlocks.NODE_STABILIZER_ADVANCED.get()))));
+        itemModels.itemModelOutput.accept(TCBlocks.NODE_STABILIZER.get().asItem(), new SpecialModelWrapper.Unbaked(
+                TCIds.rl("item/node_stabilizer_base"),
+                Optional.empty(),
+                new NodeStabilizerItemSpecialRenderer.Unbaked(false)
+        ));
+        itemModels.itemModelOutput.accept(TCBlocks.NODE_STABILIZER_ADVANCED.get().asItem(), new SpecialModelWrapper.Unbaked(
+                TCIds.rl("item/node_stabilizer_base"),
+                Optional.empty(),
+                new NodeStabilizerItemSpecialRenderer.Unbaked(true)
+        ));
         blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(TCBlocks.JAR_NODE.get(), BlockModelGenerators.plainVariant(ModelLocationUtils.getModelLocation(TCBlocks.JAR_NORMAL.get()))));
         horizontalBlock(blockModels, itemModels, TCBlocks.INFERNAL_FURNACE.get(), "infernal_furnace",true);
         blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(TCBlocks.NETHER_BRICKS_PLACEHOLDER.get(), BlockModelGenerators.plainVariant(ModelLocationUtils.getModelLocation(Blocks.NETHER_BRICKS))));

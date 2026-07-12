@@ -31,6 +31,9 @@ public class TCModelsHandlers {
     public static final Identifier WAND_MODEL_ID =
             Identifier.fromNamespaceAndPath(TCIds.MODID, "wand");
 
+    public static final Identifier NODE_STABILIZER_MODEL_ID =
+            Identifier.fromNamespaceAndPath(TCIds.MODID, "node_stabilizer");
+
     public static final Identifier OBJ_LOADER_ID =
             Identifier.fromNamespaceAndPath(TCIds.MODID, "obj");
 
@@ -42,6 +45,7 @@ public class TCModelsHandlers {
         event.register(GOLEM_BUILDER_MODEL_ID, GolemBuilderItemSpecialRenderer.Unbaked.MAP_CODEC);
         event.register(DECON_TABLE_MODEL_ID, DeconTableItemSpecialRenderer.Unbaked.MAP_CODEC);
         event.register(WAND_MODEL_ID, WandItemSpecialRenderer.Unbaked.MAP_CODEC);
+        event.register(NODE_STABILIZER_MODEL_ID, NodeStabilizerItemSpecialRenderer.Unbaked.MAP_CODEC);
     }
 
     @SubscribeEvent

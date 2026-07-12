@@ -805,7 +805,8 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("wand.thaumcraft.rod.quartz", "Quartz");
         add("wand.thaumcraft.rod.primal", "Primal");
         add("tooltip.thaumcraft.wand.capacity", "Capacity %s");
-        add("tooltip.thaumcraft.wand.vis", "%1$s x %2$s, (%3$s%% vis cost)");
+        add("tooltip.thaumcraft.wand.cost", "Vis cost %s%%");
+        add("tooltip.thaumcraft.wand.cost.except", "Vis cost %1$s%% (%2$s)");
         add("item.thaumcraft.wand_cap_iron", "Iron Cap");
         add("item.thaumcraft.wand_cap_copper", "Copper Cap");
         add("item.thaumcraft.wand_cap_gold", "Gold Cap");

@@ -7,6 +7,8 @@ import com.leclowndu93150.thaumcraft.content.essentia.jar.JarItem;
 import com.leclowndu93150.thaumcraft.content.casters.ItemFocus;
 import com.leclowndu93150.thaumcraft.content.wands.ItemPrimalCharm;
 import com.leclowndu93150.thaumcraft.content.wands.ItemWand;
+import com.leclowndu93150.thaumcraft.content.wands.ItemWandCap;
+import com.leclowndu93150.thaumcraft.content.wands.ItemWandRod;
 import com.leclowndu93150.thaumcraft.content.item.CausalityCollapserItem;
 import com.leclowndu93150.thaumcraft.content.item.CelestialBody;
 import com.leclowndu93150.thaumcraft.content.item.CelestialNotesItem;
@@ -619,36 +621,80 @@ public final class TCItems {
             ItemWand::new,
             props -> props.stacksTo(1).rarity(Rarity.UNCOMMON));
 
-    public static final DeferredItem<Item> WAND_CAP_IRON = ITEMS.registerSimpleItem("wand_cap_iron");
-    public static final DeferredItem<Item> WAND_CAP_COPPER = ITEMS.registerSimpleItem("wand_cap_copper");
-    public static final DeferredItem<Item> WAND_CAP_GOLD = ITEMS.registerSimpleItem("wand_cap_gold");
+    public static final DeferredItem<ItemWandCap> WAND_CAP_IRON = ITEMS.registerItem(
+            "wand_cap_iron",
+            props -> new ItemWandCap(props, TCWandParts.CAP_IRON));
+    public static final DeferredItem<ItemWandCap> WAND_CAP_COPPER = ITEMS.registerItem(
+            "wand_cap_copper",
+            props -> new ItemWandCap(props, TCWandParts.CAP_COPPER));
+    public static final DeferredItem<ItemWandCap> WAND_CAP_GOLD = ITEMS.registerItem(
+            "wand_cap_gold",
+            props -> new ItemWandCap(props, TCWandParts.CAP_GOLD));
     public static final DeferredItem<Item> WAND_CAP_SILVER_INERT = ITEMS.registerSimpleItem("wand_cap_silver_inert");
-    public static final DeferredItem<Item> WAND_CAP_SILVER = ITEMS.registerSimpleItem("wand_cap_silver");
+    public static final DeferredItem<ItemWandCap> WAND_CAP_SILVER = ITEMS.registerItem(
+            "wand_cap_silver",
+            props -> new ItemWandCap(props, TCWandParts.CAP_SILVER));
     public static final DeferredItem<Item> WAND_CAP_THAUMIUM_INERT = ITEMS.registerSimpleItem("wand_cap_thaumium_inert");
-    public static final DeferredItem<Item> WAND_CAP_THAUMIUM = ITEMS.registerSimpleItem("wand_cap_thaumium");
+    public static final DeferredItem<ItemWandCap> WAND_CAP_THAUMIUM = ITEMS.registerItem(
+            "wand_cap_thaumium",
+            props -> new ItemWandCap(props, TCWandParts.CAP_THAUMIUM));
     public static final DeferredItem<Item> WAND_CAP_VOID_INERT = ITEMS.registerSimpleItem("wand_cap_void_inert");
-    public static final DeferredItem<Item> WAND_CAP_VOID = ITEMS.registerSimpleItem("wand_cap_void");
+    public static final DeferredItem<ItemWandCap> WAND_CAP_VOID = ITEMS.registerItem(
+            "wand_cap_void",
+            props -> new ItemWandCap(props, TCWandParts.CAP_VOID));
 
-    public static final DeferredItem<Item> WAND_ROD_GREATWOOD = ITEMS.registerSimpleItem("wand_rod_greatwood");
-    public static final DeferredItem<Item> WAND_ROD_OBSIDIAN = ITEMS.registerSimpleItem("wand_rod_obsidian");
-    public static final DeferredItem<Item> WAND_ROD_BLAZE = ITEMS.registerSimpleItem("wand_rod_blaze");
-    public static final DeferredItem<Item> WAND_ROD_ICE = ITEMS.registerSimpleItem("wand_rod_ice");
-    public static final DeferredItem<Item> WAND_ROD_QUARTZ = ITEMS.registerSimpleItem("wand_rod_quartz");
-    public static final DeferredItem<Item> WAND_ROD_BONE = ITEMS.registerSimpleItem("wand_rod_bone");
-    public static final DeferredItem<Item> WAND_ROD_REED = ITEMS.registerSimpleItem("wand_rod_reed");
-    public static final DeferredItem<Item> WAND_ROD_SILVERWOOD = ITEMS.registerSimpleItem("wand_rod_silverwood");
+    public static final DeferredItem<ItemWandRod> WAND_ROD_GREATWOOD = ITEMS.registerItem(
+            "wand_rod_greatwood",
+            props -> new ItemWandRod(props, TCWandParts.ROD_GREATWOOD));
+    public static final DeferredItem<ItemWandRod> WAND_ROD_OBSIDIAN = ITEMS.registerItem(
+            "wand_rod_obsidian",
+            props -> new ItemWandRod(props, TCWandParts.ROD_OBSIDIAN));
+    public static final DeferredItem<ItemWandRod> WAND_ROD_BLAZE = ITEMS.registerItem(
+            "wand_rod_blaze",
+            props -> new ItemWandRod(props, TCWandParts.ROD_BLAZE));
+    public static final DeferredItem<ItemWandRod> WAND_ROD_ICE = ITEMS.registerItem(
+            "wand_rod_ice",
+            props -> new ItemWandRod(props, TCWandParts.ROD_ICE));
+    public static final DeferredItem<ItemWandRod> WAND_ROD_QUARTZ = ITEMS.registerItem(
+            "wand_rod_quartz",
+            props -> new ItemWandRod(props, TCWandParts.ROD_QUARTZ));
+    public static final DeferredItem<ItemWandRod> WAND_ROD_BONE = ITEMS.registerItem(
+            "wand_rod_bone",
+            props -> new ItemWandRod(props, TCWandParts.ROD_BONE));
+    public static final DeferredItem<ItemWandRod> WAND_ROD_REED = ITEMS.registerItem(
+            "wand_rod_reed",
+            props -> new ItemWandRod(props, TCWandParts.ROD_REED));
+    public static final DeferredItem<ItemWandRod> WAND_ROD_SILVERWOOD = ITEMS.registerItem(
+            "wand_rod_silverwood",
+            props -> new ItemWandRod(props, TCWandParts.ROD_SILVERWOOD));
 
-    public static final DeferredItem<Item> STAFF_ROD_GREATWOOD = ITEMS.registerSimpleItem("staff_rod_greatwood");
-    public static final DeferredItem<Item> STAFF_ROD_OBSIDIAN = ITEMS.registerSimpleItem("staff_rod_obsidian");
-    public static final DeferredItem<Item> STAFF_ROD_BLAZE = ITEMS.registerSimpleItem("staff_rod_blaze");
-    public static final DeferredItem<Item> STAFF_ROD_ICE = ITEMS.registerSimpleItem("staff_rod_ice");
-    public static final DeferredItem<Item> STAFF_ROD_QUARTZ = ITEMS.registerSimpleItem("staff_rod_quartz");
-    public static final DeferredItem<Item> STAFF_ROD_BONE = ITEMS.registerSimpleItem("staff_rod_bone");
-    public static final DeferredItem<Item> STAFF_ROD_REED = ITEMS.registerSimpleItem("staff_rod_reed");
-    public static final DeferredItem<Item> STAFF_ROD_SILVERWOOD = ITEMS.registerSimpleItem("staff_rod_silverwood");
-    public static final DeferredItem<Item> STAFF_ROD_PRIMAL = ITEMS.registerItem(
+    public static final DeferredItem<ItemWandRod> STAFF_ROD_GREATWOOD = ITEMS.registerItem(
+            "staff_rod_greatwood",
+            props -> new ItemWandRod(props, TCWandParts.STAFF_GREATWOOD));
+    public static final DeferredItem<ItemWandRod> STAFF_ROD_OBSIDIAN = ITEMS.registerItem(
+            "staff_rod_obsidian",
+            props -> new ItemWandRod(props, TCWandParts.STAFF_OBSIDIAN));
+    public static final DeferredItem<ItemWandRod> STAFF_ROD_BLAZE = ITEMS.registerItem(
+            "staff_rod_blaze",
+            props -> new ItemWandRod(props, TCWandParts.STAFF_BLAZE));
+    public static final DeferredItem<ItemWandRod> STAFF_ROD_ICE = ITEMS.registerItem(
+            "staff_rod_ice",
+            props -> new ItemWandRod(props, TCWandParts.STAFF_ICE));
+    public static final DeferredItem<ItemWandRod> STAFF_ROD_QUARTZ = ITEMS.registerItem(
+            "staff_rod_quartz",
+            props -> new ItemWandRod(props, TCWandParts.STAFF_QUARTZ));
+    public static final DeferredItem<ItemWandRod> STAFF_ROD_BONE = ITEMS.registerItem(
+            "staff_rod_bone",
+            props -> new ItemWandRod(props, TCWandParts.STAFF_BONE));
+    public static final DeferredItem<ItemWandRod> STAFF_ROD_REED = ITEMS.registerItem(
+            "staff_rod_reed",
+            props -> new ItemWandRod(props, TCWandParts.STAFF_REED));
+    public static final DeferredItem<ItemWandRod> STAFF_ROD_SILVERWOOD = ITEMS.registerItem(
+            "staff_rod_silverwood",
+            props -> new ItemWandRod(props, TCWandParts.STAFF_SILVERWOOD));
+    public static final DeferredItem<ItemWandRod> STAFF_ROD_PRIMAL = ITEMS.registerItem(
             "staff_rod_primal",
-            Item::new,
+            props -> new ItemWandRod(props, TCWandParts.STAFF_PRIMAL),
             props -> props.rarity(Rarity.RARE));
 
     public static final DeferredItem<ItemPrimalCharm> PRIMAL_CHARM = ITEMS.registerItem(

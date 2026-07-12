@@ -63,15 +63,20 @@ public final class NodeStabilizerRenderer
     @Override
     public void submit(NodeStabilizerRenderState state, PoseStack poseStack, SubmitNodeCollector collector,
                        CameraRenderState camera) {
-        MeshModel mesh = GolemMeshes.get(MODEL);
-        MeshPart lock = findPart(mesh, PART_LOCK);
-        MeshPart piston = findPart(mesh, PART_PISTON);
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.0F, 0.5F);
         poseStack.mulPose(Axis.XN.rotationDegrees(90.0F));
+        submitParts(state.count, state.advanced, state.ticks, poseStack, collector, state.light);
+        poseStack.popPose();
+    }
+
+    public static void submitParts(int count, boolean advanced, float ticks,
+                                   PoseStack poseStack, SubmitNodeCollector collector, int light) {
+        MeshModel mesh = GolemMeshes.get(MODEL);
+        MeshPart lock = findPart(mesh, PART_LOCK);
+        MeshPart piston = findPart(mesh, PART_PISTON);
         if (lock != null) {
             PoseStack.Pose lockPose = poseStack.last().copy();
-            int light = state.light;
             collector.submitCustomGeometry(poseStack, BASE, (pose, buffer) ->
                     GolemMeshes.renderPart(mesh, lock, lockPose, buffer, light, WHITE));
         }
@@ -80,23 +85,21 @@ public final class NodeStabilizerRenderer
                 poseStack.pushPose();
                 poseStack.mulPose(Axis.ZP.rotationDegrees(ARM_ANGLE_STEP * arm));
                 poseStack.mulPose(Axis.YP.rotationDegrees(ARM_TWIST));
-                poseStack.translate(0.0F, 0.0F, state.count / EXTEND_DIVISOR);
+                poseStack.translate(0.0F, 0.0F, count / EXTEND_DIVISOR);
                 PoseStack.Pose armPose = poseStack.last().copy();
-                int light = state.light;
                 collector.submitCustomGeometry(poseStack, BASE, (pose, buffer) ->
                         GolemMeshes.renderPart(mesh, piston, armPose, buffer, light, WHITE));
-                float pulse = Mth.sin((state.ticks + arm * 5) / 3.0F) * 0.1F + 0.9F;
+                float pulse = Mth.sin((ticks + arm * 5) / 3.0F) * 0.1F + 0.9F;
                 int glow = OVERLAY_LIGHT_BASE
-                        + (int) (OVERLAY_LIGHT_RANGE * (state.count / (float) BlockEntityNodeStabilizer.MAX_COUNT * pulse));
+                        + (int) (OVERLAY_LIGHT_RANGE * (count / (float) BlockEntityNodeStabilizer.MAX_COUNT * pulse));
                 int glowUnit = Mth.clamp(glow / 16, 0, 15);
                 int glowLight = (glowUnit << 4) | (glowUnit << 20);
-                int tint = state.advanced ? ADVANCED_TINT : WHITE;
+                int tint = advanced ? ADVANCED_TINT : WHITE;
                 collector.submitCustomGeometry(poseStack, OVERLAY, (pose, buffer) ->
                         GolemMeshes.renderPart(mesh, piston, armPose, buffer, glowLight, tint));
                 poseStack.popPose();
             }
         }
-        poseStack.popPose();
     }
 
     private static @Nullable MeshPart findPart(MeshModel mesh, String name) {

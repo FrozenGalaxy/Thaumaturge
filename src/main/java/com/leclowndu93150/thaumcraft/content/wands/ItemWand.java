@@ -22,6 +22,7 @@ import com.leclowndu93150.thaumcraft.content.world.crystal.BlockCrystal;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCWandParts;
 import java.text.DecimalFormat;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -30,6 +31,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -385,19 +387,28 @@ public class ItemWand extends Item implements ICaster, IArchitect {
                 .withStyle(ChatFormatting.GOLD));
         WandVis vis = WandVisHelper.getAllVis(stack);
         HolderLookup.Provider registries = context.registries();
+        MutableComponent amounts = null;
+        Map<ResourceKey<IAspect>, Integer> pctByPrimal = new LinkedHashMap<>();
         for (ResourceKey<IAspect> primal : TCAspects.PRIMALS) {
+            pctByPrimal.put(primal,
+                    Math.round(WandVisHelper.getConsumptionModifier(stack, null, primal, false) * 100.0F));
             int amount = vis.amount(primal);
             if (amount <= 0) {
                 continue;
             }
-            float modifier = WandVisHelper.getConsumptionModifier(stack, null, primal, false);
-            Component name = Component.translatable("aspect.thaumcraft." + primal.identifier().getPath())
-                    .withStyle(primalColor(registries, primal));
-            builder.accept(Component.translatable("tooltip.thaumcraft.wand.vis",
-                    name,
-                    VIS_FORMAT.format(amount / (float) WandEconomy.CENTIVIS_PER_VIS),
-                    VIS_FORMAT.format(modifier * 100.0F)));
+            Component chunk = Component.literal(
+                            VIS_FORMAT.format(amount / (float) WandEconomy.CENTIVIS_PER_VIS))
+                    .withStyle(WandTooltips.primalColor(registries, primal));
+            if (amounts == null) {
+                amounts = Component.empty().append(chunk);
+            } else {
+                amounts.append(Component.literal(" | ").withStyle(ChatFormatting.DARK_GRAY)).append(chunk);
+            }
         }
+        if (amounts != null) {
+            builder.accept(amounts);
+        }
+        builder.accept(WandTooltips.costSummary(registries, pctByPrimal));
         ItemStack focusStack = getFocusStack(stack);
         if (focusStack.getItem() instanceof ItemFocus focus) {
             builder.accept(Component.translatable("tooltip.thaumcraft.caster.vis_cost",
@@ -407,19 +418,5 @@ public class ItemWand extends Item implements ICaster, IArchitect {
                     .withStyle(ChatFormatting.BOLD, ChatFormatting.ITALIC, ChatFormatting.GREEN));
             focus.addFocusInformation(focusStack, builder);
         }
-    }
-
-    private static ChatFormatting primalColor(HolderLookup.@Nullable Provider registries,
-            ResourceKey<IAspect> primal) {
-        if (registries != null) {
-            ChatFormatting color = registries.lookupOrThrow(IAspect.REGISTRY_KEY).getOrThrow(primal)
-                    .value().chatColor()
-                    .map(code -> ChatFormatting.getByCode(code.charAt(0)))
-                    .orElse(null);
-            if (color != null) {
-                return color;
-            }
-        }
-        return ChatFormatting.GRAY;
     }
 }

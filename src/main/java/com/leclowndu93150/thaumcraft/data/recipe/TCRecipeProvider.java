@@ -2370,7 +2370,7 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .save(output);
     }
 
-    private void elementalRodInfusion(HolderLookup<IAspect> aspects, DeferredItem<Item> rod, Ingredient catalyst,
+    private void elementalRodInfusion(HolderLookup<IAspect> aspects, DeferredItem<? extends Item> rod, Ingredient catalyst,
                                       ResourceKey<IAspect> primal, ResourceKey<IAspect> flavor, String gateEntry) {
         new InfusionRecipeBuilder(aspects, RecipeCategory.MISC,
                 new ItemStackTemplate(rod.get()), catalyst)
@@ -2382,7 +2382,7 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .save(output);
     }
 
-    private void staffCoreRecipe(DeferredItem<Item> core, DeferredItem<Item> rod, int vis) {
+    private void staffCoreRecipe(DeferredItem<? extends Item> core, DeferredItem<? extends Item> rod, int vis) {
         arcaneShaped(new ItemStackTemplate(core.get()), vis)
                 .pattern("  S").pattern(" G ").pattern("G  ")
                 .define('S', TCItems.PRIMAL_CHARM)
