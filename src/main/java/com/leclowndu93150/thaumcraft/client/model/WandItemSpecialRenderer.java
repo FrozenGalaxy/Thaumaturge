@@ -44,7 +44,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
     private static final float PX = 0.0625F;
     private static final int TEX_W = 64;
     private static final int TEX_H = 32;
-    private static final int EMISSIVE_LIGHT = 0x00F000F0;
+    private static final int RUNE_LIGHT = 200;
     private static final float MODEL_LIFT = 0.5F;
     private static final float FOCUS_ALPHA = 0.95F;
     private static final int SCEPTRE_RUNE_COUNT = 10;
@@ -75,7 +75,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
             poseStack.translate(0.0F, 0.2F, 0.0F);
         }
 
-        int rodLight = arg.rod().glow() ? EMISSIVE_LIGHT : light;
+        int rodLight = arg.rod().glow() ? (int) (200.0F + Mth.sin((int) ticks) * 5.0F + 5.0F) : light;
         RenderType rodType = RenderTypes.entityCutout(arg.rod().texture());
         poseStack.pushPose();
         if (staff) {
@@ -120,7 +120,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
         poseStack.popPose();
 
         if (arg.hasFocus()) {
-            RenderType focusType = RenderTypes.entityTranslucentEmissive(WAND_TEXTURE);
+            RenderType focusType = RenderTypes.entityTranslucent(WAND_TEXTURE);
             poseStack.pushPose();
             if (staff) {
                 poseStack.translate(0.0F, -0.0475F, 0.0F);
@@ -129,9 +129,10 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
                 poseStack.scale(0.5F, 0.5F, 0.5F);
             }
             int tint = ARGB.color((int) (FOCUS_ALPHA * 255.0F), arg.focusColor());
+            int focusLight = (int) (195.0F + Mth.sin(ticks / 3.0F) * 10.0F + 10.0F);
             PoseStack.Pose focusPose = poseStack.last().copy();
             collector.submitCustomGeometry(poseStack, focusType, (pose, buffer) ->
-                    box(focusPose, buffer, -3.0F, -6.0F, -3.0F, 6, 6, 6, 0, 0, tint, EMISSIVE_LIGHT));
+                    box(focusPose, buffer, -3.0F, -6.0F, -3.0F, 6, 6, 6, 0, 0, tint, focusLight));
             poseStack.popPose();
         }
 
@@ -189,13 +190,13 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
         PoseStack.Pose pose = poseStack.last().copy();
         collector.submitCustomGeometry(poseStack, RUNES, (p, buffer) -> {
             buffer.addVertex(pose, -half, half, 0.0F).setColor(tint).setUv(u1, 1.0F)
-                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(EMISSIVE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
+                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
             buffer.addVertex(pose, half, half, 0.0F).setColor(tint).setUv(u1, 0.0F)
-                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(EMISSIVE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
+                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
             buffer.addVertex(pose, half, -half, 0.0F).setColor(tint).setUv(u0, 0.0F)
-                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(EMISSIVE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
+                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
             buffer.addVertex(pose, -half, -half, 0.0F).setColor(tint).setUv(u0, 1.0F)
-                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(EMISSIVE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
+                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
         });
         poseStack.popPose();
     }
@@ -235,8 +236,8 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
                              float ax, float ay, float az, float bx, float by, float bz,
                              float cx, float cy, float cz, float ex, float ey, float ez,
                              float uMin, float vMin, float uMax, float vMax) {
-        float u0 = uMin / TEX_W;
-        float u1 = uMax / TEX_W;
+        float u0 = uMax / TEX_W;
+        float u1 = uMin / TEX_W;
         float v0 = vMin / TEX_H;
         float v1 = vMax / TEX_H;
         buffer.addVertex(pose, ax, ay, az).setColor(tint).setUv(u0, v0)

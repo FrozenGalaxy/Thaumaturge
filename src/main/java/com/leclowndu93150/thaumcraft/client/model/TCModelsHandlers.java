@@ -8,6 +8,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterItemModelsEvent;
+import net.neoforged.neoforge.client.event.RegisterConditionalItemModelPropertyEvent;
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
@@ -34,6 +35,9 @@ public class TCModelsHandlers {
     public static final Identifier NODE_STABILIZER_MODEL_ID =
             Identifier.fromNamespaceAndPath(TCIds.MODID, "node_stabilizer");
 
+    public static final Identifier WAND_IS_STAFF_PROPERTY_ID =
+            Identifier.fromNamespaceAndPath(TCIds.MODID, "wand_is_staff");
+
     public static final Identifier OBJ_LOADER_ID =
             Identifier.fromNamespaceAndPath(TCIds.MODID, "obj");
 
@@ -46,6 +50,11 @@ public class TCModelsHandlers {
         event.register(DECON_TABLE_MODEL_ID, DeconTableItemSpecialRenderer.Unbaked.MAP_CODEC);
         event.register(WAND_MODEL_ID, WandItemSpecialRenderer.Unbaked.MAP_CODEC);
         event.register(NODE_STABILIZER_MODEL_ID, NodeStabilizerItemSpecialRenderer.Unbaked.MAP_CODEC);
+    }
+
+    @SubscribeEvent
+    public static void onRegisterConditionalProperties(RegisterConditionalItemModelPropertyEvent event) {
+        event.register(WAND_IS_STAFF_PROPERTY_ID, WandIsStaffProperty.MAP_CODEC);
     }
 
     @SubscribeEvent

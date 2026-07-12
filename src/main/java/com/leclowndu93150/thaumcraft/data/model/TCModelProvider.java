@@ -30,6 +30,7 @@ import net.minecraft.client.renderer.special.ChestSpecialRenderer;
 import com.leclowndu93150.thaumcraft.client.model.JarBrainItemSpecialRenderer;
 import com.leclowndu93150.thaumcraft.client.model.JarItemSpecialRenderer;
 import com.leclowndu93150.thaumcraft.client.model.NodeStabilizerItemSpecialRenderer;
+import com.leclowndu93150.thaumcraft.client.model.WandIsStaffProperty;
 import com.leclowndu93150.thaumcraft.content.essentia.jar.BlockJar;
 import com.leclowndu93150.thaumcraft.content.essentia.smeltery.BlockSmelter;
 import com.leclowndu93150.thaumcraft.content.essentia.tube.BlockEssentiaTransport;
@@ -157,10 +158,16 @@ public final class TCModelProvider extends ModelProvider {
         horizontalBlock(blockModels, itemModels, TCBlocks.SMELTER_VENT.get(), "smelter_vent");
         itemModels.generateFlatItem(TCItems.THAUMONOMICON.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(TCItems.SALIS_MUNDUS.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.itemModelOutput.accept(TCItems.WAND.get(), new SpecialModelWrapper.Unbaked(
-                TCIds.rl("item/wand_base"),
-                Optional.empty(),
-                new WandItemSpecialRenderer.Unbaked()));
+        itemModels.itemModelOutput.accept(TCItems.WAND.get(), ItemModelUtils.conditional(
+                new WandIsStaffProperty(),
+                new SpecialModelWrapper.Unbaked(
+                        TCIds.rl("item/wand_staff_base"),
+                        Optional.empty(),
+                        new WandItemSpecialRenderer.Unbaked()),
+                new SpecialModelWrapper.Unbaked(
+                        TCIds.rl("item/wand_base"),
+                        Optional.empty(),
+                        new WandItemSpecialRenderer.Unbaked())));
         itemModels.generateFlatItem(TCItems.WAND_CAP_IRON.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(TCItems.WAND_CAP_COPPER.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(TCItems.WAND_CAP_GOLD.get(), ModelTemplates.FLAT_ITEM);
