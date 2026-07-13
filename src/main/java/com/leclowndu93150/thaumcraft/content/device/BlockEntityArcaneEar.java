@@ -3,6 +3,8 @@ package com.leclowndu93150.thaumcraft.content.device;
 import com.leclowndu93150.thaumcraft.registry.TCAttachments;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -13,8 +15,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 public final class BlockEntityArcaneEar extends BlockEntity {
     private static final int NOTE_COUNT = 25;
@@ -117,18 +117,18 @@ public final class BlockEntityArcaneEar extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        note = input.getByteOr("note", (byte) 0);
-        instrument = input.getByteOr("tone", (byte) 0);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        note = input.getByte("note");
+        instrument = input.getByte("tone");
         if (note < 0 || note > 24) {
             note = 0;
         }
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         output.putByte("note", note);
         output.putByte("tone", instrument);
     }

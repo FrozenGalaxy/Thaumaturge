@@ -9,10 +9,10 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class CultistLeaderRenderer extends HumanoidMobRenderer<EntityCultistLeader, HumanoidRenderState, HumanoidModel<HumanoidRenderState>> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/cultist.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/cultist.png");
     private static final float SHADOW = 0.5F;
 
     public CultistLeaderRenderer(EntityRendererProvider.Context context) {
@@ -28,7 +28,7 @@ public final class CultistLeaderRenderer extends HumanoidMobRenderer<EntityCulti
     }
 
     @Override
-    public Identifier getTextureLocation(HumanoidRenderState state) {
+    public ResourceLocation getTextureLocation(HumanoidRenderState state) {
         return TEXTURE;
     }
 }

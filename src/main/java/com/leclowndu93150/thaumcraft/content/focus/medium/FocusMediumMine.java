@@ -11,16 +11,16 @@ import com.leclowndu93150.thaumcraft.api.casters.NodeSettingIntList;
 import com.leclowndu93150.thaumcraft.api.casters.Trajectory;
 import com.leclowndu93150.thaumcraft.content.entity.EntityFocusMine;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 
 public final class FocusMediumMine extends FocusMedium {
-    private static final Identifier KEY = TCIds.rl("mine");
+    private static final ResourceLocation KEY = TCIds.rl("mine");
 
     private static final int COMPLEXITY = 4;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

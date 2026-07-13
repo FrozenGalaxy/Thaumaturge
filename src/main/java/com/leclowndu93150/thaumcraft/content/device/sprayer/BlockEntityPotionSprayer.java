@@ -1,11 +1,10 @@
 package com.leclowndu93150.thaumcraft.content.device.sprayer;
 
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Holder;
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
@@ -36,8 +35,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import org.jspecify.annotations.Nullable;
 
@@ -269,34 +266,34 @@ public final class BlockEntityPotionSprayer extends BlockEntity implements IEsse
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         if (!potion.isEmpty()) {
-            output.store("Potion", ItemStack.CODEC, potion);
+            TCNbt.store(output, "Potion", ItemStack.CODEC, registries, potion);
         }
-        output.store("Recipe", AspectList.CODEC, recipe);
-        output.store("Progress", AspectList.CODEC, progress);
+        TCNbt.store(output, "Recipe", AspectList.CODEC, registries, recipe);
+        TCNbt.store(output, "Progress", AspectList.CODEC, registries, progress);
         output.putInt("Charges", charges);
         output.putInt("Color", color);
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        potion = input.read("Potion", ItemStack.CODEC).orElse(ItemStack.EMPTY);
-        recipe = input.read("Recipe", AspectList.CODEC).orElse(AspectList.EMPTY);
-        progress = input.read("Progress", AspectList.CODEC).orElse(AspectList.EMPTY);
-        charges = input.getIntOr("Charges", 0);
-        color = input.getIntOr("Color", DEFAULT_COLOR);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        potion = TCNbt.read(input, "Potion", ItemStack.CODEC, registries).orElse(ItemStack.EMPTY);
+        recipe = TCNbt.read(input, "Recipe", AspectList.CODEC, registries).orElse(AspectList.EMPTY);
+        progress = TCNbt.read(input, "Progress", AspectList.CODEC, registries).orElse(AspectList.EMPTY);
+        charges = input.getInt("Charges");
+        color = (input.contains("Color") ? input.getInt("Color") : DEFAULT_COLOR);
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput output = TagValueOutput.createWithContext(reporter, registries);
-            saveAdditional(output);
-            nbt.merge(output.buildResult());
+        {
+            CompoundTag output = new CompoundTag();
+            saveAdditional(output, registries);
+            nbt.merge(output);
         }
         return nbt;
     }

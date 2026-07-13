@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -31,7 +31,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public final class FocusMediumPlan extends FocusMedium implements IArchitect {
-    private static final Identifier KEY = TCIds.rl("plan");
+    private static final ResourceLocation KEY = TCIds.rl("plan");
 
     private static final int COMPLEXITY = 4;
     private static final int METHOD_FULL = 0;
@@ -40,7 +40,7 @@ public final class FocusMediumPlan extends FocusMedium implements IArchitect {
     private final List<BlockPos> checked = new ArrayList<>();
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

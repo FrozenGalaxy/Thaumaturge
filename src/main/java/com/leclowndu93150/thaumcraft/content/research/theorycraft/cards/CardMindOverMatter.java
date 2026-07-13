@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.research.theorycraft.cards;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import com.leclowndu93150.thaumcraft.api.research.TCResearchCategories;
 import com.leclowndu93150.thaumcraft.api.research.theorycraft.IResearchTableData;
@@ -8,6 +9,7 @@ import com.leclowndu93150.thaumcraft.registry.TCItems;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -15,8 +17,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 public final class CardMindOverMatter extends TheorycraftCard {
     private static final List<Supplier<ItemStack>> OPTIONS = List.of(
@@ -84,16 +84,16 @@ public final class CardMindOverMatter extends TheorycraftCard {
     }
 
     @Override
-    public void write(ValueOutput output, HolderLookup.Provider registries) {
+    public void write(CompoundTag output, HolderLookup.Provider registries) {
         super.write(output, registries);
         if (!stack.isEmpty()) {
-            output.store("stack", ItemStack.CODEC, stack);
+            TCNbt.store(output, "stack", ItemStack.CODEC, registries, stack);
         }
     }
 
     @Override
-    public void read(ValueInput input, HolderLookup.Provider registries) {
+    public void read(CompoundTag input, HolderLookup.Provider registries) {
         super.read(input, registries);
-        stack = input.read("stack", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+        stack = TCNbt.read(input, "stack", ItemStack.CODEC, registries).orElse(ItemStack.EMPTY);
     }
 }

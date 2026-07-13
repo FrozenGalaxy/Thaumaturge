@@ -3,14 +3,14 @@ package com.leclowndu93150.thaumcraft.data.model;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.essentia.tube.BlockEssentiaTransport;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
-import net.minecraft.client.data.models.BlockModelGenerators;
-import net.minecraft.client.data.models.MultiVariant;
+import net.minecraft.data.models.BlockModelGenerators;
+import net.minecraft.client.renderer.block.model.MultiVariant;
 import net.minecraft.client.data.models.blockstates.ConditionBuilder;
-import net.minecraft.client.data.models.blockstates.MultiPartGenerator;
+import net.minecraft.data.models.blockstates.MultiPartGenerator;
 import net.minecraft.client.renderer.block.dispatch.Variant;
 import net.minecraft.client.renderer.block.dispatch.VariantMutator;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -18,12 +18,12 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 public final class TubeModels {
     private TubeModels() {}
 
-    private static final Identifier TUBE_CORE = id("block/tube_core");
-    private static final Identifier TUBE_CORE_VALVE = id("block/tube_core_valve");
-    private static final Identifier TUBE_FILTER_CORE = id("block/tube_filter_core");
-    private static final Identifier TUBE_BUFFER_CORE = id("block/tube_buffer_core");
-    private static final Identifier TUBE_SIDE = id("block/tube_side");
-    private static final Identifier TUBE_SIDE_RESTRICT = id("block/tube_side_restrict");
+    private static final ResourceLocation TUBE_CORE = id("block/tube_core");
+    private static final ResourceLocation TUBE_CORE_VALVE = id("block/tube_core_valve");
+    private static final ResourceLocation TUBE_FILTER_CORE = id("block/tube_filter_core");
+    private static final ResourceLocation TUBE_BUFFER_CORE = id("block/tube_buffer_core");
+    private static final ResourceLocation TUBE_SIDE = id("block/tube_side");
+    private static final ResourceLocation TUBE_SIDE_RESTRICT = id("block/tube_side_restrict");
 
     public static void register(BlockModelGenerators blockModels) {
         registerTube(blockModels, TCBlocks.TUBE.get(), TUBE_CORE, TUBE_SIDE);
@@ -34,11 +34,11 @@ public final class TubeModels {
         registerTube(blockModels, TCBlocks.TUBE_BUFFER.get(), TUBE_BUFFER_CORE, TUBE_SIDE);
     }
 
-    private static Identifier id(String path) {
-        return Identifier.fromNamespaceAndPath(TCIds.MODID, path);
+    private static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(TCIds.MODID, path);
     }
 
-    private static void registerTube(BlockModelGenerators blockModels, Block block, Identifier coreModel, Identifier sideModel) {
+    private static void registerTube(BlockModelGenerators blockModels, Block block, ResourceLocation coreModel, ResourceLocation sideModel) {
         MultiVariant coreVariant = new MultiVariant(WeightedList.of(new Variant(coreModel)));
         MultiPartGenerator generator = MultiPartGenerator.multiPart(block).with(coreVariant);
         for (Direction direction : Direction.values()) {

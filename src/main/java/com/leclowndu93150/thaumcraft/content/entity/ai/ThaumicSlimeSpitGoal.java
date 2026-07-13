@@ -5,7 +5,7 @@ import com.leclowndu93150.thaumcraft.registry.TCEntities;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.EnumSet;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
@@ -55,7 +55,7 @@ public final class ThaumicSlimeSpitGoal extends Goal {
             return;
         }
         cooldown = COOLDOWN_RESET_TICKS;
-        ThaumicSlime child = TCEntities.THAUMIC_SLIME.get().create(serverLevel, EntitySpawnReason.MOB_SUMMONED);
+        ThaumicSlime child = TCEntities.THAUMIC_SLIME.get().create(serverLevel, MobSpawnType.MOB_SUMMONED);
         if (child == null) {
             return;
         }

@@ -2,7 +2,7 @@ package com.leclowndu93150.thaumcraft.api.golems;
 
 import com.mojang.serialization.Codec;
 import java.util.Locale;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import org.jspecify.annotations.Nullable;
 
@@ -37,18 +37,18 @@ public enum GolemTrait implements StringRepresentable {
     public static final Codec<GolemTrait> CODEC = StringRepresentable.fromEnum(GolemTrait::values);
 
     private final String serializedName;
-    private final Identifier icon;
+    private final ResourceLocation icon;
     private GolemTrait opposite;
 
     GolemTrait() {
         this.serializedName = name().toLowerCase(Locale.ROOT);
-        this.icon = Identifier.fromNamespaceAndPath("thaumcraft", "textures/misc/golem/tag_" + serializedName + ".png");
+        this.icon = ResourceLocation.fromNamespaceAndPath("thaumcraft", "textures/misc/golem/tag_" + serializedName + ".png");
     }
 
     /**
      * @return the icon texture drawn for this trait in golem UIs
      */
-    public Identifier icon() {
+    public ResourceLocation icon() {
         return icon;
     }
 

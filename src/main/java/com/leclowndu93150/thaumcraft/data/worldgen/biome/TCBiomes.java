@@ -11,7 +11,7 @@ import net.minecraft.data.worldgen.biome.OverworldBiomes;
 import net.minecraft.data.worldgen.placement.MiscOverworldPlacements;
 import net.minecraft.data.worldgen.placement.VegetationPlacements;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -128,7 +128,7 @@ public final class TCBiomes {
                 .hasPrecipitation(false)
                 .temperature(EERIE_TEMPERATURE)
                 .downfall(0.0F)
-                .setAttribute(EnvironmentAttributes.SKY_COLOR, ARGB.opaque(EERIE_SKY))
+                .setAttribute(EnvironmentAttributes.SKY_COLOR, ARGB32.opaque(EERIE_SKY))
                 .specialEffects(new BiomeSpecialEffects.Builder()
                         .waterColor(EERIE_WATER)
                         .grassColorOverride(EERIE_GRASS)

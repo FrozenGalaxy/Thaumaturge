@@ -14,12 +14,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +29,7 @@ import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
 public final class EldritchLockRenderer implements BlockEntityRenderer<BlockEntityEldritchLock, EldritchLockRenderState> {
-    private static final Identifier CUBE_TEXTURE = TCIds.rl("textures/entity/eldritch_cube.png");
+    private static final ResourceLocation CUBE_TEXTURE = TCIds.rl("textures/entity/eldritch_cube.png");
 
     private static final int ARMS = 4;
     private static final int ARM_CUBES = 4;

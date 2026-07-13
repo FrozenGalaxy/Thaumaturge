@@ -24,12 +24,12 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
 public final class AspectCompositionCategory implements IRecipeCategory<AspectCompositionCategory.Composition> {
-    public static final Identifier UID = Identifier.fromNamespaceAndPath(TCIds.MODID, "aspect_composition");
+    public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "aspect_composition");
     public static final IRecipeType<Composition> RECIPE_TYPE = IRecipeType.create(UID, Composition.class);
 
     private static final int WIDTH = 100;

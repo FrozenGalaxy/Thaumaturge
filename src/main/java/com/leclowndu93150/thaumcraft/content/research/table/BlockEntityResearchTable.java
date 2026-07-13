@@ -2,6 +2,8 @@ package com.leclowndu93150.thaumcraft.content.research.table;
 
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -19,10 +21,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jspecify.annotations.Nullable;
 
 public final class BlockEntityResearchTable extends BlockEntity implements MenuProvider {
@@ -38,7 +37,7 @@ public final class BlockEntityResearchTable extends BlockEntity implements MenuP
         super(TCBlockEntities.RESEARCH_TABLE.get(), pos, state);
     }
 
-    public ItemStacksResourceHandler items() {
+    public ItemStackHandler items() {
         return inventory;
     }
 
@@ -53,14 +52,14 @@ public final class BlockEntityResearchTable extends BlockEntity implements MenuP
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
         inventory.deserialize(input);
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         inventory.serialize(output);
     }
 
@@ -72,10 +71,10 @@ public final class BlockEntityResearchTable extends BlockEntity implements MenuP
     public Container toContainer() {
         SimpleContainer container = new SimpleContainer(SLOT_COUNT);
         for (int i = 0; i < SLOT_COUNT; i++) {
-            ItemResource resource = inventory.getResource(i);
-            int amount = inventory.getAmountAsInt(i);
+            ItemStack resource = inventory.getStackInSlot(i);
+            int amount = inventory.getStackInSlot(i).getCount();
             if (!resource.isEmpty() && amount > 0) {
-                container.setItem(i, resource.toStack(amount));
+                container.setItem(i, resource.copyWithCount(amount));
             }
         }
         return container;
@@ -86,20 +85,20 @@ public final class BlockEntityResearchTable extends BlockEntity implements MenuP
     }
 
     public boolean consumeInk() {
-        ItemStack tools = inventory.getResource(SLOT_SCRIBE_TOOLS).toStack(inventory.getAmountAsInt(SLOT_SCRIBE_TOOLS));
+        ItemStack tools = inventory.getStackInSlot(SLOT_SCRIBE_TOOLS).copy();
         if (tools.isEmpty()) return false;
         int damage = tools.getDamageValue();
         int max = tools.getMaxDamage();
         if (max <= 0 || damage >= max) return false;
         tools.setDamageValue(damage + 1);
-        inventory.set(SLOT_SCRIBE_TOOLS, ItemResource.of(tools), tools.getCount());
+        inventory.setStackInSlot(SLOT_SCRIBE_TOOLS, tools.copyWithCount(tools.getCount()));
         setChanged();
         return true;
     }
 
     public boolean consumePaper() {
-        ItemResource resource = inventory.getResource(SLOT_PAPER);
-        int amount = inventory.getAmountAsInt(SLOT_PAPER);
+        ItemStack resource = inventory.getStackInSlot(SLOT_PAPER);
+        int amount = inventory.getStackInSlot(SLOT_PAPER).getCount();
         if (resource.isEmpty() || amount <= 0) return false;
         if (resource.getItem() != Items.PAPER) return false;
         inventory.set(SLOT_PAPER, resource, amount - 1);
@@ -108,29 +107,29 @@ public final class BlockEntityResearchTable extends BlockEntity implements MenuP
     }
 
     public boolean hasInkReady() {
-        ItemStack tools = inventory.getResource(SLOT_SCRIBE_TOOLS).toStack(inventory.getAmountAsInt(SLOT_SCRIBE_TOOLS));
+        ItemStack tools = inventory.getStackInSlot(SLOT_SCRIBE_TOOLS).copy();
         return !tools.isEmpty() && tools.isDamageableItem() && tools.getDamageValue() < tools.getMaxDamage();
     }
 
     public boolean hasPaperReady() {
-        ItemResource resource = inventory.getResource(SLOT_PAPER);
-        return !resource.isEmpty() && resource.getItem() == Items.PAPER && inventory.getAmountAsInt(SLOT_PAPER) > 0;
+        ItemStack resource = inventory.getStackInSlot(SLOT_PAPER);
+        return !resource.isEmpty() && resource.getItem() == Items.PAPER && inventory.getStackInSlot(SLOT_PAPER).getCount() > 0;
     }
 
-    private final class TableInventory extends ItemStacksResourceHandler {
+    private final class TableInventory extends ItemStackHandler {
         TableInventory() {
             super(NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY));
         }
 
         @Override
-        protected void onContentsChanged(int index, ItemStack previousContents) {
+        protected void onContentsChanged(int index) {
             setChanged();
         }
 
         @Override
-        public boolean isValid(int index, ItemResource resource) {
+        public boolean isItemValid(int index, ItemStack resource) {
             return switch (index) {
-                case SLOT_SCRIBE_TOOLS -> resource.toStack(1).isDamageableItem();
+                case SLOT_SCRIBE_TOOLS -> resource.copyWithCount(1).isDamageableItem();
                 case SLOT_PAPER -> resource.getItem() == Items.PAPER;
                 default -> false;
             };

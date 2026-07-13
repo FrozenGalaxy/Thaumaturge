@@ -4,13 +4,13 @@ import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 public final class BlockEntityTubeValve extends BlockEntityTube {
     private static final float ROTATION_MAX = 360.0F;
@@ -85,15 +85,15 @@ public final class BlockEntityTubeValve extends BlockEntityTube {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        allowFlow = input.getBooleanOr("AllowFlow", true);
-        wasPoweredLastTick = input.getBooleanOr("HadPower", false);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        allowFlow = (input.contains("AllowFlow") ? input.getBoolean("AllowFlow") : true);
+        wasPoweredLastTick = input.getBoolean("HadPower");
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         output.putBoolean("AllowFlow", allowFlow);
         output.putBoolean("HadPower", wasPoweredLastTick);
     }

@@ -7,7 +7,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
 
 @EventBusSubscriber(modid = TCIds.MODID)
 public final class DeviceCapabilities {
@@ -31,17 +31,17 @@ public final class DeviceCapabilities {
                 (be, side) -> be
         );
         event.registerBlockEntity(
-                Capabilities.Item.BLOCK,
+                Capabilities.ItemHandler.BLOCK,
                 TCBlockEntities.HUNGRY_CHEST.get(),
-                (be, side) -> VanillaContainerWrapper.of(be)
+                (be, side) -> new InvWrapper(be)
         );
         event.registerBlockEntity(
-                Capabilities.Fluid.BLOCK,
+                Capabilities.FluidHandler.BLOCK,
                 TCBlockEntities.EVERFULL_URN.get(),
                 (be, side) -> be.getTank()
         );
         event.registerBlockEntity(
-                Capabilities.Energy.BLOCK,
+                Capabilities.EnergyStorage.BLOCK,
                 TCBlockEntities.VIS_GENERATOR.get(),
                 (be, side) -> side == be.outputFace() ? be : null
         );
@@ -56,7 +56,7 @@ public final class DeviceCapabilities {
                 (be, side) -> be
         );
         event.registerBlockEntity(
-                Capabilities.Item.BLOCK,
+                Capabilities.ItemHandler.BLOCK,
                 TCBlockEntities.VOID_SIPHON.get(),
                 (be, side) -> be.output()
         );
@@ -71,7 +71,7 @@ public final class DeviceCapabilities {
                 (be, side) -> be
         );
         event.registerBlockEntity(
-                Capabilities.Item.BLOCK,
+                Capabilities.ItemHandler.BLOCK,
                 TCBlockEntities.THAUMATORIUM.get(),
                 (be, side) -> be.catalyst()
         );

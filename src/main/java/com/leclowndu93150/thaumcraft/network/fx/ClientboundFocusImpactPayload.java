@@ -8,19 +8,19 @@ import net.minecraft.network.VarInt;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record ClientboundFocusImpactPayload(double x, double y, double z,
                                             float mx, float my, float mz,
                                             boolean burst, int casterId,
-                                            List<Identifier> parts) implements CustomPacketPayload {
+                                            List<ResourceLocation> parts) implements CustomPacketPayload {
     public static final int NO_CASTER = -1;
 
     public static final Type<ClientboundFocusImpactPayload> TYPE = new Type<>(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "fx_focus_impact"));
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "fx_focus_impact"));
 
-    private static final StreamCodec<ByteBuf, List<Identifier>> PARTS_CODEC =
-            Identifier.STREAM_CODEC.apply(ByteBufCodecs.list());
+    private static final StreamCodec<ByteBuf, List<ResourceLocation>> PARTS_CODEC =
+            ResourceLocation.STREAM_CODEC.apply(ByteBufCodecs.list());
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundFocusImpactPayload> STREAM_CODEC = StreamCodec.of(
             (buf, data) -> {

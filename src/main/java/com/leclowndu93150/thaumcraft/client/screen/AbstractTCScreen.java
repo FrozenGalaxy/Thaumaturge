@@ -4,11 +4,11 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractTCScreen extends Screen {
-    private final @Nullable Identifier background;
+    private final @Nullable ResourceLocation background;
     private final int backgroundTextureWidth;
     private final int backgroundTextureHeight;
 
@@ -16,11 +16,11 @@ public abstract class AbstractTCScreen extends Screen {
         this(title, null, 256, 256);
     }
 
-    protected AbstractTCScreen(Component title, @Nullable Identifier background) {
+    protected AbstractTCScreen(Component title, @Nullable ResourceLocation background) {
         this(title, background, 256, 256);
     }
 
-    protected AbstractTCScreen(Component title, @Nullable Identifier background, int backgroundTextureWidth, int backgroundTextureHeight) {
+    protected AbstractTCScreen(Component title, @Nullable ResourceLocation background, int backgroundTextureWidth, int backgroundTextureHeight) {
         super(title);
         this.background = background;
         this.backgroundTextureWidth = backgroundTextureWidth;

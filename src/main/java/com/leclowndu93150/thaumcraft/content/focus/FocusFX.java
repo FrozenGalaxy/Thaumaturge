@@ -5,7 +5,7 @@ import com.leclowndu93150.thaumcraft.api.casters.FocusPackage;
 import com.leclowndu93150.thaumcraft.network.fx.ClientboundFocusImpactPayload;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -16,7 +16,7 @@ public final class FocusFX {
 
     private FocusFX() {}
 
-    public static void impact(ServerLevel level, Vec3 hit, Identifier partKey) {
+    public static void impact(ServerLevel level, Vec3 hit, ResourceLocation partKey) {
         send(level, new ClientboundFocusImpactPayload(hit.x, hit.y, hit.z,
                 0.0F, 0.0F, 0.0F, false, ClientboundFocusImpactPayload.NO_CASTER, List.of(partKey)));
     }
@@ -26,7 +26,7 @@ public final class FocusFX {
         if (effects.isEmpty()) {
             return;
         }
-        List<Identifier> parts = new ArrayList<>(effects.size());
+        List<ResourceLocation> parts = new ArrayList<>(effects.size());
         for (FocusEffect effect : effects) {
             parts.add(effect.getKey());
         }

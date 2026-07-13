@@ -7,10 +7,10 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
+
+import java.util.List;
 import net.minecraft.world.level.block.Block;
 
-import java.util.function.Consumer;
 
 public final class JarBrainItem extends BlockItem {
     public JarBrainItem(Block block, Item.Properties properties) {
@@ -18,12 +18,11 @@ public final class JarBrainItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display,
-                                Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         Integer xp = stack.get(TCDataComponents.STORED_XP.get());
         if (xp != null && xp > 0) {
-            tooltip.accept(Component.literal(xp + " xp").withStyle(ChatFormatting.GREEN));
+            tooltip.add(Component.literal(xp + " xp").withStyle(ChatFormatting.GREEN));
         }
-        super.appendHoverText(stack, context, display, tooltip, flag);
+        super.appendHoverText(stack, context, tooltip, flag);
     }
 }

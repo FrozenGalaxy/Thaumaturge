@@ -4,15 +4,15 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
-public record ServerboundRequestRecipeDisplayPayload(Identifier recipeId) implements CustomPacketPayload {
+public record ServerboundRequestRecipeDisplayPayload(ResourceLocation recipeId) implements CustomPacketPayload {
     public static final Type<ServerboundRequestRecipeDisplayPayload> TYPE = new Type<>(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "request_recipe_display"));
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "request_recipe_display"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundRequestRecipeDisplayPayload> STREAM_CODEC =
             StreamCodec.composite(
-                    Identifier.STREAM_CODEC,
+                    ResourceLocation.STREAM_CODEC,
                     ServerboundRequestRecipeDisplayPayload::recipeId,
                     ServerboundRequestRecipeDisplayPayload::new);
 

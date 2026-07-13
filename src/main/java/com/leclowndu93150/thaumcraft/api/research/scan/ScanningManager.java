@@ -9,7 +9,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -17,8 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -52,7 +51,7 @@ public final class ScanningManager {
          * @param research the research key
          * @return {@code true} when the player's record changed
          */
-        boolean progressResearch(Player player, Identifier research);
+        boolean progressResearch(Player player, ResourceLocation research);
 
         /**
          * Awards raw knowledge of the given type toward a category.
@@ -63,7 +62,7 @@ public final class ScanningManager {
          * @param amount the amount of raw knowledge to add
          * @return {@code true} when knowledge was added
          */
-        boolean addKnowledge(Player player, KnowledgeType type, Identifier category, int amount);
+        boolean addKnowledge(Player player, KnowledgeType type, ResourceLocation category, int amount);
 
         /**
          * The effective aspect composition of an item stack.
@@ -111,7 +110,7 @@ public final class ScanningManager {
             if (!thing.checkThing(player, target)) {
                 continue;
             }
-            Identifier key = thing.getResearchKey(player, target);
+            ResourceLocation key = thing.getResearchKey(player, target);
             if (key != null && !bindingOrThrow().progressResearch(player, key)) {
                 continue;
             }
@@ -131,14 +130,14 @@ public final class ScanningManager {
             }
         }
         if (target instanceof BlockPos pos) {
-            ResourceHandler<ItemResource> handler =
-                    player.level().getCapability(Capabilities.Item.BLOCK, pos, Direction.UP);
+            IItemHandler handler =
+                    player.level().getCapability(Capabilities.ItemHandler.BLOCK, pos, Direction.UP);
             if (handler != null) {
                 int scanned = 0;
-                for (int index = 0; index < handler.size(); index++) {
-                    ItemResource resource = handler.getResource(index);
-                    if (!resource.isEmpty()) {
-                        scanTheThing(player, resource.toStack(handler.getAmountAsInt(index)));
+                for (int index = 0; index < handler.getSlots(); index++) {
+                    ItemStack held = handler.getStackInSlot(index);
+                    if (!held.isEmpty()) {
+                        scanTheThing(player, held);
                         scanned++;
                     }
                     if (scanned >= MAX_CONTAINER_SCANS) {
@@ -164,7 +163,7 @@ public final class ScanningManager {
             if (!thing.checkThing(player, target)) {
                 continue;
             }
-            Identifier key = thing.getResearchKey(player, target);
+            ResourceLocation key = thing.getResearchKey(player, target);
             if (key != null && !KnowledgeAccess.of(player).isResearchKnown(key)) {
                 return true;
             }
@@ -228,7 +227,7 @@ public final class ScanningManager {
      * @param research the research key
      * @return {@code true} when the player's record changed
      */
-    public static boolean progressResearch(Player player, Identifier research) {
+    public static boolean progressResearch(Player player, ResourceLocation research) {
         return bindingOrThrow().progressResearch(player, research);
     }
 
@@ -241,7 +240,7 @@ public final class ScanningManager {
      * @param amount the amount to add
      * @return {@code true} when knowledge was added
      */
-    public static boolean addKnowledge(Player player, KnowledgeType type, Identifier category, int amount) {
+    public static boolean addKnowledge(Player player, KnowledgeType type, ResourceLocation category, int amount) {
         return bindingOrThrow().addKnowledge(player, type, category, amount);
     }
 

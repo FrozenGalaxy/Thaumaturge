@@ -1,15 +1,15 @@
 package com.leclowndu93150.thaumcraft.content.research.theorycraft.cards;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.api.research.CategoryComponents;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import com.leclowndu93150.thaumcraft.api.research.theorycraft.IResearchTableData;
 import com.leclowndu93150.thaumcraft.api.research.theorycraft.TheorycraftCard;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public final class CardNotation extends TheorycraftCard {
@@ -75,16 +75,16 @@ public final class CardNotation extends TheorycraftCard {
     }
 
     @Override
-    public void write(ValueOutput output, HolderLookup.Provider registries) {
+    public void write(CompoundTag output, HolderLookup.Provider registries) {
         super.write(output, registries);
-        if (from != null) output.store("from", ResourceKey.codec(IResearchCategory.REGISTRY_KEY), from);
-        if (to != null) output.store("to", ResourceKey.codec(IResearchCategory.REGISTRY_KEY), to);
+        if (from != null) TCNbt.store(output, "from", ResourceKey.codec(IResearchCategory.REGISTRY_KEY), registries, from);
+        if (to != null) TCNbt.store(output, "to", ResourceKey.codec(IResearchCategory.REGISTRY_KEY), registries, to);
     }
 
     @Override
-    public void read(ValueInput input, HolderLookup.Provider registries) {
+    public void read(CompoundTag input, HolderLookup.Provider registries) {
         super.read(input, registries);
-        from = input.read("from", ResourceKey.codec(IResearchCategory.REGISTRY_KEY)).orElse(null);
-        to = input.read("to", ResourceKey.codec(IResearchCategory.REGISTRY_KEY)).orElse(null);
+        from = TCNbt.read(input, "from", ResourceKey.codec(IResearchCategory.REGISTRY_KEY), registries).orElse(null);
+        to = TCNbt.read(input, "to", ResourceKey.codec(IResearchCategory.REGISTRY_KEY), registries).orElse(null);
     }
 }

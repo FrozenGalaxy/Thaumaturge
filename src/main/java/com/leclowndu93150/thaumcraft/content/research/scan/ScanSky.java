@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -59,12 +59,12 @@ public final class ScanSky implements IScanThing {
     }
 
     @Override
-    public @Nullable Identifier getResearchKey(Player player, @Nullable Object target) {
+    public @Nullable ResourceLocation getResearchKey(Player player, @Nullable Object target) {
         return null;
     }
 
     private static void observe(ServerPlayer player, int worldDay, String body, CelestialBody note) {
-        Identifier key = ScanKeys.celestial(worldDay, body);
+        ResourceLocation key = ScanKeys.celestial(worldDay, body);
         if (KnowledgeAccess.of(player).isResearchKnown(key)) {
             player.sendOverlayMessage(Component.translatable("tc.celestial.fail.1"));
             return;
@@ -84,13 +84,13 @@ public final class ScanSky implements IScanThing {
     private static void cleanResearch(ServerPlayer player, int worldDay) {
         IPlayerKnowledge knowledge = KnowledgeAccess.of(player);
         String dayPrefix = ScanKeys.celestialDayPrefix(worldDay);
-        List<Identifier> stale = new ArrayList<>();
-        for (Identifier key : knowledge.researchList()) {
+        List<ResourceLocation> stale = new ArrayList<>();
+        for (ResourceLocation key : knowledge.researchList()) {
             if (ScanKeys.isCelestial(key) && !key.getPath().startsWith(dayPrefix)) {
                 stale.add(key);
             }
         }
-        for (Identifier key : stale) {
+        for (ResourceLocation key : stale) {
             knowledge.removeResearch(key);
         }
         if (!stale.isEmpty() && knowledge instanceof PlayerKnowledge concrete) {

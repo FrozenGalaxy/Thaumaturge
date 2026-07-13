@@ -7,13 +7,13 @@ import com.leclowndu93150.thaumcraft.content.entity.construct.MenuArcaneBore;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 
 public final class ArcaneBoreScreen extends AbstractTCContainerScreen<MenuArcaneBore> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/gui/gui_arcanebore.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/gui/gui_arcanebore.png");
     private static final int IMAGE_WIDTH = 175;
     private static final int IMAGE_HEIGHT = 232;
     private static final int HEALTH_BAR_X = 68;

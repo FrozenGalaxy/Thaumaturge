@@ -13,7 +13,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
@@ -29,7 +29,7 @@ public class ArcaneWorkbenchShapedRecipeBuilder extends ArcaneWorkbenchRecipeBui
     private final Map<Character, Ingredient> key;
 
 
-    public ArcaneWorkbenchShapedRecipeBuilder(RecipeCategory category, ItemStackTemplate result, HolderGetter<Item> items, HolderGetter<IAspect> aspects, int vis) {
+    public ArcaneWorkbenchShapedRecipeBuilder(RecipeCategory category, ItemStack result, HolderGetter<Item> items, HolderGetter<IAspect> aspects, int vis) {
         super(category, result,aspects,vis);
         this.items = items;
         this.rows = Lists.newArrayList();
@@ -65,7 +65,7 @@ public class ArcaneWorkbenchShapedRecipeBuilder extends ArcaneWorkbenchRecipeBui
     }
 
     @Override
-    protected ArcaneCraftingRecipe makeRecipe(Recipe.CommonInfo commonInfo,ItemStackTemplate result, AspectList aspects, Optional<ResearchGate> gate, int vis) {
+    protected ArcaneCraftingRecipe makeRecipe(Recipe.CommonInfo commonInfo,ItemStack result, AspectList aspects, Optional<ResearchGate> gate, int vis) {
         ArcaneShapedRecipePattern pattern = ArcaneShapedRecipePattern.of(key,rows);
         return new ArcaneShapedCraftingRecipe(commonInfo, vis, gate, aspects, pattern, result);
     }

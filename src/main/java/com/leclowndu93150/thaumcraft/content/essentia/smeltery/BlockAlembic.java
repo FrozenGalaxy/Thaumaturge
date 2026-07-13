@@ -15,15 +15,13 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -67,13 +65,11 @@ public class BlockAlembic extends BaseEntityBlock implements ILabelable {
     @Override
     protected BlockState updateShape(
             BlockState state,
-            LevelReader level,
-            ScheduledTickAccess ticks,
-            BlockPos pos,
             Direction directionToNeighbour,
-            BlockPos neighbourPos,
             BlockState neighbourState,
-            RandomSource random
+            LevelAccessor level,
+            BlockPos pos,
+            BlockPos neighbourPos
     ) {
         if (level instanceof Level lvl) {
             if (directionToNeighbour.getStepY() != 0) return state;

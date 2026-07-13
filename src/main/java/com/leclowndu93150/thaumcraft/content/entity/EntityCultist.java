@@ -4,7 +4,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -52,14 +52,14 @@ public abstract class EntityCultist extends Monster {
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                  EntitySpawnReason reason, @Nullable SpawnGroupData groupData) {
+                                                  MobSpawnType reason, @Nullable SpawnGroupData groupData) {
         this.setLoot(difficulty);
         return super.finalizeSpawn(level, difficulty, reason, groupData);
     }
 
     @Override
-    protected boolean considersEntityAsAlly(Entity entity) {
-        return entity instanceof EntityCultist || super.considersEntityAsAlly(entity);
+    public boolean isAlliedTo(Entity entity) {
+        return entity instanceof EntityCultist || super.isAlliedTo(entity);
     }
 
     @Override

@@ -8,7 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.Nullable;
 
 public final class FocusElementNode {
@@ -21,7 +21,7 @@ public final class FocusElementNode {
             Codec.INT.optionalFieldOf("parent", -1).forGetter(n -> n.parent),
             Codec.INT.listOf().optionalFieldOf("children", List.of()).forGetter(FocusElementNode::childList),
             Codec.FLOAT.optionalFieldOf("complexity", 1.0F).forGetter(n -> n.complexityMultiplier),
-            Identifier.CODEC.optionalFieldOf("key").forGetter(FocusElementNode::nodeKey),
+            ResourceLocation.CODEC.optionalFieldOf("key").forGetter(FocusElementNode::nodeKey),
             Codec.unboundedMap(Codec.STRING, Codec.INT).optionalFieldOf("settings", Map.of()).forGetter(FocusElementNode::settingValues)
     ).apply(inst, FocusElementNode::decode));
 
@@ -55,7 +55,7 @@ public final class FocusElementNode {
         return list;
     }
 
-    private Optional<Identifier> nodeKey() {
+    private Optional<ResourceLocation> nodeKey() {
         return node == null ? Optional.empty() : Optional.of(node.getKey());
     }
 
@@ -72,7 +72,7 @@ public final class FocusElementNode {
 
     private static FocusElementNode decode(int x, int y, int id, boolean target, boolean trajectory, int parent,
                                            List<Integer> children, float complexity,
-                                           Optional<Identifier> key, Map<String, Integer> settings) {
+                                           Optional<ResourceLocation> key, Map<String, Integer> settings) {
         FocusElementNode result = new FocusElementNode();
         result.x = x;
         result.y = y;

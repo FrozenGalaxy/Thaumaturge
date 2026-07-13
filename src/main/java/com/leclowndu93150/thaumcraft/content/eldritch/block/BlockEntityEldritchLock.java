@@ -23,13 +23,11 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -39,8 +37,6 @@ import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 
 public final class BlockEntityEldritchLock extends BlockEntity {
@@ -214,7 +210,7 @@ public final class BlockEntityEldritchLock extends BlockEntity {
         EntityEldritchWarden boss = new EntityEldritchWarden(TCEntities.ELDRITCH_WARDEN.get(), level);
         faceBoss(boss, lockPos, x2 + 0.5, y + 3, z2 + 0.5);
         boss.finalizeSpawn(level, level.getCurrentDifficultyAt(new BlockPos(x2, y + 3, z2)),
-                EntitySpawnReason.EVENT, null);
+                MobSpawnType.EVENT, null);
         boss.setHomeTo(new BlockPos(x, y + 2, z), 32);
         level.addFreshEntity(boss);
     }
@@ -267,7 +263,7 @@ public final class BlockEntityEldritchLock extends BlockEntity {
         EntityEldritchGolem boss = new EntityEldritchGolem(TCEntities.ELDRITCH_GOLEM.get(), level);
         faceBoss(boss, lockPos, x + 0.5, y + 3, z + 0.5);
         boss.finalizeSpawn(level, level.getCurrentDifficultyAt(new BlockPos(x, y + 3, z)),
-                EntitySpawnReason.EVENT, null);
+                MobSpawnType.EVENT, null);
         level.addFreshEntity(boss);
     }
 
@@ -305,7 +301,7 @@ public final class BlockEntityEldritchLock extends BlockEntity {
         EntityCultistPortalGreater boss = new EntityCultistPortalGreater(TCEntities.CULTIST_PORTAL_GREATER.get(), level);
         boss.snapTo(x + 0.5, y + 2, z + 0.5, 0.0F, 0.0F);
         boss.finalizeSpawn(level, level.getCurrentDifficultyAt(new BlockPos(x, y + 2, z)),
-                EntitySpawnReason.EVENT, null);
+                MobSpawnType.EVENT, null);
         level.addFreshEntity(boss);
     }
 
@@ -353,7 +349,7 @@ public final class BlockEntityEldritchLock extends BlockEntity {
         boss.snapTo(x, y, z, 0.0F, 0.0F);
         ChampionHelper.makeChampion(boss, true);
         boss.finalizeSpawn(level, level.getCurrentDifficultyAt(boss.blockPosition()),
-                EntitySpawnReason.EVENT, null);
+                MobSpawnType.EVENT, null);
         level.addFreshEntity(boss);
     }
 
@@ -397,24 +393,24 @@ public final class BlockEntityEldritchLock extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        count = input.getShortOr("count", (short) -1);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        count = (input.contains("count") ? input.getShort("count") : (short) -1);
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         output.putShort("count", (short) count);
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput output = TagValueOutput.createWithContext(reporter, registries);
-            saveAdditional(output);
-            nbt.merge(output.buildResult());
+        {
+            CompoundTag output = new CompoundTag();
+            saveAdditional(output, registries);
+            nbt.merge(output);
         }
         return nbt;
     }

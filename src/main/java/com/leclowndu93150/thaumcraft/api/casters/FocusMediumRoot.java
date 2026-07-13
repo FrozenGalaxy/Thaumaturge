@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.api.casters;
 
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,7 +18,7 @@ import org.jspecify.annotations.Nullable;
  * @since 1.0.0
  */
 public class FocusMediumRoot extends FocusMedium {
-    private static final Identifier KEY = Identifier.fromNamespaceAndPath("thaumcraft", "root");
+    private static final ResourceLocation KEY = ResourceLocation.fromNamespaceAndPath("thaumcraft", "root");
     private static final float SOURCE_EYE_OFFSET = 0.1F;
 
     private Trajectory[] trajectories;
@@ -43,7 +43,7 @@ public class FocusMediumRoot extends FocusMedium {
     }
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

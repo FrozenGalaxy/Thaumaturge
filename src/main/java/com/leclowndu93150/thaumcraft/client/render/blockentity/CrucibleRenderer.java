@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -34,7 +34,7 @@ public final class CrucibleRenderer implements BlockEntityRenderer<BlockEntityCr
             ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress
     ) {
         BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
-        state.fluid = blockEntity.getTank().getResource(0).toStack(blockEntity.getTank().getAmountAsInt(0));
+        state.fluid = blockEntity.getTank().getFluid().copy();
         state.fluidHeight = blockEntity.getFluidHeight();
         var fluidModel = Minecraft.getInstance().getModelManager().getFluidStateModelSet()
                 .get(state.fluid.getFluid().defaultFluidState());
@@ -53,10 +53,10 @@ public final class CrucibleRenderer implements BlockEntityRenderer<BlockEntityCr
 
         if (recolor > 1F) recolor = 1F;
 
-        float r = Mth.lerp(recolor,ARGB.redFloat(state.color),0.25F);
-        float g = Mth.lerp(recolor,ARGB.greenFloat(state.color),0.0F);
-        float b = Mth.lerp(recolor,ARGB.blueFloat(state.color),0.75F);
-        state.color = ARGB.colorFromFloat(1F,r,g,b);
+        float r = Mth.lerp(recolor,ARGB32.red(state.color) / 255.0F,0.25F);
+        float g = Mth.lerp(recolor,ARGB32.green(state.color) / 255.0F,0.0F);
+        float b = Mth.lerp(recolor,ARGB32.blue(state.color) / 255.0F,0.75F);
+        state.color = ARGB32.colorFromFloat(1F,r,g,b);
     }
 
     @Override

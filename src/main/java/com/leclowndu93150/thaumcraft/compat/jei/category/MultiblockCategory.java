@@ -38,7 +38,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
@@ -53,13 +53,13 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 
 public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<DustTrigger>> {
-    public static final IRecipeHolderType<DustTrigger> RECIPE_TYPE = IRecipeHolderType.create(Identifier.fromNamespaceAndPath(TCIds.MODID,"multiblock_dust_trigger"));
+    public static final IRecipeHolderType<DustTrigger> RECIPE_TYPE = IRecipeHolderType.create(ResourceLocation.fromNamespaceAndPath(TCIds.MODID,"multiblock_dust_trigger"));
 
     private static final int WIDTH = 144;
     private static final int HEIGHT = 108;
 
-    private static final IDrawable resultIcon = new AlphaDrawable(Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png"),41,7,30,30);
-    private static final IDrawable arrow = new AlphaDrawable(Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png"), 199, 168, 26, 26);
+    private static final IDrawable resultIcon = new AlphaDrawable(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png"),41,7,30,30);
+    private static final IDrawable arrow = new AlphaDrawable(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png"), 199, 168, 26, 26);
     private final IDrawable icon;
 
     private static final int DUST_SLOT_X = WIDTH / 2 - arrow.getWidth() / 2 - 20 - 18;
@@ -189,7 +189,7 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
     }
 
 
-    private @Nullable Blueprint lookupBlueprint(Identifier blueprintId) {
+    private @Nullable Blueprint lookupBlueprint(ResourceLocation blueprintId) {
         ResourceKey<Blueprint> key = ResourceKey.create(Blueprint.REGISTRY_KEY, blueprintId);
         if (ThaumcraftJEIPlugin.clientRegistryAccess() == null) return null;
         Registry<Blueprint> registry = ThaumcraftJEIPlugin.clientRegistryAccess().lookup(Blueprint.REGISTRY_KEY).orElse(null);

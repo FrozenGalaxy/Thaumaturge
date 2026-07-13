@@ -2,14 +2,13 @@ package com.leclowndu93150.thaumcraft.content.entity;
 
 import com.leclowndu93150.thaumcraft.client.fx.FXClient;
 import com.leclowndu93150.thaumcraft.registry.TCEntities;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
 
@@ -106,15 +105,15 @@ public class EntityFollowingItem extends EntitySpecialItem implements IEntityWit
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putShort("type", (short) this.type);
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
+    protected void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        this.type = input.getShortOr("type", (short) 3);
+        this.type = (input.contains("type") ? input.getShort("type") : (short) 3);
     }
 
     @Override

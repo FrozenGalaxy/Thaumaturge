@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.essentia.thaumatorium;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
@@ -19,11 +20,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -32,12 +32,7 @@ import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -50,16 +45,16 @@ public final class BlockEntityThaumatorium extends BlockEntity implements IEssen
     private static final int BASE_RECIPES = 1;
     private static final int BRAIN_BOX_BONUS = 2;
 
-    private final ItemStacksResourceHandler catalyst = new ItemStacksResourceHandler(1) {
+    private final ItemStackHandler catalyst = new ItemStackHandler(1) {
         @Override
-        protected void onContentsChanged(int index, ItemStack previousContents) {
-            super.onContentsChanged(index, previousContents);
+        protected void onContentsChanged(int index) {
+            super.onContentsChanged(index);
             setChanged();
         }
     };
 
     private AspectList essentia = AspectList.EMPTY;
-    private final List<Identifier> queue = new ArrayList<>();
+    private final List<ResourceLocation> queue = new ArrayList<>();
     private int maxRecipes = BASE_RECIPES;
     private int currentCraft = -1;
     private @Nullable Holder<IAspect> currentSuction;
@@ -71,7 +66,7 @@ public final class BlockEntityThaumatorium extends BlockEntity implements IEssen
         super(TCBlockEntities.THAUMATORIUM.get(), pos, state);
     }
 
-    public ItemStacksResourceHandler catalyst() {
+    public ItemStackHandler catalyst() {
         return catalyst;
     }
 
@@ -79,7 +74,7 @@ public final class BlockEntityThaumatorium extends BlockEntity implements IEssen
         return essentia;
     }
 
-    public List<Identifier> queue() {
+    public List<ResourceLocation> queue() {
         return queue;
     }
 
@@ -88,7 +83,7 @@ public final class BlockEntityThaumatorium extends BlockEntity implements IEssen
     }
 
     public ItemStack catalystStack() {
-        return catalyst.getResource(0).toStack(catalyst.getAmountAsInt(0));
+        return catalyst.getStackInSlot(0).copy();
     }
 
     private Direction facing() {
@@ -97,7 +92,7 @@ public final class BlockEntityThaumatorium extends BlockEntity implements IEssen
                 ? state.getValue(HorizontalDirectionalBlock.FACING) : Direction.NORTH;
     }
 
-    public void toggleRecipe(ServerLevel server, Player player, Identifier recipeId) {
+    public void toggleRecipe(ServerLevel server, Player player, ResourceLocation recipeId) {
         if (queue.remove(recipeId)) {
             afterQueueChange();
             return;
@@ -121,7 +116,7 @@ public final class BlockEntityThaumatorium extends BlockEntity implements IEssen
         syncToClient();
     }
 
-    private @Nullable RecipeHolder<?> findRecipe(ServerLevel server, Identifier recipeId) {
+    private @Nullable RecipeHolder<?> findRecipe(ServerLevel server, ResourceLocation recipeId) {
         for (RecipeHolder<?> holder : server.recipeAccess().getRecipes()) {
             if (holder.id().identifier().equals(recipeId)) {
                 return holder;
@@ -130,14 +125,14 @@ public final class BlockEntityThaumatorium extends BlockEntity implements IEssen
         return null;
     }
 
-    public List<CrucibleRecipe> candidateRecipes(ServerLevel server, Player player, List<Identifier> idsOut) {
+    public List<CrucibleRecipe> candidateRecipes(ServerLevel server, Player player, List<ResourceLocation> idsOut) {
         List<CrucibleRecipe> found = new ArrayList<>();
         ItemStack stack = catalystStack();
         for (RecipeHolder<?> holder : server.recipeAccess().getRecipes()) {
             if (!(holder.value() instanceof CrucibleRecipe recipe)) {
                 continue;
             }
-            Identifier id = holder.id().identifier();
+            ResourceLocation id = holder.id().identifier();
             boolean queued = queue.contains(id);
             boolean matches = !stack.isEmpty() && recipe.catalyst().test(stack) && recipe.doesPassGate(player);
             if (queued || matches) {
@@ -234,11 +229,10 @@ public final class BlockEntityThaumatorium extends BlockEntity implements IEssen
         if (currentRecipe == null || !currentRecipe.matches(new CrucibleRecipeInput(stack, essentia), server)) {
             return;
         }
-        try (Transaction ctx = Transaction.openRoot()) {
-            if (catalyst.extract(ItemResource.of(stack), 1, ctx) != 1) {
+        {
+            if (catalyst.extract(stack, 1, ctx) != 1) {
                 return;
             }
-            ctx.commit();
         }
         ItemStack result = currentRecipe.assemble(new CrucibleRecipeInput(stack, essentia));
         essentia = AspectList.EMPTY;
@@ -354,33 +348,35 @@ public final class BlockEntityThaumatorium extends BlockEntity implements IEssen
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        essentia = input.read("Essentia", AspectList.CODEC).orElse(AspectList.EMPTY);
-        maxRecipes = input.getIntOr("MaxRecipes", BASE_RECIPES);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        essentia = TCNbt.read(input, "Essentia", AspectList.CODEC, registries).orElse(AspectList.EMPTY);
+        maxRecipes = (input.contains("MaxRecipes") ? input.getInt("MaxRecipes") : BASE_RECIPES);
         queue.clear();
-        input.read("Queue", Identifier.CODEC.listOf()).ifPresent(queue::addAll);
-        input.child("Catalyst").ifPresent(catalyst::deserialize);
+        TCNbt.read(input, "Queue", ResourceLocation.CODEC.listOf(), registries).ifPresent(queue::addAll);
+        if (input.contains("Catalyst")) {
+            catalyst.deserializeNBT(registries, input.getCompound("Catalyst"));
+        }
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         if (!essentia.isEmpty()) {
-            output.store("Essentia", AspectList.CODEC, essentia);
+            TCNbt.store(output, "Essentia", AspectList.CODEC, registries, essentia);
         }
         output.putInt("MaxRecipes", maxRecipes);
-        output.store("Queue", Identifier.CODEC.listOf(), List.copyOf(queue));
-        catalyst.serialize(output.child("Catalyst"));
+        TCNbt.store(output, "Queue", ResourceLocation.CODEC.listOf(), registries, List.copyOf(queue));
+        output.put("Catalyst", catalyst.serializeNBT(registries));
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput out = TagValueOutput.createWithContext(reporter, registries);
-            saveAdditional(out);
-            nbt.merge(out.buildResult());
+        {
+            CompoundTag out = new CompoundTag();
+            saveAdditional(out, registries);
+            nbt.merge(out);
         }
         return nbt;
     }

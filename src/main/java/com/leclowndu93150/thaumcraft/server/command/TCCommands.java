@@ -64,7 +64,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import com.leclowndu93150.thaumcraft.content.eldritch.maze.MazeSavedData;
 import net.minecraft.server.level.ServerLevel;
@@ -72,7 +72,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -97,7 +97,7 @@ public final class TCCommands {
 
     private static final SuggestionProvider<CommandSourceStack> FOCUS_ELEMENTS =
             (ctx, builder) -> SharedSuggestionProvider.suggest(
-                    TCFocusElements.registry().keySet().stream().map(Identifier::toString), builder);
+                    TCFocusElements.registry().keySet().stream().map(ResourceLocation::toString), builder);
 
     private static final SuggestionProvider<CommandSourceStack> CHAMPION_MODS =
             (ctx, builder) -> SharedSuggestionProvider.suggest(
@@ -235,7 +235,7 @@ public final class TCCommands {
             int granted = 0;
             for (Holder.Reference<IResearchEntry> entry
                     : player.registryAccess().lookupOrThrow(IResearchEntry.REGISTRY_KEY).listElements().toList()) {
-                Identifier id = entry.key().identifier();
+                ResourceLocation id = entry.key().identifier();
                 if (knowledge.isResearchComplete(id)) {
                     continue;
                 }
@@ -496,7 +496,7 @@ public final class TCCommands {
         try {
             ServerPlayer player = ctx.getSource().getPlayerOrException();
             ServerLevel level = (ServerLevel) player.level();
-            EntityFluxRift rift = TCEntities.FLUX_RIFT.get().create(level, EntitySpawnReason.COMMAND);
+            EntityFluxRift rift = TCEntities.FLUX_RIFT.get().create(level, MobSpawnType.COMMAND);
             if (rift == null) {
                 ctx.getSource().sendFailure(Component.literal("Failed to create rift"));
                 return 0;
@@ -536,7 +536,7 @@ public final class TCCommands {
                 return 0;
             }
             EntityType<?> toSpawn = entityType == null ? EntityType.ZOMBIE : entityType.value();
-            Entity entity = toSpawn.create(level, EntitySpawnReason.COMMAND);
+            Entity entity = toSpawn.create(level, MobSpawnType.COMMAND);
             if (!(entity instanceof Monster monster)) {
                 if (entity != null) {
                     entity.discard();
@@ -578,7 +578,7 @@ public final class TCCommands {
                 ctx.getSource().sendFailure(Component.literal("Unknown entity: " + name));
                 return 0;
             }
-            var entity = type.create(level, EntitySpawnReason.COMMAND);
+            var entity = type.create(level, MobSpawnType.COMMAND);
             if (entity == null) {
                 ctx.getSource().sendFailure(Component.literal("Failed to create " + name));
                 return 0;
@@ -604,9 +604,9 @@ public final class TCCommands {
             FocusPackage core = new FocusPackage(player);
             int complexity = 0;
             for (String token : tokens) {
-                Identifier id = token.contains(":")
-                        ? Identifier.parse(token)
-                        : Identifier.fromNamespaceAndPath(TCIds.MODID, token);
+                ResourceLocation id = token.contains(":")
+                        ? ResourceLocation.parse(token)
+                        : ResourceLocation.fromNamespaceAndPath(TCIds.MODID, token);
                 IFocusElement element = FocusEngine.getElement(id);
                 if (element == null) {
                     ctx.getSource().sendFailure(Component.literal("Unknown focus element: " + id));
@@ -656,7 +656,7 @@ public final class TCCommands {
             ServerPlayer player = ctx.getSource().getPlayerOrException();
             String tag = StringArgumentType.getString(ctx, "aspect");
             ResourceKey<IAspect> key = ResourceKey.create(IAspect.REGISTRY_KEY,
-                    Identifier.fromNamespaceAndPath(TCIds.MODID, tag));
+                    ResourceLocation.fromNamespaceAndPath(TCIds.MODID, tag));
             ItemStack stack = EssentiaCrystalFactory.of(player.registryAccess(), key);
             player.getInventory().add(stack);
             ctx.getSource().sendSuccess(() -> Component.literal("Gave crystal of " + tag), false);

@@ -5,11 +5,11 @@ import com.leclowndu93150.thaumcraft.content.aspect.AspectIndex;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record ClientboundAspectIndexPayload(AspectIndex index) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<ClientboundAspectIndexPayload> TYPE = new CustomPacketPayload.Type<>(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "aspect_index"));
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "aspect_index"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundAspectIndexPayload> STREAM_CODEC =
             AspectIndex.STREAM_CODEC.map(ClientboundAspectIndexPayload::new, ClientboundAspectIndexPayload::index);

@@ -1,6 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.research;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import com.leclowndu93150.thaumcraft.content.eldritch.OuterLands;
 import com.leclowndu93150.thaumcraft.TCIds;
 import net.minecraft.server.level.ServerPlayer;
@@ -37,5 +37,5 @@ public final class ResearchLifecycleEvents {
         }
     }
 
-    private static final Identifier ENTER_OUTER_LANDS = TCIds.rl("enter_outer_lands");
+    private static final ResourceLocation ENTER_OUTER_LANDS = TCIds.rl("enter_outer_lands");
 }

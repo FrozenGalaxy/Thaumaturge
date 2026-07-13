@@ -11,7 +11,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
@@ -31,7 +30,7 @@ public class ArcaneShapedCraftingRecipe extends ArcaneCraftingRecipe{
                     ResearchGate.CODEC.optionalFieldOf("research").forGetter(o->o.gate),
                     ArcaneCraftingRecipe.PRIMAL_ASPECTS_CODEC.fieldOf("crystals").forGetter(o->o.aspects),
                     ArcaneShapedRecipePattern.MAP_CODEC.forGetter((o) -> o.pattern),
-                    ItemStackTemplate.CODEC.fieldOf("result").forGetter((o) -> o.result)
+                    ItemStack.CODEC.fieldOf("result").forGetter((o) -> o.result)
             ).apply(i, ArcaneShapedCraftingRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ArcaneShapedCraftingRecipe> STREAM_CODEC = StreamCodec.composite(
@@ -40,14 +39,14 @@ public class ArcaneShapedCraftingRecipe extends ArcaneCraftingRecipe{
             ByteBufCodecs.optional(ResearchGate.STREAM_CODEC), o -> o.gate,
             AspectList.STREAM_CODEC, o -> o.aspects,
             ArcaneShapedRecipePattern.STREAM_CODEC, (o) -> o.pattern,
-            ItemStackTemplate.STREAM_CODEC, (o) -> o.result,
+            ItemStack.STREAM_CODEC, (o) -> o.result,
             ArcaneShapedCraftingRecipe::new);
 
     public static final RecipeSerializer<ArcaneShapedCraftingRecipe> SERIALIZER= new RecipeSerializer<>(MAP_CODEC,STREAM_CODEC);
     public final ArcaneShapedRecipePattern pattern;
-    private final ItemStackTemplate result;
+    private final ItemStack result;
 
-    public ArcaneShapedCraftingRecipe(Recipe.CommonInfo commonInfo, int vis, Optional<ResearchGate> researchGate, AspectList aspects, ArcaneShapedRecipePattern pattern, ItemStackTemplate result) {
+    public ArcaneShapedCraftingRecipe(Recipe.CommonInfo commonInfo, int vis, Optional<ResearchGate> researchGate, AspectList aspects, ArcaneShapedRecipePattern pattern, ItemStack result) {
         super(commonInfo,vis,researchGate,aspects);
         this.pattern = pattern;
         this.result = result;
@@ -62,7 +61,7 @@ public class ArcaneShapedCraftingRecipe extends ArcaneCraftingRecipe{
         return this.pattern.ingredients();
     }
 
-    public ItemStackTemplate result() {
+    public ItemStack result() {
         return this.result;
     }
 

@@ -6,10 +6,9 @@ import com.leclowndu93150.thaumcraft.api.items.IWarpingGear;
 import com.leclowndu93150.thaumcraft.api.warp.WarpHelper;
 import com.leclowndu93150.thaumcraft.api.warp.WarpType;
 import com.leclowndu93150.thaumcraft.registry.TCAttributes;
-import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -18,10 +17,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
+
+import java.util.List;
 
 public final class VoidseerCharmItem extends Item implements IVisDiscountGear, IWarpingGear {
-    public static final Identifier DISCOUNT_MODIFIER_ID = TCIds.rl("voidseer_discount");
+    public static final ResourceLocation DISCOUNT_MODIFIER_ID = TCIds.rl("voidseer_discount");
     private static final int WARP_CAP = 100;
     private static final float MAX_DISCOUNT = 25.0F;
     private static final int WARP_PER_DISCOUNT = 5;
@@ -73,10 +73,9 @@ public final class VoidseerCharmItem extends Item implements IVisDiscountGear, I
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display,
-                                Consumer<Component> tooltip, TooltipFlag flag) {
-        tooltip.accept(Component.translatable("item.thaumcraft.voidseer_charm.text")
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(Component.translatable("item.thaumcraft.voidseer_charm.text")
                 .withStyle(ChatFormatting.DARK_BLUE, ChatFormatting.ITALIC));
-        super.appendHoverText(stack, context, display, tooltip, flag);
+        super.appendHoverText(stack, context, tooltip, flag);
     }
 }

@@ -11,9 +11,8 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
 public final class MenuResearchTable extends AbstractContainerMenu {
     public static final int SCRIBE_TOOLS_X = 16;
@@ -32,12 +31,12 @@ public final class MenuResearchTable extends AbstractContainerMenu {
     public static final int PLAYER_TOTAL_SLOTS = PLAYER_ROW_SLOTS * (PLAYER_ROWS + 1);
     public static final int TOTAL_INVENTORY_SLOTS = TABLE_SLOT_COUNT + PLAYER_TOTAL_SLOTS;
 
-    private final ItemStacksResourceHandler items;
+    private final ItemStackHandler items;
     private final ContainerLevelAccess access;
     private final BlockPos pos;
 
     public MenuResearchTable(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf buf) {
-        this(containerId, playerInventory, new ItemStacksResourceHandler(BlockEntityResearchTable.SLOT_COUNT), ContainerLevelAccess.NULL, buf.readBlockPos());
+        this(containerId, playerInventory, new ItemStackHandler(BlockEntityResearchTable.SLOT_COUNT), ContainerLevelAccess.NULL, buf.readBlockPos());
     }
 
     public MenuResearchTable(int containerId, Inventory playerInventory, BlockEntityResearchTable blockEntity) {
@@ -46,14 +45,14 @@ public final class MenuResearchTable extends AbstractContainerMenu {
                 blockEntity.getBlockPos());
     }
 
-    private MenuResearchTable(int containerId, Inventory playerInventory, ItemStacksResourceHandler items, ContainerLevelAccess access, BlockPos pos) {
+    private MenuResearchTable(int containerId, Inventory playerInventory, ItemStackHandler items, ContainerLevelAccess access, BlockPos pos) {
         super(TCMenus.RESEARCH_TABLE.get(), containerId);
         this.items = items;
         this.access = access;
         this.pos = pos;
 
-        addSlot(new ResourceHandlerSlot(items, items::set, BlockEntityResearchTable.SLOT_SCRIBE_TOOLS, SCRIBE_TOOLS_X, SCRIBE_TOOLS_Y));
-        addSlot(new ResourceHandlerSlot(items, items::set, BlockEntityResearchTable.SLOT_PAPER, PAPER_X, PAPER_Y));
+        addSlot(new SlotItemHandler(items, BlockEntityResearchTable.SLOT_SCRIBE_TOOLS, SCRIBE_TOOLS_X, SCRIBE_TOOLS_Y));
+        addSlot(new SlotItemHandler(items, BlockEntityResearchTable.SLOT_PAPER, PAPER_X, PAPER_Y));
 
         for (int row = 0; row < PLAYER_ROWS; row++) {
             for (int col = 0; col < PLAYER_ROW_SLOTS; col++) {
@@ -74,7 +73,7 @@ public final class MenuResearchTable extends AbstractContainerMenu {
         return pos;
     }
 
-    public ItemStacksResourceHandler tableItems() {
+    public ItemStackHandler tableItems() {
         return items;
     }
 
@@ -83,16 +82,16 @@ public final class MenuResearchTable extends AbstractContainerMenu {
     }
 
     public boolean hasUsableScribeTools() {
-        ItemResource resource = items.getResource(BlockEntityResearchTable.SLOT_SCRIBE_TOOLS);
-        int amount = items.getAmountAsInt(BlockEntityResearchTable.SLOT_SCRIBE_TOOLS);
+        ItemStack resource = items.getStackInSlot(BlockEntityResearchTable.SLOT_SCRIBE_TOOLS);
+        int amount = items.getStackInSlot(BlockEntityResearchTable.SLOT_SCRIBE_TOOLS).getCount();
         if (resource.isEmpty() || amount <= 0) return false;
-        ItemStack stack = resource.toStack(amount);
+        ItemStack stack = resource.copyWithCount(amount);
         return stack.isDamageableItem() && stack.getDamageValue() < stack.getMaxDamage();
     }
 
     public boolean hasPaperReady() {
-        ItemResource resource = items.getResource(BlockEntityResearchTable.SLOT_PAPER);
-        int amount = items.getAmountAsInt(BlockEntityResearchTable.SLOT_PAPER);
+        ItemStack resource = items.getStackInSlot(BlockEntityResearchTable.SLOT_PAPER);
+        int amount = items.getStackInSlot(BlockEntityResearchTable.SLOT_PAPER).getCount();
         return !resource.isEmpty() && resource.getItem() == Items.PAPER && amount > 0;
     }
 

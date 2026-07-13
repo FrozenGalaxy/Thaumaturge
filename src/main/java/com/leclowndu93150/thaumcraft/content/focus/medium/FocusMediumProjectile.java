@@ -12,11 +12,11 @@ import com.leclowndu93150.thaumcraft.api.casters.NodeSettingIntRange;
 import com.leclowndu93150.thaumcraft.api.casters.Trajectory;
 import com.leclowndu93150.thaumcraft.content.entity.EntityFocusProjectile;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 
 public final class FocusMediumProjectile extends FocusMedium {
-    private static final Identifier KEY = TCIds.rl("projectile");
+    private static final ResourceLocation KEY = TCIds.rl("projectile");
 
     private static final int BASE_COMPLEXITY = 4;
     private static final int BOUNCY_COMPLEXITY = 3;
@@ -24,7 +24,7 @@ public final class FocusMediumProjectile extends FocusMedium {
     private static final float SPEED_DIVISOR = 3.0F;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

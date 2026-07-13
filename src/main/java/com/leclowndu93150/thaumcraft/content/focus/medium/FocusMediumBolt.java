@@ -11,7 +11,7 @@ import com.leclowndu93150.thaumcraft.content.focus.FocusRayTrace;
 import com.leclowndu93150.thaumcraft.content.fx.FX;
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.EntityHitResult;
@@ -19,7 +19,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class FocusMediumBolt extends FocusMediumTouch {
-    private static final Identifier KEY = TCIds.rl("bolt");
+    private static final ResourceLocation KEY = TCIds.rl("bolt");
 
     static final double BOLT_RANGE = 16.0;
 
@@ -27,7 +27,7 @@ public class FocusMediumBolt extends FocusMediumTouch {
     private static final float BOLT_WIDTH_FACTOR = 0.66F;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

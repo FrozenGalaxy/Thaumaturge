@@ -1,10 +1,13 @@
 package com.leclowndu93150.thaumcraft.content.focus;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.content.focus.effect.FocusEffectRift;
 import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
 import com.leclowndu93150.thaumcraft.content.fx.helper.Sprites;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
@@ -12,8 +15,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public final class BlockEntityHole extends BlockEntity {
@@ -146,9 +147,9 @@ public final class BlockEntityHole extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        output.store("oldblock", BlockState.CODEC, oldblock);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
+        TCNbt.store(output, "oldblock", BlockState.CODEC, registries, oldblock);
         output.putInt("countdown", countdown);
         output.putInt("countdownmax", countdownmax);
         output.putInt("count", count);
@@ -156,13 +157,13 @@ public final class BlockEntityHole extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        oldblock = input.read("oldblock", BlockState.CODEC).orElse(Blocks.AIR.defaultBlockState());
-        countdown = input.getIntOr("countdown", 0);
-        countdownmax = input.getIntOr("countdownmax", DEFAULT_COUNTDOWN_MAX);
-        count = input.getIntOr("count", 0);
-        int directionOrdinal = input.getIntOr("direction", -1);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        oldblock = TCNbt.read(input, "oldblock", BlockState.CODEC, registries).orElse(Blocks.AIR.defaultBlockState());
+        countdown = input.getInt("countdown");
+        countdownmax = (input.contains("countdownmax") ? input.getInt("countdownmax") : DEFAULT_COUNTDOWN_MAX);
+        count = input.getInt("count");
+        int directionOrdinal = (input.contains("direction") ? input.getInt("direction") : -1);
         direction = directionOrdinal >= 0 ? Direction.values()[directionOrdinal] : null;
     }
 }

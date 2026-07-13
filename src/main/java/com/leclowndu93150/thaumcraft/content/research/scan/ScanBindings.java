@@ -12,7 +12,7 @@ import com.leclowndu93150.thaumcraft.content.research.PlayerKnowledge;
 import com.leclowndu93150.thaumcraft.content.research.ResearchManager;
 import java.util.Optional;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -21,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
 
 public final class ScanBindings implements ScanningManager.Bindings {
     @Override
-    public boolean progressResearch(Player player, Identifier research) {
+    public boolean progressResearch(Player player, ResourceLocation research) {
         if (!(player instanceof ServerPlayer serverPlayer)) {
             return false;
         }
@@ -48,7 +48,7 @@ public final class ScanBindings implements ScanningManager.Bindings {
     }
 
     @Override
-    public boolean addKnowledge(Player player, KnowledgeType type, Identifier category, int amount) {
+    public boolean addKnowledge(Player player, KnowledgeType type, ResourceLocation category, int amount) {
         if (!(player instanceof ServerPlayer serverPlayer)) {
             return false;
         }

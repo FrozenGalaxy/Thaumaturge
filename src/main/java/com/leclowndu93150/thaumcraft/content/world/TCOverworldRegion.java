@@ -4,7 +4,7 @@ import com.leclowndu93150.thaumcraft.data.worldgen.biome.TCBiomes;
 import com.mojang.datafixers.util.Pair;
 import java.util.function.Consumer;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -15,7 +15,7 @@ import terrablender.api.RegionType;
 public final class TCOverworldRegion extends Region {
     public static final int WEIGHT = 6;
 
-    public TCOverworldRegion(Identifier name) {
+    public TCOverworldRegion(ResourceLocation name) {
         super(name, RegionType.OVERWORLD, WEIGHT);
     }
 

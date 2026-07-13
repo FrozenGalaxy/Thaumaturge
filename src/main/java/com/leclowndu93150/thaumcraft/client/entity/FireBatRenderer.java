@@ -7,10 +7,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class FireBatRenderer extends MobRenderer<EntityFireBat, FireBatRenderState, FireBatModel> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/firebat.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/firebat.png");
     private static final float SHADOW = 0.25F;
     private static final float SCALE = 0.35F;
     private static final int FULLBRIGHT_BLOCK_LIGHT = 15;
@@ -36,7 +36,7 @@ public final class FireBatRenderer extends MobRenderer<EntityFireBat, FireBatRen
     }
 
     @Override
-    public Identifier getTextureLocation(FireBatRenderState state) {
+    public ResourceLocation getTextureLocation(FireBatRenderState state) {
         return TEXTURE;
     }
 

@@ -4,7 +4,7 @@ import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import com.leclowndu93150.thaumcraft.api.golems.IGolemAPI;
 import java.util.List;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,7 +20,7 @@ import org.jspecify.annotations.Nullable;
 public final class GolemArm extends GolemPart {
     /** The registry key for golem arms. */
     public static final ResourceKey<Registry<GolemArm>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            Identifier.fromNamespaceAndPath("thaumcraft", "golem_arm"));
+            ResourceLocation.fromNamespaceAndPath("thaumcraft", "golem_arm"));
 
     private final IArmFunction function;
 
@@ -32,7 +32,7 @@ public final class GolemArm extends GolemPart {
      * @param function   the behavior attached to these arms, or null when they have none
      * @param traits     traits granted by these arms
      */
-    public GolemArm(List<Identifier> research, Identifier icon, @Nullable GolemPartModel model,
+    public GolemArm(List<ResourceLocation> research, ResourceLocation icon, @Nullable GolemPartModel model,
                     List<GolemComponent> components, @Nullable IArmFunction function, List<GolemTrait> traits) {
         super(research, icon, components, traits, model);
         this.function = function;

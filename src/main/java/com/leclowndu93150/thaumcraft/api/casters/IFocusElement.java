@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.api.casters;
 
 import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -17,7 +17,7 @@ public interface IFocusElement {
      *
      * @return the element id, e.g. {@code thaumcraft:root}
      */
-    Identifier getKey();
+    ResourceLocation getKey();
 
     /**
      * The research required before a player may place this element into a focus. Null means

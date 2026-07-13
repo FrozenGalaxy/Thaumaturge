@@ -10,16 +10,16 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4fc;
 import org.jspecify.annotations.Nullable;
 
 public final class EldritchPortalRenderer implements BlockEntityRenderer<BlockEntityEldritchPortal, EldritchPortalRenderState> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/misc/eldritch_portal.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/misc/eldritch_portal.png");
     private static final RenderType PORTAL_TYPE = RenderType.create(
             "tc_eldritch_portal",
             RenderSetup.builder(TCRenderPipelines.FX_TRANSLUCENT)

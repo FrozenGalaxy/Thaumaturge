@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.research.theorycraft.cards;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import com.leclowndu93150.thaumcraft.api.research.TCResearchCategories;
 import com.leclowndu93150.thaumcraft.api.research.theorycraft.IResearchTableData;
@@ -8,6 +9,7 @@ import com.leclowndu93150.thaumcraft.content.misc.ItemCurio;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -15,8 +17,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 public final class CardCurio extends TheorycraftCard {
     private ItemStack curio = ItemStack.EMPTY;
@@ -89,16 +89,16 @@ public final class CardCurio extends TheorycraftCard {
     }
 
     @Override
-    public void write(ValueOutput output, HolderLookup.Provider registries) {
+    public void write(CompoundTag output, HolderLookup.Provider registries) {
         super.write(output, registries);
         if (!curio.isEmpty()) {
-            output.store("stack", ItemStack.CODEC, curio);
+            TCNbt.store(output, "stack", ItemStack.CODEC, registries, curio);
         }
     }
 
     @Override
-    public void read(ValueInput input, HolderLookup.Provider registries) {
+    public void read(CompoundTag input, HolderLookup.Provider registries) {
         super.read(input, registries);
-        curio = input.read("stack", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+        curio = TCNbt.read(input, "stack", ItemStack.CODEC, registries).orElse(ItemStack.EMPTY);
     }
 }

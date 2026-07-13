@@ -5,13 +5,13 @@ import com.leclowndu93150.thaumcraft.client.model.entity.CrossbowModel;
 import com.leclowndu93150.thaumcraft.content.entity.construct.EntityTurretCrossbow;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
 
 public final class TurretCrossbowRenderer
         extends MobRenderer<EntityTurretCrossbow, TurretCrossbowRenderState, CrossbowModel> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/crossbow.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/crossbow.png");
     private static final float SHADOW = 0.5F;
 
     public TurretCrossbowRenderer(EntityRendererProvider.Context context) {
@@ -35,7 +35,7 @@ public final class TurretCrossbowRenderer
     }
 
     @Override
-    public Identifier getTextureLocation(TurretCrossbowRenderState state) {
+    public ResourceLocation getTextureLocation(TurretCrossbowRenderState state) {
         return TEXTURE;
     }
 }

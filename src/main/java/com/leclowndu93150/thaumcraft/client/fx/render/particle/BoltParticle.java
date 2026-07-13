@@ -10,7 +10,7 @@ import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
@@ -75,7 +75,7 @@ public final class BoltParticle extends SingleQuadParticle {
         float baseY = (float) (this.y - cam.y());
         float baseZ = (float) (this.z - cam.z());
         float alpha = Mth.clamp(1.0F - (this.age + partialTickTime) / this.lifetime, MIN_ALPHA, 1.0F);
-        int color = ARGB.colorFromFloat(alpha, this.rCol, this.gCol, this.bCol);
+        int color = ARGB32.colorFromFloat(alpha, this.rCol, this.gCol, this.bCol);
         float ampl = (this.age + partialTickTime) / WAVE_AMPLITUDE_RATE;
         RandomSource jitterSource = RandomSource.create(this.seed);
         float beadSize = this.width * BEAD_SIZE_FACTOR;

@@ -8,7 +8,7 @@ import com.leclowndu93150.thaumcraft.api.research.scan.IScanThing;
 import com.leclowndu93150.thaumcraft.api.research.scan.ScanKeys;
 import com.leclowndu93150.thaumcraft.api.research.scan.ScanningManager;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -59,7 +59,7 @@ public final class ScanAspectDiscovery implements IScanThing {
     }
 
     @Override
-    public Identifier getResearchKey(Player player, @Nullable Object target) {
+    public ResourceLocation getResearchKey(Player player, @Nullable Object target) {
         return ScanKeys.aspect(aspect);
     }
 }

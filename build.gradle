@@ -88,6 +88,8 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
 dependencies {
+    compileOnly "org.jspecify:jspecify:1.0.0"
+
     implementation "curse.maven:terrablender-neoforge-940057:6054947"
 
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"

@@ -1,6 +1,6 @@
 package com.leclowndu93150.thaumcraft.api.research;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Identifiers of research entries that gameplay systems reference directly.
@@ -9,14 +9,14 @@ import net.minecraft.resources.Identifier;
  */
 public final class TCResearchEntries {
     /** Unlocks celestial observation through the thaumometer. */
-    public static final Identifier CELESTIAL_SCANNING = id("celestial_scanning");
+    public static final ResourceLocation CELESTIAL_SCANNING = id("celestial_scanning");
 
     /** Granted when the thaumometer detects dangerous flux levels in the local aura. */
-    public static final Identifier FLUX = id("flux");
+    public static final ResourceLocation FLUX = id("flux");
 
     private TCResearchEntries() {}
 
-    private static Identifier id(String path) {
-        return Identifier.fromNamespaceAndPath("thaumcraft", path);
+    private static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath("thaumcraft", path);
     }
 }

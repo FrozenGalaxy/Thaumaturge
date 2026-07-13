@@ -3,7 +3,6 @@ package com.leclowndu93150.thaumcraft.content.equipment.bauble;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.items.RechargeAccess;
 import com.leclowndu93150.thaumcraft.compat.curio.ThaumcraftCuriosCompat;
-import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -13,7 +12,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
+
+import java.util.List;
 import net.neoforged.fml.ModList;
 
 public final class AmuletVisItem extends Item {
@@ -49,10 +49,9 @@ public final class AmuletVisItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display,
-                                Consumer<Component> tooltip, TooltipFlag flag) {
-        tooltip.accept(Component.translatable("item.thaumcraft.amulet_vis.text")
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(Component.translatable("item.thaumcraft.amulet_vis.text")
                 .withStyle(ChatFormatting.AQUA));
-        super.appendHoverText(stack, context, display, tooltip, flag);
+        super.appendHoverText(stack, context, tooltip, flag);
     }
 }

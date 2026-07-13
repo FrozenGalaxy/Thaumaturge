@@ -7,8 +7,10 @@ import com.leclowndu93150.thaumcraft.api.casters.Trajectory;
 import com.leclowndu93150.thaumcraft.content.fx.FX;
 import com.leclowndu93150.thaumcraft.registry.TCAttachments;
 import com.leclowndu93150.thaumcraft.registry.TCEntities;
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -17,7 +19,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -25,8 +26,6 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.TraceableEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -49,7 +48,7 @@ public final class EntityFocusCloud extends Entity implements TraceableEntity, I
     private static final double PARTICLE_MOTION = 0.01;
 
     private @Nullable FocusPackage focusPackage;
-    private @Nullable EntityReference<LivingEntity> owner;
+    private @Nullable UUID owner;
     private int duration;
     private @Nullable List<FocusEffect> effects;
 
@@ -80,12 +79,15 @@ public final class EntityFocusCloud extends Entity implements TraceableEntity, I
     }
 
     public void setOwner(@Nullable LivingEntity owner) {
-        this.owner = EntityReference.of(owner);
+        this.owner = owner == null ? null : owner.getUUID();
     }
 
     @Override
     public @Nullable LivingEntity getOwner() {
-        return EntityReference.getLivingEntity(this.owner, this.level());
+        if (this.owner != null && this.level() instanceof ServerLevel serverLevel) {
+            return serverLevel.getEntity(this.owner) instanceof LivingEntity living ? living : null;
+        }
+        return null;
     }
 
     public void setRadius(float radius) {
@@ -136,20 +138,22 @@ public final class EntityFocusCloud extends Entity implements TraceableEntity, I
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         output.putInt("Age", this.tickCount);
         output.putInt("Duration", this.duration);
         output.putFloat("Radius", this.getRadius());
-        EntityReference.store(this.owner, output, "OwnerUUID");
+        if (this.owner != null) {
+            output.putUUID("OwnerUUID", this.owner);
+        }
         FocusPackages.save(output, this.focusPackage);
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
-        this.tickCount = input.getIntOr("Age", 0);
-        this.duration = input.getIntOr("Duration", 0);
-        this.setRadius(input.getFloatOr("Radius", DEFAULT_RADIUS));
-        this.owner = EntityReference.read(input, "OwnerUUID");
+    protected void readAdditionalSaveData(CompoundTag input) {
+        this.tickCount = input.getInt("Age");
+        this.duration = input.getInt("Duration");
+        this.setRadius((input.contains("Radius") ? input.getFloat("Radius") : DEFAULT_RADIUS));
+        this.owner = input.hasUUID("OwnerUUID") ? input.getUUID("OwnerUUID") : null;
         this.focusPackage = FocusPackages.load(input);
     }
 

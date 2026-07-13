@@ -11,9 +11,9 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.RandomSource;
 import org.joml.Matrix4fc;
 
@@ -88,7 +88,7 @@ public final class EldritchOrbRenderer extends EntityRenderer<EntityEldritchOrb,
         float v0 = BILLBOARD_ROW * texFrame;
         float u1 = u0 + texFrame;
         float v1 = v0 + texFrame;
-        int tint = ARGB.colorFromFloat(1.0F, 1.0F, 1.0F, 1.0F);
+        int tint = ARGB32.colorFromFloat(1.0F, 1.0F, 1.0F, 1.0F);
         collector.submitCustomGeometry(poseStack, BILLBOARD_TYPE, (pose, buffer) -> {
             Matrix4fc mat = pose.pose();
             buffer.addVertex(mat, -HALF, -HALF, 0.0F).setUv(u1, v1).setColor(tint).setLight(EMISSIVE_LIGHT);

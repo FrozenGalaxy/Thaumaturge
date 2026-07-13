@@ -34,12 +34,12 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -155,7 +155,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
 
     private static double persistedX = UNSET_PERSIST;
     private static double persistedY = UNSET_PERSIST;
-    private static @Nullable Identifier persistedCategoryId = null;
+    private static @Nullable ResourceLocation persistedCategoryId = null;
     private static int persistedCatScrollPos = 0;
     private static boolean persistedSearching = false;
 
@@ -165,7 +165,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
     private final Map<Holder.Reference<IResearchCategory>, List<EntryNode>> nodesByCategory = new HashMap<>();
     private final List<EntryNode> allEntries = new ArrayList<>();
     private final List<SearchResult> searchResults = new ArrayList<>();
-    private final Set<Identifier> invisibleEntries = new HashSet<>();
+    private final Set<ResourceLocation> invisibleEntries = new HashSet<>();
 
     private Holder.@Nullable Reference<IResearchCategory> activeCategory;
     private double curMouseX;
@@ -336,7 +336,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
     }
 
     private boolean isCategoryUnlocked(IPlayerKnowledge knowledge, Holder.Reference<IResearchCategory> ref) {
-        Optional<Identifier> gate = ref.value().requiredResearch();
+        Optional<ResourceLocation> gate = ref.value().requiredResearch();
         return gate.isEmpty() || knowledge.isResearchComplete(gate.get());
     }
 
@@ -383,7 +383,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
                 searchResults.add(SearchResult.category(name, ref));
             }
         }
-        for (Identifier known : knowledge.researchList()) {
+        for (ResourceLocation known : knowledge.researchList()) {
             EntryNode node = findGlobalNode(known);
             if (node == null) continue;
             String entryName = Component.translatable(node.entry.nameKey()).getString();
@@ -578,7 +578,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
                             source.entry.hasMeta(ResearchEntryMeta.REVERSE));
                 }
             }
-            for (Identifier siblingRaw : source.entry.siblings()) {
+            for (ResourceLocation siblingRaw : source.entry.siblings()) {
                 EntryNode siblingNode = findGlobalNode(siblingRaw);
                 if (siblingNode == null) continue;
                 if (!activeCategory.equals(siblingNode.category)) continue;
@@ -964,7 +964,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         TCTooltipRenderer.render(graphics, font, lines, mouseX, mouseY);
     }
 
-    private @Nullable EntryNode findGlobalNode(Identifier id) {
+    private @Nullable EntryNode findGlobalNode(ResourceLocation id) {
         for (EntryNode node : allEntries) {
             if (node.id.equals(id)) return node;
         }
@@ -1013,7 +1013,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         if (!searching && currentHighlight != null && !knowledge.isResearchKnown(currentHighlight.id) && canUnlockResearch(knowledge, currentHighlight)) {
             EntryNode hl = currentHighlight;
             updateResearch();
-            ClientPacketDistributor.sendToServer(new ServerboundUnlockResearchPayload(hl.id));
+            PacketDistributor.sendToServer(new ServerboundUnlockResearchPayload(hl.id));
             popupTimeMs = System.currentTimeMillis() + POPUP_DURATION_MS;
             popupMessage = Component.translatable("tc.research.popup", Component.translatable(hl.entry.nameKey()).getString());
             minecraft.setScreen(new EntryDetailScreen(hl.holder, hl.id, this));
@@ -1022,11 +1022,11 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
             EntryNode hl = currentHighlight;
             knowledge.clearResearchFlag(hl.id, ResearchFlag.RESEARCH);
             knowledge.clearResearchFlag(hl.id, ResearchFlag.PAGE);
-            ClientPacketDistributor.sendToServer(new ServerboundClearResearchFlagsPayload(
+            PacketDistributor.sendToServer(new ServerboundClearResearchFlagsPayload(
                     hl.id, List.of(ResearchFlag.RESEARCH, ResearchFlag.PAGE)));
             int stage = knowledge.researchStage(hl.id);
             if (stage > 1 && stage >= hl.entry.stages().size()) {
-                ClientPacketDistributor.sendToServer(new ServerboundUnlockResearchPayload(hl.id));
+                PacketDistributor.sendToServer(new ServerboundUnlockResearchPayload(hl.id));
             }
             minecraft.setScreen(new EntryDetailScreen(hl.holder, hl.id, this));
             return true;
@@ -1152,7 +1152,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         return false;
     }
 
-    private record EntryNode(Identifier id, IResearchEntry entry, Holder<IResearchEntry> holder, Holder.Reference<IResearchCategory> category) {}
+    private record EntryNode(ResourceLocation id, IResearchEntry entry, Holder<IResearchEntry> holder, Holder.Reference<IResearchCategory> category) {}
 
     private static final class SearchResult implements Comparable<SearchResult> {
         enum Kind { CATEGORY, ENTRY, RECIPE }

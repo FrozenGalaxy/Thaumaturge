@@ -10,12 +10,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.player.Player;
 
 public final class SanityHudOverlay implements LeftHudStack.Gauge {
-    private static final Identifier HUD = TCIds.rl("textures/gui/hud.png");
+    private static final ResourceLocation HUD = TCIds.rl("textures/gui/hud.png");
     private static final int TEX_SIZE = 256;
     private static final int HUD_X = 1;
     private static final int HUD_Y = 1;
@@ -30,9 +30,9 @@ public final class SanityHudOverlay implements LeftHudStack.Gauge {
     private static final int FILL_W = 8;
     private static final int FILL_RANGE = 48;
     private static final float WARP_CAP = 100.0F;
-    private static final int TEMPORARY_TINT = ARGB.colorFromFloat(1.0F, 1.0F, 0.5F, 1.0F);
-    private static final int NORMAL_TINT = ARGB.colorFromFloat(1.0F, 0.75F, 0.0F, 0.75F);
-    private static final int PERMANENT_TINT = ARGB.colorFromFloat(1.0F, 0.5F, 0.0F, 0.5F);
+    private static final int TEMPORARY_TINT = ARGB32.colorFromFloat(1.0F, 1.0F, 0.5F, 1.0F);
+    private static final int NORMAL_TINT = ARGB32.colorFromFloat(1.0F, 0.75F, 0.0F, 0.75F);
+    private static final int PERMANENT_TINT = ARGB32.colorFromFloat(1.0F, 0.5F, 0.0F, 0.5F);
     private static final int STACK_HEIGHT = 78;
 
     @Override

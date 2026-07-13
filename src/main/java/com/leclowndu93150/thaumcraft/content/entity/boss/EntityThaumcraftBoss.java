@@ -13,7 +13,7 @@ import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
@@ -24,7 +24,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.SpawnGroupData;
@@ -39,8 +39,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
@@ -126,7 +124,7 @@ public class EntityThaumcraftBoss extends Monster {
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                  EntitySpawnReason reason, @Nullable SpawnGroupData data) {
+                                                  MobSpawnType reason, @Nullable SpawnGroupData data) {
         this.setHomeTo(this.blockPosition(), HOME_RADIUS);
         this.generateName();
         this.bossEvent.setName(this.getDisplayName());
@@ -207,12 +205,12 @@ public class EntityThaumcraftBoss extends Monster {
         this.setHealth(this.getHealth() * this.getMaxHealth() / oldMax);
     }
 
-    private static Identifier hpBuffId(int slot) {
-        return Identifier.fromNamespaceAndPath("thaumcraft", "boss_hp_buff_" + slot);
+    private static ResourceLocation hpBuffId(int slot) {
+        return ResourceLocation.fromNamespaceAndPath("thaumcraft", "boss_hp_buff_" + slot);
     }
 
-    private static Identifier dmgBuffId(int slot) {
-        return Identifier.fromNamespaceAndPath("thaumcraft", "boss_dmg_buff_" + slot);
+    private static ResourceLocation dmgBuffId(int slot) {
+        return ResourceLocation.fromNamespaceAndPath("thaumcraft", "boss_dmg_buff_" + slot);
     }
 
     @Override
@@ -269,8 +267,8 @@ public class EntityThaumcraftBoss extends Monster {
     }
 
     @Override
-    public boolean considersEntityAsAlly(Entity other) {
-        return other instanceof IEldritchMob || super.considersEntityAsAlly(other);
+    public boolean isAlliedTo(Entity other) {
+        return other instanceof IEldritchMob || super.isAlliedTo(other);
     }
 
     @Override

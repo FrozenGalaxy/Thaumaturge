@@ -15,7 +15,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +29,7 @@ public class InfusionRecipeBuilder extends SimpleRecipeBuilder {
     private @Nullable ResearchGate gate;
     private @Nullable DataComponentPatch catalystPatch;
 
-    public InfusionRecipeBuilder(HolderGetter<IAspect> aspectsGetter, RecipeCategory category, ItemStackTemplate result, Ingredient catalyst) {
+    public InfusionRecipeBuilder(HolderGetter<IAspect> aspectsGetter, RecipeCategory category, ItemStack result, Ingredient catalyst) {
         super(result, category);
         this.aspectsGetter = aspectsGetter;
         this.catalyst = catalyst;

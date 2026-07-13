@@ -12,7 +12,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -20,15 +19,12 @@ import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,15 +38,15 @@ public final class BlockEntityEverfullUrn extends BlockEntity {
     private static final int ZONE_XZ = 5;
     private static final int ZONE_Y = 3;
 
-    private final FluidStacksResourceHandler tank = new FluidStacksResourceHandler(1, CAPACITY) {
+    private final FluidTank tank = new FluidTank(CAPACITY) {
         @Override
-        public boolean isValid(int index, FluidResource resource) {
+        public boolean isFluidValid(FluidStack resource) {
             return resource.is(Fluids.WATER);
         }
 
         @Override
-        protected void onContentsChanged(int index, FluidStack previousContents) {
-            super.onContentsChanged(index, previousContents);
+        protected void onContentsChanged() {
+            super.onContentsChanged();
             setChanged();
         }
     };
@@ -63,25 +59,23 @@ public final class BlockEntityEverfullUrn extends BlockEntity {
         super(TCBlockEntities.EVERFULL_URN.get(), pos, state);
     }
 
-    public FluidStacksResourceHandler getTank() {
+    public FluidTank getTank() {
         return tank;
     }
 
     public int waterAmount() {
-        return tank.getAmountAsInt(0);
+        return tank.getFluidAmount();
     }
 
     public void drainWater(int amount) {
-        try (Transaction ctx = Transaction.openRoot()) {
-            tank.extract(FluidResource.of(Fluids.WATER), amount, ctx);
-            ctx.commit();
+        {
+            tank.drain(amount, IFluidHandler.FluidAction.EXECUTE);
         }
     }
 
     private void fillWater(int amount) {
-        try (Transaction ctx = Transaction.openRoot()) {
-            tank.insert(FluidResource.of(Fluids.WATER), amount, ctx);
-            ctx.commit();
+        {
+            tank.fill(new FluidStack(Fluids.WATER, amount), IFluidHandler.FluidAction.EXECUTE);
         }
     }
 
@@ -101,8 +95,8 @@ public final class BlockEntityEverfullUrn extends BlockEntity {
             int zz = urn.handlers.get(i);
             BlockPos target = urn.zonePos(zz);
             BlockState targetState = server.getBlockState(target);
-            ResourceHandler<FluidResource> handler =
-                    server.getCapability(Capabilities.Fluid.BLOCK, target, Direction.UP);
+            IFluidHandler handler =
+                    server.getCapability(Capabilities.FluidHandler.BLOCK, target, Direction.UP);
             if (handler == null) {
                 if (!targetState.is(Blocks.CAULDRON) && !targetState.is(Blocks.WATER_CAULDRON)
                         || urn.waterAmount() < CAULDRON_COST) {
@@ -122,10 +116,9 @@ public final class BlockEntityEverfullUrn extends BlockEntity {
                 }
             } else {
                 int moved;
-                try (Transaction ctx = Transaction.openRoot()) {
-                    moved = handler.insert(FluidResource.of(Fluids.WATER), PUSH_AMOUNT, ctx);
+                {
+                    moved = handler.fill(new FluidStack(Fluids.WATER, PUSH_AMOUNT), IFluidHandler.FluidAction.EXECUTE);
                     if (moved > 0) {
-                        ctx.commit();
                     }
                 }
                 if (moved > 0) {
@@ -156,7 +149,7 @@ public final class BlockEntityEverfullUrn extends BlockEntity {
     }
 
     private boolean acceptsWater(ServerLevel server, BlockPos pos) {
-        if (server.getCapability(Capabilities.Fluid.BLOCK, pos, Direction.UP) != null) {
+        if (server.getCapability(Capabilities.FluidHandler.BLOCK, pos, Direction.UP) != null) {
             return true;
         }
         BlockState state = server.getBlockState(pos);
@@ -169,9 +162,9 @@ public final class BlockEntityEverfullUrn extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        tank.serialize(output.child("Tank"));
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
+        output.put("Tank", tank.writeToNBT(registries, new CompoundTag()));
         int[] zones = new int[handlers.size()];
         for (int i = 0; i < zones.length; i++) {
             zones[i] = handlers.get(i);
@@ -180,9 +173,11 @@ public final class BlockEntityEverfullUrn extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        input.child("Tank").ifPresent(tank::deserialize);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        if (input.contains("Tank")) {
+            tank.readFromNBT(registries, input.getCompound("Tank"));
+        }
         handlers.clear();
         int[] zones = input.getIntArray("Handlers").orElse(new int[0]);
         for (int zone : zones) {
@@ -193,10 +188,10 @@ public final class BlockEntityEverfullUrn extends BlockEntity {
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput output = TagValueOutput.createWithContext(reporter, registries);
-            saveAdditional(output);
-            nbt.merge(output.buildResult());
+        {
+            CompoundTag output = new CompoundTag();
+            saveAdditional(output, registries);
+            nbt.merge(output);
         }
         return nbt;
     }

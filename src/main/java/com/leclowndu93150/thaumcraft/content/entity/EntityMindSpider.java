@@ -1,6 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.entity;
 
 import com.leclowndu93150.thaumcraft.api.entity.IEldritchMob;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -9,10 +10,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.spider.Spider;
+import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 public final class EntityMindSpider extends Spider implements IEldritchMob {
     private static final EntityDataAccessor<Boolean> DATA_HARMLESS =
@@ -92,16 +91,16 @@ public final class EntityMindSpider extends Spider implements IEldritchMob {
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("harmless", isHarmless());
         output.putString("viewer", getViewer());
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
+    protected void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        setHarmless(input.getBooleanOr("harmless", false));
-        setViewer(input.getStringOr("viewer", ""));
+        setHarmless(input.getBoolean("harmless"));
+        setViewer(input.getString("viewer"));
     }
 }

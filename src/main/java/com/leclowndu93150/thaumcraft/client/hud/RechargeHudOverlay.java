@@ -12,14 +12,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.gui.GuiLayer;
 
 public final class RechargeHudOverlay implements GuiLayer {
-    private static final Identifier HUD = TCIds.rl("textures/gui/hud.png");
+    private static final ResourceLocation HUD = TCIds.rl("textures/gui/hud.png");
     private static final int TEX_SIZE = 256;
 
     private static final int PERIODIC_SHOW_TICKS = 60;
@@ -96,7 +96,7 @@ public final class RechargeHudOverlay implements GuiLayer {
             graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
                     -BAR_FILL_W / 2, BAR_BOTTOM - loc, BAR_FILL_U, 0.0F,
                     BAR_FILL_W, loc, BAR_FILL_W, loc, TEX_SIZE, TEX_SIZE,
-                    ARGB.color(Math.round(BAR_FILL_ALPHA * 255.0F), energyColor(mc)));
+                    ARGB32.color(Math.round(BAR_FILL_ALPHA * 255.0F), energyColor(mc)));
         }
         graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
                 BAR_FRAME_X, BAR_FRAME_Y, BAR_FRAME_U, 0.0F,

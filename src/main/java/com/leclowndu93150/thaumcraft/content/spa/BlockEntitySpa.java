@@ -20,22 +20,16 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jspecify.annotations.Nullable;
 
 public class BlockEntitySpa extends BlockEntity implements MenuProvider {
@@ -44,24 +38,24 @@ public class BlockEntitySpa extends BlockEntity implements MenuProvider {
     private static final int FLUID_COST = 1000;
     private static final int SPREAD_RADIUS = 2;
 
-    private final FluidStacksResourceHandler tank = new FluidStacksResourceHandler(1, TANK_CAPACITY) {
+    private final FluidTank tank = new FluidTank(TANK_CAPACITY) {
         @Override
-        protected void onContentsChanged(int index, FluidStack previousContents) {
-            super.onContentsChanged(index, previousContents);
+        protected void onContentsChanged() {
+            super.onContentsChanged();
             setChanged();
             syncToClient();
         }
     };
 
-    private final ItemStacksResourceHandler items = new ItemStacksResourceHandler(1) {
+    private final ItemStackHandler items = new ItemStackHandler(1) {
         @Override
-        public boolean isValid(int index, ItemResource resource) {
+        public boolean isItemValid(int index, ItemStack resource) {
             return resource.is(TCItems.BATH_SALTS.get());
         }
 
         @Override
-        protected void onContentsChanged(int index, ItemStack previousContents) {
-            super.onContentsChanged(index, previousContents);
+        protected void onContentsChanged(int index) {
+            super.onContentsChanged();
             setChanged();
         }
     };
@@ -73,11 +67,11 @@ public class BlockEntitySpa extends BlockEntity implements MenuProvider {
         super(TCBlockEntities.SPA.get(), pos, state);
     }
 
-    public FluidStacksResourceHandler getTank() {
+    public FluidTank getTank() {
         return tank;
     }
 
-    public ItemStacksResourceHandler getItems() {
+    public ItemStackHandler getItems() {
         return items;
     }
 
@@ -122,7 +116,7 @@ public class BlockEntitySpa extends BlockEntity implements MenuProvider {
         if (mix) {
             return TCBlocks.PURIFYING_FLUID.get();
         }
-        Fluid fluid = tank.getResource(0).getFluid();
+        Fluid fluid = tank.getStackInSlot(0).getFluid();
         if (!(fluid instanceof FlowingFluid)) {
             return null;
         }
@@ -132,20 +126,19 @@ public class BlockEntitySpa extends BlockEntity implements MenuProvider {
 
     private boolean hasIngredients() {
         if (mix) {
-            return tank.getResource(0).is(Fluids.WATER)
-                    && tank.getAmountAsInt(0) >= FLUID_COST
-                    && items.getResource(0).is(TCItems.BATH_SALTS.get());
+            return tank.getStackInSlot(0).is(Fluids.WATER)
+                    && tank.getFluidAmount() >= FLUID_COST
+                    && items.getStackInSlot(0).is(TCItems.BATH_SALTS.get());
         }
-        return tank.getAmountAsInt(0) >= FLUID_COST && targetBlock() != null;
+        return tank.getFluidAmount() >= FLUID_COST && targetBlock() != null;
     }
 
     private void consumeIngredients() {
-        try (Transaction ctx = Transaction.openRoot()) {
+        {
             if (mix) {
-                items.extract(items.getResource(0), 1, ctx);
+                items.extract(items.getStackInSlot(0), 1, ctx);
             }
-            tank.extract(tank.getResource(0), FLUID_COST, ctx);
-            ctx.commit();
+            tank.extract(tank.getStackInSlot(0), FLUID_COST, ctx);
         }
     }
 
@@ -180,19 +173,23 @@ public class BlockEntitySpa extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         output.putBoolean("Mix", mix);
-        tank.serialize(output.child("Tank"));
-        items.serialize(output.child("Items"));
+        output.put("Tank", tank.writeToNBT(registries, new CompoundTag()));
+        output.put("Items", items.serializeNBT(registries));
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        mix = input.getBooleanOr("Mix", true);
-        input.child("Tank").ifPresent(tank::deserialize);
-        input.child("Items").ifPresent(items::deserialize);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        mix = (input.contains("Mix") ? input.getBoolean("Mix") : true);
+        if (input.contains("Tank")) {
+            tank.readFromNBT(registries, input.getCompound("Tank"));
+        }
+        if (input.contains("Items")) {
+            items.deserializeNBT(registries, input.getCompound("Items"));
+        }
     }
 
     @Override
@@ -203,10 +200,10 @@ public class BlockEntitySpa extends BlockEntity implements MenuProvider {
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput out = TagValueOutput.createWithContext(reporter, registries);
-            saveAdditional(out);
-            nbt.merge(out.buildResult());
+        {
+            CompoundTag out = new CompoundTag();
+            saveAdditional(out, registries);
+            nbt.merge(out);
         }
         return nbt;
     }

@@ -11,15 +11,15 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
 public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThaumatorium> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/gui/gui_thaumatorium.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/gui/gui_thaumatorium.png");
     private static final int GRID_X = 48;
     private static final int GRID_Y = 56;
     private static final int CELL = 16;
@@ -107,11 +107,11 @@ public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThau
     }
 
     private void drawAspectBars(GuiGraphicsExtractor graphics, BlockEntityThaumatorium machine, int k, int l) {
-        List<Identifier> queue = machine.queue();
+        List<ResourceLocation> queue = machine.queue();
         if (queue.isEmpty()) {
             return;
         }
-        Identifier shownId = queue.get((int) (System.currentTimeMillis() / 1000L % queue.size()));
+        ResourceLocation shownId = queue.get((int) (System.currentTimeMillis() / 1000L % queue.size()));
         ClientboundThaumatoriumRecipesPayload.Entry shown = null;
         for (ClientboundThaumatoriumRecipesPayload.Entry entry : menu.clientRecipes) {
             if (entry.id().equals(shownId)) {
@@ -134,7 +134,7 @@ public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThau
             graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, BAR_U, BAR_BACK_V, BAR_WIDTH, BAR_HEIGHT, 256, 256);
             int fill = (int) (machine.essentia().amountOf(entry.aspect()) / (float) entry.amount() * BAR_WIDTH);
             if (fill > 0) {
-                int color = ARGB.opaque(entry.aspect().value().color());
+                int color = ARGB32.opaque(entry.aspect().value().color());
                 graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, BAR_U, BAR_FILL_V, Math.min(fill, BAR_WIDTH), BAR_HEIGHT, 256, 256, color);
             }
             count++;
@@ -165,7 +165,7 @@ public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThau
             int y = topPos + GRID_Y + py * CELL;
             if (mx >= x && my >= y && mx < x + CELL && my < y + CELL) {
                 if (menu.blockEntity != null) {
-                    ClientPacketDistributor.sendToServer(new ServerboundThaumatoriumTogglePayload(
+                    PacketDistributor.sendToServer(new ServerboundThaumatoriumTogglePayload(
                             menu.blockEntity.getBlockPos(), recipes.get(i).id()));
                 }
                 return true;

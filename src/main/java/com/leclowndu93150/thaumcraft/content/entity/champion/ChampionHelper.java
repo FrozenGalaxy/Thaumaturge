@@ -5,7 +5,7 @@ import com.leclowndu93150.thaumcraft.mixin.world.entity.MobAccessor;
 import com.leclowndu93150.thaumcraft.registry.TCAttributes;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
@@ -29,25 +29,25 @@ public final class ChampionHelper {
     public static final int NOT_PROCESSED = -2;
     public static final int NOT_CHAMPION = -1;
 
-    private static final Identifier CHAMPION_HEALTH_ID = TCIds.rl("champion/health");
+    private static final ResourceLocation CHAMPION_HEALTH_ID = TCIds.rl("champion/health");
     private static final AttributeModifier CHAMPION_HEALTH =
             new AttributeModifier(CHAMPION_HEALTH_ID, 100.0, AttributeModifier.Operation.ADD_VALUE);
-    private static final Identifier CHAMPION_DAMAGE_ID = TCIds.rl("champion/damage");
+    private static final ResourceLocation CHAMPION_DAMAGE_ID = TCIds.rl("champion/damage");
     private static final AttributeModifier CHAMPION_DAMAGE =
             new AttributeModifier(CHAMPION_DAMAGE_ID, 2.0, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-    private static final Identifier BOLD_SPEED_ID = TCIds.rl("champion/bold_speed");
+    private static final ResourceLocation BOLD_SPEED_ID = TCIds.rl("champion/bold_speed");
     private static final AttributeModifier BOLD_SPEED =
             new AttributeModifier(BOLD_SPEED_ID, 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-    private static final Identifier MIGHTY_DAMAGE_ID = TCIds.rl("champion/mighty_damage");
+    private static final ResourceLocation MIGHTY_DAMAGE_ID = TCIds.rl("champion/mighty_damage");
     private static final AttributeModifier MIGHTY_DAMAGE =
             new AttributeModifier(MIGHTY_DAMAGE_ID, 2.0, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-    private static final Identifier TAINTED_HEALTH_ID = TCIds.rl("champion/tainted_health");
+    private static final ResourceLocation TAINTED_HEALTH_ID = TCIds.rl("champion/tainted_health");
     private static final AttributeModifier TAINTED_HEALTH =
             new AttributeModifier(TAINTED_HEALTH_ID, 25.0, AttributeModifier.Operation.ADD_VALUE);
-    private static final Identifier TAINTED_DAMAGE_ID = TCIds.rl("champion/tainted_damage");
+    private static final ResourceLocation TAINTED_DAMAGE_ID = TCIds.rl("champion/tainted_damage");
     private static final AttributeModifier TAINTED_DAMAGE =
             new AttributeModifier(TAINTED_DAMAGE_ID, 0.5, AttributeModifier.Operation.ADD_VALUE);
-    private static final Identifier TAINTED_AI_MARKER_ID = TCIds.rl("champion/tainted_ai");
+    private static final ResourceLocation TAINTED_AI_MARKER_ID = TCIds.rl("champion/tainted_ai");
     private static final AttributeModifier TAINTED_AI_MARKER =
             new AttributeModifier(TAINTED_AI_MARKER_ID, 1.0, AttributeModifier.Operation.ADD_VALUE);
 

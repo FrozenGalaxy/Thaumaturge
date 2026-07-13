@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.api.research.scan;
 
 import java.util.function.Predicate;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -14,7 +14,7 @@ import org.jspecify.annotations.Nullable;
  * @since 1.0.0
  */
 public class ScanEntity implements IScanThing {
-    private final Identifier research;
+    private final ResourceLocation research;
     private final @Nullable EntityType<?> entityType;
     private final @Nullable Class<?> entityClass;
     private final boolean inheritedClasses;
@@ -26,7 +26,7 @@ public class ScanEntity implements IScanThing {
      * @param research the research key granted on scan
      * @param entityType the entity type to match
      */
-    public ScanEntity(Identifier research, EntityType<?> entityType) {
+    public ScanEntity(ResourceLocation research, EntityType<?> entityType) {
         this(research, entityType, null, false, null);
     }
 
@@ -37,7 +37,7 @@ public class ScanEntity implements IScanThing {
      * @param entityClass the class or interface to match
      * @param inheritedClasses whether subclasses and implementors match too
      */
-    public ScanEntity(Identifier research, Class<?> entityClass, boolean inheritedClasses) {
+    public ScanEntity(ResourceLocation research, Class<?> entityClass, boolean inheritedClasses) {
         this(research, null, entityClass, inheritedClasses, null);
     }
 
@@ -49,11 +49,11 @@ public class ScanEntity implements IScanThing {
      * @param inheritedClasses whether subclasses and implementors match too
      * @param filter additional predicate an entity must pass to match
      */
-    public ScanEntity(Identifier research, Class<?> entityClass, boolean inheritedClasses, Predicate<Entity> filter) {
+    public ScanEntity(ResourceLocation research, Class<?> entityClass, boolean inheritedClasses, Predicate<Entity> filter) {
         this(research, null, entityClass, inheritedClasses, filter);
     }
 
-    private ScanEntity(Identifier research, @Nullable EntityType<?> entityType, @Nullable Class<?> entityClass,
+    private ScanEntity(ResourceLocation research, @Nullable EntityType<?> entityType, @Nullable Class<?> entityClass,
                        boolean inheritedClasses, @Nullable Predicate<Entity> filter) {
         this.research = research;
         this.entityType = entityType;
@@ -79,7 +79,7 @@ public class ScanEntity implements IScanThing {
     }
 
     @Override
-    public Identifier getResearchKey(Player player, @Nullable Object target) {
+    public ResourceLocation getResearchKey(Player player, @Nullable Object target) {
         return research;
     }
 }

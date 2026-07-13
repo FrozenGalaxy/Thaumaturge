@@ -14,13 +14,13 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -31,9 +31,9 @@ import org.joml.Matrix4fc;
 import org.jspecify.annotations.Nullable;
 
 public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEntityInfusionMatrix, InfusionMatrixRenderState> {
-    private static final Identifier TEX_NORMAL = TCIds.rl("textures/block/infuser_normal.png");
-    private static final Identifier TEX_ANCIENT = TCIds.rl("textures/block/infuser_ancient.png");
-    private static final Identifier TEX_ELDRITCH = TCIds.rl("textures/block/infuser_eldritch.png");
+    private static final ResourceLocation TEX_NORMAL = TCIds.rl("textures/block/infuser_normal.png");
+    private static final ResourceLocation TEX_ANCIENT = TCIds.rl("textures/block/infuser_ancient.png");
+    private static final ResourceLocation TEX_ELDRITCH = TCIds.rl("textures/block/infuser_eldritch.png");
 
     private static final float SUB_CUBE_OFFSET = 0.25F;
     private static final float SUB_CUBE_SCALE = 0.45F;
@@ -59,7 +59,7 @@ public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEn
     private final MatrixCubeModel model;
     private final RandomSource haloRandom = RandomSource.create();
 
-    private static RenderType glowType(String name, Identifier texture) {
+    private static RenderType glowType(String name, ResourceLocation texture) {
         return RenderType.create(name,
                 RenderSetup.builder(TCRenderPipelines.ENTITY_ADDITIVE_EMISSIVE)
                         .withTexture("Sampler0", texture)
@@ -90,7 +90,7 @@ public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEn
         state.texture = pickTexture(matrix);
     }
 
-    private static Identifier pickTexture(BlockEntityInfusionMatrix matrix) {
+    private static ResourceLocation pickTexture(BlockEntityInfusionMatrix matrix) {
         Level level = matrix.getLevel();
         if (level == null) {
             return TEX_NORMAL;
@@ -150,7 +150,7 @@ public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEn
                                 * state.startUp;
                         collector.submitModelPart(model.glow, poseStack, glowType,
                                 LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, null,
-                                ARGB.colorFromFloat(glowAlpha, GLOW_RED, GLOW_GREEN, GLOW_BLUE), null);
+                                ARGB32.colorFromFloat(glowAlpha, GLOW_RED, GLOW_GREEN, GLOW_BLUE), null);
                     }
                     poseStack.popPose();
                 }
@@ -162,7 +162,7 @@ public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEn
         }
     }
 
-    private static RenderType glowTypeFor(Identifier texture) {
+    private static RenderType glowTypeFor(ResourceLocation texture) {
         if (texture.equals(TEX_ANCIENT)) {
             return GLOW_ANCIENT;
         }

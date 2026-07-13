@@ -13,26 +13,26 @@ import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 import org.jspecify.annotations.Nullable;
 
 public final class MirrorRenderer implements BlockEntityRenderer<BlockEntityMirrorBase, MirrorRenderState> {
-    public static final Identifier FRAME_MODEL_ID = TCIds.rl("block/mirror");
-    public static final Identifier FRAME_ESSENTIA_MODEL_ID = TCIds.rl("block/mirror_essentia");
+    public static final ResourceLocation FRAME_MODEL_ID = TCIds.rl("block/mirror");
+    public static final ResourceLocation FRAME_ESSENTIA_MODEL_ID = TCIds.rl("block/mirror_essentia");
     public static final StandaloneModelKey<BlockStateModel> FRAME_MODEL =
             new StandaloneModelKey<>(FRAME_MODEL_ID::toString);
     public static final StandaloneModelKey<BlockStateModel> FRAME_ESSENTIA_MODEL =
             new StandaloneModelKey<>(FRAME_ESSENTIA_MODEL_ID::toString);
 
-    private static final Identifier PANE_TEXTURE = TCIds.rl("textures/block/mirrorpane.png");
-    private static final Identifier PANE_TRANS_TEXTURE = TCIds.rl("textures/block/mirrorpanetrans.png");
+    private static final ResourceLocation PANE_TEXTURE = TCIds.rl("textures/block/mirrorpane.png");
+    private static final ResourceLocation PANE_TRANS_TEXTURE = TCIds.rl("textures/block/mirrorpanetrans.png");
 
     private static final int[][] WINDOW_ROWS = {
             {2, 5, 11},

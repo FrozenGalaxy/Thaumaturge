@@ -8,7 +8,7 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 
 public final class TCTooltips {
@@ -112,7 +112,7 @@ public final class TCTooltips {
         return lines;
     }
 
-    public static Component prereqEntryName(Identifier id) {
+    public static Component prereqEntryName(ResourceLocation id) {
         String path = id.getPath();
         if (path.startsWith("scanned/aspect/")) {
             String aspect = path.substring(path.lastIndexOf('/') + 1);

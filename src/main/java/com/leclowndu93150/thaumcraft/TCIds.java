@@ -1,6 +1,6 @@
 package com.leclowndu93150.thaumcraft;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class TCIds {
     public static final String MODID = "thaumcraft";
@@ -8,7 +8,7 @@ public final class TCIds {
 
     private TCIds() {}
 
-    public static Identifier rl(String path) {
-        return Identifier.fromNamespaceAndPath(MODID, path);
+    public static ResourceLocation rl(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 }

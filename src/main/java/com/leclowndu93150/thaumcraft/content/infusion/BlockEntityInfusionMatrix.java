@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.infusion;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.content.research.ResearchProgressionEvents;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
@@ -35,19 +36,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
@@ -366,7 +362,7 @@ public final class BlockEntityInfusionMatrix extends BlockEntity implements IGog
                     itemPullCountdown = ITEM_PULL_TICKS;
                     InfusionFx.itemStream(level, worldPosition, pedestalPos);
                 } else if (--itemPullCountdown < 1) {
-                    ItemStackTemplate remainder = stack.getItem().getCraftingRemainder(stack);
+                    ItemStack remainder = stack.getItem().getCraftingRemainder(stack);
                     pedestal.setItem(remainder == null ? ItemStack.EMPTY : remainder.create());
                     ingredients.remove(a);
                     setChanged();
@@ -495,7 +491,7 @@ public final class BlockEntityInfusionMatrix extends BlockEntity implements IGog
                     0.0, 0.0, 0.0);
             return;
         }
-        ItemStackTemplate template = new ItemStackTemplate(stack.getItem());
+        ItemStack template = new ItemStack(stack.getItem());
         if (stack.getItem() instanceof BlockItem) {
             for (int a = 0; a < 4; a++) {
                 level.addParticle(new InfusionCrumbsData(template, tx, ty, tz, 0.0, 0.0, 0.0),
@@ -515,23 +511,23 @@ public final class BlockEntityInfusionMatrix extends BlockEntity implements IGog
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         output.putBoolean("Active", active);
         output.putFloat("Stability", stability);
         output.putFloat("Replenish", stabilityReplenish);
         if (job != null) {
-            output.store("Job", InfusionCraftJob.CODEC, job);
+            TCNbt.store(output, "Job", InfusionCraftJob.CODEC, registries, job);
         }
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        active = input.getBooleanOr("Active", false);
-        stability = input.getFloatOr("Stability", 0.0F);
-        stabilityReplenish = input.getFloatOr("Replenish", 0.0F);
-        job = input.read("Job", InfusionCraftJob.CODEC).orElse(null);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        active = input.getBoolean("Active");
+        stability = input.getFloat("Stability");
+        stabilityReplenish = input.getFloat("Replenish");
+        job = TCNbt.read(input, "Job", InfusionCraftJob.CODEC, registries).orElse(null);
     }
 
     private void syncToClient() {
@@ -545,10 +541,10 @@ public final class BlockEntityInfusionMatrix extends BlockEntity implements IGog
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput output = TagValueOutput.createWithContext(reporter, registries);
-            saveAdditional(output);
-            nbt.merge(output.buildResult());
+        {
+            CompoundTag output = new CompoundTag();
+            saveAdditional(output, registries);
+            nbt.merge(output);
         }
         return nbt;
     }

@@ -14,24 +14,24 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public final class EldritchObeliskRenderer implements BlockEntityRenderer<BlockEntityEldritchObelisk, EldritchObeliskRenderState> {
-    public static final Identifier CAP_MODEL = TCIds.rl("models/obj/obelisk_cap.obj");
+    public static final ResourceLocation CAP_MODEL = TCIds.rl("models/obj/obelisk_cap.obj");
     public static final String CAP_PART = "Cap";
 
-    private static final Identifier SIDE_TEXTURE = TCIds.rl("textures/entity/obelisk_side.png");
-    private static final Identifier SIDE_TEXTURE_OUTER = TCIds.rl("textures/entity/obelisk_side_2.png");
-    private static final Identifier CAP_TEXTURE = TCIds.rl("textures/entity/obelisk_cap.png");
-    private static final Identifier CAP_TEXTURE_OUTER = TCIds.rl("textures/entity/obelisk_cap_2.png");
+    private static final ResourceLocation SIDE_TEXTURE = TCIds.rl("textures/entity/obelisk_side.png");
+    private static final ResourceLocation SIDE_TEXTURE_OUTER = TCIds.rl("textures/entity/obelisk_side_2.png");
+    private static final ResourceLocation CAP_TEXTURE = TCIds.rl("textures/entity/obelisk_cap.png");
+    private static final ResourceLocation CAP_TEXTURE_OUTER = TCIds.rl("textures/entity/obelisk_cap_2.png");
 
     private static final float COLUMN_BASE = 1.0F;
     private static final int COLUMN_HEIGHT = 3;

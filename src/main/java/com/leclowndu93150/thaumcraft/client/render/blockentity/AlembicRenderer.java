@@ -17,13 +17,13 @@ import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
@@ -35,7 +35,7 @@ import java.util.List;
 
 public class AlembicRenderer implements BlockEntityRenderer<BlockEntityAlembic,AlembicRenderState> {
 
-    private static final Identifier LABEL_TEXTURE = Identifier.fromNamespaceAndPath("thaumcraft", "textures/entity/label.png");
+    private static final ResourceLocation LABEL_TEXTURE = ResourceLocation.fromNamespaceAndPath("thaumcraft", "textures/entity/label.png");
 
 
     public AlembicRenderer(BlockEntityRendererProvider.Context context) {
@@ -113,7 +113,7 @@ public class AlembicRenderer implements BlockEntityRenderer<BlockEntityAlembic,A
         poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
         poseStack.translate(0.0, 0.0, -0.376f);
         int light = state.lightCoords;
-        Identifier labelTex = LABEL_TEXTURE;
+        ResourceLocation labelTex = LABEL_TEXTURE;
         RenderType labelType = RenderTypes.entityCutout(labelTex);
         collector.submitCustomGeometry(poseStack, labelType, (pose, buffer) -> labelQuad(buffer, pose, light));
         if (state.filterTexture != null) {
@@ -121,7 +121,7 @@ public class AlembicRenderer implements BlockEntityRenderer<BlockEntityAlembic,A
             poseStack.mulPose(Axis.YP.rotationDegrees(180));
             poseStack.translate(0.0, 0.0, 0.001);
             int filterColor = state.filterColor;
-            Identifier aspectTex = state.filterTexture;
+            ResourceLocation aspectTex = state.filterTexture;
             RenderType aspectType = RenderTypes.entityTranslucent(aspectTex);
             collector.submitCustomGeometry(poseStack, aspectType, (pose, buffer) -> aspectIconQuad(buffer, pose, filterColor, light));
             poseStack.popPose();

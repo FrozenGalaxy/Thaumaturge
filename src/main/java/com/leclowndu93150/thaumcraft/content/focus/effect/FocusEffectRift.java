@@ -16,7 +16,7 @@ import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -30,7 +30,7 @@ import net.minecraft.world.phys.HitResult;
 import org.jspecify.annotations.Nullable;
 
 public final class FocusEffectRift extends FocusEffect {
-    private static final Identifier KEY = TCIds.rl("rift");
+    private static final ResourceLocation KEY = TCIds.rl("rift");
 
     private static final int BASE_COMPLEXITY = 3;
     private static final int DURATION_COMPLEXITY_DIVISOR = 2;
@@ -40,7 +40,7 @@ public final class FocusEffectRift extends FocusEffect {
     private static final int PARTICLE_START_BASE = 384;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

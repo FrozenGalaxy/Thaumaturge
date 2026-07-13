@@ -6,12 +6,12 @@ import com.leclowndu93150.thaumcraft.content.casters.MenuFocusPouch;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public final class FocusPouchScreen extends AbstractTCContainerScreen<MenuFocusPouch> {
-    private static final Identifier TEXTURE =
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_focuspouch.png");
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_focuspouch.png");
     private static final int WIDTH = 175;
     private static final int HEIGHT = 232;
     private static final int BLOCKED_X = 8;

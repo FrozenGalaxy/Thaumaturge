@@ -1,15 +1,15 @@
 package com.leclowndu93150.thaumcraft.api.research.theorycraft;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import java.util.List;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -137,7 +137,7 @@ public abstract class TheorycraftCard {
      * @param output the value sink
      * @param registries the registry access for codec-based fields
      */
-    public void write(ValueOutput output, HolderLookup.Provider registries) {
+    public void write(CompoundTag output, HolderLookup.Provider registries) {
         output.putLong("seed", seed);
     }
 
@@ -148,7 +148,7 @@ public abstract class TheorycraftCard {
      * @param input the value source
      * @param registries the registry access for codec-based fields
      */
-    public void read(ValueInput input, HolderLookup.Provider registries) {
+    public void read(CompoundTag input, HolderLookup.Provider registries) {
         input.getLong("seed").ifPresent(value -> seed = value);
     }
 

@@ -2,9 +2,9 @@ package com.leclowndu93150.thaumcraft.client.model.obj;
 
 import java.util.List;
 import net.minecraft.client.model.geom.builders.UVPair;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;

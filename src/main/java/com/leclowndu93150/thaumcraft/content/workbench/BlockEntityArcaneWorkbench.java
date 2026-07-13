@@ -6,6 +6,8 @@ import com.leclowndu93150.thaumcraft.content.aura.AuraData;
 import com.leclowndu93150.thaumcraft.content.aura.AuraManager;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.ContainerHelper;
@@ -16,13 +18,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
 
 @EventBusSubscriber(modid = TCIds.MODID)
 public class BlockEntityArcaneWorkbench extends BlockEntity implements MenuProvider {
@@ -43,21 +43,21 @@ public class BlockEntityArcaneWorkbench extends BlockEntity implements MenuProvi
     @SubscribeEvent
     public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
-            Capabilities.Item.BLOCK,
+            Capabilities.ItemHandler.BLOCK,
             TCBlockEntities.ARCANE_WORKBENCH.get(),
-            (be, side) -> VanillaContainerWrapper.of(be.getInventory())
+            (be, side) -> new InvWrapper(be.getInventory())
         );
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         ContainerHelper.saveAllItems(output, inventory.getItems());
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
         ContainerHelper.loadAllItems(input, inventory.getItems());
         inventory.setChanged();
     }

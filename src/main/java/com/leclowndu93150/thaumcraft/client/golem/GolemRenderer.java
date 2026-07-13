@@ -23,11 +23,11 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
@@ -35,10 +35,10 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, GolemRenderState> {
-    private static final Identifier BASE_MODEL = TCIds.rl("models/obj/golem_base.obj");
+    private static final ResourceLocation BASE_MODEL = TCIds.rl("models/obj/golem_base.obj");
     private static final float GHOST_ALPHA = 0.15F;
-    private static final int XRAY_COLOR = ARGB.colorFromFloat(0.25F, 0.25F, 0.25F, 0.25F);
-    private static final Map<Identifier, RenderType> XRAY_TYPES = new ConcurrentHashMap<>();
+    private static final int XRAY_COLOR = ARGB32.colorFromFloat(0.25F, 0.25F, 0.25F, 0.25F);
+    private static final Map<ResourceLocation, RenderType> XRAY_TYPES = new ConcurrentHashMap<>();
 
     private final ItemModelResolver itemModelResolver;
 
@@ -48,7 +48,7 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
         this.shadowRadius = 0.3F;
     }
 
-    private static RenderType xrayType(Identifier texture) {
+    private static RenderType xrayType(ResourceLocation texture) {
         return XRAY_TYPES.computeIfAbsent(texture, tex -> RenderType.create(
                 "tc_golem_xray_" + tex.getPath().hashCode(),
                 RenderSetup.builder(TCRenderPipelines.ENTITY_TRANSLUCENT_NO_DEPTH)
@@ -111,7 +111,7 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
         if (!state.invisible) {
             renderParts(state, poseStack, collector, false, 0xFFFFFFFF);
         } else if (state.ghost) {
-            renderParts(state, poseStack, collector, false, ARGB.colorFromFloat(GHOST_ALPHA, 1.0F, 1.0F, 1.0F));
+            renderParts(state, poseStack, collector, false, ARGB32.colorFromFloat(GHOST_ALPHA, 1.0F, 1.0F, 1.0F));
         }
         if (state.xray) {
             renderParts(state, poseStack, collector, true, XRAY_COLOR);
@@ -122,7 +122,7 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
     private void renderParts(GolemRenderState state, PoseStack poseStack, SubmitNodeCollector collector,
                              boolean xray, int color) {
         GolemProperties props = state.props;
-        Identifier matTexture = props.getMaterial().texture();
+        ResourceLocation matTexture = props.getMaterial().texture();
         boolean holding = state.holdingItem;
         boolean rolling = props.hasTrait(GolemTrait.WHEELED) || props.hasTrait(GolemTrait.FLYER);
         float bry = 0.0F;
@@ -171,7 +171,7 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
         submitNamedPart(base, "waist", poseStack, collector, matTexture, xray, color, state);
         if (state.color > 0) {
             DyeColor dye = DyeColor.byId(state.color - 1);
-            int flagColor = ARGB.color(ARGB.alpha(color), dye.getTextureDiffuseColor());
+            int flagColor = ARGB32.color(ARGB32.alpha(color), dye.getTextureDiffuseColor());
             submitNamedPart(base, "flag", poseStack, collector, matTexture, xray, flagColor, state);
         }
         for (GolemPartModel part : attachedParts(props, GolemPartModel.AttachPoint.BODY)) {
@@ -274,13 +274,13 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
     }
 
     private void renderPartModel(GolemRenderState state, GolemPartModel part, GolemPartModel.LimbSide side,
-                                 PoseStack poseStack, SubmitNodeCollector collector, Identifier matTexture,
+                                 PoseStack poseStack, SubmitNodeCollector collector, ResourceLocation matTexture,
                                  boolean xray, int color) {
         MeshModel mesh = GolemMeshes.get(part.objModel());
         GolemPartRenderHook hook = GolemPartRenderHooks.hookFor(part);
         for (MeshPart objectPart : mesh.parts()) {
             poseStack.pushPose();
-            Identifier texture = part.useMaterialTextureForObjectPart(objectPart.name()) || part.texture() == null
+            ResourceLocation texture = part.useMaterialTextureForObjectPart(objectPart.name()) || part.texture() == null
                     ? matTexture : part.texture();
             hook.preRenderObjectPart(objectPart.name(), state, poseStack, side, 0.0F);
             submitMeshPart(mesh, objectPart, poseStack, collector, texture, xray, color, state);
@@ -290,7 +290,7 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
     }
 
     private static void submitNamedPart(MeshModel mesh, String name, PoseStack poseStack, SubmitNodeCollector collector,
-                                        Identifier texture, boolean xray, int color, GolemRenderState state) {
+                                        ResourceLocation texture, boolean xray, int color, GolemRenderState state) {
         for (MeshPart part : mesh.parts()) {
             if (name.equals(part.name())) {
                 submitMeshPart(mesh, part, poseStack, collector, texture, xray, color, state);
@@ -299,9 +299,9 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
     }
 
     private static void submitMeshPart(MeshModel mesh, MeshPart part, PoseStack poseStack, SubmitNodeCollector collector,
-                                       Identifier texture, boolean xray, int color, GolemRenderState state) {
+                                       ResourceLocation texture, boolean xray, int color, GolemRenderState state) {
         RenderType type = xray ? xrayType(texture)
-                : ARGB.alpha(color) < 255 ? RenderTypes.entityTranslucent(texture) : RenderTypes.entityCutout(texture);
+                : ARGB32.alpha(color) < 255 ? RenderTypes.entityTranslucent(texture) : RenderTypes.entityCutout(texture);
         int light = state.lightCoords;
         collector.submitCustomGeometry(poseStack, type,
                 (pose, buffer) -> GolemMeshes.renderPart(mesh, part, pose, buffer, light, color));

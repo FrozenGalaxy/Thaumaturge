@@ -17,10 +17,10 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -150,7 +150,7 @@ public final class FocalManipulatorRenderer implements BlockEntityRenderer<Block
         float v0 = (frame / GLOW_GRID) * texFrame;
         float u1 = u0 + texFrame;
         float v1 = v0 + texFrame;
-        int tint = ARGB.colorFromFloat(GLOW_ALPHA, r, g, b);
+        int tint = ARGB32.colorFromFloat(GLOW_ALPHA, r, g, b);
         collector.submitCustomGeometry(poseStack, GLOW_TYPE, (pose, buffer) -> {
             Matrix4fc mat = pose.pose();
             buffer.addVertex(mat, -GLOW_HALF, -GLOW_HALF, 0.0F).setUv(u1, v1).setColor(tint).setLight(EMISSIVE_LIGHT);

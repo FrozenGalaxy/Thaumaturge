@@ -15,7 +15,7 @@ import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +27,7 @@ public abstract class ArcaneWorkbenchRecipeBuilder<R extends ArcaneWorkbenchReci
     private AspectList aspects = AspectList.EMPTY;
     private final int vis;
 
-    public ArcaneWorkbenchRecipeBuilder(RecipeCategory category, ItemStackTemplate result, HolderGetter<IAspect> aspectsGetter, int vis) {
+    public ArcaneWorkbenchRecipeBuilder(RecipeCategory category, ItemStack result, HolderGetter<IAspect> aspectsGetter, int vis) {
         super(result, category);
         this.aspectsGetter = aspectsGetter;
         Preconditions.checkArgument(vis > 0, "Vis cannot be <= 0");
@@ -79,7 +79,7 @@ public abstract class ArcaneWorkbenchRecipeBuilder<R extends ArcaneWorkbenchReci
         output.accept(key, recipe, this.advancementBuilder.build(output, key, this.category));
     }
 
-    protected abstract ArcaneCraftingRecipe makeRecipe(Recipe.CommonInfo commonInfo,ItemStackTemplate result, AspectList aspects, Optional<ResearchGate> gate, int vis);
+    protected abstract ArcaneCraftingRecipe makeRecipe(Recipe.CommonInfo commonInfo,ItemStack result, AspectList aspects, Optional<ResearchGate> gate, int vis);
 
     @Override
     public ResourceKey<Recipe<?>> defaultId() {

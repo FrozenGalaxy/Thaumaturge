@@ -5,11 +5,11 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record ServerboundTableActionPayload(Action action) implements CustomPacketPayload {
     public static final Type<ServerboundTableActionPayload> TYPE = new Type<>(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "table_action"));
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "table_action"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundTableActionPayload> STREAM_CODEC =
             StreamCodec.composite(

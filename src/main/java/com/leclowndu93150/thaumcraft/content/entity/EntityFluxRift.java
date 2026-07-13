@@ -13,6 +13,7 @@ import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -25,7 +26,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -36,8 +37,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -318,7 +317,7 @@ public final class EntityFluxRift extends Entity {
     }
 
     private boolean spawnWisp(ServerLevel level) {
-        WispEntity wisp = TCEntities.WISP.get().create(level, EntitySpawnReason.EVENT);
+        WispEntity wisp = TCEntities.WISP.get().create(level, MobSpawnType.EVENT);
         if (wisp == null) {
             return false;
         }
@@ -336,7 +335,7 @@ public final class EntityFluxRift extends Entity {
     }
 
     private boolean spawnTaintSeed(ServerLevel level) {
-        EntityTaintSeedPrime seed = TCEntities.TAINT_SEED_PRIME.get().create(level, EntitySpawnReason.EVENT);
+        EntityTaintSeedPrime seed = TCEntities.TAINT_SEED_PRIME.get().create(level, MobSpawnType.EVENT);
         if (seed == null) {
             return false;
         }
@@ -441,7 +440,7 @@ public final class EntityFluxRift extends Entity {
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         output.putInt("MaxSize", maxSize);
         output.putInt("RiftSize", getRiftSize());
         output.putInt("RiftSeed", getRiftSeed());
@@ -450,12 +449,12 @@ public final class EntityFluxRift extends Entity {
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
-        maxSize = input.getIntOr("MaxSize", 0);
-        setRiftSize(input.getIntOr("RiftSize", 5));
-        setRiftSeed(input.getIntOr("RiftSeed", 0));
-        setRiftStability(input.getIntOr("Stability", 0));
-        setCollapse(input.getBooleanOr("collapse", false));
+    protected void readAdditionalSaveData(CompoundTag input) {
+        maxSize = input.getInt("MaxSize");
+        setRiftSize((input.contains("RiftSize") ? input.getInt("RiftSize") : 5));
+        setRiftSeed(input.getInt("RiftSeed"));
+        setRiftStability(input.getInt("Stability"));
+        setCollapse(input.getBoolean("collapse"));
     }
 
     public static void createRift(ServerLevel level, BlockPos pos) {
@@ -478,7 +477,7 @@ public final class EntityFluxRift extends Entity {
         if (!level.getEntitiesOfClass(EntityFluxRift.class, exclusion).isEmpty()) {
             return;
         }
-        EntityFluxRift rift = TCEntities.FLUX_RIFT.get().create(level, EntitySpawnReason.EVENT);
+        EntityFluxRift rift = TCEntities.FLUX_RIFT.get().create(level, MobSpawnType.EVENT);
         if (rift == null) {
             return;
         }

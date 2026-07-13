@@ -14,7 +14,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.jspecify.annotations.Nullable;
@@ -113,7 +113,7 @@ final class ChampionEffects {
 
     static float infested(LivingEntity mob, @Nullable LivingEntity target, @Nullable DamageSource source, float amount) {
         if (mob.getRandom().nextFloat() < PROC_CHANCE && mob.level() instanceof ServerLevel server) {
-            EntityTaintCrawler crawler = TCEntities.TAINT_CRAWLER.get().create(server, EntitySpawnReason.REINFORCEMENT);
+            EntityTaintCrawler crawler = TCEntities.TAINT_CRAWLER.get().create(server, MobSpawnType.REINFORCEMENT);
             if (crawler != null) {
                 crawler.snapTo(mob.getX(), mob.getY() + mob.getBbHeight() / 2.0F, mob.getZ(),
                         mob.getRandom().nextFloat() * 360.0F, 0.0F);

@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.api.research;
 
 import java.util.List;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * A single step within an {@link IResearchEntry}. Stages list the recipes shown, the things the
@@ -23,7 +23,7 @@ public interface IResearchStage {
      *
      * @return the recipe identifiers, never null
      */
-    List<Identifier> recipes();
+    List<ResourceLocation> recipes();
 
     /**
      * Items the player must collect to advance.
@@ -61,7 +61,7 @@ public interface IResearchStage {
      *
      * @return the prerequisite research identifiers, never null
      */
-    List<Identifier> requiredResearch();
+    List<ResourceLocation> requiredResearch();
 
     /**
      * Amount of warp inflicted on the player when this stage completes.

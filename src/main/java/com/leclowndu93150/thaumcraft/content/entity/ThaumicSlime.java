@@ -19,7 +19,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -156,7 +156,7 @@ public final class ThaumicSlime extends Slime implements ITaintedMob {
             for (int k = 0; k < size; k++) {
                 float xd = (k % 2 - 0.5F) * size / 4.0F;
                 float zd = (k / 2 - 0.5F) * size / 4.0F;
-                ThaumicSlime child = TCEntities.THAUMIC_SLIME.get().create(server, EntitySpawnReason.TRIGGERED);
+                ThaumicSlime child = TCEntities.THAUMIC_SLIME.get().create(server, MobSpawnType.TRIGGERED);
                 if (child != null) {
                     child.setSize(1, true);
                     child.snapTo(this.getX() + xd, this.getY() + 0.5, this.getZ() + zd,
@@ -179,7 +179,7 @@ public final class ThaumicSlime extends Slime implements ITaintedMob {
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                   EntitySpawnReason reason, @Nullable SpawnGroupData groupData) {
+                                                   MobSpawnType reason, @Nullable SpawnGroupData groupData) {
         int sizeBits = 1 + level.getRandom().nextInt(3);
         int size = 1 << sizeBits;
         this.setSize(size, true);
@@ -187,7 +187,7 @@ public final class ThaumicSlime extends Slime implements ITaintedMob {
     }
 
     public static boolean checkSpawnRules(EntityType<ThaumicSlime> type, LevelAccessor level,
-                                          EntitySpawnReason reason, BlockPos pos,
+                                          MobSpawnType reason, BlockPos pos,
                                           RandomSource random) {
         return false;
     }

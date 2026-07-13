@@ -13,7 +13,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
@@ -24,7 +23,7 @@ public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGate
     public static final MapCodec<CrucibleRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             Ingredient.CODEC.fieldOf("catalyst").forGetter(r -> r.catalyst),
             AspectList.NON_EMPTY_CODEC.fieldOf("aspects").forGetter(r-> r.aspects),
-            ItemStackTemplate.CODEC.fieldOf("result").forGetter(r -> r.result),
+            ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
             ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research)
     ).apply(i, CrucibleRecipe::new));
 
@@ -33,7 +32,7 @@ public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGate
             r -> r.catalyst,
             AspectList.STREAM_CODEC,
             r -> r.aspects,
-            ItemStackTemplate.STREAM_CODEC,
+            ItemStack.STREAM_CODEC,
             r -> r.result,
             ByteBufCodecs.optional(ResearchGate.STREAM_CODEC),
             r -> r.research,
@@ -45,10 +44,10 @@ public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGate
 
     private final Ingredient catalyst;
     private final AspectList aspects;
-    private final ItemStackTemplate result;
+    private final ItemStack result;
     private final Optional<ResearchGate> research;
 
-    public CrucibleRecipe(Ingredient catalyst, AspectList aspects, ItemStackTemplate result, Optional<ResearchGate> research) {
+    public CrucibleRecipe(Ingredient catalyst, AspectList aspects, ItemStack result, Optional<ResearchGate> research) {
         this.catalyst = catalyst;
         this.aspects = aspects;
         this.result = result;
@@ -122,7 +121,7 @@ public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGate
         return catalyst;
     }
 
-    public ItemStackTemplate rawResult() {
+    public ItemStack rawResult() {
         return result;
     }
 

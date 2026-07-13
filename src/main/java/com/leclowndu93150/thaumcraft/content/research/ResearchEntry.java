@@ -15,14 +15,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.RegistryFixedCodec;
 
 public record ResearchEntry(
         Holder<IResearchCategory> category,
         String nameKey,
         Set<ResearchParent> parents,
-        Set<Identifier> siblings,
+        Set<ResourceLocation> siblings,
         int column,
         int row,
         List<IResearchStage> stages,
@@ -34,7 +34,7 @@ public record ResearchEntry(
             RegistryFixedCodec.create(IResearchCategory.REGISTRY_KEY).fieldOf("category").forGetter(ResearchEntry::category),
             Codec.STRING.fieldOf("name").forGetter(ResearchEntry::nameKey),
             ResearchParent.CODEC.listOf().optionalFieldOf("parents", List.of()).forGetter(e -> List.copyOf(e.parents())),
-            Identifier.CODEC.listOf().optionalFieldOf("siblings", List.of()).forGetter(e -> List.copyOf(e.siblings())),
+            ResourceLocation.CODEC.listOf().optionalFieldOf("siblings", List.of()).forGetter(e -> List.copyOf(e.siblings())),
             Codec.INT.fieldOf("column").forGetter(ResearchEntry::column),
             Codec.INT.fieldOf("row").forGetter(ResearchEntry::row),
             ResearchStage.CODEC.listOf().fieldOf("stages").forGetter(e -> e.stages().stream().map(s -> (ResearchStage) s).toList()),
@@ -49,7 +49,7 @@ public record ResearchEntry(
             Holder<IResearchCategory> category,
             String nameKey,
             List<ResearchParent> parents,
-            List<Identifier> siblings,
+            List<ResourceLocation> siblings,
             int column,
             int row,
             List<ResearchStage> stages,

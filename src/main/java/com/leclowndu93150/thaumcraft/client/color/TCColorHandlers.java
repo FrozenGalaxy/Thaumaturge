@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.color;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -9,14 +9,14 @@ import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
 public final class TCColorHandlers {
-    public static final Identifier ASPECT_COLOR_TINT_ID =
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "aspect_color");
-    public static final Identifier CRYSTAL_ASPECT_TINT_ID =
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "crystal_aspect");
-    public static final Identifier FOCUS_COLOR_TINT_ID =
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "focus_color");
-    public static final Identifier GOLEM_MATERIAL_TINT_ID =
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "golem_material");
+    public static final ResourceLocation ASPECT_COLOR_TINT_ID =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "aspect_color");
+    public static final ResourceLocation CRYSTAL_ASPECT_TINT_ID =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "crystal_aspect");
+    public static final ResourceLocation FOCUS_COLOR_TINT_ID =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "focus_color");
+    public static final ResourceLocation GOLEM_MATERIAL_TINT_ID =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "golem_material");
 
     private TCColorHandlers() {}
 

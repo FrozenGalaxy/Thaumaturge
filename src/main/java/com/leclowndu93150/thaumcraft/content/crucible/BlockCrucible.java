@@ -12,8 +12,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.InsideBlockEffectApplier;
-import net.minecraft.world.entity.InsideBlockEffectType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -32,7 +30,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
+import net.neoforged.neoforge.fluids.FluidUtil;
 import org.jspecify.annotations.Nullable;
 
 public class BlockCrucible extends BaseEntityBlock {
@@ -89,14 +87,14 @@ public class BlockCrucible extends BaseEntityBlock {
         if (!(level.getBlockEntity(pos) instanceof BlockEntityCrucible crucible)) return InteractionResult.PASS;
         FluidStack fs = FluidUtil.getFirstStackContained(itemStack);
         if (fs.is(Fluids.WATER) && fs.amount() >= BlockEntityCrucible.TANK_CAPACITY) {
-            if (crucible.getTank().getAmountAsInt(0) < BlockEntityCrucible.TANK_CAPACITY){
+            if (crucible.getTank().getFluidAmount() < BlockEntityCrucible.TANK_CAPACITY){
                 if (FluidUtil.interactWithFluidHandler(player,hand,level,pos,hitResult.getDirection(), null)){
                     return InteractionResult.SUCCESS;
                 }
             }
         } else if (!player.isCrouching() /*&& (!(player.getItemInHand(hand).getItem() instanceof ICaster))*/ && hitResult.getDirection() == Direction.UP){
             ItemStack input = itemStack.copyWithCount(1);
-            if (crucible.getHeat() > 150 && crucible.getTank().getAmountAsInt(0) > 0 && crucible.attemptSmelt(input,player) == null){
+            if (crucible.getHeat() > 150 && crucible.getTank().getFluidAmount() > 0 && crucible.attemptSmelt(input,player) == null){
                 itemStack.shrink(1);
             }
         }
@@ -139,10 +137,10 @@ public class BlockCrucible extends BaseEntityBlock {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         if (level.isClientSide()) return;
         if (!(level.getBlockEntity(pos) instanceof BlockEntityCrucible crucible)) return;
-        if (crucible.getHeat() <= 150 || crucible.getTank().getAmountAsInt(0) <= 0) return;
+        if (crucible.getHeat() <= 150 || crucible.getTank().getFluidAmount() <= 0) return;
         if (entity instanceof ItemEntity it && !(it instanceof EntitySpecialItem)){
             crucible.attemptSmelt(it);
         } else {
@@ -150,14 +148,14 @@ public class BlockCrucible extends BaseEntityBlock {
             if (this.delay < 10)
                 return;
             delay = 0;
-            if (entity instanceof LivingEntity e && !e.isInvulnerableTo((ServerLevel) level,level.damageSources().lava())){
+            if (entity instanceof LivingEntity e && !e.isInvulnerableTo(level.damageSources().lava())){
                 entity.lavaHurt();
-                effectApplier.apply(InsideBlockEffectType.EXTINGUISH);
-                effectApplier.apply(InsideBlockEffectType.CLEAR_FREEZE);
+                entity.clearFire();
+                entity.setTicksFrozen(0);
                 level.playSound(null,pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, SoundEvents.LAVA_EXTINGUISH, SoundSource.BLOCKS,0.4F,2.0F + level.getRandom().nextFloat() * 0.4F);
             }
         }
 
-        super.entityInside(state, level, pos, entity, effectApplier, isPrecise);
+        super.entityInside(state, level, pos, entity);
     }
 }

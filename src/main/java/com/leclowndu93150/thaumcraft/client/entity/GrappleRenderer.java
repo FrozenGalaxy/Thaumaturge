@@ -17,11 +17,11 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -37,8 +37,8 @@ public final class GrappleRenderer extends EntityRenderer<EntityGrapple, Grapple
         public final List<Vec3> points = new ArrayList<>();
     }
 
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/grappler.png");
-    private static final Identifier ROPE = TCIds.rl("textures/misc/rope.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/grappler.png");
+    private static final ResourceLocation ROPE = TCIds.rl("textures/misc/rope.png");
     private static final RenderType ROPE_TYPE = RenderType.create(
             "tc_grapple_rope",
             RenderSetup.builder(TCRenderPipelines.FX_TRANSLUCENT)
@@ -98,7 +98,7 @@ public final class GrappleRenderer extends EntityRenderer<EntityGrapple, Grapple
         float u1 = u0 + 0.03125F;
         float v0 = 0.21875F;
         float v1 = v0 + 0.03125F;
-        int glowTint = ARGB.colorFromFloat(GLOW_ALPHA, 1.0F, 1.0F, 1.0F);
+        int glowTint = ARGB32.colorFromFloat(GLOW_ALPHA, 1.0F, 1.0F, 1.0F);
         collector.submitCustomGeometry(poseStack, GLOW_TYPE, (pose, buffer) -> {
             Matrix4fc mat = pose.pose();
             float half = GLOW_HALF * glowScale;

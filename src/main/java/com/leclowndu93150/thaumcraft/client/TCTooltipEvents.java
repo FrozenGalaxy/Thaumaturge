@@ -12,7 +12,7 @@ import com.leclowndu93150.thaumcraft.registry.TCBlockTags;
 import java.util.Map;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
@@ -22,7 +22,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
 public final class TCTooltipEvents {
-    private static final Identifier INFUSION_RESEARCH = TCIds.rl("unlock_infusion");
+    private static final ResourceLocation INFUSION_RESEARCH = TCIds.rl("unlock_infusion");
 
     private TCTooltipEvents() {}
 

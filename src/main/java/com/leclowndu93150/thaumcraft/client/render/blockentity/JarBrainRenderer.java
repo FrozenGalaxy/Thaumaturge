@@ -15,14 +15,14 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public final class JarBrainRenderer implements BlockEntityRenderer<BlockEntityJarBrain, JarBrainRenderState> {
-    private static final Identifier TEX_BRAIN = TCIds.rl("textures/entity/brain2.png");
-    private static final Identifier TEX_BRINE = TCIds.rl("textures/entity/jarbrine.png");
+    private static final ResourceLocation TEX_BRAIN = TCIds.rl("textures/entity/brain2.png");
+    private static final ResourceLocation TEX_BRINE = TCIds.rl("textures/entity/jarbrine.png");
     private static final float BRAIN_SCALE = 0.4F;
     private static final float BRAIN_LIFT = -0.8F;
     private static final float BOB_PERIOD = 14.0F;

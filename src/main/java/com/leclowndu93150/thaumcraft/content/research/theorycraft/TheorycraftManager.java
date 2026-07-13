@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -166,7 +166,7 @@ public final class TheorycraftManager {
         float[] total = { BASE_INSPIRATION };
         IPlayerKnowledge knowledge = KnowledgeAccess.of(player);
         player.registryAccess().lookup(IResearchEntry.REGISTRY_KEY).ifPresent(lookup -> {
-            for (Identifier id : knowledge.researchList()) {
+            for (ResourceLocation id : knowledge.researchList()) {
                 lookup.get(ResourceKey.create(IResearchEntry.REGISTRY_KEY, id)).ifPresent(ref -> {
                     IResearchEntry entry = ref.value();
                     if (entry.hasMeta(ResearchEntryMeta.SPIKY)) total[0] += 0.5F;

@@ -9,7 +9,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
@@ -41,10 +41,10 @@ public record InfernalBonus(HolderSet<Item> items, IntProvider count, float chan
             ).apply(instance, InfernalBonus::new));
 
     public static final AdvancedDataMapType<Item, List<InfernalBonus>, Remover> DATA_MAP = AdvancedDataMapType.builder(
-                    Identifier.fromNamespaceAndPath(TCIds.MODID, "infernal_bonus"),
+                    ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "infernal_bonus"),
                     Registries.ITEM,
                     CODEC.listOf(1, 64)
-            ).merger((_, _, fv, _, sv) ->
+            ).merger((registry, fKey, fv, sKey, sv) ->
                     Stream.concat(fv.stream(), sv.stream()).toList())
             .remover(Remover.CODEC)
             .synced(CODEC.listOf(1, 64), false)

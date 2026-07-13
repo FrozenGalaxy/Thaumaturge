@@ -19,16 +19,12 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 
 public final class BlockEntityEldritchAltar extends BlockEntity {
@@ -102,7 +98,7 @@ public final class BlockEntityEldritchAltar extends BlockEntity {
         }
         knight.snapTo(x + 0.5, y, z + 0.5, 0.0F, 0.0F);
         if (level.noCollision(knight) && !level.containsAnyLiquid(knight.getBoundingBox())) {
-            knight.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos), EntitySpawnReason.EVENT, null);
+            knight.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos), MobSpawnType.EVENT, null);
             knight.setHomeTo(pos, 16);
             level.addFreshEntity(knight);
         }
@@ -122,7 +118,7 @@ public final class BlockEntityEldritchAltar extends BlockEntity {
         }
         guardian.snapTo(x + 0.5, y, z + 0.5, 0.0F, 0.0F);
         if (level.noCollision(guardian) && !level.containsAnyLiquid(guardian.getBoundingBox())) {
-            guardian.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos), EntitySpawnReason.EVENT, null);
+            guardian.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos), MobSpawnType.EVENT, null);
             guardian.setHomeTo(pos, 16);
             level.addFreshEntity(guardian);
         }
@@ -140,7 +136,7 @@ public final class BlockEntityEldritchAltar extends BlockEntity {
             cleric.snapTo(pos.getX() + 0.5 + xx, pos.getY(), pos.getZ() + 0.5 + zz, 0.0F, 0.0F);
             if (level.noCollision(cleric) && !level.containsAnyLiquid(cleric.getBoundingBox())) {
                 cleric.setHomeTo(pos, 8);
-                cleric.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), EntitySpawnReason.EVENT, null);
+                cleric.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null);
                 if (level.addFreshEntity(cleric)) {
                     success++;
                     cleric.setRitualist(true);
@@ -211,19 +207,19 @@ public final class BlockEntityEldritchAltar extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        eyes = input.getByteOr("eyes", (byte) 0);
-        mazeChecked = input.getBooleanOr("mazeChecked", false);
-        open = input.getBooleanOr("open", false);
-        spawnedClerics = input.getBooleanOr("spawnedClerics", false);
-        spawner = input.getBooleanOr("spawner", false);
-        spawnType = input.getByteOr("spawntype", (byte) 0);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        eyes = input.getByte("eyes");
+        mazeChecked = input.getBoolean("mazeChecked");
+        open = input.getBoolean("open");
+        spawnedClerics = input.getBoolean("spawnedClerics");
+        spawner = input.getBoolean("spawner");
+        spawnType = input.getByte("spawntype");
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         output.putByte("eyes", eyes);
         output.putBoolean("mazeChecked", mazeChecked);
         output.putBoolean("open", open);
@@ -235,10 +231,10 @@ public final class BlockEntityEldritchAltar extends BlockEntity {
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput output = TagValueOutput.createWithContext(reporter, registries);
-            saveAdditional(output);
-            nbt.merge(output.buildResult());
+        {
+            CompoundTag output = new CompoundTag();
+            saveAdditional(output, registries);
+            nbt.merge(output);
         }
         return nbt;
     }

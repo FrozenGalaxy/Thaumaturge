@@ -13,14 +13,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.PlacementInfo;
-import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -30,14 +29,14 @@ import net.minecraft.world.level.block.Block;
 public final class DustTriggerTagRecipe implements DustTrigger {
     public static final MapCodec<DustTriggerTagRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
                     TagKey.codec(Registries.BLOCK).fieldOf("target_tag").forGetter(r -> r.targetTag),
-                    ItemStackTemplate.CODEC.fieldOf("result").forGetter(r -> r.result),
+                    ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
                     ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research)
             ).apply(i, DustTriggerTagRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, DustTriggerTagRecipe> STREAM_CODEC = StreamCodec.composite(
-            Identifier.STREAM_CODEC.map(rl -> TagKey.create(Registries.BLOCK, rl), TagKey::location),
+            ResourceLocation.STREAM_CODEC.map(rl -> TagKey.create(Registries.BLOCK, rl), TagKey::location),
             r -> r.targetTag,
-            ItemStackTemplate.STREAM_CODEC,
+            ItemStack.STREAM_CODEC,
             r -> r.result,
             ByteBufCodecs.optional(ResearchGate.STREAM_CODEC),
             r -> r.research,
@@ -47,10 +46,10 @@ public final class DustTriggerTagRecipe implements DustTrigger {
     public static final RecipeSerializer<DustTriggerTagRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     private final TagKey<Block> targetTag;
-    private final ItemStackTemplate result;
+    private final ItemStack result;
     private final Optional<ResearchGate> research;
 
-    public DustTriggerTagRecipe(TagKey<Block> targetTag, ItemStackTemplate result, Optional<ResearchGate> research) {
+    public DustTriggerTagRecipe(TagKey<Block> targetTag, ItemStack result, Optional<ResearchGate> research) {
         this.targetTag = targetTag;
         this.result = result;
         this.research = research;

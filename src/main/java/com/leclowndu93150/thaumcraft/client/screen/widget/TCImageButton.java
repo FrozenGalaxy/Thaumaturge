@@ -3,10 +3,10 @@ package com.leclowndu93150.thaumcraft.client.screen.widget;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class TCImageButton extends TCButton {
-    private final Identifier texture;
+    private final ResourceLocation texture;
     private final int u;
     private final int v;
     private final int spriteWidth;
@@ -19,7 +19,7 @@ public class TCImageButton extends TCButton {
             int y,
             int width,
             int height,
-            Identifier texture,
+            ResourceLocation texture,
             int u,
             int v,
             int spriteWidth,
@@ -44,7 +44,7 @@ public class TCImageButton extends TCButton {
             int centerY,
             int width,
             int height,
-            Identifier texture,
+            ResourceLocation texture,
             int u,
             int v,
             int spriteWidth,

@@ -8,8 +8,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jspecify.annotations.Nullable;
 
 public final class MenuVoidSiphon extends AbstractContainerMenu {
@@ -31,9 +31,9 @@ public final class MenuVoidSiphon extends AbstractContainerMenu {
     public MenuVoidSiphon(int containerId, Inventory playerInventory, @Nullable BlockEntityVoidSiphon blockEntity) {
         super(TCMenus.VOID_SIPHON.get(), containerId);
         this.blockEntity = blockEntity;
-        ItemStacksResourceHandler items = blockEntity != null ? blockEntity.output() : new ItemStacksResourceHandler(1);
+        ItemStackHandler items = blockEntity != null ? blockEntity.output() : new ItemStackHandler(1);
 
-        addSlot(new ResourceHandlerSlot(items, items::set, 0, OUTPUT_X, OUTPUT_Y) {
+        addSlot(new SlotItemHandler(items, 0, OUTPUT_X, OUTPUT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;

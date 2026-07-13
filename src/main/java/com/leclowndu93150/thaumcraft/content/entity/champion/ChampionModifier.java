@@ -2,7 +2,7 @@ package com.leclowndu93150.thaumcraft.content.entity.champion;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import java.util.List;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -54,10 +54,10 @@ public final class ChampionModifier {
             new ChampionModifier(INFESTED, "infested", Trigger.WHEN_HURT, ChampionEffects::infested),
             new ChampionModifier(TAINTED, "tainted", Trigger.TICK, ChampionEffects::tainted));
 
-    public static final Identifier NONE_MARKER_ID = TCIds.rl("champion/none");
+    public static final ResourceLocation NONE_MARKER_ID = TCIds.rl("champion/none");
     public static final AttributeModifier NONE_MARKER =
             new AttributeModifier(NONE_MARKER_ID, 1.0, AttributeModifier.Operation.ADD_VALUE);
-    public static final Identifier MINUS_ONE_ID = TCIds.rl("champion/minus_one");
+    public static final ResourceLocation MINUS_ONE_ID = TCIds.rl("champion/minus_one");
     public static final AttributeModifier MINUS_ONE =
             new AttributeModifier(MINUS_ONE_ID, -1.0, AttributeModifier.Operation.ADD_VALUE);
 

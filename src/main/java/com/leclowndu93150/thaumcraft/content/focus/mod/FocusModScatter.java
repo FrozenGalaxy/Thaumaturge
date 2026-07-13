@@ -10,12 +10,12 @@ import com.leclowndu93150.thaumcraft.api.casters.Trajectory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 
 public final class FocusModScatter extends FocusMod {
-    private static final Identifier KEY = TCIds.rl("scatter");
+    private static final ResourceLocation KEY = TCIds.rl("scatter");
 
     private static final float MIN_COMPLEXITY = 2.0F;
     private static final float CONE_COMPLEXITY_DIVISOR = 45.0F;
@@ -23,7 +23,7 @@ public final class FocusModScatter extends FocusMod {
     private static final float POWER_FORKS_DIVISOR = 2.0F;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

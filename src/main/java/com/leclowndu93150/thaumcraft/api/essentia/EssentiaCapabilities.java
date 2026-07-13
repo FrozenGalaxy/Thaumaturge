@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.api.essentia;
 
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.ItemCapability;
 
@@ -20,19 +20,19 @@ public final class EssentiaCapabilities {
     /** Sided block capability for essentia transport. */
     public static final BlockCapability<IEssentiaTransport, Direction> TRANSPORT =
             BlockCapability.createSided(
-                    Identifier.fromNamespaceAndPath("thaumcraft", "essentia_transport"),
+                    ResourceLocation.fromNamespaceAndPath("thaumcraft", "essentia_transport"),
                     IEssentiaTransport.class);
 
     /** Item capability for essentia containers. */
     public static final ItemCapability<IEssentiaContainerItem, Void> CONTAINER =
             ItemCapability.createVoid(
-                    Identifier.fromNamespaceAndPath("thaumcraft", "essentia_container"),
+                    ResourceLocation.fromNamespaceAndPath("thaumcraft", "essentia_container"),
                     IEssentiaContainerItem.class);
 
     /** Sided block capability for synthetic aspect queries (filters, routing intents). */
     public static final BlockCapability<IAspectQuery, Direction> ASPECT_QUERY =
             BlockCapability.createSided(
-                    Identifier.fromNamespaceAndPath("thaumcraft", "aspect_query"),
+                    ResourceLocation.fromNamespaceAndPath("thaumcraft", "aspect_query"),
                     IAspectQuery.class);
 
     private EssentiaCapabilities() {}

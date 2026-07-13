@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 
 public final class KnowledgeRequirementWidget {
@@ -45,10 +45,10 @@ public final class KnowledgeRequirementWidget {
     private static final int PROGRESS_BAR_FILLED_V = 232;
     private static final int PROGRESS_BAR_EMPTY_V = 234;
 
-    private static final Map<KnowledgeType, Identifier> ICONS = new EnumMap<>(KnowledgeType.class);
+    private static final Map<KnowledgeType, ResourceLocation> ICONS = new EnumMap<>(KnowledgeType.class);
     static {
-        ICONS.put(KnowledgeType.THEORY, Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/research/knowledge_theory.png"));
-        ICONS.put(KnowledgeType.OBSERVATION, Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/research/knowledge_observation.png"));
+        ICONS.put(KnowledgeType.THEORY, ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/research/knowledge_theory.png"));
+        ICONS.put(KnowledgeType.OBSERVATION, ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/research/knowledge_observation.png"));
     }
 
     private KnowledgeRequirementWidget() {}
@@ -87,7 +87,7 @@ public final class KnowledgeRequirementWidget {
     }
 
     private static void drawIcon(GuiGraphicsExtractor graphics, int x, int y, KnowledgeType type) {
-        Identifier icon = ICONS.get(type);
+        ResourceLocation icon = ICONS.get(type);
         if (icon == null) return;
         graphics.pose().pushMatrix();
         graphics.pose().translate(x, y);

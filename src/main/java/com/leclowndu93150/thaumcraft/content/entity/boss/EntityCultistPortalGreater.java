@@ -10,13 +10,14 @@ import com.leclowndu93150.thaumcraft.registry.TCEntities;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
@@ -28,8 +29,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
@@ -77,15 +76,15 @@ public class EntityCultistPortalGreater extends EntityThaumcraftBoss {
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putInt("stage", this.stage);
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
+    protected void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        this.stage = input.getIntOr("stage", 0);
+        this.stage = input.getInt("stage");
     }
 
     @Override
@@ -211,7 +210,7 @@ public class EntityCultistPortalGreater extends EntityThaumcraftBoss {
         cultist.setPos(this.getX() + this.random.nextFloat() - this.random.nextFloat(),
                 this.getY() + 0.25, this.getZ() + this.random.nextFloat() - this.random.nextFloat());
         cultist.finalizeSpawn(server, server.getCurrentDifficultyAt(cultist.blockPosition()),
-                EntitySpawnReason.MOB_SUMMONED, null);
+                MobSpawnType.MOB_SUMMONED, null);
         cultist.setHomeTo(this.blockPosition(), 32);
         server.addFreshEntity(cultist);
         if (cultist instanceof EntityCultist minion) {

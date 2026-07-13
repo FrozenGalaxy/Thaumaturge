@@ -11,7 +11,7 @@ import com.leclowndu93150.thaumcraft.content.focus.FocusRayTrace;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,7 +21,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class FocusMediumTouch extends FocusMedium {
-    private static final Identifier KEY = TCIds.rl("touch");
+    private static final ResourceLocation KEY = TCIds.rl("touch");
 
     static final double RAY_MIN_RANGE = 0.25;
     static final float RAY_PADDING = 0.25F;
@@ -30,7 +30,7 @@ public class FocusMediumTouch extends FocusMedium {
     private static final double MOTION_HALF = 2.0;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

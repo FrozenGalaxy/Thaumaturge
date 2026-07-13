@@ -7,7 +7,7 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.data.AtlasIds;
 import net.minecraft.util.Mth;

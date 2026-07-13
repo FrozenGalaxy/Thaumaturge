@@ -6,7 +6,7 @@ import com.leclowndu93150.thaumcraft.api.golems.tasks.Task;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
 /**
@@ -20,7 +20,7 @@ public interface ISeal {
     /**
      * @return the registry id of this seal kind
      */
-    Identifier getKey();
+    ResourceLocation getKey();
 
     /**
      * @param level the level
@@ -73,7 +73,7 @@ public interface ISeal {
     /**
      * @return the icon texture rendered on the seal in the world
      */
-    Identifier getSealIcon();
+    ResourceLocation getSealIcon();
 
     /**
      * Called when the seal is removed from the world.

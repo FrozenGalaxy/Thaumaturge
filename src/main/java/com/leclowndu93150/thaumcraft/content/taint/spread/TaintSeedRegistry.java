@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -19,7 +19,7 @@ public final class TaintSeedRegistry extends SavedData {
     ).apply(builder, list -> new TaintSeedRegistry(new ArrayList<>(list))));
 
     public static final SavedDataType<TaintSeedRegistry> TYPE = new SavedDataType<>(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "taint_seeds"),
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "taint_seeds"),
             TaintSeedRegistry::new,
             CODEC,
             DataFixTypes.LEVEL);

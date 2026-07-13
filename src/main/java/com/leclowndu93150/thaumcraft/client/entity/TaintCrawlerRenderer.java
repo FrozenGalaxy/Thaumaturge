@@ -3,15 +3,15 @@ package com.leclowndu93150.thaumcraft.client.entity;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.entity.EntityTaintCrawler;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.monster.silverfish.SilverfishModel;
+import net.minecraft.client.model.SilverfishModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class TaintCrawlerRenderer extends MobRenderer<EntityTaintCrawler, LivingEntityRenderState, SilverfishModel> {
-    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/entity/taint_crawler.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/entity/taint_crawler.png");
     private static final float CRAWLER_SCALE = 0.7F;
 
     public TaintCrawlerRenderer(EntityRendererProvider.Context context) {
@@ -19,7 +19,7 @@ public final class TaintCrawlerRenderer extends MobRenderer<EntityTaintCrawler, 
     }
 
     @Override
-    public Identifier getTextureLocation(LivingEntityRenderState state) {
+    public ResourceLocation getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }
 

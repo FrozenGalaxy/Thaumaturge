@@ -2,7 +2,7 @@ package com.leclowndu93150.thaumcraft.registry;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -58,10 +58,10 @@ public final class TCItemTags {
     private TCItemTags() {}
 
     private static TagKey<Item> key(String path) {
-        return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(TCIds.MODID, path));
+        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(TCIds.MODID, path));
     }
 
     private static TagKey<Item> common(String path) {
-        return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", path));
+        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", path));
     }
 }

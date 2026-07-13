@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.joml.Vector3f;
@@ -37,7 +37,7 @@ public final class MaterialLibrary {
         return this.materials;
     }
 
-    public void loadFromResource(ResourceManager resources, Identifier location) throws IOException {
+    public void loadFromResource(ResourceManager resources, ResourceLocation location) throws IOException {
         Resource resource = resources.getResourceOrThrow(location);
         try (InputStream stream = resource.open()) {
             loadFromStream(stream);

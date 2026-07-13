@@ -18,14 +18,14 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 public final class AspectIndex implements IAspectIndex {
     public static final AspectIndex EMPTY = new AspectIndex(Map.of());
 
-    public static final Codec<AspectIndex> CODEC = Codec.unboundedMap(Identifier.CODEC, AspectList.CODEC)
+    public static final Codec<AspectIndex> CODEC = Codec.unboundedMap(ResourceLocation.CODEC, AspectList.CODEC)
             .xmap(AspectIndex::fromIdMap, AspectIndex::toIdMap);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, AspectIndex> STREAM_CODEC = StreamCodec.composite(
@@ -95,13 +95,13 @@ public final class AspectIndex implements IAspectIndex {
         return of(map);
     }
 
-    private Map<Identifier, AspectList> toIdMap() {
-        Map<Identifier, AspectList> out = new HashMap<>(byItem.size());
+    private Map<ResourceLocation, AspectList> toIdMap() {
+        Map<ResourceLocation, AspectList> out = new HashMap<>(byItem.size());
         byItem.forEach((item, aspects) -> out.put(BuiltInRegistries.ITEM.getKey(item), aspects));
         return out;
     }
 
-    private static AspectIndex fromIdMap(Map<Identifier, AspectList> map) {
+    private static AspectIndex fromIdMap(Map<ResourceLocation, AspectList> map) {
         Map<Item, AspectList> out = new HashMap<>(map.size());
         map.forEach((id, aspects) -> {
             Item item = BuiltInRegistries.ITEM.getValue(id);
@@ -112,14 +112,14 @@ public final class AspectIndex implements IAspectIndex {
         return of(out);
     }
 
-    private record Entry(Identifier itemId, AspectList aspects) {
+    private record Entry(ResourceLocation itemId, AspectList aspects) {
         static final Codec<Entry> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-                Identifier.CODEC.fieldOf("item").forGetter(Entry::itemId),
+                ResourceLocation.CODEC.fieldOf("item").forGetter(Entry::itemId),
                 AspectList.CODEC.fieldOf("aspects").forGetter(Entry::aspects)
         ).apply(builder, Entry::new));
 
         static final StreamCodec<RegistryFriendlyByteBuf, Entry> STREAM_CODEC = StreamCodec.composite(
-                Identifier.STREAM_CODEC, Entry::itemId,
+                ResourceLocation.STREAM_CODEC, Entry::itemId,
                 AspectList.STREAM_CODEC, Entry::aspects,
                 Entry::new
         );

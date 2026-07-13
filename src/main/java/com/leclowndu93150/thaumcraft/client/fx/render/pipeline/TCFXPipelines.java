@@ -10,7 +10,7 @@ import com.mojang.blaze3d.platform.SourceFactor;
 import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class TCFXPipelines {
     private static final RenderPipeline.Snippet BASE = RenderPipeline.builder()
@@ -25,7 +25,7 @@ public final class TCFXPipelines {
 
     private TCFXPipelines() {}
 
-    public static RenderPipeline additiveTextured(Identifier location) {
+    public static RenderPipeline additiveTextured(ResourceLocation location) {
         return RenderPipeline.builder(BASE)
                 .withLocation(location)
                 .withColorTargetState(new ColorTargetState(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE)))
@@ -34,7 +34,7 @@ public final class TCFXPipelines {
                 .build();
     }
 
-    public static RenderPipeline translucentTextured(Identifier location) {
+    public static RenderPipeline translucentTextured(ResourceLocation location) {
         return RenderPipeline.builder(BASE)
                 .withLocation(location)
                 .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
@@ -43,7 +43,7 @@ public final class TCFXPipelines {
                 .build();
     }
 
-    public static RenderPipeline additiveTexturedNoDepth(Identifier location) {
+    public static RenderPipeline additiveTexturedNoDepth(ResourceLocation location) {
         return RenderPipeline.builder(BASE)
                 .withLocation(location)
                 .withColorTargetState(new ColorTargetState(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE)))

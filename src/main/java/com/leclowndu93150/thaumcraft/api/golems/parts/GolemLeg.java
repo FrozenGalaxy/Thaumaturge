@@ -3,7 +3,7 @@ package com.leclowndu93150.thaumcraft.api.golems.parts;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import java.util.List;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import org.jspecify.annotations.Nullable;
 
@@ -15,7 +15,7 @@ import org.jspecify.annotations.Nullable;
 public final class GolemLeg extends GolemPart {
     /** The registry key for golem legs. */
     public static final ResourceKey<Registry<GolemLeg>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            Identifier.fromNamespaceAndPath("thaumcraft", "golem_leg"));
+            ResourceLocation.fromNamespaceAndPath("thaumcraft", "golem_leg"));
 
     private final ILegFunction function;
 
@@ -27,7 +27,7 @@ public final class GolemLeg extends GolemPart {
      * @param function   the behavior ticked for these legs, or null when they have none
      * @param traits     traits granted by these legs
      */
-    public GolemLeg(List<Identifier> research, Identifier icon, @Nullable GolemPartModel model,
+    public GolemLeg(List<ResourceLocation> research, ResourceLocation icon, @Nullable GolemPartModel model,
                     List<GolemComponent> components, @Nullable ILegFunction function, List<GolemTrait> traits) {
         super(research, icon, components, traits, model);
         this.function = function;

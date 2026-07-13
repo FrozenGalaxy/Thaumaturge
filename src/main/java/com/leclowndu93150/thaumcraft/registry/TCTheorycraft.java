@@ -47,7 +47,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.registry.TCEntities;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -55,10 +55,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class TCTheorycraft {
     public static final ResourceKey<Registry<CardFactory>> CARDS_REGISTRY_KEY =
-            ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(TCIds.MODID, "theorycraft_card"));
+            ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "theorycraft_card"));
 
     public static final ResourceKey<Registry<ITheorycraftAid>> AIDS_REGISTRY_KEY =
-            ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(TCIds.MODID, "theorycraft_aid"));
+            ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "theorycraft_aid"));
 
     public static final DeferredRegister<CardFactory> CARDS = DeferredRegister.create(CARDS_REGISTRY_KEY, TCIds.MODID);
     public static final DeferredRegister<ITheorycraftAid> AIDS = DeferredRegister.create(AIDS_REGISTRY_KEY, TCIds.MODID);

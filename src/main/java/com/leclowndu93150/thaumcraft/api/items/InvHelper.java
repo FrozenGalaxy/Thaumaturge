@@ -8,7 +8,7 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -16,14 +16,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Inventory access and filter matching used by golem seals and provisioning. Replaces the
- * {@code InventoryUtils}, built on the NeoForge resource transfer API.
+ * {@code InventoryUtils}, built on the NeoForge item handler capability.
  *
  * @since 1.0.0
  */
@@ -80,9 +79,9 @@ public final class InvHelper {
      * @param side  the side to access from, or null for the unsided handler
      * @return the item handler there, or null when absent
      */
-    public static @Nullable ResourceHandler<ItemResource> getItemHandlerAt(Level level, BlockPos pos,
-                                                                           @Nullable Direction side) {
-        return level.getCapability(Capabilities.Item.BLOCK, pos, side);
+    public static @Nullable IItemHandler getItemHandlerAt(Level level, BlockPos pos,
+                                                           @Nullable Direction side) {
+        return level.getCapability(Capabilities.ItemHandler.BLOCK, pos, side);
     }
 
     /**
@@ -90,24 +89,12 @@ public final class InvHelper {
      *
      * @return the remainder that did not fit
      */
-    public static ItemStack insertStack(@Nullable ResourceHandler<ItemResource> handler, ItemStack stack,
+    public static ItemStack insertStack(@Nullable IItemHandler handler, ItemStack stack,
                                         boolean simulate) {
         if (handler == null || stack.isEmpty()) {
             return stack;
         }
-        int inserted;
-        try (Transaction transaction = Transaction.openRoot()) {
-            inserted = handler.insert(ItemResource.of(stack), stack.getCount(), transaction);
-            if (!simulate) {
-                transaction.commit();
-            }
-        }
-        if (inserted >= stack.getCount()) {
-            return ItemStack.EMPTY;
-        }
-        ItemStack remainder = stack.copy();
-        remainder.setCount(stack.getCount() - inserted);
-        return remainder;
+        return ItemHandlerHelper.insertItemStacked(handler, stack.copy(), simulate);
     }
 
     /**
@@ -116,7 +103,7 @@ public final class InvHelper {
      * @return the remainder that did not fit
      */
     public static ItemStack insertStackAt(Level level, BlockPos pos, Direction side, ItemStack stack, boolean simulate) {
-        ResourceHandler<ItemResource> inventory = getItemHandlerAt(level, pos, side);
+        IItemHandler inventory = getItemHandlerAt(level, pos, side);
         return inventory != null ? insertStack(inventory, stack, simulate) : stack;
     }
 
@@ -151,14 +138,14 @@ public final class InvHelper {
     /**
      * @return the total count of matching items in the handler
      */
-    public static int countTotalItemsIn(@Nullable ResourceHandler<ItemResource> inventory, ItemStack stack,
+    public static int countTotalItemsIn(@Nullable IItemHandler inventory, ItemStack stack,
                                         InvFilter filter) {
         int count = 0;
         if (inventory != null) {
-            for (int index = 0; index < inventory.size(); index++) {
-                ItemResource resource = inventory.getResource(index);
-                if (!resource.isEmpty() && areItemStacksEqual(stack, resource.toStack(1), filter)) {
-                    count += inventory.getAmountAsInt(index);
+            for (int index = 0; index < inventory.getSlots(); index++) {
+                ItemStack held = inventory.getStackInSlot(index);
+                if (!held.isEmpty() && areItemStacksEqual(stack, held, filter)) {
+                    count += held.getCount();
                 }
             }
         }
@@ -200,7 +187,7 @@ public final class InvHelper {
         return componentsEqualIgnoringDamage(first, second, filter.ignoreDamage);
     }
 
-    private static Identifier itemId(ItemStack stack) {
+    private static ResourceLocation itemId(ItemStack stack) {
         return BuiltInRegistries.ITEM.getKey(stack.getItem());
     }
 
@@ -247,16 +234,15 @@ public final class InvHelper {
      * @return the first matching stack, or an empty stack
      */
     public static ItemStack findFirstMatchFromFilter(List<ItemStack> filterStacks, boolean blacklist,
-                                                     ResourceHandler<ItemResource> inv, InvFilter filter,
+                                                     IItemHandler inv, InvFilter filter,
                                                      boolean leaveOne) {
         slots:
-        for (int index = 0; index < inv.size(); index++) {
-            ItemResource resource = inv.getResource(index);
-            if (resource.isEmpty()) {
+        for (int index = 0; index < inv.getSlots(); index++) {
+            ItemStack held = inv.getStackInSlot(index);
+            if (held.isEmpty()) {
                 continue;
             }
-            ItemStack candidate = resource.toStack(Math.min(inv.getAmountAsInt(index),
-                    resource.toStack(1).getMaxStackSize()));
+            ItemStack candidate = copyLimitedStack(held, held.getMaxStackSize());
             if (candidate.isEmpty() || (leaveOne && countTotalItemsIn(inv, candidate, filter) < 2)) {
                 continue;
             }
@@ -388,22 +374,17 @@ public final class InvHelper {
      *
      * @return the removed items, or an empty stack
      */
-    public static ItemStack removeStackFrom(@Nullable ResourceHandler<ItemResource> inventory, ItemStack stack,
+    public static ItemStack removeStackFrom(@Nullable IItemHandler inventory, ItemStack stack,
                                             InvFilter filter, boolean simulate) {
         if (inventory == null || stack.isEmpty()) {
             return ItemStack.EMPTY;
         }
         int amount = stack.getCount();
         int removed = 0;
-        try (Transaction transaction = Transaction.openRoot()) {
-            for (int index = 0; index < inventory.size() && removed < amount; index++) {
-                ItemResource resource = inventory.getResource(index);
-                if (!resource.isEmpty() && areItemStacksEqual(stack, resource.toStack(1), filter)) {
-                    removed += inventory.extract(index, resource, amount - removed, transaction);
-                }
-            }
-            if (!simulate) {
-                transaction.commit();
+        for (int index = 0; index < inventory.getSlots() && removed < amount; index++) {
+            ItemStack held = inventory.getStackInSlot(index);
+            if (!held.isEmpty() && areItemStacksEqual(stack, held, filter)) {
+                removed += inventory.extractItem(index, amount - removed, simulate).getCount();
             }
         }
         if (removed == 0) {

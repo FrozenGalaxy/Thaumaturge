@@ -5,10 +5,10 @@ import com.leclowndu93150.thaumcraft.client.model.entity.EldritchGolemModel;
 import com.leclowndu93150.thaumcraft.content.entity.boss.EntityEldritchGolem;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class EldritchGolemRenderer extends MobRenderer<EntityEldritchGolem, EldritchGolemRenderState, EldritchGolemModel> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/eldritch_golem.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/eldritch_golem.png");
     private static final float SHADOW = 0.7F;
 
     public EldritchGolemRenderer(EntityRendererProvider.Context context) {
@@ -29,7 +29,7 @@ public final class EldritchGolemRenderer extends MobRenderer<EntityEldritchGolem
     }
 
     @Override
-    public Identifier getTextureLocation(EldritchGolemRenderState state) {
+    public ResourceLocation getTextureLocation(EldritchGolemRenderState state) {
         return TEXTURE;
     }
 }

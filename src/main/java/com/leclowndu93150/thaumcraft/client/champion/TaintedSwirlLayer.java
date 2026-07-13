@@ -12,20 +12,20 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.rendertype.TextureTransform;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
 public final class TaintedSwirlLayer<S extends LivingEntityRenderState, M extends EntityModel<? super S>>
         extends RenderLayer<S, M> {
-    private static final Identifier TAINT_FIBRES =
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/models/taint_fibres.png");
+    private static final ResourceLocation TAINT_FIBRES =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/models/taint_fibres.png");
     private static final float ALPHA = 0.66F;
-    private static final int COLOR = ARGB.colorFromFloat(ALPHA, 1.0F, 1.0F, 1.0F);
+    private static final int COLOR = ARGB32.colorFromFloat(ALPHA, 1.0F, 1.0F, 1.0F);
     private static final float U_FREQUENCY = 2.5E-4F;
     private static final float V_FACTOR = 0.001F;
     private static final float UV_SCALE_U = 8.0F;

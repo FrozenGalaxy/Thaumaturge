@@ -13,7 +13,7 @@ import com.leclowndu93150.thaumcraft.content.casters.BlockBreakerEngine;
 import com.leclowndu93150.thaumcraft.content.focus.FocusFX;
 import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -27,7 +27,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public final class FocusEffectBreak extends FocusEffect {
-    private static final Identifier KEY = TCIds.rl("break");
+    private static final ResourceLocation KEY = TCIds.rl("break");
 
     private static final int POWER_COMPLEXITY_FACTOR = 3;
     private static final int SILK_COMPLEXITY_FACTOR = 4;
@@ -40,7 +40,7 @@ public final class FocusEffectBreak extends FocusEffect {
     private static final int PARTICLE_START_BASE = 704;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

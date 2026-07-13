@@ -29,17 +29,17 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jspecify.annotations.Nullable;
 
 public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGolemBuilder> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/gui/gui_golembuilder.png");
-    private static final Identifier MATERIAL_ICON = TCIds.rl("textures/item/golem.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/gui/gui_golembuilder.png");
+    private static final ResourceLocation MATERIAL_ICON = TCIds.rl("textures/item/golem.png");
 
     private static final int IMAGE_WIDTH = 208;
     private static final int IMAGE_HEIGHT = 224;
@@ -140,12 +140,12 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
         gatherInfo();
     }
 
-    private boolean knowsAll(List<Identifier> research) {
+    private boolean knowsAll(List<ResourceLocation> research) {
         if (minecraft == null || minecraft.player == null) {
             return false;
         }
         IPlayerKnowledge knowledge = KnowledgeAccess.of(minecraft.player);
-        for (Identifier id : research) {
+        for (ResourceLocation id : research) {
             if (!knowledge.isResearchComplete(id)) {
                 return false;
             }
@@ -186,7 +186,7 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
         props.setAddon(valAddons.get(addonIndex));
         BlockEntityGolemBuilder builder = menu.blockEntity();
         if (builder != null) {
-            ClientPacketDistributor.sendToServer(new ServerboundGolemPressPayload(builder.getBlockPos(), props.copy(), false));
+            PacketDistributor.sendToServer(new ServerboundGolemPressPayload(builder.getBlockPos(), props.copy(), false));
         }
         redoComps();
         GolemTrait[] tags = props.getTraits().toArray(new GolemTrait[0]);
@@ -282,17 +282,17 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
                 }));
     }
 
-    private void addPartButton(int x, int y, Identifier icon, String kind, String path, int color) {
+    private void addPartButton(int x, int y, ResourceLocation icon, String kind, String path, int color) {
         TCHoverButton button = TCHoverButton.centered(leftPos + x, topPos + y, 16,
                 new TCButtonIcon.TextureIcon(icon),
                 Component.translatable("golem." + kind + "." + path), () -> {});
         button.setDescription(Component.translatable("golem." + kind + ".text." + path));
-        button.setTintColor(ARGB.opaque(color));
+        button.setTintColor(ARGB32.opaque(color));
         addRenderableWidget(button);
     }
 
     private static <T> String keyOf(Registry<T> registry, T value) {
-        Identifier key = registry.getKey(value);
+        ResourceLocation key = registry.getKey(value);
         return key == null ? "unknown" : key.getPath();
     }
 
@@ -377,7 +377,7 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
         }
         BlockEntityGolemBuilder builder = menu.blockEntity();
         if (builder != null) {
-            ClientPacketDistributor.sendToServer(new ServerboundGolemPressPayload(builder.getBlockPos(), props.copy(), true));
+            PacketDistributor.sendToServer(new ServerboundGolemPressPayload(builder.getBlockPos(), props.copy(), true));
             disableAll = true;
         }
     }
@@ -392,7 +392,7 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
                     graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
                             leftPos + COMPONENT_GRID_X + col * 16, topPos + COMPONENT_GRID_Y + 16 * row,
                             MISSING_U, MISSING_V, 16, 16, 256, 256,
-                            ARGB.color(128, 0xFFFFFF));
+                            ARGB32.color(128, 0xFFFFFF));
                 }
                 if (++row > 3) {
                     row = 0;
@@ -450,7 +450,7 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
             int alpha = isHovered() && active ? 255 : 230;
             graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, getX(), getY(),
                     CRAFT_U, CRAFT_V, CRAFT_WIDTH, CRAFT_HEIGHT, 256, 256,
-                    ARGB.color(alpha, 0xFFFFFF));
+                    ARGB32.color(alpha, 0xFFFFFF));
             if (!active) {
                 graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, getX(), getY(),
                         CRAFT_U, CRAFT_DISABLED_V, CRAFT_WIDTH, CRAFT_HEIGHT, 256, 256);

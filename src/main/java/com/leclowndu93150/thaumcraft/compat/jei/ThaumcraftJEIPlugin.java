@@ -48,7 +48,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
@@ -57,7 +57,7 @@ import org.jspecify.annotations.Nullable;
 
 @JeiPlugin
 public final class ThaumcraftJEIPlugin implements IModPlugin {
-    private static final Identifier PLUGIN_UID = Identifier.fromNamespaceAndPath(TCIds.MODID, "jei_plugin");
+    private static final ResourceLocation PLUGIN_UID = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "jei_plugin");
 
     /*public static Map<IRecipeType<?>,List<RecipeHolder<?>>> searchAffectedRecipes;
     public static IJeiRuntime runtime;*/
@@ -65,7 +65,7 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
     public ThaumcraftJEIPlugin() {}
 
     @Override
-    public Identifier getPluginUid() {
+    public ResourceLocation getPluginUid() {
         return PLUGIN_UID;
     }
 
@@ -151,7 +151,7 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
         for (RecipeType<@NonNull R> type : new RecipeType[]{TCRecipeTypes.DUST_TRIGGER.get(),TCRecipeTypes.CRUCIBLE.get()}) {
             RecipeMap recipes = TCClientRecipes.getRecipeMapForType(Minecraft.getInstance().level, type);
             List<RecipeHolder<@NonNull R>> holders = List.copyOf(recipes.byType(type));
-            Identifier uid = BuiltInRegistries.RECIPE_TYPE.getKey(type);
+            ResourceLocation uid = BuiltInRegistries.RECIPE_TYPE.getKey(type);
             List<RecipeHolder<@NonNull R>> hided = holders.stream().filter(r->!r.value().doesPassGate(Minecraft.getInstance().player)).toList();
             IRecipeHolderType<@NonNull R> jeiType = (IRecipeHolderType<R>) runtime.getRecipeManager().getRecipeType(uid).get();
             runtime.getRecipeManager().hideRecipes(jeiType,hided);

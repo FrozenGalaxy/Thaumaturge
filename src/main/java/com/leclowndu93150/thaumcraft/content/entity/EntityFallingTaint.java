@@ -4,6 +4,7 @@ import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.registry.TCEntities;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -18,8 +19,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
 
 public final class EntityFallingTaint extends Entity implements IEntityWithComplexSpawn {
@@ -121,21 +120,21 @@ public final class EntityFallingTaint extends Entity implements IEntityWithCompl
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         output.putInt("BlockId", Block.getId(fallTile));
         output.putLong("Origin", originPos.asLong());
         output.putInt("Time", fallTime);
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
-        int id = input.getIntOr("BlockId", Block.getId(fallTile));
+    protected void readAdditionalSaveData(CompoundTag input) {
+        int id = (input.contains("BlockId") ? input.getInt("BlockId") : Block.getId(fallTile));
         BlockState resolved = Block.stateById(id);
         if (!resolved.isAir()) {
             fallTile = resolved;
         }
-        originPos = BlockPos.of(input.getLongOr("Origin", 0L));
-        fallTime = input.getIntOr("Time", 0);
+        originPos = BlockPos.of(input.getLong("Origin"));
+        fallTime = input.getInt("Time");
     }
 
     @Override

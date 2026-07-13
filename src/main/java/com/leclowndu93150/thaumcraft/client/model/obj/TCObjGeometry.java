@@ -5,28 +5,28 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.block.dispatch.ModelState;
+import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelDebugName;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.geometry.UnbakedGeometry;
-import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 
 public final class TCObjGeometry implements UnbakedGeometry {
     private static final float CENTER_OFFSET = 0.5F;
 
-    private final Identifier model;
+    private final ResourceLocation model;
     private final boolean flipV;
     private final boolean cornerSpace;
 
-    public TCObjGeometry(Identifier model, boolean flipV, boolean cornerSpace) {
+    public TCObjGeometry(ResourceLocation model, boolean flipV, boolean cornerSpace) {
         this.model = model;
         this.flipV = flipV;
         this.cornerSpace = cornerSpace;

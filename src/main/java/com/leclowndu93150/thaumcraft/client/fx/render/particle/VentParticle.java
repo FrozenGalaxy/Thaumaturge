@@ -12,7 +12,7 @@ import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
@@ -124,7 +124,7 @@ public final class VentParticle extends SingleQuadParticle {
         float dy = (float)(Mth.lerp((double)partialTickTime, this.yo, this.y) - pos.y());
         float dz = (float)(Mth.lerp((double)partialTickTime, this.zo, this.z) - pos.z());
         float fadeAlpha = ALPHA * ((this.psm - this.scale) / this.psm);
-        int color = ARGB.colorFromFloat(fadeAlpha, this.rCol, this.gCol, this.bCol);
+        int color = ARGB32.colorFromFloat(fadeAlpha, this.rCol, this.gCol, this.bCol);
         int light = this.getLightCoords(partialTickTime);
         renderState.add(
                 this.getLayer(),

@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.essentia.tube;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.essentia.EssentiaCapabilities;
 import com.leclowndu93150.thaumcraft.api.essentia.IEssentiaTransport;
@@ -12,6 +13,8 @@ import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import com.mojang.serialization.Codec;
 import java.nio.ByteBuffer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.Packet;
@@ -26,8 +29,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jspecify.annotations.Nullable;
 
@@ -332,13 +333,13 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        essentiaType = input.read("EssentiaType", ASPECT_KEY_CODEC).orElse(null);
-        essentiaAmount = input.getIntOr("EssentiaAmount", 0);
-        suctionType = input.read("SuctionType", ASPECT_KEY_CODEC).orElse(null);
-        suction = input.getIntOr("Suction", 0);
-        int facingOrdinal = input.getIntOr("Facing", Direction.NORTH.ordinal());
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        essentiaType = TCNbt.read(input, "EssentiaType", ASPECT_KEY_CODEC, registries).orElse(null);
+        essentiaAmount = input.getInt("EssentiaAmount");
+        suctionType = TCNbt.read(input, "SuctionType", ASPECT_KEY_CODEC, registries).orElse(null);
+        suction = input.getInt("Suction");
+        int facingOrdinal = (input.contains("Facing") ? input.getInt("Facing") : Direction.NORTH.ordinal());
         if (facingOrdinal >= 0 && facingOrdinal < 6) {
             facing = Direction.values()[facingOrdinal];
         } else {
@@ -348,18 +349,18 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        if (essentiaType != null) output.store("EssentiaType", ASPECT_KEY_CODEC, essentiaType);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
+        if (essentiaType != null) TCNbt.store(output, "EssentiaType", ASPECT_KEY_CODEC, registries, essentiaType);
         output.putInt("EssentiaAmount", essentiaAmount);
-        if (suctionType != null) output.store("SuctionType", ASPECT_KEY_CODEC, suctionType);
+        if (suctionType != null) TCNbt.store(output, "SuctionType", ASPECT_KEY_CODEC, registries, suctionType);
         output.putInt("Suction", suction);
         output.putInt("Facing", facing.ordinal());
         writeOpenSides(output);
     }
 
-    protected void readOpenSides(ValueInput input) {
-        byte[] data = input.read("OpenSides", Codec.BYTE_BUFFER).map(buf -> {
+    protected void readOpenSides(CompoundTag input) {
+        byte[] data = TCNbt.read(input, "OpenSides", Codec.BYTE_BUFFER, registries).map(buf -> {
             byte[] arr = new byte[buf.remaining()];
             buf.get(arr);
             return arr;
@@ -375,12 +376,12 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
         }
     }
 
-    protected void writeOpenSides(ValueOutput output) {
+    protected void writeOpenSides(CompoundTag output) {
         byte[] data = new byte[6];
         for (int a = 0; a < 6; a++) {
             data[a] = (byte) (openSides[a] ? 1 : 0);
         }
-        output.store("OpenSides", Codec.BYTE_BUFFER, ByteBuffer.wrap(data));
+        TCNbt.store(output, "OpenSides", Codec.BYTE_BUFFER, registries, ByteBuffer.wrap(data));
     }
 
     @Override

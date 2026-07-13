@@ -4,7 +4,7 @@ import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import java.util.List;
 import java.util.function.Supplier;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 
@@ -18,10 +18,10 @@ import net.minecraft.world.item.ItemStack;
 public final class GolemMaterial {
     /** The registry key for golem materials. */
     public static final ResourceKey<Registry<GolemMaterial>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            Identifier.fromNamespaceAndPath("thaumcraft", "golem_material"));
+            ResourceLocation.fromNamespaceAndPath("thaumcraft", "golem_material"));
 
-    private final List<Identifier> research;
-    private final Identifier texture;
+    private final List<ResourceLocation> research;
+    private final ResourceLocation texture;
     private final int itemColor;
     private final int healthMod;
     private final int armor;
@@ -42,7 +42,7 @@ public final class GolemMaterial {
      * @param componentMechanism supplies the material's mechanism crafting item
      * @param traits             traits granted by the material
      */
-    public GolemMaterial(List<Identifier> research, Identifier texture, int itemColor, int healthMod, int armor,
+    public GolemMaterial(List<ResourceLocation> research, ResourceLocation texture, int itemColor, int healthMod, int armor,
                          int damage, Supplier<ItemStack> componentBase, Supplier<ItemStack> componentMechanism,
                          List<GolemTrait> traits) {
         this.research = List.copyOf(research);
@@ -59,14 +59,14 @@ public final class GolemMaterial {
     /**
      * @return research entries gating this material; empty means ungated
      */
-    public List<Identifier> research() {
+    public List<ResourceLocation> research() {
         return research;
     }
 
     /**
      * @return the body texture for golems of this material
      */
-    public Identifier texture() {
+    public ResourceLocation texture() {
         return texture;
     }
 

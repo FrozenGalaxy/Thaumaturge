@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.essentia;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.essentia.IEssentiaTransport;
@@ -17,13 +18,9 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -209,30 +206,30 @@ public final class BlockEntityCentrifuge extends BlockEntity implements IEssenti
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        aspectIn = input.read("AspectIn", ASPECT_KEY_CODEC).orElse(null);
-        aspectOut = input.read("AspectOut", ASPECT_KEY_CODEC).orElse(null);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        aspectIn = TCNbt.read(input, "AspectIn", ASPECT_KEY_CODEC, registries).orElse(null);
+        aspectOut = TCNbt.read(input, "AspectOut", ASPECT_KEY_CODEC, registries).orElse(null);
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         if (aspectIn != null) {
-            output.store("AspectIn", ASPECT_KEY_CODEC, aspectIn);
+            TCNbt.store(output, "AspectIn", ASPECT_KEY_CODEC, registries, aspectIn);
         }
         if (aspectOut != null) {
-            output.store("AspectOut", ASPECT_KEY_CODEC, aspectOut);
+            TCNbt.store(output, "AspectOut", ASPECT_KEY_CODEC, registries, aspectOut);
         }
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput output = TagValueOutput.createWithContext(reporter, registries);
-            saveAdditional(output);
-            nbt.merge(output.buildResult());
+        {
+            CompoundTag output = new CompoundTag();
+            saveAdditional(output, registries);
+            nbt.merge(output);
         }
         return nbt;
     }

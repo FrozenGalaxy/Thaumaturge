@@ -17,7 +17,7 @@ import com.leclowndu93150.thaumcraft.content.golem.seals.MenuSealBase;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -246,7 +246,7 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
                     int dye = DyeColor.byId(menu.color() - 1).getTextureDiffuseColor();
                     graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.GUI_BASE,
                             leftPos + middleX + 20, topPos + middleY + 6, COLOR_SWATCH_U, COLOR_SWATCH_V,
-                            6, 6, ATLAS, ATLAS, ARGB.opaque(dye));
+                            6, 6, ATLAS, ATLAS, ARGB32.opaque(dye));
                 }
                 int mx = mouseX - leftPos;
                 int my = mouseY - topPos;
@@ -319,7 +319,7 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
     }
 
     private void drawCentered(GuiGraphicsExtractor graphics, String text, int x, int y, int color) {
-        graphics.text(font, text, x - font.width(text) / 2, y, ARGB.opaque(color), true);
+        graphics.text(font, text, x - font.width(text) / 2, y, ARGB32.opaque(color), true);
     }
 
     interface UvSupplier {

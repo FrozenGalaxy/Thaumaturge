@@ -4,7 +4,7 @@ import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.client.render.crystal.CrystalUnbakedModel;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.blockstates.BlockModelDefinitionGenerator;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelDispatcher;

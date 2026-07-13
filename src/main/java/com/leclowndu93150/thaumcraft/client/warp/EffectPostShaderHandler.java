@@ -5,7 +5,7 @@ import com.leclowndu93150.thaumcraft.mixin.client.renderer.GameRendererInvoker;
 import com.leclowndu93150.thaumcraft.registry.TCMobEffects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -14,12 +14,12 @@ import org.jspecify.annotations.Nullable;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
 public final class EffectPostShaderHandler {
-    private static final Identifier DEATH_GAZE_SHADER = TCIds.rl("death_gaze");
-    private static final Identifier BLURRED_VISION_SHADER = TCIds.rl("blurred_vision");
-    private static final Identifier UNNATURAL_HUNGER_SHADER = TCIds.rl("unnatural_hunger");
-    private static final Identifier SUN_SCORNED_SHADER = TCIds.rl("sun_scorned");
+    private static final ResourceLocation DEATH_GAZE_SHADER = TCIds.rl("death_gaze");
+    private static final ResourceLocation BLURRED_VISION_SHADER = TCIds.rl("blurred_vision");
+    private static final ResourceLocation UNNATURAL_HUNGER_SHADER = TCIds.rl("unnatural_hunger");
+    private static final ResourceLocation SUN_SCORNED_SHADER = TCIds.rl("sun_scorned");
 
-    private static @Nullable Identifier active;
+    private static @Nullable ResourceLocation active;
 
     private EffectPostShaderHandler() {}
 
@@ -31,7 +31,7 @@ public final class EffectPostShaderHandler {
             active = null;
             return;
         }
-        Identifier desired = desiredShader(player);
+        ResourceLocation desired = desiredShader(player);
         if (desired == active && (desired == null || desired.equals(mc.gameRenderer.currentPostEffect()))) {
             return;
         }
@@ -44,7 +44,7 @@ public final class EffectPostShaderHandler {
         ((GameRendererInvoker) mc.gameRenderer).thaumcraft$setPostEffect(desired);
     }
 
-    private static @Nullable Identifier desiredShader(LocalPlayer player) {
+    private static @Nullable ResourceLocation desiredShader(LocalPlayer player) {
         if (player.hasEffect(TCMobEffects.DEATH_GAZE)) {
             return DEATH_GAZE_SHADER;
         }

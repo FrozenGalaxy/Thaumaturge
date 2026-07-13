@@ -7,7 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -34,9 +33,9 @@ public class BlockInfernalFurnace extends BaseEntityBlock {
         if (level.getBlockEntity(pos) instanceof BlockEntityInfernalFurnace furnace) {
             for (int i = 0; i < furnace.inventory().size(); i++) {
                 var resource = furnace.inventory().getResource(i);
-                int amount = furnace.inventory().getAmountAsInt(i);
+                int amount = furnace.inventory().getStackInSlot(i).getCount();
                 if (!resource.isEmpty() && amount > 0) {
-                    Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, resource.toStack(amount));
+                    Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, resource.copyWithCount(amount));
                 }
             }
         }
@@ -133,7 +132,7 @@ public class BlockInfernalFurnace extends BaseEntityBlock {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         if (entity.getX() < pos.getX() + 0.3F)
             entity.setDeltaMovement(entity.getDeltaMovement().add(1.0E-4F, 0, 0));
         if (entity.getX() > pos.getX() + 0.7F)
@@ -157,6 +156,6 @@ public class BlockInfernalFurnace extends BaseEntityBlock {
                 lv.igniteForSeconds(10);
             }
         }
-        super.entityInside(state, level, pos, entity, effectApplier, isPrecise);
+        super.entityInside(state, level, pos, entity);
     }
 }

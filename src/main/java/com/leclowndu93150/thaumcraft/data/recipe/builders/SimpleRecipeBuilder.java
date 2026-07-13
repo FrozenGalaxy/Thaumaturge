@@ -5,20 +5,20 @@ import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeUnlockAdvancementBuilder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.ItemStack;
 
 import net.minecraft.world.item.crafting.Recipe;
 
 import org.jetbrains.annotations.Nullable;
 
 public abstract class SimpleRecipeBuilder implements RecipeBuilder {
-    protected final ItemStackTemplate result;
+    protected final ItemStack result;
     protected boolean showNotification = true;
 
     protected final RecipeUnlockAdvancementBuilder advancementBuilder;
     protected final RecipeCategory category;
 
-    public SimpleRecipeBuilder(ItemStackTemplate result, RecipeCategory category) {
+    public SimpleRecipeBuilder(ItemStack result, RecipeCategory category) {
         this.result = result;
         this.category = category;
         this.advancementBuilder = new RecipeUnlockAdvancementBuilder();

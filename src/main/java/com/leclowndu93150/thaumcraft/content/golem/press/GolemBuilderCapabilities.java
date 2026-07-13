@@ -20,7 +20,7 @@ public final class GolemBuilderCapabilities {
                 (be, side) -> side == null || be.isConnectable(side) ? be : null
         );
         event.registerBlockEntity(
-                Capabilities.Item.BLOCK,
+                Capabilities.ItemHandler.BLOCK,
                 TCBlockEntities.GOLEM_BUILDER.get(),
                 (be, side) -> be.output()
         );

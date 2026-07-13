@@ -13,12 +13,12 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public final class CentrifugeRenderer implements BlockEntityRenderer<BlockEntityCentrifuge, CentrifugeRenderState> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/centrifuge.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/centrifuge.png");
 
     private final CentrifugeModel model;
 

@@ -4,7 +4,6 @@ import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
 import com.leclowndu93150.thaumcraft.content.entity.EntityFluxRift;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.List;
-import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -15,7 +14,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
@@ -29,14 +27,13 @@ public final class ItemCreativeFluxSponge extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display,
-                                Consumer<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(stack, context, display, tooltip, flag);
-        tooltip.accept(Component.translatable("tooltip.thaumcraft.flux_sponge.drain.0").withStyle(ChatFormatting.GREEN));
-        tooltip.accept(Component.translatable("tooltip.thaumcraft.flux_sponge.drain.1").withStyle(ChatFormatting.GREEN));
-        tooltip.accept(Component.translatable("tooltip.thaumcraft.flux_sponge.rifts.0").withStyle(ChatFormatting.DARK_AQUA));
-        tooltip.accept(Component.translatable("tooltip.thaumcraft.flux_sponge.rifts.1").withStyle(ChatFormatting.DARK_AQUA));
-        tooltip.accept(Component.translatable("tooltip.thaumcraft.flux_sponge.creative").withStyle(ChatFormatting.DARK_PURPLE));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltip, flag);
+        tooltip.add(Component.translatable("tooltip.thaumcraft.flux_sponge.drain.0").withStyle(ChatFormatting.GREEN));
+        tooltip.add(Component.translatable("tooltip.thaumcraft.flux_sponge.drain.1").withStyle(ChatFormatting.GREEN));
+        tooltip.add(Component.translatable("tooltip.thaumcraft.flux_sponge.rifts.0").withStyle(ChatFormatting.DARK_AQUA));
+        tooltip.add(Component.translatable("tooltip.thaumcraft.flux_sponge.rifts.1").withStyle(ChatFormatting.DARK_AQUA));
+        tooltip.add(Component.translatable("tooltip.thaumcraft.flux_sponge.creative").withStyle(ChatFormatting.DARK_PURPLE));
     }
 
     @Override

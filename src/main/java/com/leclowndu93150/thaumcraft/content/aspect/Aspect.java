@@ -7,7 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.RegistryFixedCodec;
 
 public record Aspect(
@@ -15,7 +15,7 @@ public record Aspect(
         int color,
         List<Holder<IAspect>> components,
         Optional<String> chatColor,
-        Identifier texture,
+        ResourceLocation texture,
         int blend
 ) implements IAspect {
     public static final int DEFAULT_BLEND = 1;
@@ -27,12 +27,12 @@ public record Aspect(
             RegistryFixedCodec.create(IAspect.REGISTRY_KEY).listOf().optionalFieldOf("components", List.of())
                     .forGetter(Aspect::components),
             Codec.STRING.optionalFieldOf("chat_color").forGetter(Aspect::chatColor),
-            Identifier.CODEC.optionalFieldOf("texture").forGetter(Aspect::optionalTexture),
+            ResourceLocation.CODEC.optionalFieldOf("texture").forGetter(Aspect::optionalTexture),
             Codec.INT.optionalFieldOf("blend", DEFAULT_BLEND).forGetter(Aspect::blend)
     ).apply(builder, Aspect::create))
             .validate(Aspect::validate);
 
-    private Optional<Identifier> optionalTexture() {
+    private Optional<ResourceLocation> optionalTexture() {
         return texture.equals(defaultTexture(tag)) ? Optional.empty() : Optional.of(texture);
     }
 
@@ -57,7 +57,7 @@ public record Aspect(
             int color,
             List<Holder<IAspect>> components,
             Optional<String> chatColor,
-            Optional<Identifier> texture,
+            Optional<ResourceLocation> texture,
             int blend
     ) {
         return new Aspect(tag, color, components, chatColor, texture.orElseGet(() -> defaultTexture(tag)), blend);
@@ -71,7 +71,7 @@ public record Aspect(
         return DataResult.success(aspect);
     }
 
-    private static Identifier defaultTexture(String tag) {
-        return Identifier.fromNamespaceAndPath("thaumcraft", "textures/aspects/" + tag + ".png");
+    private static ResourceLocation defaultTexture(String tag) {
+        return ResourceLocation.fromNamespaceAndPath("thaumcraft", "textures/aspects/" + tag + ".png");
     }
 }

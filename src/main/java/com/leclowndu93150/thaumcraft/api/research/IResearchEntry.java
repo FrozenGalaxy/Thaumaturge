@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Set;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 
 /**
@@ -19,7 +19,7 @@ import net.minecraft.resources.ResourceKey;
 public interface IResearchEntry {
     /** Datapack registry key for research entries. */
     ResourceKey<Registry<IResearchEntry>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            Identifier.fromNamespaceAndPath("thaumcraft", "research_entry"));
+            ResourceLocation.fromNamespaceAndPath("thaumcraft", "research_entry"));
 
     /**
      * Category this entry belongs to.
@@ -49,7 +49,7 @@ public interface IResearchEntry {
      *
      * @return the sibling identifiers, never null
      */
-    Set<Identifier> siblings();
+    Set<ResourceLocation> siblings();
 
     /**
      * Column position in the Thaumonomicon grid.

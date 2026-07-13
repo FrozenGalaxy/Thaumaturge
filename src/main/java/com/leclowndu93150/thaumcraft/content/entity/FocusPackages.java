@@ -1,12 +1,12 @@
 package com.leclowndu93150.thaumcraft.content.entity;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEffect;
 import com.leclowndu93150.thaumcraft.api.casters.FocusPackage;
 import java.util.List;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public final class FocusPackages {
@@ -33,12 +33,12 @@ public final class FocusPackages {
         }
     }
 
-    public static void save(ValueOutput output, @Nullable FocusPackage focusPackage) {
-        output.storeNullable(PACK_KEY, FocusPackage.CODEC, focusPackage);
+    public static void save(CompoundTag output, @Nullable FocusPackage focusPackage) {
+        TCNbt.storeNullable(output, PACK_KEY, FocusPackage.CODEC, registries, focusPackage);
     }
 
-    public static @Nullable FocusPackage load(ValueInput input) {
-        return input.read(PACK_KEY, FocusPackage.CODEC).orElse(null);
+    public static @Nullable FocusPackage load(CompoundTag input) {
+        return TCNbt.read(input, PACK_KEY, FocusPackage.CODEC, registries).orElse(null);
     }
 
     public static List<FocusEffect> effects(@Nullable FocusPackage focusPackage) {

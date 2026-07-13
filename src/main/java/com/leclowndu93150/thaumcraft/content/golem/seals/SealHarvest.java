@@ -24,7 +24,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -59,7 +59,7 @@ public class SealHarvest implements ISeal, ISealGui, ISealConfigArea, ISealConfi
     private final Map<Long, ReplantInfo> replantTasks = new HashMap<>();
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return TCIds.rl("harvest");
     }
 
@@ -257,7 +257,7 @@ public class SealHarvest implements ISeal, ISealGui, ISealConfigArea, ISealConfi
     }
 
     @Override
-    public Identifier getSealIcon() {
+    public ResourceLocation getSealIcon() {
         return TCIds.rl("textures/item/seal_harvest.png");
     }
 

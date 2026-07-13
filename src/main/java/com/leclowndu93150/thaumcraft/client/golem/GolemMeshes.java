@@ -12,17 +12,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public final class GolemMeshes {
-    private static final Map<Identifier, MeshModel> CACHE = new ConcurrentHashMap<>();
+    private static final Map<ResourceLocation, MeshModel> CACHE = new ConcurrentHashMap<>();
     private static final Vector3f DEFAULT_NORMAL = new Vector3f(0.0F, 1.0F, 0.0F);
 
     private GolemMeshes() {}
 
-    public static MeshModel get(Identifier objLocation) {
+    public static MeshModel get(ResourceLocation objLocation) {
         return CACHE.computeIfAbsent(objLocation, location -> {
             try {
                 return TCObjLoader.load(Minecraft.getInstance().getResourceManager(), location);

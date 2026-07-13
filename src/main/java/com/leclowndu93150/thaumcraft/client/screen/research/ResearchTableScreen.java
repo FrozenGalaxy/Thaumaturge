@@ -40,13 +40,13 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuResearchTable> {
     public static final int PANEL_W = 255;
@@ -85,8 +85,8 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
     private static final int QUESTION_QUAD_SIZE = 16;
     private static final int QUESTION_SRC_SIZE = 32;
     private static final int QUESTION_TEXTURE_SIZE = 32;
-    private static final Identifier QUESTION_TEXTURE =
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/aspects/_unknown.png");
+    private static final ResourceLocation QUESTION_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/aspects/_unknown.png");
 
     private static final int SAVED_CARD_ANCHOR_X = 191;
     private static final int SAVED_CARD_ANCHOR_Y = 100;
@@ -507,7 +507,7 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
         }
         if (activeCompleteIndex >= 0) {
             playLocalSound(TCSounds.WRITE.get(), WRITE_SOUND_VOLUME, SOUND_PITCH);
-            ClientPacketDistributor.sendToServer(ServerboundCardAnimationCompletePayload.INSTANCE);
+            PacketDistributor.sendToServer(ServerboundCardAnimationCompletePayload.INSTANCE);
         }
     }
 
@@ -597,7 +597,7 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
 
     private void renderDeck(GuiGraphicsExtractor graphics, ResearchTableData data, int mouseX, int mouseY) {
         if (data.isComplete()) return;
-        int paperCount = menu.tableItems().getAmountAsInt(1);
+        int paperCount = menu.tableItems().getStackInSlot(1).getCount();
         if (paperCount <= 0) return;
         int sheets = 1 + paperCount / DECK_SHEETS_PER_PAPER;
         Random r = new Random(DECK_SHEET_SEED);
@@ -771,7 +771,7 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
                 Component.translatable("button.thaumcraft.create_theory"),
                 () -> {
                     playLocalSound(TCSounds.CLACK.get(), CLACK_SOUND_VOLUME, SOUND_PITCH);
-                    ClientPacketDistributor.sendToServer(new ServerboundStartTheoryPayload(new ArrayList<>(selectedAids)));
+                    PacketDistributor.sendToServer(new ServerboundStartTheoryPayload(new ArrayList<>(selectedAids)));
                 }
         );
         createButton.setTintColor(CREATE_BUTTON_TINT);
@@ -787,7 +787,7 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
                     playLocalSound(TCSounds.CLACK.get(), CLACK_SOUND_VOLUME, SOUND_PITCH);
                     tempCatTotals.clear();
                     sparkleQueue.clear();
-                    ClientPacketDistributor.sendToServer(new ServerboundTableActionPayload(ServerboundTableActionPayload.Action.COMPLETE));
+                    PacketDistributor.sendToServer(new ServerboundTableActionPayload(ServerboundTableActionPayload.Action.COMPLETE));
                 }
         );
         completeButton.setTintColor(COMPLETE_BUTTON_TINT);
@@ -803,7 +803,7 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
                     playLocalSound(TCSounds.CLACK.get(), CLACK_SOUND_VOLUME, SOUND_PITCH);
                     tempCatTotals.clear();
                     sparkleQueue.clear();
-                    ClientPacketDistributor.sendToServer(new ServerboundTableActionPayload(ServerboundTableActionPayload.Action.SCRAP));
+                    PacketDistributor.sendToServer(new ServerboundTableActionPayload(ServerboundTableActionPayload.Action.SCRAP));
                 }
         );
         scrapButton.setTintColor(SCRAP_BUTTON_TINT);
@@ -943,12 +943,12 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
                 int hitCard = hitCard(event.x(), event.y());
                 if (hitCard >= 0) {
                     if (menu.hasUsableScribeTools()) {
-                        ClientPacketDistributor.sendToServer(new ServerboundPlayCardPayload(hitCard));
+                        PacketDistributor.sendToServer(new ServerboundPlayCardPayload(hitCard));
                     }
                     return true;
                 }
                 if (data.cardChoices().isEmpty() && hitDeck(event.x(), event.y()) && menu.hasPaperReady()) {
-                    ClientPacketDistributor.sendToServer(ServerboundDrawCardsPayload.INSTANCE);
+                    PacketDistributor.sendToServer(ServerboundDrawCardsPayload.INSTANCE);
                     return true;
                 }
             }
@@ -995,7 +995,7 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
 
     @Override
     public void onClose() {
-        ClientPacketDistributor.sendToServer(ServerboundEndSessionPayload.INSTANCE);
+        PacketDistributor.sendToServer(ServerboundEndSessionPayload.INSTANCE);
         super.onClose();
     }
 

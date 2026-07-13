@@ -4,6 +4,7 @@ import com.leclowndu93150.thaumcraft.api.entity.IEldritchMob;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -21,7 +22,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -39,8 +40,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public class EntityEldritchCrab extends Monster implements IEldritchMob {
@@ -107,7 +106,7 @@ public class EntityEldritchCrab extends Monster implements IEldritchMob {
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                  EntitySpawnReason reason, @Nullable SpawnGroupData groupData) {
+                                                  MobSpawnType reason, @Nullable SpawnGroupData groupData) {
         if (level.getDifficulty() == Difficulty.HARD) {
             this.setHelm(true);
         } else {
@@ -184,13 +183,13 @@ public class EntityEldritchCrab extends Monster implements IEldritchMob {
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
+    protected void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        this.setHelm(input.getBooleanOr("helm", false));
+        this.setHelm(input.getBoolean("helm"));
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("helm", this.hasHelm());
     }
@@ -226,7 +225,7 @@ public class EntityEldritchCrab extends Monster implements IEldritchMob {
     }
 
     @Override
-    protected boolean considersEntityAsAlly(Entity entity) {
-        return entity instanceof EntityEldritchCrab || super.considersEntityAsAlly(entity);
+    public boolean isAlliedTo(Entity entity) {
+        return entity instanceof EntityEldritchCrab || super.isAlliedTo(entity);
     }
 }

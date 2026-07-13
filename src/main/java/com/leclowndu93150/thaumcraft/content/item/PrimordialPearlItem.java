@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import org.jspecify.annotations.Nullable;
 
 public final class PrimordialPearlItem extends Item {
@@ -21,11 +20,11 @@ public final class PrimordialPearlItem extends Item {
     }
 
     @Override
-    public @Nullable ItemStackTemplate getCraftingRemainder(ItemInstance instance) {
+    public @Nullable ItemStack getCraftingRemainder(ItemInstance instance) {
         if (instance.getOrDefault(DataComponents.DAMAGE,0) + 1 >= MAX_DAMAGE) {
             return null;
         }
-        return new ItemStackTemplate(TCItems.PRIMORDIAL_PEARL, DataComponentPatch.builder()
+        return new ItemStack(TCItems.PRIMORDIAL_PEARL, DataComponentPatch.builder()
                 .set(DataComponents.DAMAGE,instance.getOrDefault(DataComponents.DAMAGE,0)+1).build());
     }
 

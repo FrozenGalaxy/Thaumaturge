@@ -20,7 +20,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Unit;
-import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
@@ -61,10 +61,10 @@ public final class TCDataComponents {
                     .persistent(FocusPackage.CODEC)
                     .networkSynchronized(FocusPackage.STREAM_CODEC));
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemStackTemplate>> SOCKETED_FOCUS =
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemStack>> SOCKETED_FOCUS =
             DATA_COMPONENTS.registerComponentType("socketed_focus", builder -> builder
-                    .persistent(ItemStackTemplate.CODEC)
-                    .networkSynchronized(ItemStackTemplate.STREAM_CODEC));
+                    .persistent(ItemStack.CODEC)
+                    .networkSynchronized(ItemStack.STREAM_CODEC));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<CasterArea>> CASTER_AREA =
             DATA_COMPONENTS.registerComponentType("caster_area", builder -> builder

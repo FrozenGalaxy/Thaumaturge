@@ -5,17 +5,17 @@ import com.leclowndu93150.thaumcraft.content.entity.EntityBrainyZombie;
 import com.leclowndu93150.thaumcraft.content.entity.EntityGiantBrainyZombie;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.monster.zombie.BabyZombieModel;
-import net.minecraft.client.model.monster.zombie.ZombieModel;
+import net.minecraft.client.model.ZombieModel;
 import net.minecraft.client.renderer.entity.AbstractZombieRenderer;
 import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 
 public final class BrainyZombieRenderer
         extends AbstractZombieRenderer<EntityBrainyZombie, BrainyZombieRenderState, ZombieModel<BrainyZombieRenderState>> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/brainy_zombie.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/brainy_zombie.png");
     private static final float ANGER_TINT_STRENGTH = 0.5F;
 
     public BrainyZombieRenderer(EntityRendererProvider.Context context) {
@@ -38,7 +38,7 @@ public final class BrainyZombieRenderer
     }
 
     @Override
-    public Identifier getTextureLocation(BrainyZombieRenderState state) {
+    public ResourceLocation getTextureLocation(BrainyZombieRenderState state) {
         return TEXTURE;
     }
 
@@ -48,6 +48,6 @@ public final class BrainyZombieRenderer
             return super.getModelTint(state);
         }
         float fade = 1.0F - Math.min(1.0F, state.anger) * ANGER_TINT_STRENGTH;
-        return ARGB.colorFromFloat(1.0F, 1.0F, Mth.clamp(fade, 0.0F, 1.0F), Mth.clamp(fade, 0.0F, 1.0F));
+        return ARGB32.colorFromFloat(1.0F, 1.0F, Mth.clamp(fade, 0.0F, 1.0F), Mth.clamp(fade, 0.0F, 1.0F));
     }
 }

@@ -29,9 +29,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -45,7 +44,7 @@ public final class ArcaneWorkbenchCategory implements IRecipeCategory<RecipeHold
     public static final IRecipeHolderType<ArcaneCraftingRecipe> RECIPE_TYPE =
             IRecipeHolderType.create(TCRecipeTypes.ARCANE.get());
 
-    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png");
 
     private static final int WIDTH = 162;
     private static final int HEIGHT = 138;
@@ -115,7 +114,7 @@ public final class ArcaneWorkbenchCategory implements IRecipeCategory<RecipeHold
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<ArcaneCraftingRecipe> holder, IFocusGroup focuses) {
         ArcaneCraftingRecipe recipe = holder.value();
-        ItemStackTemplate output;
+        ItemStack output;
 
         if (recipe instanceof ArcaneShapedCraftingRecipe shaped) {
             output = shaped.result();

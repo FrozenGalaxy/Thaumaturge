@@ -4,17 +4,17 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumcraft.api.casters.FocusModSplit;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.HitResult;
 import org.jspecify.annotations.Nullable;
 
 public final class FocusModSplitTarget extends FocusModSplit {
-    private static final Identifier KEY = TCIds.rl("split_target");
+    private static final ResourceLocation KEY = TCIds.rl("split_target");
 
     private static final int COMPLEXITY = 4;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

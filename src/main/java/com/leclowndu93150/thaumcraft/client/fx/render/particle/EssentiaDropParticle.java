@@ -6,7 +6,7 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.RandomSource;
 import org.joml.Vector3f;
 
@@ -20,7 +20,7 @@ public final class EssentiaDropParticle extends SingleQuadParticle {
                 level.getRandom().nextGaussian() * 0.005,
                 level.getRandom().nextGaussian() * 0.005,
                 sprites.get(level.getRandom()));
-        Vector3f rgb = ARGB.vector3fFromRGB24(data.color());
+        Vector3f rgb = new Vector3f(ARGB32.red(data.color()) / 255.0F, ARGB32.green(data.color()) / 255.0F, ARGB32.blue(data.color()) / 255.0F);
         this.rCol = rgb.x();
         this.gCol = rgb.y();
         this.bCol = rgb.z();

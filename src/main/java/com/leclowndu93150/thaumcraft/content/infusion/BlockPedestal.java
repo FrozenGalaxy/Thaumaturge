@@ -1,6 +1,5 @@
 package com.leclowndu93150.thaumcraft.content.infusion;
 
-import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.StateDefinition;
 import com.leclowndu93150.thaumcraft.content.device.BlockInlay;
@@ -45,8 +44,7 @@ public final class BlockPedestal extends BaseEntityBlock {
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock,
-                                   @Nullable Orientation orientation, boolean movedByPiston) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos fromPos, boolean movedByPiston) {
         if (!level.isClientSide()) {
             BlockInlay.updateNetwork(level, pos);
         }

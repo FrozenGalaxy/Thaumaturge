@@ -4,7 +4,7 @@ import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import java.util.Optional;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 
@@ -21,15 +21,15 @@ import net.minecraft.util.Mth;
 public interface IResearchCategory {
     /** Datapack registry key for research categories. */
     ResourceKey<Registry<IResearchCategory>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            Identifier.fromNamespaceAndPath("thaumcraft", "research_category"));
+            ResourceLocation.fromNamespaceAndPath("thaumcraft", "research_category"));
 
     /**
-     * Identifier of the research entry that gates access to this category in the Thaumonomicon.
+     * ResourceLocation of the research entry that gates access to this category in the Thaumonomicon.
      * When absent the category is unconditionally visible.
      *
      * @return the gating research entry identifier, or empty
      */
-    Optional<Identifier> requiredResearch();
+    Optional<ResourceLocation> requiredResearch();
 
     /**
      * Aspect-weighted formula used to convert scanned aspect amounts into raw category knowledge.
@@ -72,23 +72,23 @@ public interface IResearchCategory {
     }
 
     /**
-     * Identifier of the icon sprite for this category's tab.
+     * ResourceLocation of the icon sprite for this category's tab.
      *
      * @return the texture identifier
      */
-    Identifier icon();
+    ResourceLocation icon();
 
     /**
-     * Identifier of the background sprite drawn behind the category's entry grid.
+     * ResourceLocation of the background sprite drawn behind the category's entry grid.
      *
      * @return the texture identifier
      */
-    Identifier background();
+    ResourceLocation background();
 
     /**
-     * Identifier of an optional second background sprite drawn over the primary background.
+     * ResourceLocation of an optional second background sprite drawn over the primary background.
      *
      * @return the texture identifier, or empty when the category uses a single layer
      */
-    Optional<Identifier> overlayBackground();
+    Optional<ResourceLocation> overlayBackground();
 }

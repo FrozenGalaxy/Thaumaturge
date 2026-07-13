@@ -2,7 +2,7 @@ package com.leclowndu93150.thaumcraft.api.research;
 
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeType;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.ICancellableEvent;
@@ -35,19 +35,19 @@ public abstract class ResearchEvent extends Event implements ICancellableEvent {
      * Fired when a research entry is about to be added to a player's record.
      */
     public static final class Unlocked extends ResearchEvent {
-        private final Identifier research;
+        private final ResourceLocation research;
 
-        public Unlocked(Player player, Identifier research) {
+        public Unlocked(Player player, ResourceLocation research) {
             super(player);
             this.research = research;
         }
 
         /**
-         * Identifier of the research entry being unlocked.
+         * ResourceLocation of the research entry being unlocked.
          *
          * @return the research entry identifier
          */
-        public Identifier research() {
+        public ResourceLocation research() {
             return research;
         }
     }
@@ -56,11 +56,11 @@ public abstract class ResearchEvent extends Event implements ICancellableEvent {
      * Fired when a player advances or sets a research entry's stage.
      */
     public static final class StageAdvanced extends ResearchEvent {
-        private final Identifier research;
+        private final ResourceLocation research;
         private final int previousStage;
         private final int newStage;
 
-        public StageAdvanced(Player player, Identifier research, int previousStage, int newStage) {
+        public StageAdvanced(Player player, ResourceLocation research, int previousStage, int newStage) {
             super(player);
             this.research = research;
             this.previousStage = previousStage;
@@ -68,11 +68,11 @@ public abstract class ResearchEvent extends Event implements ICancellableEvent {
         }
 
         /**
-         * Identifier of the research entry whose stage is changing.
+         * ResourceLocation of the research entry whose stage is changing.
          *
          * @return the research entry identifier
          */
-        public Identifier research() {
+        public ResourceLocation research() {
             return research;
         }
 
@@ -99,19 +99,19 @@ public abstract class ResearchEvent extends Event implements ICancellableEvent {
      * Fired when a research entry is about to be marked complete.
      */
     public static final class Completed extends ResearchEvent {
-        private final Identifier research;
+        private final ResourceLocation research;
 
-        public Completed(Player player, Identifier research) {
+        public Completed(Player player, ResourceLocation research) {
             super(player);
             this.research = research;
         }
 
         /**
-         * Identifier of the research entry being completed.
+         * ResourceLocation of the research entry being completed.
          *
          * @return the research entry identifier
          */
-        public Identifier research() {
+        public ResourceLocation research() {
             return research;
         }
     }

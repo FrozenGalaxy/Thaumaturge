@@ -10,18 +10,18 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public final class PatternCrafterRenderer implements BlockEntityRenderer<BlockEntityPatternCrafter, PatternCrafterRenderState> {
-    private static final Identifier MODES_TEXTURE = TCIds.rl("textures/block/pattern_crafter_modes.png");
-    private static final Identifier GEAR_TEXTURE = TCIds.rl("textures/misc/gear_brass.png");
+    private static final ResourceLocation MODES_TEXTURE = TCIds.rl("textures/block/pattern_crafter_modes.png");
+    private static final ResourceLocation GEAR_TEXTURE = TCIds.rl("textures/misc/gear_brass.png");
 
     private static final int MODE_FRAMES = 10;
     private static final float MODE_SIZE = 0.5F;

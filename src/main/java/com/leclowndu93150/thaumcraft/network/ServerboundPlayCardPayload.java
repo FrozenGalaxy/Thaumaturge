@@ -5,11 +5,11 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record ServerboundPlayCardPayload(int choiceIndex) implements CustomPacketPayload {
     public static final Type<ServerboundPlayCardPayload> TYPE = new Type<>(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "play_card"));
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "play_card"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundPlayCardPayload> STREAM_CODEC =
             StreamCodec.composite(

@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.research.theorycraft.cards;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import com.leclowndu93150.thaumcraft.api.research.TCResearchCategories;
@@ -7,14 +8,13 @@ import com.leclowndu93150.thaumcraft.api.research.theorycraft.IResearchTableData
 import com.leclowndu93150.thaumcraft.api.research.theorycraft.TheorycraftCard;
 import java.util.List;
 import java.util.Random;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public final class CardReactions extends TheorycraftCard {
@@ -78,30 +78,30 @@ public final class CardReactions extends TheorycraftCard {
     }
 
     @Override
-    public void write(ValueOutput output, HolderLookup.Provider registries) {
+    public void write(CompoundTag output, HolderLookup.Provider registries) {
         super.write(output, registries);
         saveAspect(output, "aspect1", aspect1);
         saveAspect(output, "aspect2", aspect2);
     }
 
     @Override
-    public void read(ValueInput input, HolderLookup.Provider registries) {
+    public void read(CompoundTag input, HolderLookup.Provider registries) {
         super.read(input, registries);
         aspect1 = loadAspect(input, registries, "aspect1");
         aspect2 = loadAspect(input, registries, "aspect2");
     }
 
-    private static @Nullable Holder<IAspect> loadAspect(ValueInput input, HolderLookup.Provider registries, String field) {
-        return input.read(field, Identifier.CODEC)
+    private static @Nullable Holder<IAspect> loadAspect(CompoundTag input, HolderLookup.Provider registries, String field) {
+        return TCNbt.read(input, field, ResourceLocation.CODEC, registries)
                 .flatMap(id -> registries.lookupOrThrow(IAspect.REGISTRY_KEY)
                         .get(ResourceKey.create(IAspect.REGISTRY_KEY, id)))
                 .map(holder -> (Holder<IAspect>) holder)
                 .orElse(null);
     }
 
-    private static void saveAspect(ValueOutput output, String field, @Nullable Holder<IAspect> aspect) {
+    private static void saveAspect(CompoundTag output, String field, @Nullable Holder<IAspect> aspect) {
         if (aspect != null) {
-            aspect.unwrapKey().ifPresent(key -> output.store(field, Identifier.CODEC, key.identifier()));
+            aspect.unwrapKey().ifPresent(key -> TCNbt.store(output, field, ResourceLocation.CODEC, registries, key.identifier()));
         }
     }
 }

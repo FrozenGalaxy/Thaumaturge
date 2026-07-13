@@ -13,16 +13,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public abstract class BlockEntityMirrorBase extends BlockEntity {
@@ -187,14 +183,14 @@ public abstract class BlockEntityMirrorBase extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        linked = input.getBooleanOr("linked", false);
-        instability = input.getIntOr("instability", 0);
-        long pos = input.getLongOr("linkPos", 0L);
-        String dim = input.getStringOr("linkDim", "");
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        linked = input.getBoolean("linked");
+        instability = input.getInt("instability");
+        long pos = input.getLong("linkPos");
+        String dim = input.getString("linkDim");
         if (!dim.isEmpty()) {
-            Identifier dimId = Identifier.tryParse(dim);
+            ResourceLocation dimId = ResourceLocation.tryParse(dim);
             if (dimId != null) {
                 link = GlobalPos.of(ResourceKey.create(Registries.DIMENSION, dimId), BlockPos.of(pos));
             }
@@ -202,8 +198,8 @@ public abstract class BlockEntityMirrorBase extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         output.putBoolean("linked", linked);
         output.putInt("instability", instability);
         if (link != null) {
@@ -241,10 +237,10 @@ public abstract class BlockEntityMirrorBase extends BlockEntity {
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput output = TagValueOutput.createWithContext(reporter, registries);
-            saveAdditional(output);
-            nbt.merge(output.buildResult());
+        {
+            CompoundTag output = new CompoundTag();
+            saveAdditional(output, registries);
+            nbt.merge(output);
         }
         return nbt;
     }

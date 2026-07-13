@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.api.aspect;
 
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 
 /**
@@ -16,7 +16,7 @@ public final class AspectCapabilities {
     /** Sided block capability for aspect storing. */
     public static final BlockCapability<IAspectContainer, Direction> CONTAINER =
             BlockCapability.createSided(
-                    Identifier.fromNamespaceAndPath("thaumcraft", "aspect_container"),
+                    ResourceLocation.fromNamespaceAndPath("thaumcraft", "aspect_container"),
                     IAspectContainer.class);
 
     private AspectCapabilities() {}

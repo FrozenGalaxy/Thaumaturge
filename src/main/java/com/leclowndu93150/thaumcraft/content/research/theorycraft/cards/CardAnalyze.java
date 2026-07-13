@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.research.theorycraft.cards;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.api.capability.IPlayerKnowledge;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeType;
@@ -11,12 +12,11 @@ import com.leclowndu93150.thaumcraft.api.research.theorycraft.TheorycraftCard;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public final class CardAnalyze extends TheorycraftCard {
@@ -77,16 +77,16 @@ public final class CardAnalyze extends TheorycraftCard {
     }
 
     @Override
-    public void write(ValueOutput output, HolderLookup.Provider registries) {
+    public void write(CompoundTag output, HolderLookup.Provider registries) {
         super.write(output, registries);
         if (category != null) {
-            output.store("category", ResourceKey.codec(IResearchCategory.REGISTRY_KEY), category);
+            TCNbt.store(output, "category", ResourceKey.codec(IResearchCategory.REGISTRY_KEY), registries, category);
         }
     }
 
     @Override
-    public void read(ValueInput input, HolderLookup.Provider registries) {
+    public void read(CompoundTag input, HolderLookup.Provider registries) {
         super.read(input, registries);
-        category = input.read("category", ResourceKey.codec(IResearchCategory.REGISTRY_KEY)).orElse(null);
+        category = TCNbt.read(input, "category", ResourceKey.codec(IResearchCategory.REGISTRY_KEY), registries).orElse(null);
     }
 }

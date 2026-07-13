@@ -16,11 +16,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
@@ -35,9 +35,9 @@ import org.joml.Quaternionf;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
 public final class ArchitectOverlayRenderer {
-    private static final Identifier FRAME_CORNER = TCIds.rl("textures/misc/frame_corner.png");
-    private static final Identifier FRAME_SIDE = TCIds.rl("textures/misc/frame_side.png");
-    private static final Identifier ARROWS = TCIds.rl("textures/misc/architect_arrows.png");
+    private static final ResourceLocation FRAME_CORNER = TCIds.rl("textures/misc/frame_corner.png");
+    private static final ResourceLocation FRAME_SIDE = TCIds.rl("textures/misc/frame_side.png");
+    private static final ResourceLocation ARROWS = TCIds.rl("textures/misc/architect_arrows.png");
 
     private static final RenderPipeline PIPELINE =
             TCFXPipelines.additiveTexturedNoDepth(TCIds.rl("pipeline/architect_overlay"));
@@ -72,7 +72,7 @@ public final class ArchitectOverlayRenderer {
 
     private ArchitectOverlayRenderer() {}
 
-    private static RenderType makeType(String name, Identifier texture) {
+    private static RenderType makeType(String name, ResourceLocation texture) {
         return RenderType.create(name,
                 RenderSetup.builder(PIPELINE)
                         .withTexture("Sampler0", texture)
@@ -219,7 +219,7 @@ public final class ArchitectOverlayRenderer {
 
     private static void drawQuad(PoseStack poseStack, VertexConsumer buffer,
                                  float r, float g, float b, float alpha) {
-        int color = ARGB.colorFromFloat(alpha, Math.min(r, 1.0F), Math.min(g, 1.0F), Math.min(b, 1.0F));
+        int color = ARGB32.colorFromFloat(alpha, Math.min(r, 1.0F), Math.min(g, 1.0F), Math.min(b, 1.0F));
         PoseStack.Pose pose = poseStack.last();
         buffer.addVertex(pose, -HALF, HALF, 0.0F).setUv(1.0F, 1.0F).setColor(color);
         buffer.addVertex(pose, HALF, HALF, 0.0F).setUv(1.0F, 0.0F).setColor(color);

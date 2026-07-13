@@ -12,8 +12,8 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jspecify.annotations.Nullable;
 
 public final class MenuGolemBuilder extends AbstractContainerMenu {
@@ -33,7 +33,7 @@ public final class MenuGolemBuilder extends AbstractContainerMenu {
     private final DataSlot maxCost = DataSlot.standalone();
 
     public MenuGolemBuilder(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf buf) {
-        this(containerId, playerInventory, new ItemStacksResourceHandler(SLOT_COUNT),
+        this(containerId, playerInventory, new ItemStackHandler(SLOT_COUNT),
                 ContainerLevelAccess.create(playerInventory.player.level(), buf.readBlockPos()));
     }
 
@@ -42,12 +42,12 @@ public final class MenuGolemBuilder extends AbstractContainerMenu {
                 ContainerLevelAccess.create(blockEntity.getLevel(), blockEntity.getBlockPos()));
     }
 
-    private MenuGolemBuilder(int containerId, Inventory playerInventory, ItemStacksResourceHandler items,
+    private MenuGolemBuilder(int containerId, Inventory playerInventory, ItemStackHandler items,
                              ContainerLevelAccess access) {
         super(TCMenus.GOLEM_BUILDER.get(), containerId);
         this.access = access;
 
-        addSlot(new ResourceHandlerSlot(items, items::set, 0, OUTPUT_X, OUTPUT_Y) {
+        addSlot(new SlotItemHandler(items, 0, OUTPUT_X, OUTPUT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return stack.getItem() instanceof ItemGolemPlacer;

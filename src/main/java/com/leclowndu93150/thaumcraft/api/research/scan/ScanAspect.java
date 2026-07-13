@@ -5,7 +5,7 @@ import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeType;
 import com.leclowndu93150.thaumcraft.api.research.TCResearchCategories;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
 public class ScanAspect implements IScanThing {
     private static final int DISCOVERY_OBSERVATION_POINTS = 1;
 
-    private final Identifier research;
+    private final ResourceLocation research;
     private final Holder<IAspect> aspect;
 
     /**
@@ -31,7 +31,7 @@ public class ScanAspect implements IScanThing {
      * @param research the research key granted on scan
      * @param aspect the aspect the target must carry
      */
-    public ScanAspect(Identifier research, Holder<IAspect> aspect) {
+    public ScanAspect(ResourceLocation research, Holder<IAspect> aspect) {
         this.research = research;
         this.aspect = aspect;
     }
@@ -65,7 +65,7 @@ public class ScanAspect implements IScanThing {
     }
 
     @Override
-    public Identifier getResearchKey(Player player, @Nullable Object target) {
+    public ResourceLocation getResearchKey(Player player, @Nullable Object target) {
         return research;
     }
 }

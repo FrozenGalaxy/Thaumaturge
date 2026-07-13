@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.api.research.scan;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -15,7 +15,7 @@ import org.jspecify.annotations.Nullable;
  * @since 1.0.0
  */
 public class ScanBlock implements IScanThing {
-    private final Identifier research;
+    private final ResourceLocation research;
     private final Block[] blocks;
 
     /**
@@ -24,7 +24,7 @@ public class ScanBlock implements IScanThing {
      * @param research the research key granted on scan
      * @param blocks the blocks this subject matches
      */
-    public ScanBlock(Identifier research, Block... blocks) {
+    public ScanBlock(ResourceLocation research, Block... blocks) {
         this.research = research;
         this.blocks = blocks;
         for (Block block : blocks) {
@@ -49,7 +49,7 @@ public class ScanBlock implements IScanThing {
     }
 
     @Override
-    public Identifier getResearchKey(Player player, @Nullable Object target) {
+    public ResourceLocation getResearchKey(Player player, @Nullable Object target) {
         return research;
     }
 }

@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
@@ -20,8 +20,8 @@ import org.jspecify.annotations.Nullable;
 import java.util.function.Consumer;
 
 public final class JarBrainItemSpecialRenderer implements NoDataSpecialModelRenderer {
-    private static final Identifier TEX_BRAIN = TCIds.rl("textures/entity/brain2.png");
-    private static final Identifier TEX_BRINE = TCIds.rl("textures/entity/jarbrine.png");
+    private static final ResourceLocation TEX_BRAIN = TCIds.rl("textures/entity/brain2.png");
+    private static final ResourceLocation TEX_BRINE = TCIds.rl("textures/entity/jarbrine.png");
     private static final float BRAIN_SCALE = 0.4F;
     private static final float BRAIN_LIFT = -0.77F;
 

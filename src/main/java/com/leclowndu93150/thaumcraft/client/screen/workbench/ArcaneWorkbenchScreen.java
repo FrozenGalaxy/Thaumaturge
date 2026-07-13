@@ -13,8 +13,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
@@ -49,7 +49,7 @@ public class ArcaneWorkbenchScreen extends AbstractTCContainerScreen<MenuArcaneW
                 graphics.pose().translate(x+MenuArcaneWorkbench.CRYSTAL_X[index] + 7.5F, y+MenuArcaneWorkbench.CRYSTAL_Y[index] + 8F);
                 graphics.pose().rotate(index * 60 + ((float) minecraft.getCameraEntity().tickCount / 75) % 360);
                 graphics.pose().scale(0.5f);
-                graphics.blit(RenderPipelines.GUI_TEXTURED,TCScreenTextures.ARCANE_WORKBENCH,-32,-32,192,0,64,64,256,256, ARGB.color(128,color));
+                graphics.blit(RenderPipelines.GUI_TEXTURED,TCScreenTextures.ARCANE_WORKBENCH,-32,-32,192,0,64,64,256,256, ARGB32.color(128,color));
                 graphics.pose().popMatrix();
 
             }

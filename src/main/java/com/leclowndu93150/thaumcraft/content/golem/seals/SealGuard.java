@@ -14,12 +14,12 @@ import com.leclowndu93150.thaumcraft.content.golem.tasks.TaskHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.fish.WaterAnimal;
+import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -38,7 +38,7 @@ public class SealGuard implements ISeal, ISealGui, ISealConfigArea {
     private int delay = System.identityHashCode(this) % 22;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return TCIds.rl("guard");
     }
 
@@ -98,7 +98,7 @@ public class SealGuard implements ISeal, ISealGui, ISealConfigArea {
     }
 
     @Override
-    public Identifier getSealIcon() {
+    public ResourceLocation getSealIcon() {
         return TCIds.rl("textures/item/seal_guard.png");
     }
 

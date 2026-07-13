@@ -14,7 +14,7 @@ public final class ResearchTableCapabilities {
     @SubscribeEvent
     public static void onRegister(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
-                Capabilities.Item.BLOCK,
+                Capabilities.ItemHandler.BLOCK,
                 TCBlockEntities.RESEARCH_TABLE.get(),
                 (blockEntity, side) -> blockEntity.items()
         );

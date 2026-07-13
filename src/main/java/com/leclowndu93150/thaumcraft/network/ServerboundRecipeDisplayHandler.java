@@ -3,7 +3,7 @@ package com.leclowndu93150.thaumcraft.network;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.util.context.ContextMap;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import com.leclowndu93150.thaumcraft.TCIds;
 import java.util.List;
 import net.minecraft.core.registries.Registries;
@@ -43,7 +43,7 @@ public final class ServerboundRecipeDisplayHandler {
                 List<RecipeDisplay> displays = holder.value().display();
                 if (displays.isEmpty()) continue;
                 ItemStack result = displays.get(0).result().resolveForFirstStack(displayContext);
-                Identifier resultId = result.getItem().builtInRegistryHolder()
+                ResourceLocation resultId = result.getItem().builtInRegistryHolder()
                         .unwrapKey().map(ResourceKey::identifier).orElse(null);
                 if (!payload.itemId().equals(resultId)) continue;
                 boolean thaumcraft = holder.id().identifier().getNamespace().equals(TCIds.MODID);

@@ -24,7 +24,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -37,10 +37,10 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
     public static final StreamCodec<RegistryFriendlyByteBuf, PlayerKnowledge> STREAM_CODEC =
             ByteBufCodecs.fromCodecWithRegistries(CODEC.codec());
 
-    private final Set<Identifier> research = new HashSet<>();
-    private final Set<Identifier> completed = new HashSet<>();
-    private final Map<Identifier, Integer> stages = new HashMap<>();
-    private final Map<Identifier, EnumSet<ResearchFlag>> flags = new HashMap<>();
+    private final Set<ResourceLocation> research = new HashSet<>();
+    private final Set<ResourceLocation> completed = new HashSet<>();
+    private final Map<ResourceLocation, Integer> stages = new HashMap<>();
+    private final Map<ResourceLocation, EnumSet<ResearchFlag>> flags = new HashMap<>();
     private final Map<KnowledgeKey, Integer> knowledge = new HashMap<>();
 
     public PlayerKnowledge() {
@@ -78,7 +78,7 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
                 .toList();
     }
 
-    private List<ResearchFlag> flagsAsList(Identifier key) {
+    private List<ResearchFlag> flagsAsList(ResourceLocation key) {
         EnumSet<ResearchFlag> set = flags.get(key);
         return set == null ? List.of() : List.copyOf(set);
     }
@@ -111,7 +111,7 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
     }
 
     @Override
-    public ResearchStatus researchStatus(Identifier res) {
+    public ResearchStatus researchStatus(ResourceLocation res) {
         if (!isResearchKnown(res)) {
             return ResearchStatus.UNKNOWN;
         }
@@ -119,32 +119,32 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
     }
 
     @Override
-    public boolean isResearchComplete(Identifier res) {
+    public boolean isResearchComplete(ResourceLocation res) {
         return res != null && completed.contains(res);
     }
 
-    public boolean markComplete(Identifier res) {
+    public boolean markComplete(ResourceLocation res) {
         if (res == null || !research.contains(res)) return false;
         return completed.add(res);
     }
 
-    public boolean clearComplete(Identifier res) {
+    public boolean clearComplete(ResourceLocation res) {
         if (res == null) return false;
         return completed.remove(res);
     }
 
     @Override
-    public boolean isResearchKnown(Identifier res) {
+    public boolean isResearchKnown(ResourceLocation res) {
         return res != null && research.contains(res);
     }
 
     @Override
-    public boolean isResearchKnown(Identifier res, int minimumStage) {
+    public boolean isResearchKnown(ResourceLocation res, int minimumStage) {
         return isResearchKnown(res) && researchStage(res) >= minimumStage;
     }
 
     @Override
-    public int researchStage(Identifier res) {
+    public int researchStage(ResourceLocation res) {
         if (res == null || !research.contains(res)) {
             return -1;
         }
@@ -153,7 +153,7 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
     }
 
     @Override
-    public boolean setResearchStage(Identifier res, int stage) {
+    public boolean setResearchStage(ResourceLocation res, int stage) {
         if (res == null || !research.contains(res) || stage <= 0) {
             return false;
         }
@@ -162,13 +162,13 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
     }
 
     @Override
-    public boolean addResearch(Identifier res) {
+    public boolean addResearch(ResourceLocation res) {
         if (res == null) return false;
         return research.add(res);
     }
 
     @Override
-    public boolean removeResearch(Identifier res) {
+    public boolean removeResearch(ResourceLocation res) {
         if (res == null) return false;
         boolean removed = research.remove(res);
         if (removed) {
@@ -180,18 +180,18 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
     }
 
     @Override
-    public Set<Identifier> researchList() {
+    public Set<ResourceLocation> researchList() {
         return Collections.unmodifiableSet(research);
     }
 
     @Override
-    public boolean setResearchFlag(Identifier res, ResearchFlag flag) {
+    public boolean setResearchFlag(ResourceLocation res, ResearchFlag flag) {
         if (res == null || flag == null) return false;
         return flags.computeIfAbsent(res, k -> EnumSet.noneOf(ResearchFlag.class)).add(flag);
     }
 
     @Override
-    public boolean clearResearchFlag(Identifier res, ResearchFlag flag) {
+    public boolean clearResearchFlag(ResourceLocation res, ResearchFlag flag) {
         if (res == null || flag == null) return false;
         EnumSet<ResearchFlag> set = flags.get(res);
         if (set == null) return false;
@@ -203,7 +203,7 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
     }
 
     @Override
-    public boolean hasResearchFlag(Identifier res, ResearchFlag flag) {
+    public boolean hasResearchFlag(ResourceLocation res, ResearchFlag flag) {
         if (res == null || flag == null) return false;
         EnumSet<ResearchFlag> set = flags.get(res);
         return set != null && set.contains(flag);
@@ -245,7 +245,7 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
         research.addAll(other.research);
         completed.addAll(other.completed);
         stages.putAll(other.stages);
-        for (Map.Entry<Identifier, EnumSet<ResearchFlag>> entry : other.flags.entrySet()) {
+        for (Map.Entry<ResourceLocation, EnumSet<ResearchFlag>> entry : other.flags.entrySet()) {
             flags.put(entry.getKey(), EnumSet.copyOf(entry.getValue()));
         }
         knowledge.putAll(other.knowledge);
@@ -260,11 +260,11 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
                 }));
     }
 
-    private record KnowledgeKey(KnowledgeType type, Identifier category) {}
+    private record KnowledgeKey(KnowledgeType type, ResourceLocation category) {}
 
-    private record ResearchRecord(Identifier key, Optional<Integer> stage, List<ResearchFlag> flags, boolean complete) {
+    private record ResearchRecord(ResourceLocation key, Optional<Integer> stage, List<ResearchFlag> flags, boolean complete) {
         static final Codec<ResearchRecord> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Identifier.CODEC.fieldOf("id").forGetter(ResearchRecord::key),
+                ResourceLocation.CODEC.fieldOf("id").forGetter(ResearchRecord::key),
                 Codec.INT.optionalFieldOf("stage").forGetter(ResearchRecord::stage),
                 ResearchFlag.CODEC.listOf().optionalFieldOf("flags", List.of()).forGetter(ResearchRecord::flags),
                 Codec.BOOL.optionalFieldOf("complete", false).forGetter(ResearchRecord::complete)

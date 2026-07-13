@@ -8,16 +8,16 @@ import java.io.IOException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.sprite.Material;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
 
 public final class CrystalUnbakedModel implements CustomUnbakedBlockStateModel {
     public static final CrystalUnbakedModel INSTANCE = new CrystalUnbakedModel();
     public static final MapCodec<CrystalUnbakedModel> CODEC = MapCodec.unit(INSTANCE);
-    public static final Identifier MODEL_LOCATION = Identifier.fromNamespaceAndPath(TCIds.MODID, "models/obj/crystal.obj");
-    public static final Identifier SPRITE_LOCATION = Identifier.fromNamespaceAndPath(TCIds.MODID, "block/crystal");
-    public static final Identifier DEBUG_NAME = Identifier.fromNamespaceAndPath(TCIds.MODID, "crystal");
+    public static final ResourceLocation MODEL_LOCATION = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "models/obj/crystal.obj");
+    public static final ResourceLocation SPRITE_LOCATION = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "block/crystal");
+    public static final ResourceLocation DEBUG_NAME = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "crystal");
 
     private CrystalUnbakedModel() {}
 

@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -63,22 +63,22 @@ final class PotionAspects {
         return cull(result, ASPECT_CAP);
     }
 
-    private static Holder<IAspect> resolve(ServerLevel level, Identifier id) {
+    private static Holder<IAspect> resolve(ServerLevel level, ResourceLocation id) {
         return EssentiaTransportHelper.resolve(level, ResourceKey.create(IAspect.REGISTRY_KEY, id));
     }
 
     private static List<ItemStack> reagentsOf(ServerLevel level, Holder<Potion> potion) {
         List<ItemStack> reagents = new ArrayList<>();
-        Set<Identifier> visitedPotions = new HashSet<>();
+        Set<ResourceLocation> visitedPotions = new HashSet<>();
         List<?> mixes = ((PotionBrewingAccessor) level.potionBrewing()).thaumcraft$getPotionMixes();
         collectReagents(mixes, potion, reagents, visitedPotions, 0);
         return reagents;
     }
 
     private static void collectReagents(List<?> mixes, Holder<Potion> target, List<ItemStack> reagents,
-                                        Set<Identifier> visited, int depth) {
+                                        Set<ResourceLocation> visited, int depth) {
         if (depth > MAX_REAGENT_DEPTH) return;
-        Identifier targetId = target.unwrapKey().map(k -> k.identifier()).orElse(null);
+        ResourceLocation targetId = target.unwrapKey().map(k -> k.identifier()).orElse(null);
         if (targetId == null || !visited.add(targetId)) return;
         for (Object raw : mixes) {
             PotionBrewingMixAccessor mix = (PotionBrewingMixAccessor) raw;

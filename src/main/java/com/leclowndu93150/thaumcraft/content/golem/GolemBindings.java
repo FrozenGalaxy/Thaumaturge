@@ -11,19 +11,19 @@ import com.leclowndu93150.thaumcraft.content.golem.tasks.TaskHandler;
 import com.leclowndu93150.thaumcraft.registry.TCAttachments;
 import com.leclowndu93150.thaumcraft.registry.TCSeals;
 import java.util.List;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
 public final class GolemBindings implements GolemHelper.Bindings {
     @Override
-    public @Nullable ISeal createSeal(Identifier key) {
+    public @Nullable ISeal createSeal(ResourceLocation key) {
         return TCSeals.registry().getOptional(key).map(type -> (ISeal) type.factory().get()).orElse(null);
     }
 
     @Override
-    public ItemStack getSealStack(Identifier key) {
+    public ItemStack getSealStack(ResourceLocation key) {
         return TCSeals.registry().getOptional(key)
                 .map(type -> new ItemStack(type.placerItem().get()))
                 .orElse(ItemStack.EMPTY);

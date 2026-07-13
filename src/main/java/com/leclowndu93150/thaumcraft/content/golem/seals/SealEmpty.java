@@ -14,12 +14,11 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.items.IItemHandler;
 
 public class SealEmpty extends SealFiltered {
     private static final int SCAN_INTERVAL = 20;
@@ -40,7 +39,7 @@ public class SealEmpty extends SealFiltered {
     private final Map<Integer, ItemStack> cache = new HashMap<>();
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return TCIds.rl("empty");
     }
 
@@ -57,7 +56,7 @@ public class SealEmpty extends SealFiltered {
         if (delay++ % SCAN_INTERVAL != 0) {
             return;
         }
-        ResourceHandler<ItemResource> handler = InvHelper.getItemHandlerAt(level, seal.getSealPos().pos(), seal.getSealPos().face());
+        IItemHandler handler = InvHelper.getItemHandlerAt(level, seal.getSealPos().pos(), seal.getSealPos().face());
         if (handler == null) {
             return;
         }
@@ -121,7 +120,7 @@ public class SealEmpty extends SealFiltered {
     }
 
     @Override
-    public Identifier getSealIcon() {
+    public ResourceLocation getSealIcon() {
         return TCIds.rl("textures/item/seal_empty.png");
     }
 

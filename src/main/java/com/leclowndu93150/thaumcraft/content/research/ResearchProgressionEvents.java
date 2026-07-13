@@ -14,7 +14,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.Filterable;
@@ -46,12 +46,12 @@ public final class ResearchProgressionEvents {
     private static final int DEEP_DOWN_DEPTH = 10;
     private static final double UP_HIGH_FRACTION = 0.4;
 
-    private static final Identifier GOT_CRYSTALS = TCIds.rl("gotcrystals");
-    private static final Identifier GOT_DREAM = TCIds.rl("gotdream");
-    private static final Identifier GOT_THAUMONOMICON = TCIds.rl("gotthaumonomicon");
-    private static final Identifier UNLOCK_AUROMANCY = TCIds.rl("unlock_auromancy");
-    private static final Identifier BASE_AUROMANCY = TCIds.rl("base_auromancy");
-    private static final Identifier F_ONFIRE = TCIds.rl("f_onfire");
+    private static final ResourceLocation GOT_CRYSTALS = TCIds.rl("gotcrystals");
+    private static final ResourceLocation GOT_DREAM = TCIds.rl("gotdream");
+    private static final ResourceLocation GOT_THAUMONOMICON = TCIds.rl("gotthaumonomicon");
+    private static final ResourceLocation UNLOCK_AUROMANCY = TCIds.rl("unlock_auromancy");
+    private static final ResourceLocation BASE_AUROMANCY = TCIds.rl("base_auromancy");
+    private static final ResourceLocation F_ONFIRE = TCIds.rl("f_onfire");
 
     private ResearchProgressionEvents() {}
 
@@ -64,11 +64,11 @@ public final class ResearchProgressionEvents {
 
     public static void recordCrafted(ServerPlayer player, ItemStack crafted) {
         if (crafted.isEmpty()) return;
-        Identifier itemId = crafted.getItem().builtInRegistryHolder().unwrapKey()
+        ResourceLocation itemId = crafted.getItem().builtInRegistryHolder().unwrapKey()
                 .map(ResourceKey::identifier).orElse(null);
         if (itemId == null) return;
         PlayerKnowledge knowledge = (PlayerKnowledge) KnowledgeAccess.of(player);
-        Identifier craftedKey = ResearchManager.craftedKey(itemId);
+        ResourceLocation craftedKey = ResearchManager.craftedKey(itemId);
         if (knowledge.isResearchKnown(craftedKey)) return;
         if (!isCraftReference(player, crafted)) return;
         knowledge.addResearch(craftedKey);
@@ -183,7 +183,7 @@ public final class ResearchProgressionEvents {
                 player.getStats().getValue(Stats.CUSTOM.get(Stats.SWIM_ONE_CM)) > SWIM_MILESTONE_CM);
     }
 
-    private static void milestone(ServerPlayer player, PlayerKnowledge knowledge, Identifier id,
+    private static void milestone(ServerPlayer player, PlayerKnowledge knowledge, ResourceLocation id,
                                   String messageKey, boolean condition) {
         if (!condition || knowledge.isResearchKnown(id)) return;
         knowledge.addResearch(id);

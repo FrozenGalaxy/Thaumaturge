@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
 
 public final class AuraManager {
     public static final int AURA_CEILING = 500;
-    public static final Identifier AURA_PRESERVE_RESEARCH = TCIds.rl("aura_preserve");
+    public static final ResourceLocation AURA_PRESERVE_RESEARCH = TCIds.rl("aura_preserve");
 
     private static final Map<ResourceKey<Level>, Set<ChunkPos>> LOADED_CHUNKS = new ConcurrentHashMap<>();
     private static final Map<ResourceKey<Level>, BlockPos> RIFT_TRIGGER = new ConcurrentHashMap<>();

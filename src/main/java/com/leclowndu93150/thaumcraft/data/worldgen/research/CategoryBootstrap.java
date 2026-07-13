@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 
 public final class CategoryBootstrap {
-    private static final Identifier BACK_OVER = tex("textures/gui/gui_research_back_over.png");
+    private static final ResourceLocation BACK_OVER = tex("textures/gui/gui_research_back_over.png");
 
     private CategoryBootstrap() {}
 
@@ -132,19 +132,19 @@ public final class CategoryBootstrap {
     private static void register(
             BootstrapContext<IResearchCategory> ctx,
             ResourceKey<IResearchCategory> key,
-            Optional<Identifier> requiredResearch,
+            Optional<ResourceLocation> requiredResearch,
             AspectList formula,
-            Identifier icon,
-            Identifier background
+            ResourceLocation icon,
+            ResourceLocation background
     ) {
         ctx.register(key, new ResearchCategory(requiredResearch, formula, icon, background, Optional.of(BACK_OVER)));
     }
 
-    private static Identifier tex(String path) {
-        return Identifier.fromNamespaceAndPath(TCIds.MODID, path);
+    private static ResourceLocation tex(String path) {
+        return ResourceLocation.fromNamespaceAndPath(TCIds.MODID, path);
     }
 
-    private static Identifier unlock(String which) {
-        return Identifier.fromNamespaceAndPath(TCIds.MODID, "unlock_" + which);
+    private static ResourceLocation unlock(String which) {
+        return ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "unlock_" + which);
     }
 }

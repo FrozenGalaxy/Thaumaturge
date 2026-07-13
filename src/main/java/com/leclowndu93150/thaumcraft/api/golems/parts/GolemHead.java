@@ -3,7 +3,7 @@ package com.leclowndu93150.thaumcraft.api.golems.parts;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import java.util.List;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import org.jspecify.annotations.Nullable;
 
@@ -15,7 +15,7 @@ import org.jspecify.annotations.Nullable;
 public final class GolemHead extends GolemPart {
     /** The registry key for golem heads. */
     public static final ResourceKey<Registry<GolemHead>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            Identifier.fromNamespaceAndPath("thaumcraft", "golem_head"));
+            ResourceLocation.fromNamespaceAndPath("thaumcraft", "golem_head"));
 
     private final IHeadFunction function;
 
@@ -27,7 +27,7 @@ public final class GolemHead extends GolemPart {
      * @param function   the behavior ticked for this head, or null when it has none
      * @param traits     traits granted by this head
      */
-    public GolemHead(List<Identifier> research, Identifier icon, @Nullable GolemPartModel model,
+    public GolemHead(List<ResourceLocation> research, ResourceLocation icon, @Nullable GolemPartModel model,
                      List<GolemComponent> components, @Nullable IHeadFunction function, List<GolemTrait> traits) {
         super(research, icon, components, traits, model);
         this.function = function;

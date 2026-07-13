@@ -19,7 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
@@ -65,8 +65,8 @@ public final class CardSheetRenderer {
     private static final int ITEM_STRIDE_PRESCALE = 18;
     private static final int ITEM_HALF_STRIDE_PRESCALE = 9;
 
-    private static final Identifier UNKNOWN_TEXTURE =
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/aspects/_unknown.png");
+    private static final ResourceLocation UNKNOWN_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/aspects/_unknown.png");
     private static final int UNKNOWN_QUAD_SIZE = 16;
     private static final int UNKNOWN_TEX_SIZE = 32;
     private static final int UNKNOWN_TINT_RGB = 0xBFBFBF;
@@ -164,7 +164,7 @@ public final class CardSheetRenderer {
         graphics.pose().popMatrix();
     }
 
-    private static void drawPaper(GuiGraphicsExtractor graphics, Identifier texture, float alpha, int colorMask, boolean flipMirrored) {
+    private static void drawPaper(GuiGraphicsExtractor graphics, ResourceLocation texture, float alpha, int colorMask, boolean flipMirrored) {
         if (alpha >= 0.999F) {
             float u0 = flipMirrored ? 1.0F : 0.0F;
             float u1 = flipMirrored ? 0.0F : 1.0F;

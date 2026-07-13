@@ -5,7 +5,7 @@ import com.leclowndu93150.thaumcraft.api.research.scan.ScanKeys;
 import com.leclowndu93150.thaumcraft.api.research.scan.ScanningManager;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
@@ -51,7 +51,7 @@ public final class ScanPotion implements IScanThing {
     }
 
     @Override
-    public Identifier getResearchKey(Player player, @Nullable Object target) {
+    public ResourceLocation getResearchKey(Player player, @Nullable Object target) {
         return ScanKeys.effect(effect.unwrapKey().orElseThrow().identifier());
     }
 }

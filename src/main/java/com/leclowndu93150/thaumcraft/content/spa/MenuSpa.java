@@ -12,8 +12,8 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jspecify.annotations.Nullable;
 
 public final class MenuSpa extends AbstractContainerMenu {
@@ -29,11 +29,11 @@ public final class MenuSpa extends AbstractContainerMenu {
     public static final int PLAYER_ROWS = 3;
     public static final int TOTAL_INVENTORY_SLOTS = SLOT_COUNT + PLAYER_ROW_SLOTS * (PLAYER_ROWS + 1);
 
-    private final ItemStacksResourceHandler items;
+    private final ItemStackHandler items;
     private final ContainerLevelAccess access;
 
     public MenuSpa(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf buf) {
-        this(containerId, playerInventory, new ItemStacksResourceHandler(SLOT_COUNT),
+        this(containerId, playerInventory, new ItemStackHandler(SLOT_COUNT),
                 ContainerLevelAccess.create(playerInventory.player.level(), buf.readBlockPos()));
     }
 
@@ -42,13 +42,13 @@ public final class MenuSpa extends AbstractContainerMenu {
                 ContainerLevelAccess.create(blockEntity.getLevel(), blockEntity.getBlockPos()));
     }
 
-    private MenuSpa(int containerId, Inventory playerInventory, ItemStacksResourceHandler items,
+    private MenuSpa(int containerId, Inventory playerInventory, ItemStackHandler items,
                     ContainerLevelAccess access) {
         super(TCMenus.SPA.get(), containerId);
         this.items = items;
         this.access = access;
 
-        addSlot(new ResourceHandlerSlot(items, items::set, 0, SALTS_X, SALTS_Y) {
+        addSlot(new SlotItemHandler(items, 0, SALTS_X, SALTS_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return stack.is(TCItems.BATH_SALTS.get());

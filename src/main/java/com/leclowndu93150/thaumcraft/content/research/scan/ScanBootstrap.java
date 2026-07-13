@@ -20,17 +20,17 @@ import java.util.Set;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ambient.Bat;
-import net.minecraft.world.entity.animal.parrot.Parrot;
+import net.minecraft.world.entity.animal.Parrot;
 import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.entity.monster.Ghast;
-import net.minecraft.world.entity.monster.spider.Spider;
-import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
-import net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingProjectile;
+import net.minecraft.world.entity.monster.Spider;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -41,8 +41,8 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 
 @EventBusSubscriber(modid = TCIds.MODID)
 public final class ScanBootstrap {
-    private static final Set<Identifier> DYNAMIC_ASPECTS = new HashSet<>();
-    private static final Set<Identifier> DYNAMIC_ENCHANTMENTS = new HashSet<>();
+    private static final Set<ResourceLocation> DYNAMIC_ASPECTS = new HashSet<>();
+    private static final Set<ResourceLocation> DYNAMIC_ENCHANTMENTS = new HashSet<>();
     private static boolean registered;
 
     private ScanBootstrap() {}

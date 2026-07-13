@@ -1,9 +1,12 @@
 package com.leclowndu93150.thaumcraft.content.device.mirror;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -11,8 +14,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 public final class BlockEntityMirror extends BlockEntityMirrorBase {
     public static final int TRANSPORT_EVENT = 1;
@@ -114,15 +115,15 @@ public final class BlockEntityMirror extends BlockEntityMirrorBase {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        outputStacks = new ArrayList<>(input.read("Items", ItemStack.CODEC.listOf()).orElse(List.of()));
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        outputStacks = new ArrayList<>(TCNbt.read(input, "Items", ItemStack.CODEC.listOf(), registries).orElse(List.of()));
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         List<ItemStack> filtered = outputStacks.stream().filter(stack -> !stack.isEmpty()).toList();
-        output.store("Items", ItemStack.CODEC.listOf(), filtered);
+        TCNbt.store(output, "Items", ItemStack.CODEC.listOf(), registries, filtered);
     }
 }

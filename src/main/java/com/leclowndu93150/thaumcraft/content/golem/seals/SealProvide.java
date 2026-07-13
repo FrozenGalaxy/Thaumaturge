@@ -15,12 +15,11 @@ import java.util.Iterator;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.items.IItemHandler;
 
 public class SealProvide extends SealFiltered implements ISealConfigToggles {
     private static final int SCAN_INTERVAL = 20;
@@ -44,7 +43,7 @@ public class SealProvide extends SealFiltered implements ISealConfigToggles {
     private int delay = System.identityHashCode(this) % 88;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return TCIds.rl("provider");
     }
 
@@ -72,7 +71,7 @@ public class SealProvide extends SealFiltered implements ISealConfigToggles {
         if (delay++ % SCAN_INTERVAL != 0) {
             return;
         }
-        ResourceHandler<ItemResource> inv = InvHelper.getItemHandlerAt(level, seal.getSealPos().pos(), seal.getSealPos().face());
+        IItemHandler inv = InvHelper.getItemHandlerAt(level, seal.getSealPos().pos(), seal.getSealPos().face());
         if (inv == null) {
             return;
         }
@@ -132,7 +131,7 @@ public class SealProvide extends SealFiltered implements ISealConfigToggles {
     }
 
     private void collectForDelivery(Level level, IGolemAPI golem, Task task, ProvisionRequest request) {
-        ResourceHandler<ItemResource> inv = InvHelper.getItemHandlerAt(level, task.getSealPos().pos(), task.getSealPos().face());
+        IItemHandler inv = InvHelper.getItemHandlerAt(level, task.getSealPos().pos(), task.getSealPos().face());
         if (inv == null) {
             return;
         }
@@ -260,7 +259,7 @@ public class SealProvide extends SealFiltered implements ISealConfigToggles {
     }
 
     @Override
-    public Identifier getSealIcon() {
+    public ResourceLocation getSealIcon() {
         return TCIds.rl("textures/item/seal_provider.png");
     }
 

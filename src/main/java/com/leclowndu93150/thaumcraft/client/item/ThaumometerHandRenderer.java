@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -90,7 +90,7 @@ public final class ThaumometerHandRenderer {
         poseStack.mulPose(Axis.XP.rotationDegrees(HAND_PITCH));
         poseStack.mulPose(Axis.ZP.rotationDegrees(invert * HAND_ROLL));
         poseStack.translate(invert * HAND_X, HAND_Y, HAND_Z);
-        Identifier skinTexture = player.getSkin().body().texturePath();
+        ResourceLocation skinTexture = player.getSkin().body().texturePath();
         if (arm == HumanoidArm.RIGHT) {
             renderer.renderRightHand(poseStack, collector, light, skinTexture,
                     player.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE));

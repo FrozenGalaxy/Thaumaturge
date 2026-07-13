@@ -12,7 +12,7 @@ import com.leclowndu93150.thaumcraft.content.focus.FocusFX;
 import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -26,7 +26,7 @@ import net.minecraft.world.phys.HitResult;
 import org.jspecify.annotations.Nullable;
 
 public final class FocusEffectAir extends FocusEffect {
-    private static final Identifier KEY = TCIds.rl("air");
+    private static final ResourceLocation KEY = TCIds.rl("air");
 
     private static final int BASE_DAMAGE = 1;
     private static final int POWER_COMPLEXITY_FACTOR = 2;
@@ -37,7 +37,7 @@ public final class FocusEffectAir extends FocusEffect {
     private static final int PARTICLE_NUM = 5;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

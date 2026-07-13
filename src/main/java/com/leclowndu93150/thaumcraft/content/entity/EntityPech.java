@@ -20,6 +20,7 @@ import com.leclowndu93150.thaumcraft.content.pech.MenuPech;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.NonNullList;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +47,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -67,14 +68,12 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.arrow.Arrow;
+import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public class EntityPech extends Monster implements RangedAttackMob {
@@ -130,7 +129,7 @@ public class EntityPech extends Monster implements RangedAttackMob {
     }
 
     public static boolean checkPechSpawnRules(EntityType<EntityPech> type, ServerLevelAccessor level,
-                                              EntitySpawnReason reason, BlockPos pos, RandomSource random) {
+                                              MobSpawnType reason, BlockPos pos, RandomSource random) {
         int count = level.getEntitiesOfClass(EntityPech.class,
                 new AABB(pos).inflate(16.0, 16.0, 16.0)).size();
         return count < MAX_NEARBY_PECHS && Monster.checkMonsterSpawnRules(type, level, reason, pos, random);
@@ -296,7 +295,7 @@ public class EntityPech extends Monster implements RangedAttackMob {
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level,
-                                                  DifficultyInstance difficulty, EntitySpawnReason reason,
+                                                  DifficultyInstance difficulty, MobSpawnType reason,
                                                   @Nullable SpawnGroupData groupData) {
         this.setDropChance(EquipmentSlot.MAINHAND, 0.2F);
         this.setDropChance(EquipmentSlot.OFFHAND, 0.2F);
@@ -583,7 +582,7 @@ public class EntityPech extends Monster implements RangedAttackMob {
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putByte("PechType", (byte) this.getPechType());
         output.putShort("Anger", (short) this.getAnger());
@@ -592,11 +591,11 @@ public class EntityPech extends Monster implements RangedAttackMob {
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
+    protected void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        this.setPechType(input.getByteOr("PechType", (byte) 0));
-        this.setAnger(input.getShortOr("Anger", (short) 0));
-        this.setTamed(input.getBooleanOr("Tamed", false));
+        this.setPechType(input.getByte("PechType"));
+        this.setAnger(input.getShort("Anger"));
+        this.setTamed(input.getBoolean("Tamed"));
         this.loot = NonNullList.withSize(LOOT_SLOTS, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(input, this.loot);
         this.setCombatTask();

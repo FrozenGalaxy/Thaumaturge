@@ -12,7 +12,7 @@ import com.leclowndu93150.thaumcraft.content.golem.GolemInteractionHelper;
 import com.leclowndu93150.thaumcraft.content.golem.tasks.TaskHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -35,7 +35,7 @@ public class SealUse extends SealFiltered implements ISealConfigToggles {
     private int watchedTask = Integer.MIN_VALUE;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return TCIds.rl("use");
     }
 
@@ -110,7 +110,7 @@ public class SealUse extends SealFiltered implements ISealConfigToggles {
     }
 
     @Override
-    public Identifier getSealIcon() {
+    public ResourceLocation getSealIcon() {
         return TCIds.rl("textures/item/seal_use.png");
     }
 

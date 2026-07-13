@@ -5,7 +5,7 @@ import net.minecraft.client.renderer.entity.ArrowRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.TippableArrowRenderer;
 import net.minecraft.client.renderer.entity.state.ArrowRenderState;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class GolemDartRenderer extends ArrowRenderer<EntityGolemDart, ArrowRenderState> {
     public GolemDartRenderer(EntityRendererProvider.Context context) {
@@ -18,7 +18,7 @@ public final class GolemDartRenderer extends ArrowRenderer<EntityGolemDart, Arro
     }
 
     @Override
-    protected Identifier getTextureLocation(ArrowRenderState state) {
+    protected ResourceLocation getTextureLocation(ArrowRenderState state) {
         return TippableArrowRenderer.NORMAL_ARROW_LOCATION;
     }
 }

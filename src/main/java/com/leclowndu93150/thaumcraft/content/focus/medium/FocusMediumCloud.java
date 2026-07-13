@@ -11,11 +11,11 @@ import com.leclowndu93150.thaumcraft.api.casters.NodeSettingIntRange;
 import com.leclowndu93150.thaumcraft.api.casters.Trajectory;
 import com.leclowndu93150.thaumcraft.content.entity.EntityFocusCloud;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 
 public final class FocusMediumCloud extends FocusMedium {
-    private static final Identifier KEY = TCIds.rl("cloud");
+    private static final ResourceLocation KEY = TCIds.rl("cloud");
 
     private static final int BASE_COMPLEXITY = 4;
     private static final int RADIUS_COMPLEXITY_FACTOR = 2;
@@ -23,7 +23,7 @@ public final class FocusMediumCloud extends FocusMedium {
     private static final float POWER_MULTIPLIER = 0.5F;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

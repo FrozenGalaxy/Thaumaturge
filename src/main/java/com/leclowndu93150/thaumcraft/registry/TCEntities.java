@@ -17,7 +17,7 @@ import com.leclowndu93150.thaumcraft.content.entity.projectile.EntityGrapple;
 import com.leclowndu93150.thaumcraft.content.golem.EntityThaumcraftGolem;
 import com.leclowndu93150.thaumcraft.content.misc.alumentum.ThrownAlumentum;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -381,7 +381,7 @@ public final class TCEntities {
             String name, Supplier<EntityType.Builder<T>> builderSupplier) {
         return ENTITIES.register(name, () -> builderSupplier.get().build(
                 ResourceKey.create(Registries.ENTITY_TYPE,
-                        Identifier.fromNamespaceAndPath(TCIds.MODID, name))));
+                        ResourceLocation.fromNamespaceAndPath(TCIds.MODID, name))));
     }
 
     public static void register(IEventBus modBus) {

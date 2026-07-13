@@ -3,9 +3,10 @@ package com.leclowndu93150.thaumcraft.api.aspect;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * An aspect is one of the fundamental thaumic essences that make up the world.
@@ -29,7 +30,7 @@ import net.minecraft.resources.ResourceKey;
 public interface IAspect {
     /** The datapack registry key for aspects. */
     ResourceKey<Registry<IAspect>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            Identifier.fromNamespaceAndPath("thaumcraft", "aspect"));
+            ResourceLocation.fromNamespaceAndPath("thaumcraft", "aspect"));
 
     /**
      * The unique tag of this aspect. Stable identifier and the registry path of the aspect.
@@ -62,11 +63,11 @@ public interface IAspect {
     Optional<String> chatColor();
 
     /**
-     * Identifier of the sprite texture used to render this aspect.
+     * ResourceLocation of the sprite texture used to render this aspect.
      *
      * @return the texture identifier, typically under {@code textures/aspects/}
      */
-    Identifier texture();
+    ResourceLocation texture();
 
     /**
      * The OpenGL blend function used when drawing this aspect's icon. Most aspects use the

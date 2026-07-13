@@ -6,21 +6,21 @@ import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastManager;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 public final class ResearchToast implements Toast {
     private static final long DURATION_MS = 5000L;
-    private static final Identifier TOAST_SPRITE = Identifier.withDefaultNamespace("toast/recipe");
+    private static final ResourceLocation TOAST_SPRITE = ResourceLocation.withDefaultNamespace("toast/recipe");
 
     private final Component title;
     private final Component subtitle;
     private final ItemStack icon;
-    private final Identifier id;
+    private final ResourceLocation id;
     private Toast.Visibility wantedVisibility = Visibility.SHOW;
 
-    public ResearchToast(Identifier researchId, Component title, Component subtitle, ItemStack icon) {
+    public ResearchToast(ResourceLocation researchId, Component title, Component subtitle, ItemStack icon) {
         this.id = researchId;
         this.title = title;
         this.subtitle = subtitle;

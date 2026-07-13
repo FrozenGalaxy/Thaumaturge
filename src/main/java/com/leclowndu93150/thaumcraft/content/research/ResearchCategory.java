@@ -5,21 +5,21 @@ import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record ResearchCategory(
-        Optional<Identifier> requiredResearch,
+        Optional<ResourceLocation> requiredResearch,
         AspectList formula,
-        Identifier icon,
-        Identifier background,
-        Optional<Identifier> overlayBackground
+        ResourceLocation icon,
+        ResourceLocation background,
+        Optional<ResourceLocation> overlayBackground
 ) implements IResearchCategory {
     public static final Codec<ResearchCategory> DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Identifier.CODEC.optionalFieldOf("required_research").forGetter(ResearchCategory::requiredResearch),
+            ResourceLocation.CODEC.optionalFieldOf("required_research").forGetter(ResearchCategory::requiredResearch),
             AspectList.CODEC.fieldOf("formula").forGetter(ResearchCategory::formula),
-            Identifier.CODEC.fieldOf("icon").forGetter(ResearchCategory::icon),
-            Identifier.CODEC.fieldOf("background").forGetter(ResearchCategory::background),
-            Identifier.CODEC.optionalFieldOf("overlay_background").forGetter(ResearchCategory::overlayBackground)
+            ResourceLocation.CODEC.fieldOf("icon").forGetter(ResearchCategory::icon),
+            ResourceLocation.CODEC.fieldOf("background").forGetter(ResearchCategory::background),
+            ResourceLocation.CODEC.optionalFieldOf("overlay_background").forGetter(ResearchCategory::overlayBackground)
     ).apply(instance, ResearchCategory::new));
 
     public static final Codec<IResearchCategory> CODEC = DIRECT_CODEC.xmap(c -> (IResearchCategory) c, ResearchCategory::ofInterface);

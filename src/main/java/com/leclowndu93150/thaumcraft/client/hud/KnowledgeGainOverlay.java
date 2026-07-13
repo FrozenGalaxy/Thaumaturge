@@ -13,9 +13,9 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
@@ -27,9 +27,9 @@ import org.jspecify.annotations.Nullable;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
 public final class KnowledgeGainOverlay implements GuiLayer {
-    private static final Identifier BOOK = TCIds.rl("textures/item/thaumonomicon.png");
-    private static final Identifier KNOW_OBSERVATION = TCIds.rl("textures/research/knowledge_observation.png");
-    private static final Identifier KNOW_THEORY = TCIds.rl("textures/research/knowledge_theory.png");
+    private static final ResourceLocation BOOK = TCIds.rl("textures/item/thaumonomicon.png");
+    private static final ResourceLocation KNOW_OBSERVATION = TCIds.rl("textures/research/knowledge_observation.png");
+    private static final ResourceLocation KNOW_THEORY = TCIds.rl("textures/research/knowledge_theory.png");
 
     private static final LinkedBlockingQueue<Tracker> TRACKERS = new LinkedBlockingQueue<>();
     private static float bookFade;
@@ -61,7 +61,7 @@ public final class KnowledgeGainOverlay implements GuiLayer {
         int ww = graphics.guiWidth();
         int hh = graphics.guiHeight();
 
-        int bookTint = ARGB.color(Math.round(bookFade / BOOK_FADE_MAX * 255.0F), 255, 255, 255);
+        int bookTint = ARGB32.color(Math.round(bookFade / BOOK_FADE_MAX * 255.0F), 255, 255, 255);
         graphics.blit(RenderPipelines.GUI_TEXTURED, BOOK,
                 ww - BOOK_CORNER_OFFSET, hh - BOOK_CORNER_OFFSET,
                 0.0F, 0.0F, BOOK_SIZE, BOOK_SIZE, BOOK_SIZE, BOOK_SIZE, BOOK_SIZE, BOOK_SIZE, bookTint);
@@ -96,11 +96,11 @@ public final class KnowledgeGainOverlay implements GuiLayer {
             graphics.pose().translate(xx, yy);
             graphics.pose().rotate((float) Math.toRadians(84 + rand.nextInt(12) - QUAD_INTRINSIC_ROTATION));
 
-            Identifier typeIcon = current.type == KnowledgeType.THEORY ? KNOW_THEORY : KNOW_OBSERVATION;
-            drawCentered(graphics, typeIcon, s, ARGB.color(ICON_ALPHA, 255, 255, 255), false);
-            Identifier categoryIcon = categoryIcon(mc, current.category);
+            ResourceLocation typeIcon = current.type == KnowledgeType.THEORY ? KNOW_THEORY : KNOW_OBSERVATION;
+            drawCentered(graphics, typeIcon, s, ARGB32.color(ICON_ALPHA, 255, 255, 255), false);
+            ResourceLocation categoryIcon = categoryIcon(mc, current.category);
             if (categoryIcon != null) {
-                drawCentered(graphics, categoryIcon, s * 0.75F, ARGB.color(ICON_ALPHA, 255, 255, 255), false);
+                drawCentered(graphics, categoryIcon, s * 0.75F, ARGB32.color(ICON_ALPHA, 255, 255, 255), false);
             }
 
             if (current.progress > current.max * 0.9F) {
@@ -154,7 +154,7 @@ public final class KnowledgeGainOverlay implements GuiLayer {
             int frame = spark.startFrame + spark.age % BURST_FRAME_SPREAD;
             int frameU = frame % PARTICLE_GRID;
             int frameV = frame / PARTICLE_GRID;
-            int tint = ARGB.colorFromFloat(alpha, 1.0F, spark.g, spark.b);
+            int tint = ARGB32.colorFromFloat(alpha, 1.0F, spark.g, spark.b);
             float x = spark.xo + (spark.x - spark.xo) * partial;
             float y = spark.yo + (spark.y - spark.yo) * partial;
             graphics.pose().pushMatrix();
@@ -180,7 +180,7 @@ public final class KnowledgeGainOverlay implements GuiLayer {
         graphics.pose().rotate((float) Math.toRadians(-rand.nextInt(360)));
         float g = Mth.nextInt(mc.level.getRandom(), 189, 255) / 255.0F;
         float b = Mth.nextInt(mc.level.getRandom(), 64, 255) / 255.0F;
-        int tint = ARGB.colorFromFloat(ICON_ALPHA / 255.0F, 1.0F, g, b);
+        int tint = ARGB32.colorFromFloat(ICON_ALPHA / 255.0F, 1.0F, g, b);
         int frame = BURST_FRAME_START + rand.nextInt(BURST_FRAME_SPREAD);
         int frameU = frame % PARTICLE_GRID;
         int frameV = frame / PARTICLE_GRID;
@@ -194,7 +194,7 @@ public final class KnowledgeGainOverlay implements GuiLayer {
         graphics.pose().popMatrix();
     }
 
-    private static void drawCentered(GuiGraphicsExtractor graphics, Identifier texture, float size, int tint, boolean additive) {
+    private static void drawCentered(GuiGraphicsExtractor graphics, ResourceLocation texture, float size, int tint, boolean additive) {
         graphics.pose().pushMatrix();
         graphics.pose().translate(-size / 2.0F, -size / 2.0F);
         graphics.pose().scale(size / ICON_TEX_SIZE, size / ICON_TEX_SIZE);
@@ -203,7 +203,7 @@ public final class KnowledgeGainOverlay implements GuiLayer {
         graphics.pose().popMatrix();
     }
 
-    private static @Nullable Identifier categoryIcon(Minecraft mc, @Nullable ResourceKey<IResearchCategory> category) {
+    private static @Nullable ResourceLocation categoryIcon(Minecraft mc, @Nullable ResourceKey<IResearchCategory> category) {
         if (category == null || mc.level == null) {
             return null;
         }

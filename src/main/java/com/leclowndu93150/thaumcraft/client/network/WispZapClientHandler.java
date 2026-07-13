@@ -6,7 +6,7 @@ import com.leclowndu93150.thaumcraft.content.fx.data.BoltData;
 import com.leclowndu93150.thaumcraft.network.ClientboundWispZapPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -33,9 +33,9 @@ public final class WispZapClientHandler {
                 Holder<IAspect> aspect = wisp.aspect();
                 if (aspect != null) {
                     int color = aspect.value().color();
-                    r = ARGB.red(color) / 255.0F;
-                    g = ARGB.green(color) / 255.0F;
-                    b = ARGB.blue(color) / 255.0F;
+                    r = ARGB32.red(color) / 255.0F;
+                    g = ARGB32.green(color) / 255.0F;
+                    b = ARGB32.blue(color) / 255.0F;
                 }
             }
             mc.level.addParticle(

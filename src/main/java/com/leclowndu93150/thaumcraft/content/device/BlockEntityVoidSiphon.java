@@ -10,22 +10,17 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,15 +31,15 @@ public final class BlockEntityVoidSiphon extends BlockEntity {
     private static final double RIFT_RANGE = 8.0;
     private static final int SHRINK_CHANCE = 33;
 
-    private final ItemStacksResourceHandler output = new ItemStacksResourceHandler(1) {
+    private final ItemStackHandler output = new ItemStackHandler(1) {
         @Override
-        public boolean isValid(int index, ItemResource resource) {
+        public boolean isItemValid(int index, ItemStack resource) {
             return resource.is(TCItems.VOID_SEED.get());
         }
 
         @Override
-        protected void onContentsChanged(int index, ItemStack previousContents) {
-            super.onContentsChanged(index, previousContents);
+        protected void onContentsChanged(int index) {
+            super.onContentsChanged(index);
             setChanged();
         }
     };
@@ -56,7 +51,7 @@ public final class BlockEntityVoidSiphon extends BlockEntity {
         super(TCBlockEntities.VOID_SIPHON.get(), pos, state);
     }
 
-    public ItemStacksResourceHandler output() {
+    public ItemStackHandler output() {
         return output;
     }
 
@@ -84,11 +79,11 @@ public final class BlockEntityVoidSiphon extends BlockEntity {
         boolean changed = false;
         while (siphon.progress >= PROGRESS_REQUIRED && siphon.hasOutputRoom()) {
             siphon.progress -= PROGRESS_REQUIRED;
-            ItemStack current = siphon.output.getResource(0).toStack(siphon.output.getAmountAsInt(0));
+            ItemStack current = siphon.output.getStackInSlot(0).copy();
             if (current.isEmpty()) {
-                siphon.output.set(0, ItemResource.of(new ItemStack(TCItems.VOID_SEED.get())), 1);
+                siphon.output.setStackInSlot(0, new ItemStack(TCItems.VOID_SEED.get()).copyWithCount(1));
             } else {
-                siphon.output.set(0, siphon.output.getResource(0), current.getCount() + 1);
+                siphon.output.set(0, siphon.output.getStackInSlot(0), current.getCount() + 1);
             }
             changed = true;
         }
@@ -98,7 +93,7 @@ public final class BlockEntityVoidSiphon extends BlockEntity {
     }
 
     private boolean hasOutputRoom() {
-        ItemStack stack = output.getResource(0).toStack(output.getAmountAsInt(0));
+        ItemStack stack = output.getStackInSlot(0).copy();
         return stack.isEmpty() || stack.is(TCItems.VOID_SEED.get()) && stack.getCount() < stack.getMaxStackSize();
     }
 
@@ -122,26 +117,28 @@ public final class BlockEntityVoidSiphon extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        progress = input.getIntOr("progress", 0);
-        input.child("Output").ifPresent(output::deserialize);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        progress = input.getInt("progress");
+        if (input.contains("Output")) {
+            output.deserializeNBT(registries, input.getCompound("Output"));
+        }
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output_) {
-        super.saveAdditional(output_);
+    protected void saveAdditional(CompoundTag output_, HolderLookup.Provider registries) {
+        super.saveAdditional(output_, registries);
         output_.putInt("progress", progress);
-        output.serialize(output_.child("Output"));
+        output_.put("Output", output.serializeNBT(registries));
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput out = TagValueOutput.createWithContext(reporter, registries);
-            saveAdditional(out);
-            nbt.merge(out.buildResult());
+        {
+            CompoundTag out = new CompoundTag();
+            saveAdditional(out, registries);
+            nbt.merge(out);
         }
         return nbt;
     }

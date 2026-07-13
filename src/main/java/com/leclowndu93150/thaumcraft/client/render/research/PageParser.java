@@ -7,7 +7,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class PageParser {
     public static final int PAGE_WIDTH = 140;
@@ -23,7 +23,7 @@ public final class PageParser {
     private static final float BONUS_BREAK_FRACTION = 0.66F;
     private static final int IMAGE_GAP = 2;
 
-    private static final Identifier KNOWLEDGETYPES_ID = Identifier.fromNamespaceAndPath("thaumcraft", "knowledge_types");
+    private static final ResourceLocation KNOWLEDGETYPES_ID = ResourceLocation.fromNamespaceAndPath("thaumcraft", "knowledge_types");
     private static final String ADDENDUM_TEXT_KEY = "tc.addendumtext";
 
     private PageParser() {}
@@ -34,7 +34,7 @@ public final class PageParser {
 
     public static List<Page> parse(
             Font font,
-            Identifier entryId,
+            ResourceLocation entryId,
             String stageTextKey,
             List<String> addendaTextKeys,
             int knowledgeTypeRowCount,
@@ -241,13 +241,13 @@ public final class PageParser {
 
     public static final class PageImage {
         public static final PageImage LINE_DIVIDER = new PageImage(
-                Identifier.fromNamespaceAndPath("thaumcraft", "textures/gui/gui_researchbook.png"),
+                ResourceLocation.fromNamespaceAndPath("thaumcraft", "textures/gui/gui_researchbook.png"),
                 24, 184, 95, 6, 1.0F);
         public static final PageImage SECTION_DIVIDER = new PageImage(
-                Identifier.fromNamespaceAndPath("thaumcraft", "textures/gui/gui_researchbook.png"),
+                ResourceLocation.fromNamespaceAndPath("thaumcraft", "textures/gui/gui_researchbook.png"),
                 28, 192, 140, 6, 1.0F);
 
-        public final Identifier texture;
+        public final ResourceLocation texture;
         public final int u;
         public final int v;
         public final int w;
@@ -256,7 +256,7 @@ public final class PageParser {
         public final int renderedWidth;
         public final int renderedHeight;
 
-        public PageImage(Identifier texture, int u, int v, int w, int h, float scale) {
+        public PageImage(ResourceLocation texture, int u, int v, int w, int h, float scale) {
             this.texture = texture;
             this.u = u;
             this.v = v;
@@ -279,7 +279,7 @@ public final class PageParser {
             String[] parts = descriptor.split(":");
             if (parts.length != 7) return null;
             try {
-                Identifier id = Identifier.fromNamespaceAndPath(parts[0], parts[1]);
+                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(parts[0], parts[1]);
                 int u = Integer.parseInt(parts[2]);
                 int v = Integer.parseInt(parts[3]);
                 int w = Integer.parseInt(parts[4]);

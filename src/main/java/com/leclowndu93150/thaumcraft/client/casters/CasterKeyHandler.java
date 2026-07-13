@@ -13,7 +13,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
@@ -59,7 +59,7 @@ public final class CasterKeyHandler {
                         && (player.getMainHandItem().getItem() instanceof ICaster
                         || player.getOffhandItem().getItem() instanceof ICaster)) {
                     if (player.isShiftKeyDown()) {
-                        ClientPacketDistributor.sendToServer(
+                        PacketDistributor.sendToServer(
                                 new ServerboundFocusChangePayload(CasterManager.REMOVE_FOCUS));
                     } else {
                         radialActive = true;
@@ -77,7 +77,7 @@ public final class CasterKeyHandler {
                     int mod = InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL)
                             ? MOD_CYCLE_DIM
                             : InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT) ? MOD_SHIFT : MOD_GROW;
-                    ClientPacketDistributor.sendToServer(new ServerboundCasterKeyPayload(mod));
+                    PacketDistributor.sendToServer(new ServerboundCasterKeyPayload(mod));
                 }
                 keyPressedG = true;
             }

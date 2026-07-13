@@ -14,7 +14,7 @@ import com.leclowndu93150.thaumcraft.network.ClientboundWarpFXPayload;
 import com.leclowndu93150.thaumcraft.registry.TCEntities;
 import com.leclowndu93150.thaumcraft.registry.TCMobEffects;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,7 +24,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -76,10 +76,10 @@ public final class WarpEvents {
     private static final int BATH_SALTS_WARP_THRESHOLD = 10;
     private static final int ELDRITCH_MINOR_WARP_THRESHOLD = 25;
     private static final int ELDRITCH_MAJOR_WARP_THRESHOLD = 50;
-    private static final Identifier BATH_SALTS_ENTRY = TCIds.rl("bath_salts");
-    private static final Identifier BATHSALTS_FLAG = TCIds.rl("bathsalts");
-    private static final Identifier ELDRITCH_MINOR_FLAG = TCIds.rl("eldritchminor");
-    private static final Identifier ELDRITCH_MAJOR_FLAG = TCIds.rl("eldritchmajor");
+    private static final ResourceLocation BATH_SALTS_ENTRY = TCIds.rl("bath_salts");
+    private static final ResourceLocation BATHSALTS_FLAG = TCIds.rl("bathsalts");
+    private static final ResourceLocation ELDRITCH_MINOR_FLAG = TCIds.rl("eldritchminor");
+    private static final ResourceLocation ELDRITCH_MAJOR_FLAG = TCIds.rl("eldritchmajor");
 
     private static void checkWarpMilestones(ServerPlayer player, int actualWarp) {
         IPlayerKnowledge knowledge = KnowledgeAccess.of(player);
@@ -186,7 +186,7 @@ public final class WarpEvents {
         int spawns = Math.min(MAX_SPIDERS, warp);
         for (int i = 0; i < spawns; i++) {
             for (int attempt = 0; attempt < SPAWN_ATTEMPTS; attempt++) {
-                EntityMindSpider spider = TCEntities.MIND_SPIDER.get().create(level, EntitySpawnReason.EVENT);
+                EntityMindSpider spider = TCEntities.MIND_SPIDER.get().create(level, MobSpawnType.EVENT);
                 if (spider == null) {
                     return;
                 }

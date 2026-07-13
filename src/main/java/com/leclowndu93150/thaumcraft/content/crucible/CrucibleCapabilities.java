@@ -24,7 +24,7 @@ public final class CrucibleCapabilities {
         );
 
         event.registerBlockEntity(
-                Capabilities.Fluid.BLOCK,
+                Capabilities.FluidHandler.BLOCK,
                 TCBlockEntities.CRUCIBLE.get(),
                 (be, side) -> be.getTank()
         );

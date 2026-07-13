@@ -11,15 +11,15 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import org.joml.Matrix4fc;
 
 public final class WispRenderer extends EntityRenderer<WispEntity, WispRenderState> {
-    private static final Identifier NODES = TCIds.rl("textures/misc/auranodes.png");
+    private static final ResourceLocation NODES = TCIds.rl("textures/misc/auranodes.png");
 
     private static final RenderType PARTICLES_TYPE = RenderType.create(
             "tc_wisp_particles",
@@ -96,8 +96,8 @@ public final class WispRenderer extends EntityRenderer<WispEntity, WispRenderSta
         float u1 = u0 + texFrame;
         float v1 = v0 + texFrame;
         float half = scale * QUAD_HALF_FACTOR;
-        int tint = ARGB.colorFromFloat(alpha,
-                ARGB.red(color) / 255.0F, ARGB.green(color) / 255.0F, ARGB.blue(color) / 255.0F);
+        int tint = ARGB32.colorFromFloat(alpha,
+                ARGB32.red(color) / 255.0F, ARGB32.green(color) / 255.0F, ARGB32.blue(color) / 255.0F);
         collector.submitCustomGeometry(poseStack, type, (pose, buffer) ->
                 addQuad(buffer, pose.pose(), half, u0, v0, u1, v1, tint));
     }

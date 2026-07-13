@@ -6,7 +6,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.color.item.ItemTintSource;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -24,9 +24,9 @@ public record CrystalAspectTint(int fallback) implements ItemTintSource {
     public int calculate(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity owner) {
         AspectInstance instance = stack.get(TCDataComponents.CRYSTAL_ASPECT.get());
         if (instance == null) {
-            return ARGB.opaque(fallback);
+            return ARGB32.opaque(fallback);
         }
-        return ARGB.opaque(instance.aspect().value().color());
+        return ARGB32.opaque(instance.aspect().value().color());
     }
 
     @Override

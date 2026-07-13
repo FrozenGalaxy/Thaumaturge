@@ -5,16 +5,16 @@ import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumcraft.api.casters.FocusModSplit;
 import com.leclowndu93150.thaumcraft.api.casters.Trajectory;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.Nullable;
 
 public final class FocusModSplitTrajectory extends FocusModSplit {
-    private static final Identifier KEY = TCIds.rl("split_trajectory");
+    private static final ResourceLocation KEY = TCIds.rl("split_trajectory");
 
     private static final int COMPLEXITY = 5;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

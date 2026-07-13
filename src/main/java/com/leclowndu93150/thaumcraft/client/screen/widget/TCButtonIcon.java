@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public sealed interface TCButtonIcon {
@@ -29,8 +29,8 @@ public sealed interface TCButtonIcon {
         }
     }
 
-    record TextureIcon(Identifier texture, int textureWidth, int textureHeight) implements TCButtonIcon {
-        public TextureIcon(Identifier texture) {
+    record TextureIcon(ResourceLocation texture, int textureWidth, int textureHeight) implements TCButtonIcon {
+        public TextureIcon(ResourceLocation texture) {
             this(texture, 16, 16);
         }
 

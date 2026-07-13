@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -27,8 +26,7 @@ public abstract class PurifyingFluid extends BaseFlowingFluid {
         super(properties);
     }
 
-    @Override
-    protected void entityInside(Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier) {
+    public static void applyEntityInside(Level level, BlockPos pos, Entity entity) {
         FluidState fs = level.getFluidState(pos);
         float quanta = fs.getAmount() / MAX_AMOUNT;
         Vec3 motion = entity.getDeltaMovement();

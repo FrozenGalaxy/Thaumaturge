@@ -5,16 +5,16 @@ import com.leclowndu93150.thaumcraft.content.device.BlockEntityVoidSiphon;
 import com.leclowndu93150.thaumcraft.content.device.MenuVoidSiphon;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.player.Inventory;
 
 public final class VoidSiphonScreen extends AbstractTCContainerScreen<MenuVoidSiphon> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/gui/gui_void_siphon.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/gui/gui_void_siphon.png");
     private static final int PORTAL_X = 62;
     private static final int PORTAL_Y = 14;
     private static final int PORTAL_SIZE = 52;
-    private static final int PROGRESS_COLOR = ARGB.color(160, 60, 0, 90);
+    private static final int PROGRESS_COLOR = ARGB32.color(160, 60, 0, 90);
 
     public VoidSiphonScreen(MenuVoidSiphon menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title, TEXTURE, 176, 166);

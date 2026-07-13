@@ -11,17 +11,17 @@ import com.leclowndu93150.thaumcraft.api.casters.NodeSettingIntList;
 import com.leclowndu93150.thaumcraft.api.casters.Trajectory;
 import com.leclowndu93150.thaumcraft.content.entity.EntitySpellBat;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 
 public final class FocusMediumSpellBat extends FocusMedium {
-    private static final Identifier KEY = TCIds.rl("spellbat");
+    private static final ResourceLocation KEY = TCIds.rl("spellbat");
 
     private static final int COMPLEXITY = 8;
     private static final float POWER_MULTIPLIER = 0.33F;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

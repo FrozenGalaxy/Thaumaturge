@@ -24,10 +24,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.TagValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public final class ResearchTableData implements IResearchTableData {
@@ -367,9 +364,7 @@ public final class ResearchTableData implements IResearchTableData {
             card.setSeed(seed);
             CompoundTag stored = state.tag();
             if (stored != null && !stored.isEmpty()) {
-                try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(() -> "card:" + key.identifier(), Thaumcraft.LOGGER)) {
-                    card.read(TagValueInput.create(reporter, registries, stored), registries);
-                }
+                card.read(stored, registries);
             }
             return card;
         }
@@ -381,12 +376,9 @@ public final class ResearchTableData implements IResearchTableData {
                 boolean selected,
                 HolderLookup.Provider registries
         ) {
-            CardState state;
-            try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(() -> "card:" + key.identifier(), Thaumcraft.LOGGER)) {
-                TagValueOutput output = TagValueOutput.createWithContext(reporter, registries);
-                card.write(output, registries);
-                state = new CardState(output.buildResult());
-            }
+            CompoundTag output = new CompoundTag();
+            card.write(output, registries);
+            CardState state = new CardState(output);
             return new CardChoice(key, card.seed(), state, fromAid, selected);
         }
     }

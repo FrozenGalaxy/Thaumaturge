@@ -2,7 +2,7 @@ package com.leclowndu93150.thaumcraft.api.research.scan;
 
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -26,8 +26,8 @@ public final class ScanKeys {
      * @param item the item
      * @return the research key
      */
-    public static Identifier item(Item item) {
-        Identifier id = BuiltInRegistries.ITEM.getKey(item);
+    public static ResourceLocation item(Item item) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
         return key("item/" + id.getNamespace() + "/" + id.getPath());
     }
 
@@ -37,8 +37,8 @@ public final class ScanKeys {
      * @param type the entity type
      * @return the research key
      */
-    public static Identifier entity(EntityType<?> type) {
-        Identifier id = BuiltInRegistries.ENTITY_TYPE.getKey(type);
+    public static ResourceLocation entity(EntityType<?> type) {
+        ResourceLocation id = BuiltInRegistries.ENTITY_TYPE.getKey(type);
         return key("entity/" + id.getNamespace() + "/" + id.getPath());
     }
 
@@ -48,8 +48,8 @@ public final class ScanKeys {
      * @param aspect the aspect key
      * @return the research key
      */
-    public static Identifier aspect(ResourceKey<IAspect> aspect) {
-        Identifier id = aspect.identifier();
+    public static ResourceLocation aspect(ResourceKey<IAspect> aspect) {
+        ResourceLocation id = aspect.identifier();
         return key("aspect/" + id.getNamespace() + "/" + id.getPath());
     }
 
@@ -59,7 +59,7 @@ public final class ScanKeys {
      * @param enchantment the enchantment identifier
      * @return the research key
      */
-    public static Identifier enchantment(Identifier enchantment) {
+    public static ResourceLocation enchantment(ResourceLocation enchantment) {
         return key("enchantment/" + enchantment.getNamespace() + "/" + enchantment.getPath());
     }
 
@@ -69,7 +69,7 @@ public final class ScanKeys {
      * @param effect the effect identifier
      * @return the research key
      */
-    public static Identifier effect(Identifier effect) {
+    public static ResourceLocation effect(ResourceLocation effect) {
         return key("effect/" + effect.getNamespace() + "/" + effect.getPath());
     }
 
@@ -80,7 +80,7 @@ public final class ScanKeys {
      * @param body the observed body, e.g. {@code "sun"}, {@code "moon3"}, {@code "star1"}
      * @return the research key
      */
-    public static Identifier celestial(int worldDay, String body) {
+    public static ResourceLocation celestial(int worldDay, String body) {
         return key(celestialDayPrefix(worldDay) + body);
     }
 
@@ -101,11 +101,11 @@ public final class ScanKeys {
      * @param research the research key
      * @return {@code true} when the key is a celestial observation
      */
-    public static boolean isCelestial(Identifier research) {
+    public static boolean isCelestial(ResourceLocation research) {
         return research.getNamespace().equals(NAMESPACE) && research.getPath().startsWith(PREFIX + "celestial/");
     }
 
-    private static Identifier key(String path) {
-        return Identifier.fromNamespaceAndPath(NAMESPACE, PREFIX + path);
+    private static ResourceLocation key(String path) {
+        return ResourceLocation.fromNamespaceAndPath(NAMESPACE, PREFIX + path);
     }
 }

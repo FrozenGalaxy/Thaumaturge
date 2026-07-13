@@ -11,9 +11,8 @@ import java.util.Set;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
@@ -39,7 +38,7 @@ public final class SalisMundusRecipe extends CustomRecipe {
         boolean bowl = false;
         boolean flint = false;
         boolean redstone = false;
-        Set<Identifier> crystals = new HashSet<>();
+        Set<ResourceLocation> crystals = new HashSet<>();
         for (int slot = 0; slot < input.size(); slot++) {
             ItemStack stack = input.getItem(slot);
             if (stack.isEmpty()) {
@@ -89,7 +88,7 @@ public final class SalisMundusRecipe extends CustomRecipe {
             if (stack.is(Items.FLINT) || stack.is(Items.BOWL)) {
                 result.set(slot, stack.copyWithCount(1));
             } else {
-                ItemStackTemplate remainder = stack.getItem().getCraftingRemainder();
+                ItemStack remainder = stack.getItem().getCraftingRemainder();
                 if (remainder != null) {
                     result.set(slot, remainder.create());
                 }

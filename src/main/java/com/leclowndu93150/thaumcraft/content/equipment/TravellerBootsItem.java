@@ -4,7 +4,7 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.items.IRechargable;
 import com.leclowndu93150.thaumcraft.api.items.RechargeAccess;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -28,7 +28,7 @@ public final class TravellerBootsItem extends Item implements IRechargable {
     private static final float WATER_AIR_BOOST = 0.025F;
     private static final float STEP_HEIGHT_BONUS = 0.4F;
     private static final AttributeModifier STEP_MODIFIER = new AttributeModifier(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "traveller_step"),
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "traveller_step"),
             STEP_HEIGHT_BONUS, AttributeModifier.Operation.ADD_VALUE);
 
     public TravellerBootsItem(Properties properties) {

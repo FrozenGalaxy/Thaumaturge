@@ -13,15 +13,15 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 public class SpaScreen extends AbstractTCContainerScreen<MenuSpa> {
-    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_spa.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_spa.png");
 
     private static final int MIX_X = 89;
     private static final int MIX_Y = 35;
@@ -72,8 +72,8 @@ public class SpaScreen extends AbstractTCContainerScreen<MenuSpa> {
                 x + MIX_X, y + MIX_Y, MIX_ON_U, mix ? MIX_ON_V : MIX_OFF_V,
                 MIX_SIZE, MIX_SIZE, 256, 256);
 
-        FluidResource resource = spa.getTank().getResource(0);
-        int amount = spa.getTank().getAmountAsInt(0);
+        FluidStack resource = spa.getTank().getFluid();
+        int amount = spa.getTank().getFluidAmount();
         if (amount > 0 && !resource.isEmpty()) {
             Fluid fluid = resource.getFluid();
             FluidModel model = Minecraft.getInstance().getModelManager()
@@ -82,7 +82,7 @@ public class SpaScreen extends AbstractTCContainerScreen<MenuSpa> {
             int tint = -1;
             if (model.tintSource() != null) {
                 BlockState fluidBlock = fluid.defaultFluidState().createLegacyBlock();
-                tint = ARGB.opaque(model.tintSource().color(fluidBlock));
+                tint = ARGB32.opaque(model.tintSource().color(fluidBlock));
             }
             for (int a = 0; a < FLUID_SEGMENTS; a++) {
                 graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite,

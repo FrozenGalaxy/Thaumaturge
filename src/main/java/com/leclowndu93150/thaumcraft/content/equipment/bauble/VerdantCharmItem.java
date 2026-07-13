@@ -4,7 +4,6 @@ import com.leclowndu93150.thaumcraft.api.items.IRechargable;
 import com.leclowndu93150.thaumcraft.api.items.RechargeAccess;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCMobEffects;
-import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffects;
@@ -13,7 +12,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
+
+import java.util.List;
 
 public final class VerdantCharmItem extends Item implements IRechargable {
     public static final int TYPE_BASE = 0;
@@ -90,16 +90,15 @@ public final class VerdantCharmItem extends Item implements IRechargable {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display,
-                                Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         int type = type(stack);
         if (type == TYPE_LIFE) {
-            tooltip.accept(Component.translatable("item.thaumcraft.verdant_charm.life.text")
+            tooltip.add(Component.translatable("item.thaumcraft.verdant_charm.life.text")
                     .withStyle(ChatFormatting.GOLD));
         } else if (type == TYPE_SUSTAIN) {
-            tooltip.accept(Component.translatable("item.thaumcraft.verdant_charm.sustain.text")
+            tooltip.add(Component.translatable("item.thaumcraft.verdant_charm.sustain.text")
                     .withStyle(ChatFormatting.GOLD));
         }
-        super.appendHoverText(stack, context, display, tooltip, flag);
+        super.appendHoverText(stack, context, tooltip, flag);
     }
 }

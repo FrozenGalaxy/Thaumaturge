@@ -1,6 +1,6 @@
 package com.leclowndu93150.thaumcraft.api.research.scan;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -14,7 +14,7 @@ import org.jspecify.annotations.Nullable;
  * @since 1.0.0
  */
 public class ScanItemTag implements IScanThing {
-    private final Identifier research;
+    private final ResourceLocation research;
     private final TagKey<Item> tag;
 
     /**
@@ -23,7 +23,7 @@ public class ScanItemTag implements IScanThing {
      * @param research the research key granted on scan
      * @param tag the item tag this subject matches
      */
-    public ScanItemTag(Identifier research, TagKey<Item> tag) {
+    public ScanItemTag(ResourceLocation research, TagKey<Item> tag) {
         this.research = research;
         this.tag = tag;
     }
@@ -35,7 +35,7 @@ public class ScanItemTag implements IScanThing {
     }
 
     @Override
-    public Identifier getResearchKey(Player player, @Nullable Object target) {
+    public ResourceLocation getResearchKey(Player player, @Nullable Object target) {
         return research;
     }
 }

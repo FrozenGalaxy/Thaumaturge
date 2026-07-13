@@ -7,7 +7,7 @@ import com.leclowndu93150.thaumcraft.api.golems.tasks.Task;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -47,7 +47,7 @@ public final class GolemHelper {
      * @param key the seal kind's registry id
      * @return a fresh behavior instance of that kind, or null when unknown
      */
-    public static @Nullable ISeal createSeal(Identifier key) {
+    public static @Nullable ISeal createSeal(ResourceLocation key) {
         return impl().createSeal(key);
     }
 
@@ -55,7 +55,7 @@ public final class GolemHelper {
      * @param key the seal kind's registry id
      * @return the placer item stack for that kind, or an empty stack when unknown
      */
-    public static ItemStack getSealStack(Identifier key) {
+    public static ItemStack getSealStack(ResourceLocation key) {
         return impl().getSealStack(key);
     }
 
@@ -193,9 +193,9 @@ public final class GolemHelper {
      * @since 1.0.0
      */
     public interface Bindings {
-        @Nullable ISeal createSeal(Identifier key);
+        @Nullable ISeal createSeal(ResourceLocation key);
 
-        ItemStack getSealStack(Identifier key);
+        ItemStack getSealStack(ResourceLocation key);
 
         @Nullable ISealEntity getSealEntity(Level level, @Nullable SealPos pos);
 

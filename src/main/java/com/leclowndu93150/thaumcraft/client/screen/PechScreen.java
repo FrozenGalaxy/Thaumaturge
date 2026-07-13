@@ -7,11 +7,11 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class PechScreen extends AbstractTCContainerScreen<MenuPech> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/gui/gui_pech.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/gui/gui_pech.png");
     private static final int IMAGE_WIDTH = 175;
     private static final int IMAGE_HEIGHT = 232;
     private static final int TRADE_BUTTON_X = 67;

@@ -5,7 +5,7 @@ import com.leclowndu93150.thaumcraft.client.model.obj.MeshPart;
 import com.leclowndu93150.thaumcraft.client.model.obj.MeshQuadBaker;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.sprite.Material.Baked;
 import org.joml.Matrix4f;
 

@@ -1,6 +1,6 @@
 package com.leclowndu93150.thaumcraft.api.research.scan;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -12,7 +12,7 @@ import org.jspecify.annotations.Nullable;
  * @since 1.0.0
  */
 public class ScanItem implements IScanThing {
-    private final Identifier research;
+    private final ResourceLocation research;
     private final ItemStack stack;
 
     /**
@@ -21,7 +21,7 @@ public class ScanItem implements IScanThing {
      * @param research the research key granted on scan
      * @param stack the stack whose item this subject matches
      */
-    public ScanItem(Identifier research, ItemStack stack) {
+    public ScanItem(ResourceLocation research, ItemStack stack) {
         this.research = research;
         this.stack = stack;
     }
@@ -38,7 +38,7 @@ public class ScanItem implements IScanThing {
     }
 
     @Override
-    public Identifier getResearchKey(Player player, @Nullable Object target) {
+    public ResourceLocation getResearchKey(Player player, @Nullable Object target) {
         return research;
     }
 }

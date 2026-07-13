@@ -12,8 +12,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jspecify.annotations.Nullable;
 
 public final class MenuFocalManipulator extends AbstractContainerMenu {
@@ -26,13 +26,13 @@ public final class MenuFocalManipulator extends AbstractContainerMenu {
     private static final int TABLE_SLOT_COUNT = 1;
     private static final int TOTAL_SLOTS = 37;
 
-    private final ItemStacksResourceHandler items;
+    private final ItemStackHandler items;
     private final ContainerLevelAccess access;
     private final BlockPos pos;
     private final @Nullable BlockEntityFocalManipulator table;
 
     public MenuFocalManipulator(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf buf) {
-        this(containerId, playerInventory, new ItemStacksResourceHandler(1), ContainerLevelAccess.NULL, buf.readBlockPos(), null);
+        this(containerId, playerInventory, new ItemStackHandler(1), ContainerLevelAccess.NULL, buf.readBlockPos(), null);
     }
 
     public MenuFocalManipulator(int containerId, Inventory playerInventory, BlockEntityFocalManipulator table) {
@@ -40,7 +40,7 @@ public final class MenuFocalManipulator extends AbstractContainerMenu {
                 ContainerLevelAccess.create(table.getLevel(), table.getBlockPos()), table.getBlockPos(), table);
     }
 
-    private MenuFocalManipulator(int containerId, Inventory playerInventory, ItemStacksResourceHandler items,
+    private MenuFocalManipulator(int containerId, Inventory playerInventory, ItemStackHandler items,
                                  ContainerLevelAccess access, BlockPos pos, @Nullable BlockEntityFocalManipulator table) {
         super(TCMenus.FOCAL_MANIPULATOR.get(), containerId);
         this.items = items;
@@ -48,7 +48,7 @@ public final class MenuFocalManipulator extends AbstractContainerMenu {
         this.pos = pos;
         this.table = table;
 
-        addSlot(new ResourceHandlerSlot(items, items::set, BlockEntityFocalManipulator.SLOT_FOCUS, FOCUS_SLOT_X, FOCUS_SLOT_Y));
+        addSlot(new SlotItemHandler(items, BlockEntityFocalManipulator.SLOT_FOCUS, FOCUS_SLOT_X, FOCUS_SLOT_Y));
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 9; j++) {

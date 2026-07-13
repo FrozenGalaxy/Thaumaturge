@@ -43,7 +43,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.FormattedCharSequence;
@@ -55,7 +55,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jspecify.annotations.Nullable;
 
 public final class EntryDetailScreen extends AbstractTCScreen {
@@ -168,8 +168,8 @@ public final class EntryDetailScreen extends AbstractTCScreen {
 
     private static final int LABEL_TINT = 0x40FFFFFF;
 
-    private static final Identifier FIRSTSTEPS_RESEARCH = Identifier.fromNamespaceAndPath(TCIds.MODID, "first_steps");
-    private static final Identifier KNOWLEDGETYPES_RESEARCH = Identifier.fromNamespaceAndPath(TCIds.MODID, "knowledge_types");
+    private static final ResourceLocation FIRSTSTEPS_RESEARCH = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "first_steps");
+    private static final ResourceLocation KNOWLEDGETYPES_RESEARCH = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "knowledge_types");
 
     private static final int ASPECTS_INSERT_OFFSET_X = 60;
     private static final int ASPECTS_INSERT_OFFSET_Y = 24;
@@ -243,7 +243,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
     private static final int INSERT_PAPER_SIZE = 255;
 
     private final Holder<IResearchEntry> entry;
-    private final Identifier entryId;
+    private final ResourceLocation entryId;
     private final @Nullable Screen parent;
     private int currentPage;
     private int sw;
@@ -251,7 +251,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
     private List<PageParser.Page> parsedPages = List.of();
     private boolean showingAspects;
     private boolean showingKnowledge;
-    private @Nullable Identifier shownRecipe;
+    private @Nullable ResourceLocation shownRecipe;
     private int recipePage;
     private int aspectsPage;
     private boolean flagsCleared;
@@ -259,9 +259,9 @@ public final class EntryDetailScreen extends AbstractTCScreen {
     private int lastStage;
     private int rhash;
     private boolean isComplete;
-    private final Deque<Identifier> history = new ArrayDeque<>();
+    private final Deque<ResourceLocation> history = new ArrayDeque<>();
 
-    public EntryDetailScreen(Holder<IResearchEntry> entry, Identifier entryId, @Nullable Screen parent) {
+    public EntryDetailScreen(Holder<IResearchEntry> entry, ResourceLocation entryId, @Nullable Screen parent) {
         super(Component.translatable("research.thaumcraft." + entryId.getPath() + ".title"));
         this.entry = entry;
         this.entryId = entryId;
@@ -275,18 +275,18 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         sh = (height - PANE_H) / 2;
         currentPage = clampPage(currentPage);
         for (IResearchStage stage : entry.value().stages()) {
-            for (Identifier recipeId : stage.recipes()) {
+            for (ResourceLocation recipeId : stage.recipes()) {
                 RecipeDisplayCache.ensureRequested(recipeId);
             }
         }
         for (ResearchAddendum addendum : entry.value().addenda()) {
-            for (Identifier recipeId : addendum.recipes()) {
+            for (ResourceLocation recipeId : addendum.recipes()) {
                 RecipeDisplayCache.ensureRequested(recipeId);
             }
         }
         rebuildPages();
         if (!flagsCleared) {
-            ClientPacketDistributor.sendToServer(new ServerboundClearResearchFlagsPayload(
+            PacketDistributor.sendToServer(new ServerboundClearResearchFlagsPayload(
                     entryId, List.of(ResearchFlag.RESEARCH, ResearchFlag.PAGE)));
             flagsCleared = true;
         }
@@ -314,7 +314,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         List<ResearchAddendum> unlocked = new ArrayList<>();
         for (ResearchAddendum addendum : entry.value().addenda()) {
             boolean met = true;
-            for (Identifier required : addendum.requiredResearch()) {
+            for (ResourceLocation required : addendum.requiredResearch()) {
                 if (!knowledge.isResearchComplete(required)) {
                     met = false;
                     break;
@@ -325,12 +325,12 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         return unlocked;
     }
 
-    private List<Identifier> displayRecipes(IResearchStage stage) {
+    private List<ResourceLocation> displayRecipes(IResearchStage stage) {
         List<ResearchAddendum> addenda = unlockedAddenda();
         if (addenda.isEmpty()) return stage.recipes();
-        List<Identifier> all = new ArrayList<>(stage.recipes());
+        List<ResourceLocation> all = new ArrayList<>(stage.recipes());
         for (ResearchAddendum addendum : addenda) {
-            for (Identifier rid : addendum.recipes()) {
+            for (ResourceLocation rid : addendum.recipes()) {
                 if (!all.contains(rid)) all.add(rid);
             }
         }
@@ -581,7 +581,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         return true;
     }
 
-    private boolean knowsResearch(Identifier id) {
+    private boolean knowsResearch(ResourceLocation id) {
         if (minecraft == null || minecraft.player == null) return false;
         return KnowledgeAccess.of(minecraft.player).isResearchComplete(id);
     }
@@ -609,7 +609,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         if (minecraft == null || minecraft.player == null) return;
         int ticksExisted = minecraft.player.tickCount;
         int frame = ticksExisted % FORBIDDEN_NODE_FRAME_COUNT;
-        Identifier nodeTex = Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/misc/auranodes.png");
+        ResourceLocation nodeTex = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/misc/auranodes.png");
         int u = frame * FORBIDDEN_NODE_CELL_PX;
         int v = FORBIDDEN_NODE_ROW * FORBIDDEN_NODE_CELL_PX;
         int half = FORBIDDEN_NODE_DRAW_SIZE / 2;
@@ -667,12 +667,12 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         }
     }
 
-    private void renderResearchPrereqs(GuiGraphicsExtractor graphics, List<Identifier> prereqs, IPlayerKnowledge knowledge, int x, int y, int mouseX, int mouseY, boolean[] satisfied) {
+    private void renderResearchPrereqs(GuiGraphicsExtractor graphics, List<ResourceLocation> prereqs, IPlayerKnowledge knowledge, int x, int y, int mouseX, int mouseY, boolean[] satisfied) {
         int spacing = prereqs.size() > 6 ? SLOT_BUDGET / prereqs.size() : SLOT_DEFAULT_SPACING;
         int shift = SLOT_BASE_SHIFT;
         int innerX = x + SLOT_INNER_OFFSET_X;
         for (int i = 0; i < prereqs.size(); i++) {
-            Identifier prereq = prereqs.get(i);
+            ResourceLocation prereq = prereqs.get(i);
             int slotX = innerX + shift;
             graphics.text(font,
                     Component.literal("?").withStyle(ChatFormatting.GOLD),
@@ -771,12 +771,12 @@ public final class EntryDetailScreen extends AbstractTCScreen {
     }
 
     private void renderRecipeBookmarks(GuiGraphicsExtractor graphics, IResearchStage stage, int mouseX, int mouseY) {
-        List<Identifier> recipes = displayRecipes(stage);
+        List<ResourceLocation> recipes = displayRecipes(stage);
         if (recipes.isEmpty()) return;
         int space = Math.min(RECIPE_BOOKMARK_MAX_STEP, RECIPE_BOOKMARK_TOTAL_BUDGET / recipes.size());
         int slotY = sh + RECIPE_BOOKMARK_BASE_Y_OFFSET;
         Random rng = new Random(rhash);
-        for (Identifier rid : recipes) {
+        for (ResourceLocation rid : recipes) {
             List<RecipeDisplay> displays = RecipeDisplayCache.get(rid);
             if (displays == null || displays.isEmpty()) {
                 slotY += space;
@@ -871,8 +871,8 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         if (known.isEmpty()) return;
         int count = -1;
         int start = aspectsPage * ASPECT_PAGE_ROWS;
-        Identifier backTile = Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/aspects/_back.png");
-        Identifier unknownTile = Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/aspects/_unknown.png");
+        ResourceLocation backTile = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/aspects/_back.png");
+        ResourceLocation unknownTile = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/aspects/_unknown.png");
         List<AspectInstance> sorted = known.sortedByTag();
         for (AspectInstance entry : sorted) {
             count++;
@@ -985,7 +985,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                 color);
     }
 
-    private void drawUnknownAspect(GuiGraphicsExtractor graphics, Identifier unknownTile) {
+    private void drawUnknownAspect(GuiGraphicsExtractor graphics, ResourceLocation unknownTile) {
         graphics.blit(RenderPipelines.GUI_TEXTURED, unknownTile,
                 0, 0,
                 0.0F, 0.0F,
@@ -1117,7 +1117,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
     }
 
     private void drawKnowledgeIcon(GuiGraphicsExtractor graphics, int x, int y, KnowledgeType type, Holder.Reference<IResearchCategory> category) {
-        Identifier typeIcon = Identifier.fromNamespaceAndPath(TCIds.MODID,
+        ResourceLocation typeIcon = ResourceLocation.fromNamespaceAndPath(TCIds.MODID,
                 "textures/research/knowledge_" + type.getSerializedName() + ".png");
         graphics.pose().pushMatrix();
         graphics.pose().translate(x, y);
@@ -1308,7 +1308,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             IResearchStage stage = entry.value().stages().get(currentStageIndex());
             int hitRecipe = hitRecipeBookmark(mx, my, stage);
             if (hitRecipe >= 0) {
-                Identifier rid = displayRecipes(stage).get(hitRecipe);
+                ResourceLocation rid = displayRecipes(stage).get(hitRecipe);
                 if (rid.equals(shownRecipe)) {
                     shownRecipe = null;
                 } else {
@@ -1322,7 +1322,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             }
             if (currentPage == 0 && !isComplete && !hold && !insertOpen()) {
                 if (hitStageComplete(mx, my, stage)) {
-                    ClientPacketDistributor.sendToServer(new ServerboundAdvanceStagePayload(entryId));
+                    PacketDistributor.sendToServer(new ServerboundAdvanceStagePayload(entryId));
                     playSound(TCSounds.WRITE.get(), 0.66F, 1.0F);
                     lastStage = currentStageIndex();
                     hold = true;
@@ -1346,14 +1346,14 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         ItemStack hover = RecipeDisplayWidget.hoverStackForDisplay(
                 cx - gridW / 2, cy - gridH / 2, current, gameTime, (int) mx, (int) my);
         if (hover == null || hover.isEmpty()) return false;
-        Identifier itemId = hover.getItem().builtInRegistryHolder()
+        ResourceLocation itemId = hover.getItem().builtInRegistryHolder()
                 .unwrapKey().map(ResourceKey::identifier).orElse(null);
         if (itemId == null) return false;
-        ClientPacketDistributor.sendToServer(new ServerboundRequestItemRecipePayload(itemId));
+        PacketDistributor.sendToServer(new ServerboundRequestItemRecipePayload(itemId));
         return true;
     }
 
-    public void openRecipeFromNavigation(Identifier recipeId) {
+    public void openRecipeFromNavigation(ResourceLocation recipeId) {
         if (recipeId.equals(shownRecipe)) return;
         if (shownRecipe != null) {
             history.push(shownRecipe);
@@ -1399,7 +1399,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
     }
 
     private int hitRecipeBookmark(double mx, double my, IResearchStage stage) {
-        List<Identifier> recipes = displayRecipes(stage);
+        List<ResourceLocation> recipes = displayRecipes(stage);
         if (recipes.isEmpty()) return -1;
         int space = Math.min(RECIPE_BOOKMARK_MAX_STEP, RECIPE_BOOKMARK_TOTAL_BUDGET / recipes.size());
         int slotY = sh + RECIPE_BOOKMARK_BASE_Y_OFFSET;

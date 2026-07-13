@@ -17,10 +17,9 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ItemSupplier;
-import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -58,7 +57,7 @@ public final class EntityBottleTaint extends ThrowableItemProjectile implements 
                         this.random.nextDouble() * 2.0 - 1.0);
             }
             ItemParticleOption crack = new ItemParticleOption(ParticleTypes.ITEM,
-                    ItemStackTemplate.fromNonEmptyStack(new ItemStack(TCItems.BOTTLE_TAINT.get())));
+                    new ItemStack(TCItems.BOTTLE_TAINT.get()));
             for (int k = 0; k < BOTTLE_CRACK_COUNT; k++) {
                 this.level().addParticle(crack, this.getX(), this.getY(), this.getZ(),
                         this.random.nextGaussian() * 0.15, this.random.nextDouble() * 0.2,

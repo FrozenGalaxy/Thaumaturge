@@ -12,11 +12,11 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -24,9 +24,9 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public final class EldritchCapRenderer<T extends BlockEntity> implements BlockEntityRenderer<T, EldritchCapRenderState> {
-    public static final Identifier CAP_TEXTURE = TCIds.rl("textures/entity/obelisk_cap.png");
-    public static final Identifier CAP_TEXTURE_OUTER = TCIds.rl("textures/entity/obelisk_cap_2.png");
-    public static final Identifier ALTAR_TEXTURE = TCIds.rl("textures/entity/obelisk_cap_altar.png");
+    public static final ResourceLocation CAP_TEXTURE = TCIds.rl("textures/entity/obelisk_cap.png");
+    public static final ResourceLocation CAP_TEXTURE_OUTER = TCIds.rl("textures/entity/obelisk_cap_2.png");
+    public static final ResourceLocation ALTAR_TEXTURE = TCIds.rl("textures/entity/obelisk_cap_altar.png");
 
     private static final float EYE_OFFSET = 0.46F;
     private static final float EYE_HEIGHT = 0.2F;
@@ -35,14 +35,14 @@ public final class EldritchCapRenderer<T extends BlockEntity> implements BlockEn
     private static final float IN_FRAME_SCALE = 0.5128205F;
     private static final float IN_FRAME_DROP = -0.05F;
 
-    private final Identifier texture;
-    private final Identifier textureOuter;
+    private final ResourceLocation texture;
+    private final ResourceLocation textureOuter;
     private final ToIntFunction<T> eyeCount;
     private final ItemModelResolver itemModelResolver;
     private ItemStack eyeStack = ItemStack.EMPTY;
 
-    public EldritchCapRenderer(BlockEntityRendererProvider.Context context, Identifier texture,
-                               Identifier textureOuter, ToIntFunction<T> eyeCount) {
+    public EldritchCapRenderer(BlockEntityRendererProvider.Context context, ResourceLocation texture,
+                               ResourceLocation textureOuter, ToIntFunction<T> eyeCount) {
         this.texture = texture;
         this.textureOuter = textureOuter;
         this.eyeCount = eyeCount;

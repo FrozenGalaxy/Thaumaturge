@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -24,16 +24,16 @@ import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public final class JarRenderer implements BlockEntityRenderer<BlockEntityJar, JarRenderState> {
-    private static final Identifier BRINE_TEXTURE = Identifier.fromNamespaceAndPath("thaumcraft", "textures/entity/jarbrine.png");
-    private static final Identifier LABEL_TEXTURE = Identifier.fromNamespaceAndPath("thaumcraft", "textures/entity/label.png");
-    public static final Identifier ANIMATED_GLOW_LOCATION = Identifier.fromNamespaceAndPath("thaumcraft", "block/animatedglow");
+    private static final ResourceLocation BRINE_TEXTURE = ResourceLocation.fromNamespaceAndPath("thaumcraft", "textures/entity/jarbrine.png");
+    private static final ResourceLocation LABEL_TEXTURE = ResourceLocation.fromNamespaceAndPath("thaumcraft", "textures/entity/label.png");
+    public static final ResourceLocation ANIMATED_GLOW_LOCATION = ResourceLocation.fromNamespaceAndPath("thaumcraft", "block/animatedglow");
     public static final SpriteId ANIMATED_GLOW_SPRITE = new SpriteId(TextureAtlas.LOCATION_BLOCKS, ANIMATED_GLOW_LOCATION);
 
     public static final float FLUID_MIN = 4.0F / 16.0F;
@@ -198,7 +198,7 @@ public final class JarRenderer implements BlockEntityRenderer<BlockEntityJar, Ja
         float rot = (state.blockPos.getX() + state.facing.ordinal()) % 4 - 2;
         poseStack.mulPose(Axis.ZN.rotationDegrees(rot));
         int light = state.lightCoords;
-        Identifier labelTex = LABEL_TEXTURE;
+        ResourceLocation labelTex = LABEL_TEXTURE;
         RenderType labelType = RenderTypes.entityCutout(labelTex);
         poseStack.mulPose(Axis.YP.rotationDegrees(180));
         collector.submitCustomGeometry(poseStack, labelType, (pose, buffer) -> labelQuad(buffer, pose, light));
@@ -206,7 +206,7 @@ public final class JarRenderer implements BlockEntityRenderer<BlockEntityJar, Ja
             poseStack.pushPose();
             poseStack.translate(0.0, 0.0, 0.001);
             int filterColor = state.filterColor;
-            Identifier aspectTex = state.filterTexture;
+            ResourceLocation aspectTex = state.filterTexture;
             RenderType aspectType = RenderTypes.entityTranslucent(aspectTex);
             collector.submitCustomGeometry(poseStack, aspectType, (pose, buffer) -> aspectIconQuad(buffer, pose, filterColor, light));
             poseStack.popPose();

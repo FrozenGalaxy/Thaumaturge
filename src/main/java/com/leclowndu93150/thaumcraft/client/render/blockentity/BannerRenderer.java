@@ -23,9 +23,9 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,8 +34,8 @@ import org.joml.Matrix4fc;
 import org.jspecify.annotations.Nullable;
 
 public final class BannerRenderer implements BlockEntityRenderer<BlockEntityBanner, BannerRenderState> {
-    private static final Identifier TEX_BLANK = TCIds.rl("textures/entity/banner_blank.png");
-    private static final Identifier TEX_CULTIST = TCIds.rl("textures/entity/banner_cultist.png");
+    private static final ResourceLocation TEX_BLANK = TCIds.rl("textures/entity/banner_blank.png");
+    private static final ResourceLocation TEX_CULTIST = TCIds.rl("textures/entity/banner_cultist.png");
     private static final float SWAY_BASE = 0.02F;
     private static final float SWAY_PERIOD = 11.0F;
     private static final float WALL_FORWARD = -0.4125F;
@@ -92,7 +92,7 @@ public final class BannerRenderer implements BlockEntityRenderer<BlockEntityBann
 
     @Override
     public void submit(BannerRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        Identifier texture = state.color == -1 ? TEX_CULTIST : TEX_BLANK;
+        ResourceLocation texture = state.color == -1 ? TEX_CULTIST : TEX_BLANK;
         int tint = state.color == -1 ? -1 : state.color;
         poseStack.pushPose();
         poseStack.translate(0.5F, 1.5F, 0.5F);
@@ -115,7 +115,7 @@ public final class BannerRenderer implements BlockEntityRenderer<BlockEntityBann
     }
 
     private void submitPart(SubmitNodeCollector collector, PoseStack poseStack, ModelPart part,
-                            Identifier texture, int color, BannerRenderState state) {
+                            ResourceLocation texture, int color, BannerRenderState state) {
         collector.submitModelPart(part, poseStack, RenderTypes.entityCutout(texture),
                 state.lightCoords, OverlayTexture.NO_OVERLAY, null, color, null);
     }
@@ -127,7 +127,7 @@ public final class BannerRenderer implements BlockEntityRenderer<BlockEntityBann
         int light = state.lightCoords;
         collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(state.aspectTexture), (pose, buffer) -> {
             Matrix4fc mat = pose.pose();
-            int color = ARGB.colorFromFloat(0.75F, 1.0F, 1.0F, 1.0F);
+            int color = ARGB32.colorFromFloat(0.75F, 1.0F, 1.0F, 1.0F);
             addVertex(buffer, mat, -ASPECT_HALF_WIDTH, ASPECT_TOP, 0.0F, 1.0F, color, light);
             addVertex(buffer, mat, ASPECT_HALF_WIDTH, ASPECT_TOP, 1.0F, 1.0F, color, light);
             addVertex(buffer, mat, ASPECT_HALF_WIDTH, ASPECT_BOTTOM, 1.0F, 0.0F, color, light);

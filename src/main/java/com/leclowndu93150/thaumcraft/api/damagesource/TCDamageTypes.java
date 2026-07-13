@@ -2,7 +2,7 @@ package com.leclowndu93150.thaumcraft.api.damagesource;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
 
@@ -27,6 +27,6 @@ public final class TCDamageTypes {
     private TCDamageTypes() {}
 
     private static ResourceKey<DamageType> key(String path) {
-        return ResourceKey.create(Registries.DAMAGE_TYPE, Identifier.fromNamespaceAndPath(TCIds.MODID, path));
+        return ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(TCIds.MODID, path));
     }
 }

@@ -17,7 +17,7 @@ import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -26,7 +26,7 @@ import org.jspecify.annotations.Nullable;
 public final class SealEntity implements ISealEntity {
     public static final Codec<SealEntity> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             SealPos.CODEC.fieldOf("pos").forGetter(SealEntity::sealPos),
-            Identifier.CODEC.fieldOf("type").forGetter(seal -> seal.typeId),
+            ResourceLocation.CODEC.fieldOf("type").forGetter(seal -> seal.typeId),
             Codec.BYTE.optionalFieldOf("priority", (byte) 0).forGetter(SealEntity::getPriority),
             Codec.BYTE.optionalFieldOf("color", (byte) 0).forGetter(SealEntity::getColor),
             Codec.BOOL.optionalFieldOf("locked", false).forGetter(SealEntity::isLocked),
@@ -37,7 +37,7 @@ public final class SealEntity implements ISealEntity {
     ).apply(instance, SealEntity::fromCodec));
 
     private final SealPos sealPos;
-    private final Identifier typeId;
+    private final ResourceLocation typeId;
     private final ISeal seal;
     private byte priority;
     private byte color;
@@ -47,7 +47,7 @@ public final class SealEntity implements ISealEntity {
     private BlockPos area = new BlockPos(1, 1, 1);
     private boolean stopped;
 
-    public SealEntity(SealPos sealPos, Identifier typeId, ISeal seal) {
+    public SealEntity(SealPos sealPos, ResourceLocation typeId, ISeal seal) {
         this.sealPos = sealPos;
         this.typeId = typeId;
         this.seal = seal;
@@ -59,7 +59,7 @@ public final class SealEntity implements ISealEntity {
         }
     }
 
-    private static SealEntity fromCodec(SealPos pos, Identifier typeId, byte priority, byte color,
+    private static SealEntity fromCodec(SealPos pos, ResourceLocation typeId, byte priority, byte color,
                                         boolean locked, boolean redstone, Optional<UUID> owner,
                                         BlockPos area, CompoundTag data) {
         SealType type = TCSeals.registry().getValue(typeId);
@@ -97,7 +97,7 @@ public final class SealEntity implements ISealEntity {
         }
     }
 
-    public Identifier getTypeId() {
+    public ResourceLocation getTypeId() {
         return typeId;
     }
 

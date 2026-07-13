@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -20,7 +20,7 @@ public final class WavefrontObject {
         this.fileName = fileName;
     }
 
-    public static WavefrontObject load(ResourceManager resources, Identifier location) throws IOException {
+    public static WavefrontObject load(ResourceManager resources, ResourceLocation location) throws IOException {
         WavefrontObject result = new WavefrontObject(location.toString());
         Resource resource = resources.getResourceOrThrow(location);
         try (InputStream stream = resource.open()) {
@@ -47,7 +47,7 @@ public final class WavefrontObject {
         return fileName;
     }
 
-    private void parse(ResourceManager resources, Identifier objLocation, InputStream stream) throws IOException {
+    private void parse(ResourceManager resources, ResourceLocation objLocation, InputStream stream) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             String currentLine;
             while ((currentLine = reader.readLine()) != null) {
@@ -148,11 +148,11 @@ public final class WavefrontObject {
         }
     }
 
-    private void loadMaterialLibrary(ResourceManager resources, Identifier parent, String path) throws IOException {
+    private void loadMaterialLibrary(ResourceManager resources, ResourceLocation parent, String path) throws IOException {
         String prefix = parent.getPath();
         int slash = prefix.lastIndexOf('/');
         prefix = slash >= 0 ? prefix.substring(0, slash + 1) : "";
-        Identifier mtlLocation = Identifier.fromNamespaceAndPath(parent.getNamespace(), prefix + path);
+        ResourceLocation mtlLocation = ResourceLocation.fromNamespaceAndPath(parent.getNamespace(), prefix + path);
         if (resources.getResource(mtlLocation).isPresent()) {
             this.materialLibrary.loadFromResource(resources, mtlLocation);
         }

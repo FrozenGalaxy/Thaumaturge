@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.equipment;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,8 +20,8 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 @EventBusSubscriber(modid = TCIds.MODID)
 public final class FortressArmorEvents {
-    private static final Identifier SET_ARMOR_ID = TCIds.rl("fortress_set_armor");
-    private static final Identifier SET_TOUGHNESS_ID = TCIds.rl("fortress_set_toughness");
+    private static final ResourceLocation SET_ARMOR_ID = TCIds.rl("fortress_set_armor");
+    private static final ResourceLocation SET_TOUGHNESS_ID = TCIds.rl("fortress_set_toughness");
     private static final EquipmentSlot[] SET_SLOTS =
             {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS};
     private static final float MAGIC_ABSORB_DIVISOR = 35.0F;
@@ -56,7 +56,7 @@ public final class FortressArmorEvents {
                 pieces > 0 ? 1 : 0);
     }
 
-    private static void applyBonus(Player player, AttributeInstance attribute, Identifier id, int amount) {
+    private static void applyBonus(Player player, AttributeInstance attribute, ResourceLocation id, int amount) {
         if (attribute == null) {
             return;
         }

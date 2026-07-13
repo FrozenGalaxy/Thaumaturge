@@ -16,7 +16,6 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -26,12 +25,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.items.IItemHandler;
 
 public final class BlockEntityPatternCrafter extends BlockEntity {
     public static final int PATTERN_COUNT = 10;
@@ -101,15 +96,15 @@ public final class BlockEntityPatternCrafter extends BlockEntity {
             power += AuraHelper.drainVis(server, pos, VIS_DRAIN, false);
         }
         int inputCount = PATTERN_INPUT_COUNTS[patternType];
-        ResourceHandler<ItemResource> above = InvHelper.getItemHandlerAt(server, pos.above(), Direction.DOWN);
-        ResourceHandler<ItemResource> below = InvHelper.getItemHandlerAt(server, pos.below(), Direction.UP);
+        IItemHandler above = InvHelper.getItemHandlerAt(server, pos.above(), Direction.DOWN);
+        IItemHandler below = InvHelper.getItemHandlerAt(server, pos.below(), Direction.UP);
         if (above == null || below == null) {
             return;
         }
         for (int slot = 0; slot < above.size(); slot++) {
-            ItemResource resource = above.getResource(slot);
+            ItemStack resource = above.getStackInSlot(slot);
             if (resource.isEmpty()) continue;
-            ItemStack testStack = resource.toStack(inputCount);
+            ItemStack testStack = resource.copyWithCount(inputCount);
             ItemStack removed = InvHelper.removeStackFrom(server, pos.above(), Direction.DOWN,
                     testStack.copy(), InvHelper.InvFilter.STRICT, true);
             if (removed.getCount() != inputCount) continue;
@@ -184,26 +179,26 @@ public final class BlockEntityPatternCrafter extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         output.putByte("Type", patternType);
         output.putFloat("Power", power);
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        patternType = input.getByteOr("Type", (byte) 0);
-        power = input.getFloatOr("Power", 0.0F);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        patternType = input.getByte("Type");
+        power = input.getFloat("Power");
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput output = TagValueOutput.createWithContext(reporter, registries);
-            saveAdditional(output);
-            nbt.merge(output.buildResult());
+        {
+            CompoundTag output = new CompoundTag();
+            saveAdditional(output, registries);
+            nbt.merge(output);
         }
         return nbt;
     }

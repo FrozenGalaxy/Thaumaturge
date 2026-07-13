@@ -3,7 +3,7 @@ package com.leclowndu93150.thaumcraft.api.research;
 import com.leclowndu93150.thaumcraft.api.capability.IPlayerKnowledge;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * A reference from a research entry to one of its parent entries.
@@ -19,7 +19,7 @@ import net.minecraft.resources.Identifier;
  * @param inherit whether the Thaumonomicon suppresses the connector line for this reference
  * @since 1.0.0
  */
-public record ResearchParent(Identifier id, int stage, boolean inherit) {
+public record ResearchParent(ResourceLocation id, int stage, boolean inherit) {
     /** String codec using the {@code ~}/{@code @stage} prefix and suffix conventions. */
     public static final Codec<ResearchParent> CODEC = Codec.STRING.comapFlatMap(
             ResearchParent::parse, ResearchParent::serialize);
@@ -30,7 +30,7 @@ public record ResearchParent(Identifier id, int stage, boolean inherit) {
      * @param id the parent entry identifier
      * @return the reference
      */
-    public static ResearchParent of(Identifier id) {
+    public static ResearchParent of(ResourceLocation id) {
         return new ResearchParent(id, 0, false);
     }
 
@@ -61,7 +61,7 @@ public record ResearchParent(Identifier id, int stage, boolean inherit) {
             }
             body = body.substring(0, at);
         }
-        Identifier id = Identifier.tryParse(body);
+        ResourceLocation id = ResourceLocation.tryParse(body);
         if (id == null) {
             return DataResult.error(() -> "Invalid parent identifier '" + value + "'");
         }

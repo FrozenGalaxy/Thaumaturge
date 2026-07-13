@@ -4,7 +4,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.minecraft.client.resources.model.geometry.UnbakedGeometry;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.neoforged.neoforge.client.model.AbstractUnbakedModel;
 import net.neoforged.neoforge.client.model.StandardModelParameters;
@@ -13,7 +13,7 @@ import net.neoforged.neoforge.client.model.UnbakedModelLoader;
 public final class TCObjUnbakedModel extends AbstractUnbakedModel {
     private final TCObjGeometry geometry;
 
-    public TCObjUnbakedModel(StandardModelParameters parameters, Identifier model, boolean flipV, boolean cornerSpace) {
+    public TCObjUnbakedModel(StandardModelParameters parameters, ResourceLocation model, boolean flipV, boolean cornerSpace) {
         super(parameters);
         this.geometry = new TCObjGeometry(model, flipV, cornerSpace);
     }
@@ -31,7 +31,7 @@ public final class TCObjUnbakedModel extends AbstractUnbakedModel {
         @Override
         public TCObjUnbakedModel read(JsonObject jsonObject, JsonDeserializationContext context) throws JsonParseException {
             StandardModelParameters parameters = StandardModelParameters.parse(jsonObject, context);
-            Identifier model = Identifier.parse(GsonHelper.getAsString(jsonObject, "model"));
+            ResourceLocation model = ResourceLocation.parse(GsonHelper.getAsString(jsonObject, "model"));
             boolean flipV = GsonHelper.getAsBoolean(jsonObject, "flip_v", false);
             boolean cornerSpace = GsonHelper.getAsBoolean(jsonObject, "corner_space", false);
             return new TCObjUnbakedModel(parameters, model, flipV, cornerSpace);

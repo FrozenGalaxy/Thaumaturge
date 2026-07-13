@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,6 +20,11 @@ public class BlockPurifyingFluid extends LiquidBlock {
 
     public BlockPurifyingFluid(FlowingFluid fluid, Properties properties) {
         super(fluid, properties);
+    }
+
+    @Override
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        PurifyingFluid.applyEntityInside(level, pos, entity);
     }
 
     @Override

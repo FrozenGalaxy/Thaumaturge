@@ -14,7 +14,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -136,7 +136,7 @@ public final class BlockEntityEldritchCrabSpawner extends BlockEntity {
         double offsetZ = dir.getAxis() == Direction.Axis.Z ? crab.getBbWidth() / 2.0 : 0.5;
         crab.snapTo(pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, dir.toYRot(), 0.0F);
         crab.setDeltaMovement(dir.getStepX() * 0.2F, dir.getStepY() * 0.2F, dir.getStepZ() * 0.2F);
-        crab.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(pos), EntitySpawnReason.SPAWNER, null);
+        crab.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(pos), MobSpawnType.SPAWNER, null);
         int difficulty = Math.max((int) (level.getDifficulty().getId()
                 + serverLevel.getCurrentDifficultyAt(pos).getEffectiveDifficulty()), 1);
         crab.setHelm(level.getRandom().nextInt(Math.max(HELM_ROLL / difficulty, 1)) == 0);

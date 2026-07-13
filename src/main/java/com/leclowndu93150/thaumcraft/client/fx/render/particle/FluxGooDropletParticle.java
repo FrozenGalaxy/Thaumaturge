@@ -7,7 +7,7 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jspecify.annotations.Nullable;
 
@@ -44,7 +44,7 @@ public final class FluxGooDropletParticle extends BreakingItemParticle {
                                        double xa, double ya, double za,
                                        RandomSource random) {
             TextureAtlasSprite sprite = this.getSprite(
-                    new ItemStackTemplate(Items.SLIME_BALL), level, random);
+                    new ItemStack(Items.SLIME_BALL), level, random);
             int lifetime = options.lifetime() > 0
                     ? options.lifetime()
                     : (int) (66.0F / (random.nextFloat() * 0.9F + 0.1F));

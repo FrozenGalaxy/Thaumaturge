@@ -18,7 +18,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -31,17 +30,11 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,10 +44,10 @@ import java.util.Optional;
 @EventBusSubscriber(modid = TCIds.MODID)
 public class BlockEntityInfernalFurnace extends BlockEntity {
 
-    private final ItemStacksResourceHandler inventory = new ItemStacksResourceHandler(32) {
+    private final ItemStackHandler inventory = new ItemStackHandler(32) {
         @Override
-        public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
-            return 0;
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            return ItemStack.EMPTY;
         }
     };
     public int furnaceCookTime = 0;
@@ -70,7 +63,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
     @SubscribeEvent
     public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
-                Capabilities.Item.BLOCK,
+                Capabilities.ItemHandler.BLOCK,
                 TCBlockEntities.INFERNAL_FURNACE.get(),
                 (be, side) ->
                         side == null || side == Direction.UP ? be.inventory() : null
@@ -93,7 +86,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
         return ItemStack.EMPTY;
     }
 
-    public ItemStacksResourceHandler inventory() {
+    public ItemStackHandler inventory() {
         return inventory;
     }
 
@@ -104,16 +97,16 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        furnaceCookTime = input.getShortOr("CookTime", (short) 0);
-        speedyTime = input.getShortOr("SpeedyTime", (short) 0);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        furnaceCookTime = input.getShort("CookTime");
+        speedyTime = input.getShort("SpeedyTime");
         inventory.deserialize(input);
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         output.putShort("CookTime", (short) furnaceCookTime);
         output.putShort("SpeedyTime", (short) speedyTime);
         inventory.serialize(output);
@@ -138,8 +131,8 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
         furnaceCookTime = Mth.clamp(furnaceCookTime, 0, furnaceMaxCookTime);
         if (furnaceCookTime <= 0 && cooking) {
             for (int slot = 0; slot < inventory.size(); slot++) {
-                if (inventory.getAmountAsInt(slot) > 0) {
-                    ItemStack inputStack = inventory.getResource(slot).toStack(inventory.getAmountAsInt(slot));
+                if (inventory.getStackInSlot(slot).getCount() > 0) {
+                    ItemStack inputStack = inventory.getStackInSlot(slot).copy();
                     Optional<AbstractCookingRecipe> recipe = getCookingRecipe(inputStack);
                     if (recipe.isPresent()) {
                         if (speedyTime > 0)
@@ -162,12 +155,12 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
                             AuraHelper.polluteAura(level, getBlockPos().relative(getBlockState().getValue(BlockInfernalFurnace.FACING).getOpposite()), 1.0F, true);
 
                         // Remove after smelting
-                        inventory.set(slot, ItemResource.of(inputStack), inventory.getAmountAsInt(slot) - 1);
+                        inventory.setStackInSlot(slot, inputStack.copyWithCount(inventory.getStackInSlot(slot).getCount() - 1));
                         break;
                     }
 
                     // Destroy item if no recipe
-                    inventory.set(slot, ItemResource.of(inputStack), inventory.getAmountAsInt(slot) - 1);
+                    inventory.setStackInSlot(slot, inputStack.copyWithCount(inventory.getStackInSlot(slot).getCount() - 1));
                 }
             }
         }
@@ -177,8 +170,8 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
 
         if (this.furnaceCookTime == 0 && !cooking) {
             for (int slot = 0; slot < inventory.size(); slot++) {
-                if (inventory.getAmountAsInt(slot) > 0) {
-                    ItemStack inputStack = inventory.getResource(slot).toStack(inventory.getAmountAsInt(slot));
+                if (inventory.getStackInSlot(slot).getCount() > 0) {
+                    ItemStack inputStack = inventory.getStackInSlot(slot).copy();
                     if (canSmelt(inputStack)) {
                         furnaceMaxCookTime = calculateCookTime();
                         furnaceCookTime = furnaceMaxCookTime;
@@ -191,9 +184,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
 
     public ItemStack addItemsToInventory(ItemStack item) {
         if (canSmelt(item)) {
-            Transaction transaction = Transaction.openRoot();
-            item = item.copyWithCount(item.getCount() - inventory.insert(ItemResource.of(item), item.getCount(), transaction));
-            transaction.commit();
+            item = item.copyWithCount(item.getCount() - inventory.insert(item, item.getCount(), transaction));
         } else {
             destroyItemEffects();
             item = ItemStack.EMPTY;
@@ -274,7 +265,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
         for (int slot = 0; slot < inventory.size(); slot++) {
             Direction direction = getBlockState().getValue(BlockInfernalFurnace.FACING).getOpposite();
             ItemEntity entity = new ItemEntity(
-                    level, pos.getX() + direction.getStepX(), (float) pos.getY() + direction.getStepY(), pos.getZ() + direction.getStepZ(), inventory.getResource(slot).toStack(inventory.getAmountAsInt(slot)));
+                    level, pos.getX() + direction.getStepX(), (float) pos.getY() + direction.getStepY(), pos.getZ() + direction.getStepZ(), inventory.getStackInSlot(slot).copy());
             entity.setDeltaMovement(0.3 * direction.getStepX(), 0.3 * direction.getStepY(), 0.3 * direction.getStepZ());
             level.addFreshEntity(entity);
         }
@@ -323,10 +314,10 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput tagvalueoutput = TagValueOutput.createWithContext(problemreporter$scopedcollector, registries);
-            saveAdditional(tagvalueoutput);
-            nbt.merge(tagvalueoutput.buildResult());
+        {
+            CompoundTag tagvalueoutput = new CompoundTag();
+            saveAdditional(tagvalueoutput, registries);
+            nbt.merge(tagvalueoutput);
         }
         return nbt;
     }

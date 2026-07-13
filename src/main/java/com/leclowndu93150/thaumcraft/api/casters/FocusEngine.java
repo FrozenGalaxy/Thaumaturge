@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.EntityHitResult;
@@ -40,7 +40,7 @@ public final class FocusEngine {
      * @param key the element id
      * @return a new element instance, or null when no element is registered under {@code key}
      */
-    public static @Nullable IFocusElement getElement(Identifier key) {
+    public static @Nullable IFocusElement getElement(ResourceLocation key) {
         FocusElementType type = registry().getValue(key);
         if (type == null) {
             return null;
@@ -58,7 +58,7 @@ public final class FocusEngine {
      * @param key the element id
      * @return the icon texture, or null when no element is registered under {@code key}
      */
-    public static @Nullable Identifier getElementIcon(Identifier key) {
+    public static @Nullable ResourceLocation getElementIcon(ResourceLocation key) {
         FocusElementType type = registry().getValue(key);
         return type != null ? type.icon() : null;
     }
@@ -70,7 +70,7 @@ public final class FocusEngine {
      * @return the packed {@code 0xRRGGBB} color, or white when no element is registered
      *         under {@code key}
      */
-    public static int getElementColor(Identifier key) {
+    public static int getElementColor(ResourceLocation key) {
         FocusElementType type = registry().getValue(key);
         return type != null ? type.color() : 0xFFFFFF;
     }
@@ -83,7 +83,7 @@ public final class FocusEngine {
      * @param key          the element id to look for
      * @return true when a top-level node carries {@code key}
      */
-    public static boolean doesPackageContainElement(FocusPackage focusPackage, Identifier key) {
+    public static boolean doesPackageContainElement(FocusPackage focusPackage, ResourceLocation key) {
         for (IFocusElement node : focusPackage.getNodes()) {
             if (node.getKey().equals(key)) {
                 return true;

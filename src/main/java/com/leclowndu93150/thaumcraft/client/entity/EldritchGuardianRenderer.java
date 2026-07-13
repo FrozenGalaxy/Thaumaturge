@@ -6,15 +6,15 @@ import com.leclowndu93150.thaumcraft.content.entity.EntityEldritchGuardian;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import org.jspecify.annotations.Nullable;
 
 public final class EldritchGuardianRenderer extends MobRenderer<EntityEldritchGuardian, EldritchGuardianRenderState, EldritchGuardianModel> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/eldritch_guardian.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/eldritch_guardian.png");
     private static final float SHADOW = 0.5F;
     private static final float NEAR_ALPHA = 0.6F;
     private static final double NEAR_RANGE_SQ = 256.0;
@@ -58,11 +58,11 @@ public final class EldritchGuardianRenderer extends MobRenderer<EntityEldritchGu
 
     @Override
     protected int getModelTint(EldritchGuardianRenderState state) {
-        return ARGB.colorFromFloat(state.alpha, 1.0F, 1.0F, 1.0F);
+        return ARGB32.colorFromFloat(state.alpha, 1.0F, 1.0F, 1.0F);
     }
 
     @Override
-    public Identifier getTextureLocation(EldritchGuardianRenderState state) {
+    public ResourceLocation getTextureLocation(EldritchGuardianRenderState state) {
         return TEXTURE;
     }
 }

@@ -2,7 +2,7 @@ package com.leclowndu93150.thaumcraft.api.casters;
 
 import java.util.function.Supplier;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 
 /**
@@ -19,8 +19,8 @@ import net.minecraft.resources.ResourceKey;
  * @param color   the packed {@code 0xRRGGBB} tint applied to the icon
  * @since 1.0.0
  */
-public record FocusElementType(Supplier<? extends IFocusElement> factory, Identifier icon, int color) {
+public record FocusElementType(Supplier<? extends IFocusElement> factory, ResourceLocation icon, int color) {
     /** The registry key for focus element types. */
     public static final ResourceKey<Registry<FocusElementType>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            Identifier.fromNamespaceAndPath("thaumcraft", "focus_element"));
+            ResourceLocation.fromNamespaceAndPath("thaumcraft", "focus_element"));
 }

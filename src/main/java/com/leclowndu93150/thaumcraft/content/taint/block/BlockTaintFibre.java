@@ -126,9 +126,8 @@ public final class BlockTaintFibre extends Block implements ITaintBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, LevelReader level, net.minecraft.world.level.ScheduledTickAccess scheduledAccess,
-                                      BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState,
-                                      RandomSource random) {
+    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
+                                      LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         return computeState(state, level, pos);
     }
 

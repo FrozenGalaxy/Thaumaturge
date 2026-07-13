@@ -11,7 +11,7 @@ import com.leclowndu93150.thaumcraft.api.casters.Trajectory;
 import com.leclowndu93150.thaumcraft.content.focus.FocusFX;
 import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -24,13 +24,13 @@ import net.minecraft.world.phys.HitResult;
 import org.jspecify.annotations.Nullable;
 
 public final class FocusEffectHeal extends FocusEffect {
-    private static final Identifier KEY = TCIds.rl("heal");
+    private static final ResourceLocation KEY = TCIds.rl("heal");
 
     private static final int POWER_COMPLEXITY_FACTOR = 4;
     private static final float UNDEAD_DAMAGE_FACTOR = 1.5F;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

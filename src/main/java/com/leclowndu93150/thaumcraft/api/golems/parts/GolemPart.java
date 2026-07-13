@@ -2,7 +2,7 @@ package com.leclowndu93150.thaumcraft.api.golems.parts;
 
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import java.util.List;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -13,13 +13,13 @@ import org.jspecify.annotations.Nullable;
  * @since 1.0.0
  */
 public abstract class GolemPart {
-    private final List<Identifier> research;
-    private final Identifier icon;
+    private final List<ResourceLocation> research;
+    private final ResourceLocation icon;
     private final List<GolemComponent> components;
     private final List<GolemTrait> traits;
     private final GolemPartModel model;
 
-    protected GolemPart(List<Identifier> research, Identifier icon, List<GolemComponent> components,
+    protected GolemPart(List<ResourceLocation> research, ResourceLocation icon, List<GolemComponent> components,
                         List<GolemTrait> traits, @Nullable GolemPartModel model) {
         this.research = List.copyOf(research);
         this.icon = icon;
@@ -31,14 +31,14 @@ public abstract class GolemPart {
     /**
      * @return research entries gating this part; empty means ungated
      */
-    public List<Identifier> research() {
+    public List<ResourceLocation> research() {
         return research;
     }
 
     /**
      * @return the icon drawn for this part in the golem press
      */
-    public Identifier icon() {
+    public ResourceLocation icon() {
         return icon;
     }
 

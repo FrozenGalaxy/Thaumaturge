@@ -5,7 +5,7 @@ import com.leclowndu93150.thaumcraft.api.golems.ISealDisplayer;
 import com.leclowndu93150.thaumcraft.api.golems.seals.ISeal;
 import com.leclowndu93150.thaumcraft.content.golem.seals.SealHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -17,18 +17,18 @@ import net.minecraft.world.level.LevelReader;
 import org.jspecify.annotations.Nullable;
 
 public final class ItemSealPlacer extends Item implements ISealDisplayer {
-    private final Identifier sealKey;
+    private final ResourceLocation sealKey;
 
     public ItemSealPlacer(Properties properties) {
         this(null, properties);
     }
 
-    public ItemSealPlacer(@Nullable Identifier sealKey, Properties properties) {
+    public ItemSealPlacer(@Nullable ResourceLocation sealKey, Properties properties) {
         super(properties);
         this.sealKey = sealKey;
     }
 
-    public @Nullable Identifier sealKey() {
+    public @Nullable ResourceLocation sealKey() {
         return sealKey;
     }
 

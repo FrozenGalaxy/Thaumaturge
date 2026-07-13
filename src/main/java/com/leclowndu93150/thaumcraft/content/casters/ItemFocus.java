@@ -17,9 +17,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import org.jspecify.annotations.Nullable;
 
 public class ItemFocus extends Item {
@@ -51,7 +49,7 @@ public class ItemFocus extends Item {
     public static int getFocusColor(ItemStack focusStack) {
         FocusPackage core = getPackage(focusStack);
         if (core == null) {
-            ItemStackTemplate socketed = focusStack.get(TCDataComponents.SOCKETED_FOCUS.get());
+            ItemStack socketed = focusStack.get(TCDataComponents.SOCKETED_FOCUS.get());
             if (socketed != null) {
                 core = socketed.get(TCDataComponents.FOCUS_PACKAGE.get());
             }
@@ -117,8 +115,7 @@ public class ItemFocus extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display,
-            Consumer<Component> builder, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> builder, TooltipFlag flag) {
         addFocusInformation(stack, builder);
     }
 
@@ -127,7 +124,7 @@ public class ItemFocus extends Item {
         if (core == null) {
             return;
         }
-        builder.accept(Component.translatable("tooltip.thaumcraft.focus.vis_cost", formatVis(getVisCost(focusStack))));
+        builder.add(Component.translatable("tooltip.thaumcraft.focus.vis_cost", formatVis(getVisCost(focusStack))));
         for (IFocusElement element : core.getNodes()) {
             if (element instanceof FocusNode node && !(node instanceof FocusMediumRoot)) {
                 buildInfo(builder, node, 0);
@@ -155,7 +152,7 @@ public class ItemFocus extends Item {
             settings.append("]");
             line.append(settings.withStyle(ChatFormatting.DARK_AQUA));
         }
-        builder.accept(line);
+        builder.add(line);
         if (node instanceof FocusModSplit split) {
             for (FocusPackage branch : split.getSplitPackages()) {
                 for (IFocusElement element : branch.getNodes()) {

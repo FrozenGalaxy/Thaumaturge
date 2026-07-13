@@ -13,7 +13,7 @@ import com.leclowndu93150.thaumcraft.content.focus.FocusFX;
 import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -27,7 +27,7 @@ import net.minecraft.world.phys.HitResult;
 import org.jspecify.annotations.Nullable;
 
 public final class FocusEffectEarth extends FocusEffect {
-    private static final Identifier KEY = TCIds.rl("earth");
+    private static final ResourceLocation KEY = TCIds.rl("earth");
 
     private static final int DAMAGE_FACTOR = 2;
     private static final int POWER_COMPLEXITY_FACTOR = 3;
@@ -36,7 +36,7 @@ public final class FocusEffectEarth extends FocusEffect {
     private static final int PARTICLE_START_BASE = 75;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

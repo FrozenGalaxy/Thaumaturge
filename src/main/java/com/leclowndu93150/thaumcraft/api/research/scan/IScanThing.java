@@ -1,6 +1,6 @@
 package com.leclowndu93150.thaumcraft.api.research.scan;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;
 
@@ -36,7 +36,7 @@ public interface IScanThing {
      * @param target the scan target
      * @return the research key, or {@code null} when this subject grants no key
      */
-    @Nullable Identifier getResearchKey(Player player, @Nullable Object target);
+    @Nullable ResourceLocation getResearchKey(Player player, @Nullable Object target);
 
     /**
      * Called after the research key was granted (or immediately when the key is {@code null}).

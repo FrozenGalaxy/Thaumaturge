@@ -7,11 +7,11 @@ import com.leclowndu93150.thaumcraft.content.entity.construct.MenuTurretBasic;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class TurretBasicScreen<T extends MenuTurretBasic> extends AbstractTCContainerScreen<T> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/gui/gui_turret_basic.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/gui/gui_turret_basic.png");
     static final int IMAGE_WIDTH = 175;
     static final int IMAGE_HEIGHT = 232;
     static final int HEALTH_BAR_Y = 59;
@@ -25,7 +25,7 @@ public class TurretBasicScreen<T extends MenuTurretBasic> extends AbstractTCCont
         super(menu, inventory, title, TEXTURE, IMAGE_WIDTH, IMAGE_HEIGHT);
     }
 
-    protected TurretBasicScreen(T menu, Inventory inventory, Component title, Identifier texture) {
+    protected TurretBasicScreen(T menu, Inventory inventory, Component title, ResourceLocation texture) {
         super(menu, inventory, title, texture, IMAGE_WIDTH, IMAGE_HEIGHT);
     }
 
@@ -37,7 +37,7 @@ public class TurretBasicScreen<T extends MenuTurretBasic> extends AbstractTCCont
         drawHealthBar(graphics, HEALTH_BAR_X, TEXTURE);
     }
 
-    void drawHealthBar(GuiGraphicsExtractor graphics, int barX, Identifier texture) {
+    void drawHealthBar(GuiGraphicsExtractor graphics, int barX, ResourceLocation texture) {
         EntityTurretCrossbow turret = menu.turret();
         if (turret == null) {
             return;

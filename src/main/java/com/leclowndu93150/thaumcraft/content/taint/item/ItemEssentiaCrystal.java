@@ -5,14 +5,14 @@ import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.essentia.IEssentiaContainerItem;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
-import java.util.function.Consumer;
 
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
+
+import java.util.List;
 
 public final class ItemEssentiaCrystal extends Item implements IEssentiaContainerItem {
     public ItemEssentiaCrystal(Properties properties) {
@@ -30,14 +30,13 @@ public final class ItemEssentiaCrystal extends Item implements IEssentiaContaine
     }
 
 /*    @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display,
-                                Consumer<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         Holder<IAspect> aspect = aspectOf(stack);
         if (aspect != null) {
             int color = aspect.value().color();
             Component line = Component.translatable("aspect.thaumcraft." + aspect.value().tag() + ".desc")
                     .withStyle(style -> style.withColor(color));
-            tooltip.accept(line);
+            tooltip.add(line);
         }
     }*/
 

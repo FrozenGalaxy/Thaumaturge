@@ -16,6 +16,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -29,8 +30,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 public final class EntityTaintSwarm extends Monster implements ITaintedMob {
     private static final EntityDataAccessor<Boolean> SUMMONED =
@@ -161,17 +160,17 @@ public final class EntityTaintSwarm extends Monster implements ITaintedMob {
     }
 
     @Override
-    public void addAdditionalSaveData(ValueOutput output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("Summoned", isSummoned());
         output.putInt("DamBonus", damBonus);
     }
 
     @Override
-    public void readAdditionalSaveData(ValueInput input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        setSummoned(input.getBooleanOr("Summoned", false));
-        damBonus = input.getIntOr("DamBonus", 0);
+        setSummoned(input.getBoolean("Summoned"));
+        damBonus = input.getInt("DamBonus");
     }
 
     @Override

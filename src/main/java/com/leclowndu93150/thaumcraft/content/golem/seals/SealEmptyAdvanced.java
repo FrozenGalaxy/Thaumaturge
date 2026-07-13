@@ -5,12 +5,12 @@ import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import com.leclowndu93150.thaumcraft.api.golems.seals.ISealConfigToggles;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public class SealEmptyAdvanced extends SealEmpty implements ISealConfigToggles {
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return TCIds.rl("empty_advanced");
     }
 
@@ -20,7 +20,7 @@ public class SealEmptyAdvanced extends SealEmpty implements ISealConfigToggles {
     }
 
     @Override
-    public Identifier getSealIcon() {
+    public ResourceLocation getSealIcon() {
         return TCIds.rl("textures/item/seal_empty_advanced.png");
     }
 

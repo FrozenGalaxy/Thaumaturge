@@ -38,27 +38,27 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jspecify.annotations.Nullable;
 
 public final class FocalManipulatorScreen extends AbstractTCContainerScreen<MenuFocalManipulator> {
-    private static final Identifier TEX = TCIds.rl("textures/gui/gui_wandtable.png");
-    private static final Identifier TEX2 = TCIds.rl("textures/gui/gui_wandtable2.png");
-    private static final Identifier TEX3 = TCIds.rl("textures/gui/gui_wandtable3.png");
-    private static final Identifier TEX_BASE = TCIds.rl("textures/gui/gui_base.png");
-    private static final Identifier TEX_COMPLEXITY = TCIds.rl("textures/gui/complex.png");
-    private static final Identifier TEX_COST_XP = TCIds.rl("textures/gui/costxp.png");
-    private static final Identifier TEX_COST_VIS = TCIds.rl("textures/gui/costvis.png");
-    private static final Identifier ICON_MEDIUM = TCIds.rl("textures/foci/_medium.png");
-    private static final Identifier ICON_EFFECT = TCIds.rl("textures/foci/_effect.png");
-    private static final Identifier ROOT_KEY = Identifier.fromNamespaceAndPath(TCIds.MODID, "root");
+    private static final ResourceLocation TEX = TCIds.rl("textures/gui/gui_wandtable.png");
+    private static final ResourceLocation TEX2 = TCIds.rl("textures/gui/gui_wandtable2.png");
+    private static final ResourceLocation TEX3 = TCIds.rl("textures/gui/gui_wandtable3.png");
+    private static final ResourceLocation TEX_BASE = TCIds.rl("textures/gui/gui_base.png");
+    private static final ResourceLocation TEX_COMPLEXITY = TCIds.rl("textures/gui/complex.png");
+    private static final ResourceLocation TEX_COST_XP = TCIds.rl("textures/gui/costxp.png");
+    private static final ResourceLocation TEX_COST_VIS = TCIds.rl("textures/gui/costvis.png");
+    private static final ResourceLocation ICON_MEDIUM = TCIds.rl("textures/foci/_medium.png");
+    private static final ResourceLocation ICON_EFFECT = TCIds.rl("textures/foci/_effect.png");
+    private static final ResourceLocation ROOT_KEY = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "root");
 
     private static final int GUI_SIZE = 231;
     private static final int ATLAS = 256;
@@ -165,7 +165,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
     private @Nullable BlockEntityFocalManipulator table;
     private @Nullable EditBox nameField;
     private TCImageButton buttonConfirm;
-    private final List<Identifier> shownParts = new ArrayList<>();
+    private final List<ResourceLocation> shownParts = new ArrayList<>();
     private final List<FocusSettingSpinner> spinners = new ArrayList<>();
     private @Nullable FocusSlider sliderParts;
     private @Nullable FocusSlider sliderSide;
@@ -242,7 +242,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
 
     private void sendData() {
         if (table != null) {
-            ClientPacketDistributor.sendToServer(new ServerboundFocusDataPayload(
+            PacketDistributor.sendToServer(new ServerboundFocusDataPayload(
                     menu.pos(), table.focusName, List.copyOf(table.data.values())));
         }
     }
@@ -341,7 +341,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
         }
     }
 
-    private void drawStatIcon(GuiGraphicsExtractor graphics, Identifier texture, int y, String tooltipKey, int mouseX, int mouseY) {
+    private void drawStatIcon(GuiGraphicsExtractor graphics, ResourceLocation texture, int y, String tooltipKey, int mouseX, int mouseY) {
         graphics.blit(RenderPipelines.GUI_TEXTURED, texture, leftPos + INFO_X, topPos + y,
                 0, 0, INFO_W, INFO_H, INFO_W, INFO_H);
         if (mouseX >= leftPos + INFO_X && mouseX < leftPos + INFO_X + INFO_W
@@ -368,7 +368,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
     private void drawPartsList(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         int count = 0;
         int index = 0;
-        for (Identifier key : shownParts) {
+        for (ResourceLocation key : shownParts) {
             if (++count - 1 < partsStart) {
                 continue;
             }
@@ -457,7 +457,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
         }
     }
 
-    private void drawClippedRect(GuiGraphicsExtractor graphics, Identifier texture, int x, int y, int u, int v, int w, int h) {
+    private void drawClippedRect(GuiGraphicsExtractor graphics, ResourceLocation texture, int x, int y, int u, int v, int w, int h) {
         if (inClipRegion(x - leftPos + w / 2, y - topPos + h / 2, CLIP_CENTER_X, CLIP_CENTER_Y, CLIP_CENTER_W, CLIP_CENTER_H)) {
             graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w, h, ATLAS, ATLAS);
         }
@@ -483,7 +483,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
         blitCentered(graphics, FocusEngine.getElementIcon(node.getKey()), x, y, iconSize, 0xFFFFFFFF);
     }
 
-    private static void blitCentered(GuiGraphicsExtractor graphics, Identifier texture, int cx, int cy, float size, int color) {
+    private static void blitCentered(GuiGraphicsExtractor graphics, ResourceLocation texture, int cx, int cy, float size, int color) {
         int s = Math.round(size);
         int half = s / 2;
         graphics.blit(RenderPipelines.GUI_TEXTURED, texture, cx - half, cy - half, 0.0F, 0.0F, s, s, 32, 32, 32, 32, color);
@@ -566,7 +566,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
             if (selectedNode >= 0) {
                 int count = 0;
                 int index = 0;
-                for (Identifier key : shownParts) {
+                for (ResourceLocation key : shownParts) {
                     if (++count - 1 < partsStart) {
                         continue;
                     }
@@ -675,7 +675,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
         }
     }
 
-    private void addNodeAt(Identifier elementKey, int idx, boolean gather) {
+    private void addNodeAt(ResourceLocation elementKey, int idx, boolean gather) {
         if (table == null) {
             return;
         }
@@ -854,16 +854,16 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
     }
 
     private void gatherPartsList() {
-        List<Identifier> previousParts = new ArrayList<>(shownParts);
+        List<ResourceLocation> previousParts = new ArrayList<>(shownParts);
         shownParts.clear();
         if (table == null || minecraft == null || minecraft.player == null
                 || selectedNode < 0 || !table.data.containsKey(selectedNode)) {
             return;
         }
-        List<Identifier> pMed = new ArrayList<>();
-        List<Identifier> pEff = new ArrayList<>();
-        List<Identifier> pMod = new ArrayList<>();
-        List<Identifier> excluded = new ArrayList<>();
+        List<ResourceLocation> pMed = new ArrayList<>();
+        List<ResourceLocation> pEff = new ArrayList<>();
+        List<ResourceLocation> pMod = new ArrayList<>();
+        List<ResourceLocation> excluded = new ArrayList<>();
         boolean hasExclusive = false;
         boolean hasMedium = false;
         for (FocusElementNode fn : table.data.values()) {
@@ -883,7 +883,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
         if (parent == null || parent.node == null) {
             return;
         }
-        for (Identifier key : TCFocusElements.registry().keySet()) {
+        for (ResourceLocation key : TCFocusElements.registry().keySet()) {
             if (key.equals(ROOT_KEY)) {
                 continue;
             }

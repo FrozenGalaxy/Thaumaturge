@@ -11,7 +11,7 @@ import com.mojang.blaze3d.platform.SourceFactor;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -24,35 +24,35 @@ public final class TCRenderPipelines {
     private static final DepthStencilState ALWAYS_NO_WRITE = new DepthStencilState(CompareOp.ALWAYS_PASS, false);
 
     public static final RenderPipeline FX_ADDITIVE = RenderPipeline.builder(RenderPipelines.PARTICLE_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/fx_additive"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/fx_additive"))
             .withColorTargetState(new ColorTargetState(TC_ADDITIVE))
             .withDepthStencilState(TEST_NO_WRITE)
             .withCull(false)
             .build();
 
     public static final RenderPipeline FX_TRANSLUCENT = RenderPipeline.builder(RenderPipelines.PARTICLE_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/fx_translucent"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/fx_translucent"))
             .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
             .withDepthStencilState(TEST_NO_WRITE)
             .withCull(false)
             .build();
 
     public static final RenderPipeline FX_ADDITIVE_NO_DEPTH = RenderPipeline.builder(RenderPipelines.PARTICLE_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/fx_additive_no_depth"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/fx_additive_no_depth"))
             .withColorTargetState(new ColorTargetState(TC_ADDITIVE))
             .withDepthStencilState(ALWAYS_NO_WRITE)
             .withCull(false)
             .build();
 
     public static final RenderPipeline FX_TRANSLUCENT_NO_DEPTH = RenderPipeline.builder(RenderPipelines.PARTICLE_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/fx_translucent_no_depth"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/fx_translucent_no_depth"))
             .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
             .withDepthStencilState(ALWAYS_NO_WRITE)
             .withCull(false)
             .build();
 
     public static final RenderPipeline SPARKLE = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/sparkle"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/sparkle"))
             .withVertexShader("core/rendertype_lightning")
             .withFragmentShader("core/rendertype_lightning")
             .withColorTargetState(new ColorTargetState(BlendFunction.LIGHTNING))
@@ -62,40 +62,40 @@ public final class TCRenderPipelines {
             .build();
 
     public static final RenderPipeline RIFT_GLOW = RenderPipeline.builder(RenderPipelines.END_PORTAL_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/rift_glow"))
-            .withVertexShader(Identifier.fromNamespaceAndPath(TCIds.MODID, "core/tc_ender"))
-            .withFragmentShader(Identifier.fromNamespaceAndPath(TCIds.MODID, "core/tc_ender"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/rift_glow"))
+            .withVertexShader(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "core/tc_ender"))
+            .withFragmentShader(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "core/tc_ender"))
             .withColorTargetState(new ColorTargetState(TC_ADDITIVE))
             .withDepthStencilState(TEST_NO_WRITE)
             .withCull(false)
             .build();
 
     public static final RenderPipeline RIFT_GLOW_NO_DEPTH = RenderPipeline.builder(RenderPipelines.END_PORTAL_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/rift_glow_no_depth"))
-            .withVertexShader(Identifier.fromNamespaceAndPath(TCIds.MODID, "core/tc_ender"))
-            .withFragmentShader(Identifier.fromNamespaceAndPath(TCIds.MODID, "core/tc_ender"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/rift_glow_no_depth"))
+            .withVertexShader(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "core/tc_ender"))
+            .withFragmentShader(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "core/tc_ender"))
             .withColorTargetState(new ColorTargetState(TC_ADDITIVE))
             .withDepthStencilState(ALWAYS_NO_WRITE)
             .withCull(false)
             .build();
 
     public static final RenderPipeline RIFT_SOLID = RenderPipeline.builder(RenderPipelines.END_PORTAL_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/rift_solid"))
-            .withVertexShader(Identifier.fromNamespaceAndPath(TCIds.MODID, "core/tc_ender"))
-            .withFragmentShader(Identifier.fromNamespaceAndPath(TCIds.MODID, "core/tc_ender"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/rift_solid"))
+            .withVertexShader(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "core/tc_ender"))
+            .withFragmentShader(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "core/tc_ender"))
             .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
             .withCull(false)
             .build();
 
     public static final RenderPipeline PORTAL_SURFACE = RenderPipeline.builder(RenderPipelines.END_PORTAL_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/portal_surface"))
-            .withVertexShader(Identifier.fromNamespaceAndPath(TCIds.MODID, "core/tc_portal"))
-            .withFragmentShader(Identifier.fromNamespaceAndPath(TCIds.MODID, "core/tc_portal"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/portal_surface"))
+            .withVertexShader(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "core/tc_portal"))
+            .withFragmentShader(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "core/tc_portal"))
             .withCull(false)
             .build();
 
     public static final RenderPipeline SPARKLE_CULLED = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/sparkle_culled"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/sparkle_culled"))
             .withVertexShader("core/rendertype_lightning")
             .withFragmentShader("core/rendertype_lightning")
             .withColorTargetState(new ColorTargetState(BlendFunction.LIGHTNING))
@@ -104,7 +104,7 @@ public final class TCRenderPipelines {
             .build();
 
     public static final RenderPipeline ENTITY_ADDITIVE_EMISSIVE = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/entity_additive_emissive"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/entity_additive_emissive"))
             .withVertexShader("core/entity")
             .withFragmentShader("core/entity")
             .withShaderDefine("EMISSIVE")
@@ -117,7 +117,7 @@ public final class TCRenderPipelines {
             .build();
 
     public static final RenderPipeline ENTITY_TRANSLUCENT_NO_DEPTH = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/entity_translucent_no_depth"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/entity_translucent_no_depth"))
             .withVertexShader("core/entity")
             .withFragmentShader("core/entity")
             .withShaderDefine("NO_OVERLAY")
@@ -130,7 +130,7 @@ public final class TCRenderPipelines {
             .build();
 
     public static final RenderPipeline TAINTED_SWIRL_NO_DEPTH = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/tainted_swirl_no_depth"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/tainted_swirl_no_depth"))
             .withShaderDefine("ALPHA_CUTOUT", 0.1F)
             .withShaderDefine("APPLY_TEXTURE_MATRIX")
             .withShaderDefine("NO_OVERLAY")
@@ -141,7 +141,7 @@ public final class TCRenderPipelines {
             .build();
 
     public static final RenderPipeline GUI_TEXTURED_ADDITIVE = RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(TCIds.MODID, "pipeline/gui_textured_additive"))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/gui_textured_additive"))
             .withColorTargetState(new ColorTargetState(TC_ADDITIVE))
             .build();
 

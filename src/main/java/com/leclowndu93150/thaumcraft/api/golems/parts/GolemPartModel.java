@@ -1,6 +1,6 @@
 package com.leclowndu93150.thaumcraft.api.golems.parts;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -29,8 +29,8 @@ public final class GolemPartModel {
         MIDDLE
     }
 
-    private final Identifier objModel;
-    private final Identifier texture;
+    private final ResourceLocation objModel;
+    private final ResourceLocation texture;
     private final AttachPoint attachPoint;
 
     /**
@@ -39,7 +39,7 @@ public final class GolemPartModel {
      *                    part uses the material texture
      * @param attachPoint where the model attaches
      */
-    public GolemPartModel(Identifier objModel, @Nullable Identifier texture, AttachPoint attachPoint) {
+    public GolemPartModel(ResourceLocation objModel, @Nullable ResourceLocation texture, AttachPoint attachPoint) {
         this.objModel = objModel;
         this.texture = texture;
         this.attachPoint = attachPoint;
@@ -48,14 +48,14 @@ public final class GolemPartModel {
     /**
      * @return the OBJ model location
      */
-    public Identifier objModel() {
+    public ResourceLocation objModel() {
         return objModel;
     }
 
     /**
      * @return the texture for non-material object parts, or null when absent
      */
-    public @Nullable Identifier texture() {
+    public @Nullable ResourceLocation texture() {
         return texture;
     }
 

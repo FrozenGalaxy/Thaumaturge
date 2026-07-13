@@ -2,7 +2,7 @@ package com.leclowndu93150.thaumcraft.content.infusion;
 
 import net.minecraft.util.Mth;
 import com.leclowndu93150.thaumcraft.content.device.BlockEntityStabilizer;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
@@ -38,7 +38,7 @@ public final class InstabilityEvents {
 
     private InstabilityEvents() {}
 
-    private static final Identifier INSTABILITY_RESEARCH = TCIds.rl("instability");
+    private static final ResourceLocation INSTABILITY_RESEARCH = TCIds.rl("instability");
 
     private static void grantInstabilityResearch(ServerLevel level, BlockPos matrixPos) {
         List<ServerPlayer> targets = level.getEntitiesOfClass(ServerPlayer.class,

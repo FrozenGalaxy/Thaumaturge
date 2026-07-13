@@ -10,11 +10,10 @@ import com.leclowndu93150.thaumcraft.api.warp.WarpType;
 import com.leclowndu93150.thaumcraft.content.research.ResearchManager;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.List;
-import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -27,7 +26,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
 public final class ItemCurio extends Item {
@@ -51,7 +49,7 @@ public final class ItemCurio extends Item {
         }
     }
 
-    private static final Identifier CRIMSON_RITES_RESEARCH = TCIds.rl("crimson_rites");
+    private static final ResourceLocation CRIMSON_RITES_RESEARCH = TCIds.rl("crimson_rites");
     private static final int RITES_WARP_THRESHOLD = 20;
     private static final int NORMAL_WARP = 1;
     private static final int TEMPORARY_WARP = 5;
@@ -68,10 +66,9 @@ public final class ItemCurio extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display,
-                                Consumer<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(stack, context, display, tooltip, flag);
-        tooltip.accept(Component.translatable("item.curio.text"));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltip, flag);
+        tooltip.add(Component.translatable("item.curio.text"));
     }
 
     @Override

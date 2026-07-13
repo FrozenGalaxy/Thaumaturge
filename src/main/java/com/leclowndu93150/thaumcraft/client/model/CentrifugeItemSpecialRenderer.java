@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
@@ -18,7 +18,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.function.Consumer;
 
 public final class CentrifugeItemSpecialRenderer implements NoDataSpecialModelRenderer {
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/centrifuge.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/centrifuge.png");
 
     private final CentrifugeModel model;
 

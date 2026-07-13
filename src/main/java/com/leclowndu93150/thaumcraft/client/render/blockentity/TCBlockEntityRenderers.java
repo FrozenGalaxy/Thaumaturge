@@ -4,7 +4,7 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEntityEldritchAltar;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -58,7 +58,7 @@ public final class TCBlockEntityRenderers {
     public static void onRegisterAdditionalModels(ModelEvent.RegisterStandalone event){
         for (int i = 0; i < BellowsRenderer.parts.length; i++) {
             String part = BellowsRenderer.parts[i];
-            Identifier modelId = TCIds.rl("block/bellows/" + part);
+            ResourceLocation modelId = TCIds.rl("block/bellows/" + part);
             BellowsRenderer.MODEL_KEYS[i] = new StandaloneModelKey<>(modelId::toString);
             event.register(BellowsRenderer.MODEL_KEYS[i], SimpleUnbakedStandaloneModel.blockStateModel(modelId));
         }

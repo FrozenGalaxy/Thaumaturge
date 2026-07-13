@@ -13,14 +13,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public final class EntryIconRenderer {
     public static final int ICON_REFERENCE_SIZE = 16;
     public static final int HIT_PADDING = 2;
 
-    public static final Identifier NODE_TEXTURE = Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/misc/auranodes.png");
+    public static final ResourceLocation NODE_TEXTURE = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/misc/auranodes.png");
     private static final int NODE_TEXTURE_SIZE = 2048;
     private static final int NODE_GRID = 32;
     private static final int NODE_FRAME_SIZE = NODE_TEXTURE_SIZE / NODE_GRID;
@@ -55,8 +55,8 @@ public final class EntryIconRenderer {
     private static final int ICON_TEX_SIZE = 16;
     private static final long FLIPBOOK_FRAME_MS = 150L;
 
-    private static final Identifier FOCUS_EFFECT_BACK = Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/foci/_effect.png");
-    private static final Identifier FOCUS_MEDIUM_BACK = Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/foci/_medium.png");
+    private static final ResourceLocation FOCUS_EFFECT_BACK = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/foci/_effect.png");
+    private static final ResourceLocation FOCUS_MEDIUM_BACK = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/foci/_medium.png");
     private static final float FOCUS_PART_SCALE = 24.0F;
     private static final int FOCUS_BACK_ALPHA = 220;
     private static final int FOCUS_GLYPH_ALPHA = 220;
@@ -152,14 +152,14 @@ public final class EntryIconRenderer {
             drawFocusIcon(graphics, iconX + ICON_TEX_SIZE / 2, iconY + ICON_TEX_SIZE / 2, focus.elementId(), locked);
             return;
         }
-        if (icon instanceof Identifier texture) {
+        if (icon instanceof ResourceLocation texture) {
             drawTextureIcon(graphics, iconX, iconY, texture, locked);
         }
     }
 
-    public record FocusIcon(Identifier elementId) {}
+    public record FocusIcon(ResourceLocation elementId) {}
 
-    public static void drawFocusIcon(GuiGraphicsExtractor graphics, int centerX, int centerY, Identifier elementId, boolean locked) {
+    public static void drawFocusIcon(GuiGraphicsExtractor graphics, int centerX, int centerY, ResourceLocation elementId, boolean locked) {
         IFocusElement element = FocusEngine.getElement(elementId);
         if (!(element instanceof FocusNode node)) {
             return;
@@ -171,19 +171,19 @@ public final class EntryIconRenderer {
             blitCentered(graphics, FOCUS_MEDIUM_BACK, centerX, centerY, Math.round(FOCUS_PART_SCALE * 0.9F), color);
         }
         int glyphAlpha = locked ? FOCUS_GLYPH_LOCKED_ALPHA : FOCUS_GLYPH_ALPHA;
-        Identifier glyph = FocusEngine.getElementIcon(elementId);
+        ResourceLocation glyph = FocusEngine.getElementIcon(elementId);
         if (glyph != null) {
             blitCentered(graphics, glyph, centerX, centerY, Math.round(FOCUS_PART_SCALE / 2.0F), (glyphAlpha << 24) | 0x00FFFFFF);
         }
     }
 
-    private static void blitCentered(GuiGraphicsExtractor graphics, Identifier texture, int cx, int cy, int size, int color) {
+    private static void blitCentered(GuiGraphicsExtractor graphics, ResourceLocation texture, int cx, int cy, int size, int color) {
         int half = size / 2;
         graphics.blit(RenderPipelines.GUI_TEXTURED, texture, cx - half, cy - half,
                 0.0F, 0.0F, size, size, 32, 32, 32, 32, color);
     }
 
-    private static void drawTextureIcon(GuiGraphicsExtractor graphics, int iconX, int iconY, Identifier texture, boolean locked) {
+    private static void drawTextureIcon(GuiGraphicsExtractor graphics, int iconX, int iconY, ResourceLocation texture, boolean locked) {
         Minecraft mc = Minecraft.getInstance();
         AbstractTexture tex = mc.getTextureManager().getTexture(texture);
         int tint = locked ? COLOR_UNKNOWN_LOCKED_ICON : COLOR_COMPLETE;

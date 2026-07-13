@@ -15,7 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -198,7 +198,7 @@ public final class TaintHelper {
         if (!isAtTaintSeedEdge(level, target)) {
             return;
         }
-        EntityTaintSeed seed = TCEntities.TAINT_SEED.get().create(level, EntitySpawnReason.NATURAL);
+        EntityTaintSeed seed = TCEntities.TAINT_SEED.get().create(level, MobSpawnType.NATURAL);
         if (seed == null) {
             return;
         }

@@ -11,6 +11,7 @@ import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
@@ -33,7 +34,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantable;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ClipContext;
@@ -41,8 +41,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -166,8 +164,7 @@ public class EntityArcaneBore extends EntityOwnedConstruct {
         int radius = 0;
         ItemStack held = getMainHandItem();
         if (!held.isEmpty() && held.is(ItemTags.PICKAXES)) {
-            Enchantable enchantable = held.get(DataComponents.ENCHANTABLE);
-            radius = (enchantable == null ? 0 : enchantable.value()) / 3;
+            radius = held.getItem().getEnchantmentValue() / 3;
             radius += InfusionEnchantmentHelper.level(held, InfusionEnchantment.DESTRUCTIVE) * 2;
         }
         return radius <= 1 ? 2 : radius;
@@ -450,15 +447,15 @@ public class EntityArcaneBore extends EntityOwnedConstruct {
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
+    protected void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        charge = input.getFloatOr("charge", 0.0F);
-        setFacing(Direction.values()[input.getByteOr("facing", (byte) 0)]);
-        setActive(input.getBooleanOr("active", false));
+        charge = input.getFloat("charge");
+        setFacing(Direction.values()[input.getByte("facing")]);
+        setActive(input.getBoolean("active"));
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putFloat("charge", charge);
         output.putByte("facing", (byte) getFacing().ordinal());

@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.casters;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
@@ -32,7 +33,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -41,13 +41,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jspecify.annotations.Nullable;
 
 public final class BlockEntityFocalManipulator extends BlockEntity implements MenuProvider {
@@ -72,18 +68,18 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
         super(TCBlockEntities.FOCAL_MANIPULATOR.get(), pos, state);
     }
 
-    public ItemStacksResourceHandler items() {
+    public ItemStackHandler items() {
         return inventory;
     }
 
     public ItemStack focusStack() {
-        ItemResource resource = inventory.getResource(SLOT_FOCUS);
-        int amount = inventory.getAmountAsInt(SLOT_FOCUS);
-        return resource.isEmpty() || amount <= 0 ? ItemStack.EMPTY : resource.toStack(amount);
+        ItemStack resource = inventory.getStackInSlot(SLOT_FOCUS);
+        int amount = inventory.getStackInSlot(SLOT_FOCUS).getCount();
+        return resource.isEmpty() || amount <= 0 ? ItemStack.EMPTY : resource.copyWithCount(amount);
     }
 
     private void setFocusStack(ItemStack stack) {
-        inventory.set(SLOT_FOCUS, ItemResource.of(stack), stack.getCount());
+        inventory.setStackInSlot(SLOT_FOCUS, stack.copyWithCount(stack.getCount()));
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, BlockEntityFocalManipulator table) {
@@ -331,24 +327,24 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         inventory.serialize(output);
         output.putFloat("Vis", vis);
         output.putString("FocusName", focusName);
-        output.store("Crystals", AspectList.CODEC, crystalsSync);
-        output.store("Nodes", FocusElementNode.CODEC.listOf(), List.copyOf(data.values()));
+        TCNbt.store(output, "Crystals", AspectList.CODEC, registries, crystalsSync);
+        TCNbt.store(output, "Nodes", FocusElementNode.CODEC.listOf(), registries, List.copyOf(data.values()));
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
         inventory.deserialize(input);
-        vis = input.getFloatOr("Vis", 0.0F);
-        focusName = input.getStringOr("FocusName", "");
-        crystalsSync = input.read("Crystals", AspectList.CODEC).orElse(AspectList.EMPTY);
+        vis = input.getFloat("Vis");
+        focusName = input.getString("FocusName");
+        crystalsSync = TCNbt.read(input, "Crystals", AspectList.CODEC, registries).orElse(AspectList.EMPTY);
         data.clear();
-        input.read("Nodes", FocusElementNode.CODEC.listOf()).ifPresent(nodes -> {
+        TCNbt.read(input, "Nodes", FocusElementNode.CODEC.listOf(), registries).ifPresent(nodes -> {
             for (FocusElementNode node : nodes) {
                 data.put(node.id, node);
             }
@@ -367,10 +363,10 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput output = TagValueOutput.createWithContext(reporter, registries);
-            saveAdditional(output);
-            nbt.merge(output.buildResult());
+        {
+            CompoundTag output = new CompoundTag();
+            saveAdditional(output, registries);
+            nbt.merge(output);
         }
         return nbt;
     }
@@ -380,13 +376,13 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    private final class TableInventory extends ItemStacksResourceHandler {
+    private final class TableInventory extends ItemStackHandler {
         TableInventory() {
             super(NonNullList.withSize(1, ItemStack.EMPTY));
         }
 
         @Override
-        protected void onContentsChanged(int index, ItemStack previousContents) {
+        protected void onContentsChanged(int index) {
             setChanged();
             if (level != null && !level.isClientSide()) {
                 vis = 0.0F;
@@ -396,7 +392,7 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
         }
 
         @Override
-        public boolean isValid(int index, ItemResource resource) {
+        public boolean isItemValid(int index, ItemStack resource) {
             return resource.getItem() instanceof ItemFocus;
         }
     }

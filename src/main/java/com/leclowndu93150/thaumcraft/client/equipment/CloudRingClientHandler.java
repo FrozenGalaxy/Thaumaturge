@@ -18,7 +18,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
 public final class CloudRingClientHandler {
@@ -81,7 +81,7 @@ public final class CloudRingClientHandler {
         }
         player.setDeltaMovement(velocityX, velocityY, velocityZ);
         player.resetFallDistance();
-        ClientPacketDistributor.sendToServer(new ServerboundCloudJumpPayload());
+        PacketDistributor.sendToServer(new ServerboundCloudJumpPayload());
         CommonHooks.onLivingJump(player);
     }
 }

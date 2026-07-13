@@ -8,6 +8,7 @@ import com.leclowndu93150.thaumcraft.content.entity.champion.ChampionHelper;
 import com.leclowndu93150.thaumcraft.content.entity.champion.ChampionModifier;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -19,10 +20,10 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -40,8 +41,6 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.providers.VanillaEnchantmentProviders;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public class EntityCultistLeader extends EntityThaumcraftBoss implements RangedAttackMob {
@@ -108,15 +107,15 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements RangedA
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putByte("title", this.entityData.get(DATA_TITLE));
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
+    protected void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        setTitle(input.getByteOr("title", (byte) 0));
+        setTitle(input.getByte("title"));
     }
 
     private void equipPraetorGear() {
@@ -133,7 +132,7 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements RangedA
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                  EntitySpawnReason reason, @Nullable SpawnGroupData data) {
+                                                  MobSpawnType reason, @Nullable SpawnGroupData data) {
         this.equipPraetorGear();
         float clamped = difficulty.getSpecialMultiplier();
         ItemStack weapon = this.getMainHandItem();
@@ -147,9 +146,9 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements RangedA
     }
 
     @Override
-    public boolean considersEntityAsAlly(Entity other) {
+    public boolean isAlliedTo(Entity other) {
         return other instanceof EntityCultist || other instanceof EntityCultistLeader
-                || super.considersEntityAsAlly(other);
+                || super.isAlliedTo(other);
     }
 
     @Override

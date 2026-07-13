@@ -5,13 +5,13 @@ import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.resources.Identifier;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.RenderType;
 import org.joml.Matrix4fc;
 
 public final class EldritchPortalSurface {
-    public static final Identifier TUNNEL_TEXTURE = TCIds.rl("textures/misc/tunnel.png");
-    public static final Identifier PARTICLE_FIELD_TEXTURE = TCIds.rl("textures/misc/particlefield.png");
+    public static final ResourceLocation TUNNEL_TEXTURE = TCIds.rl("textures/misc/tunnel.png");
+    public static final ResourceLocation PARTICLE_FIELD_TEXTURE = TCIds.rl("textures/misc/particlefield.png");
 
     public static final RenderType SURFACE = RenderType.create(
             "tc_eldritch_portal_surface",

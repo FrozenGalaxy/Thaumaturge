@@ -8,11 +8,11 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public final class TurretAdvancedScreen extends TurretBasicScreen<MenuTurretAdvanced> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/gui/gui_turret_advanced.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/gui/gui_turret_advanced.png");
     private static final int HEALTH_BAR_X = 30;
     private static final int BUTTON_X = 90;
     private static final int BUTTON_FIRST_Y = 13;

@@ -4,13 +4,13 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record ServerboundCardAnimationCompletePayload() implements CustomPacketPayload {
     public static final ServerboundCardAnimationCompletePayload INSTANCE = new ServerboundCardAnimationCompletePayload();
 
     public static final Type<ServerboundCardAnimationCompletePayload> TYPE = new Type<>(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "card_animation_complete"));
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "card_animation_complete"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundCardAnimationCompletePayload> STREAM_CODEC =
             StreamCodec.unit(INSTANCE);

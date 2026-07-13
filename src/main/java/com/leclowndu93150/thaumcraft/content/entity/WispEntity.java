@@ -11,18 +11,19 @@ import com.leclowndu93150.thaumcraft.content.taint.item.EssentiaCrystalFactory;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Holder;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -34,8 +35,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -93,7 +92,7 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
         if (id.isEmpty()) {
             return null;
         }
-        Identifier parsed = Identifier.tryParse(id);
+        ResourceLocation parsed = ResourceLocation.tryParse(id);
         if (parsed == null) {
             return null;
         }
@@ -103,7 +102,7 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
                 .orElse(null);
     }
 
-    public void setAspect(Identifier aspect) {
+    public void setAspect(ResourceLocation aspect) {
         this.entityData.set(DATA_ASPECT, aspect.toString());
     }
 
@@ -216,7 +215,7 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
     }
 
     public static boolean checkWispSpawnRules(EntityType<WispEntity> type, ServerLevelAccessor level,
-                                              EntitySpawnReason reason, BlockPos pos, RandomSource random) {
+                                              MobSpawnType reason, BlockPos pos, RandomSource random) {
         int nearby = level.getEntitiesOfClass(WispEntity.class,
                 new AABB(pos).inflate(NEARBY_WISP_RANGE)).size();
         return nearby < MAX_NEARBY_WISPS
@@ -224,14 +223,14 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putString("Type", this.entityData.get(DATA_ASPECT));
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
+    protected void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        this.entityData.set(DATA_ASPECT, input.getStringOr("Type", ""));
+        this.entityData.set(DATA_ASPECT, input.getString("Type"));
     }
 }

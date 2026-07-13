@@ -13,8 +13,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.InsideBlockEffectApplier;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -273,8 +272,7 @@ public abstract class FluxGooFluid extends BaseFlowingFluid {
         level.scheduleTick(pos, level.getFluidState(pos).getType(), getTickDelay(level));
     }
 
-    @Override
-    protected void entityInside(Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier) {
+    public static void applyEntityInside(Level level, BlockPos pos, Entity entity) {
         FluidState fs = level.getFluidState(pos);
         int amount = fs.getAmount();
         int meta = amount - 1;
@@ -302,7 +300,7 @@ public abstract class FluxGooFluid extends BaseFlowingFluid {
 
     private static void spawnSlime(ServerLevel level, BlockPos pos, int size) {
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-        ThaumicSlime slime = TCEntities.THAUMIC_SLIME.get().create(level, EntitySpawnReason.NATURAL);
+        ThaumicSlime slime = TCEntities.THAUMIC_SLIME.get().create(level, MobSpawnType.NATURAL);
         if (slime == null) {
             return;
         }

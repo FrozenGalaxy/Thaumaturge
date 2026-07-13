@@ -2,7 +2,7 @@ package com.leclowndu93150.thaumcraft.api.capability;
 
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import java.util.Set;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -18,8 +18,8 @@ import net.minecraft.server.level.ServerPlayer;
  * observable change, {@code false} otherwise. Callers that mutate must invoke {@link #sync(ServerPlayer)}
  * to publish the new state to the owner.
  *
- * <p>Research is identified by {@link Identifier}. The legacy stage gate notation {@code "id@2"}
- * is replaced by separate {@link #researchStage(Identifier)} queries; see {@link #isResearchKnown(Identifier, int)}.
+ * <p>Research is identified by {@link ResourceLocation}. The legacy stage gate notation {@code "id@2"}
+ * is replaced by separate {@link #researchStage(ResourceLocation)} queries; see {@link #isResearchKnown(ResourceLocation, int)}.
  *
  * @since 1.0.0
  */
@@ -35,7 +35,7 @@ public interface IPlayerKnowledge {
      * @param research the research entry identifier; must not be null
      * @return the status, never null; {@link ResearchStatus#UNKNOWN} when the entry has not been added
      */
-    ResearchStatus researchStatus(Identifier research);
+    ResearchStatus researchStatus(ResourceLocation research);
 
     /**
      * Returns whether the entry is known and every stage is complete.
@@ -43,7 +43,7 @@ public interface IPlayerKnowledge {
      * @param research the research entry identifier
      * @return {@code true} when the entry is complete
      */
-    boolean isResearchComplete(Identifier research);
+    boolean isResearchComplete(ResourceLocation research);
 
     /**
      * Returns whether the entry has been added to this player's record.
@@ -51,7 +51,7 @@ public interface IPlayerKnowledge {
      * @param research the research entry identifier
      * @return {@code true} when the entry is known regardless of stage
      */
-    boolean isResearchKnown(Identifier research);
+    boolean isResearchKnown(ResourceLocation research);
 
     /**
      * Returns whether the entry is known and the player has reached at least the given stage.
@@ -60,7 +60,7 @@ public interface IPlayerKnowledge {
      * @param minimumStage the minimum stage required
      * @return {@code true} when the entry is known and the player is at or beyond {@code minimumStage}
      */
-    boolean isResearchKnown(Identifier research, int minimumStage);
+    boolean isResearchKnown(ResourceLocation research, int minimumStage);
 
     /**
      * Returns the current stage of the given research, or {@code -1} when the entry is not known.
@@ -68,7 +68,7 @@ public interface IPlayerKnowledge {
      * @param research the research entry identifier
      * @return the stage index, or {@code -1} when unknown
      */
-    int researchStage(Identifier research);
+    int researchStage(ResourceLocation research);
 
     /**
      * Adds the research to the player's record. Has no effect when already added.
@@ -76,7 +76,7 @@ public interface IPlayerKnowledge {
      * @param research the research entry identifier
      * @return {@code true} when the entry was newly added
      */
-    boolean addResearch(Identifier research);
+    boolean addResearch(ResourceLocation research);
 
     /**
      * Sets the current stage of the given research. Has no effect when the entry is not known or
@@ -86,7 +86,7 @@ public interface IPlayerKnowledge {
      * @param stage the new stage; must be positive
      * @return {@code true} when the stored stage changed
      */
-    boolean setResearchStage(Identifier research, int stage);
+    boolean setResearchStage(ResourceLocation research, int stage);
 
     /**
      * Removes the research and any associated stage or flags from the player's record.
@@ -94,14 +94,14 @@ public interface IPlayerKnowledge {
      * @param research the research entry identifier
      * @return {@code true} when an entry was removed
      */
-    boolean removeResearch(Identifier research);
+    boolean removeResearch(ResourceLocation research);
 
     /**
      * The unmodifiable set of every research entry currently in the player's record.
      *
      * @return an unmodifiable set, never null
      */
-    Set<Identifier> researchList();
+    Set<ResourceLocation> researchList();
 
     /**
      * Adds a flag to the given research entry.
@@ -110,7 +110,7 @@ public interface IPlayerKnowledge {
      * @param flag the flag to set
      * @return {@code true} when the flag was newly set
      */
-    boolean setResearchFlag(Identifier research, ResearchFlag flag);
+    boolean setResearchFlag(ResourceLocation research, ResearchFlag flag);
 
     /**
      * Removes a flag from the given research entry.
@@ -119,7 +119,7 @@ public interface IPlayerKnowledge {
      * @param flag the flag to clear
      * @return {@code true} when the flag was present and removed
      */
-    boolean clearResearchFlag(Identifier research, ResearchFlag flag);
+    boolean clearResearchFlag(ResourceLocation research, ResearchFlag flag);
 
     /**
      * Returns whether the given research entry has the given flag set.
@@ -128,7 +128,7 @@ public interface IPlayerKnowledge {
      * @param flag the flag to test
      * @return {@code true} when set
      */
-    boolean hasResearchFlag(Identifier research, ResearchFlag flag);
+    boolean hasResearchFlag(ResourceLocation research, ResearchFlag flag);
 
     /**
      * Adds raw progress for the given knowledge type and category. The raw counter is scaled by

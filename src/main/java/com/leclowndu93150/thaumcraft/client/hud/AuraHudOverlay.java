@@ -12,15 +12,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public final class AuraHudOverlay implements LeftHudStack.Gauge {
-    private static final Identifier HUD = TCIds.rl("textures/gui/hud.png");
+    private static final ResourceLocation HUD = TCIds.rl("textures/gui/hud.png");
     private static final int TEX_SIZE = 256;
 
     private static final float VISCON = 525.0F;
@@ -85,7 +85,7 @@ public final class AuraHudOverlay implements LeftHudStack.Gauge {
         ClientAuraCache.tick();
         ChunkPos pos = ChunkPos.containing(player.blockPosition());
         if (ClientAuraCache.shouldRequest(pos)) {
-            ClientPacketDistributor.sendToServer(new ServerboundRequestAuraChunkPayload(pos.x(), pos.z()));
+            PacketDistributor.sendToServer(new ServerboundRequestAuraChunkPayload(pos.x(), pos.z()));
         }
         ClientAuraCache.Snapshot snap = ClientAuraCache.get(pos);
         if (snap == null) {

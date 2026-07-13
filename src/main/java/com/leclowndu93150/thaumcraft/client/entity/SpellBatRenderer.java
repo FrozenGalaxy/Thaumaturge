@@ -8,11 +8,11 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 
 public final class SpellBatRenderer extends MobRenderer<EntitySpellBat, SpellBatRenderState, FireBatModel> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/spellbat.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/spellbat.png");
     private static final float SHADOW = 0.25F;
     private static final float SCALE = 0.35F;
     private static final float Y_OFFSET = -0.1F;
@@ -38,7 +38,7 @@ public final class SpellBatRenderer extends MobRenderer<EntitySpellBat, SpellBat
 
     @Override
     protected int getModelTint(SpellBatRenderState state) {
-        return ARGB.color(TINT_ALPHA, state.color);
+        return ARGB32.color(TINT_ALPHA, state.color);
     }
 
     @Override
@@ -47,7 +47,7 @@ public final class SpellBatRenderer extends MobRenderer<EntitySpellBat, SpellBat
     }
 
     @Override
-    public Identifier getTextureLocation(SpellBatRenderState state) {
+    public ResourceLocation getTextureLocation(SpellBatRenderState state) {
         return TEXTURE;
     }
 

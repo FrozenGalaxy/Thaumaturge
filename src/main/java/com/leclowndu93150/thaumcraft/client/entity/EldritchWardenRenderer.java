@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class EldritchWardenRenderer extends MobRenderer<EntityEldritchWarden, EldritchWardenRenderer.State, EldritchGuardianModel> {
     public static final class State extends EldritchGuardianRenderState {
@@ -16,7 +16,7 @@ public final class EldritchWardenRenderer extends MobRenderer<EntityEldritchWard
         public float height;
     }
 
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/eldritch_warden.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/eldritch_warden.png");
     private static final float SHADOW = 0.5F;
     private static final float SPAWN_TICKS = 150.0F;
 
@@ -50,7 +50,7 @@ public final class EldritchWardenRenderer extends MobRenderer<EntityEldritchWard
     }
 
     @Override
-    public Identifier getTextureLocation(State state) {
+    public ResourceLocation getTextureLocation(State state) {
         return TEXTURE;
     }
 }

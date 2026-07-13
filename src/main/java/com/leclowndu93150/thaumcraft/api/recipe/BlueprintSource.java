@@ -12,7 +12,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
@@ -162,7 +162,7 @@ public sealed interface BlueprintSource {
         ).apply(i, TagSource::new));
 
         static final StreamCodec<RegistryFriendlyByteBuf, TagSource> STREAM_CODEC_INSTANCE = StreamCodec.composite(
-                Identifier.STREAM_CODEC.map(rl -> TagKey.create(Registries.BLOCK, rl), TagKey::location),
+                ResourceLocation.STREAM_CODEC.map(rl -> TagKey.create(Registries.BLOCK, rl), TagKey::location),
                 TagSource::tag,
                 TagSource::new
         );

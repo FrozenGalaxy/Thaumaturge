@@ -8,7 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
@@ -120,11 +120,11 @@ public class MoundPiece extends ScatteredFeaturePiece {
         }
         this.spawnedPortal = true;
         EntityCultistPortalLesser portal =
-                TCEntities.CULTIST_PORTAL_LESSER.get().create(level.getLevel(), EntitySpawnReason.STRUCTURE);
+                TCEntities.CULTIST_PORTAL_LESSER.get().create(level.getLevel(), MobSpawnType.STRUCTURE);
         if (portal != null) {
             portal.setPersistenceRequired();
             portal.snapTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0.0F, 0.0F);
-            portal.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), EntitySpawnReason.STRUCTURE, null);
+            portal.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.STRUCTURE, null);
             level.addFreshEntityWithPassengers(portal);
         }
     }

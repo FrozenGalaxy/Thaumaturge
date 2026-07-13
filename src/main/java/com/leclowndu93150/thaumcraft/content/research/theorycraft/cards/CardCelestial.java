@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.research.theorycraft.cards;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
 import com.leclowndu93150.thaumcraft.api.research.CategoryComponents;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
@@ -12,13 +13,12 @@ import com.leclowndu93150.thaumcraft.content.item.CelestialNotesItem;
 import com.leclowndu93150.thaumcraft.content.research.ResearchManager;
 import java.util.List;
 import java.util.Random;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public final class CardCelestial extends TheorycraftCard {
@@ -111,21 +111,21 @@ public final class CardCelestial extends TheorycraftCard {
     }
 
     @Override
-    public void write(ValueOutput output, HolderLookup.Provider registries) {
+    public void write(CompoundTag output, HolderLookup.Provider registries) {
         super.write(output, registries);
         output.putInt("note1", note1);
         output.putInt("note2", note2);
         if (category != null) {
-            output.store("category", ResourceKey.codec(IResearchCategory.REGISTRY_KEY), category);
+            TCNbt.store(output, "category", ResourceKey.codec(IResearchCategory.REGISTRY_KEY), registries, category);
         }
     }
 
     @Override
-    public void read(ValueInput input, HolderLookup.Provider registries) {
+    public void read(CompoundTag input, HolderLookup.Provider registries) {
         super.read(input, registries);
-        note1 = input.getIntOr("note1", -1);
-        note2 = input.getIntOr("note2", -1);
-        category = input.read("category", ResourceKey.codec(IResearchCategory.REGISTRY_KEY)).orElse(null);
+        note1 = (input.contains("note1") ? input.getInt("note1") : -1);
+        note2 = (input.contains("note2") ? input.getInt("note2") : -1);
+        category = TCNbt.read(input, "category", ResourceKey.codec(IResearchCategory.REGISTRY_KEY), registries).orElse(null);
     }
 
     private static boolean isStar(int note) {

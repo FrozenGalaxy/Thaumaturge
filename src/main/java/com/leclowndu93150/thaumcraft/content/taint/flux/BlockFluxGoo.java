@@ -4,6 +4,7 @@ import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -70,6 +71,11 @@ public final class BlockFluxGoo extends LiquidBlock {
                     .build();
             level.addParticle(data, x, y, z, 0.0, 0.0, 0.0);
         }
+    }
+
+    @Override
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        FluxGooFluid.applyEntityInside(level, pos, entity);
     }
 
     @Override

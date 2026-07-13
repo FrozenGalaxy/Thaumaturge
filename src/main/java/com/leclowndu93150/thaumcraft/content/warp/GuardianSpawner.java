@@ -8,7 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.Mob;
 
 public final class GuardianSpawner {
@@ -33,7 +33,7 @@ public final class GuardianSpawner {
                 continue;
             }
             EntityEldritchGuardian guardian =
-                    TCEntities.ELDRITCH_GUARDIAN.get().create(level, EntitySpawnReason.EVENT);
+                    TCEntities.ELDRITCH_GUARDIAN.get().create(level, MobSpawnType.EVENT);
             if (guardian == null) {
                 return;
             }
@@ -57,7 +57,7 @@ public final class GuardianSpawner {
                 continue;
             }
             EntityCultistPortalLesser portal =
-                    TCEntities.CULTIST_PORTAL_LESSER.get().create(level, EntitySpawnReason.EVENT);
+                    TCEntities.CULTIST_PORTAL_LESSER.get().create(level, MobSpawnType.EVENT);
             if (portal == null) {
                 return;
             }
@@ -67,7 +67,7 @@ public final class GuardianSpawner {
                 continue;
             }
             portal.finalizeSpawn(level, level.getCurrentDifficultyAt(portal.blockPosition()),
-                    EntitySpawnReason.EVENT, null);
+                    MobSpawnType.EVENT, null);
             level.addFreshEntity(portal);
             WarpManager.sendActionBar(player, "warp.thaumcraft.text.16");
             return;

@@ -15,11 +15,10 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -31,7 +30,7 @@ public final class InfusionRecipe implements Recipe<InfusionInput>, IInfusionRec
             Ingredient.CODEC.listOf(1, 64).fieldOf("components").forGetter(r -> r.components),
             AspectList.NON_EMPTY_CODEC.fieldOf("aspects").forGetter(r -> r.aspects),
             Codec.intRange(0, 100).optionalFieldOf("instability", 0).forGetter(r -> r.instability),
-            ItemStackTemplate.CODEC.optionalFieldOf("result").forGetter(r -> r.result),
+            ItemStack.CODEC.optionalFieldOf("result").forGetter(r -> r.result),
             DataComponentPatch.CODEC.optionalFieldOf("catalyst_patch").forGetter(r -> r.catalystPatch),
             ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research)
     ).apply(i, InfusionRecipe::new)).validate(recipe ->
@@ -48,7 +47,7 @@ public final class InfusionRecipe implements Recipe<InfusionInput>, IInfusionRec
             r -> r.aspects,
             ByteBufCodecs.VAR_INT,
             r -> r.instability,
-            ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC),
+            ByteBufCodecs.optional(ItemStack.STREAM_CODEC),
             r -> r.result,
             ByteBufCodecs.optional(DataComponentPatch.STREAM_CODEC),
             r -> r.catalystPatch,
@@ -63,17 +62,17 @@ public final class InfusionRecipe implements Recipe<InfusionInput>, IInfusionRec
     private final List<Ingredient> components;
     private final AspectList aspects;
     private final int instability;
-    private final Optional<ItemStackTemplate> result;
+    private final Optional<ItemStack> result;
     private final Optional<DataComponentPatch> catalystPatch;
     private final Optional<ResearchGate> research;
 
     public InfusionRecipe(Ingredient catalyst, List<Ingredient> components, AspectList aspects,
-                          int instability, ItemStackTemplate result, Optional<ResearchGate> research) {
+                          int instability, ItemStack result, Optional<ResearchGate> research) {
         this(catalyst, components, aspects, instability, Optional.of(result), Optional.empty(), research);
     }
 
     public InfusionRecipe(Ingredient catalyst, List<Ingredient> components, AspectList aspects,
-                          int instability, Optional<ItemStackTemplate> result,
+                          int instability, Optional<ItemStack> result,
                           Optional<DataComponentPatch> catalystPatch, Optional<ResearchGate> research) {
         this.catalyst = catalyst;
         this.components = List.copyOf(components);

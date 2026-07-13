@@ -5,8 +5,10 @@ import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;
 import com.leclowndu93150.thaumcraft.api.casters.FocusPackage;
 import com.leclowndu93150.thaumcraft.api.casters.Trajectory;
 import com.leclowndu93150.thaumcraft.registry.TCEntities;
+import java.util.UUID;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -17,7 +19,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TraceableEntity;
@@ -27,8 +28,6 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -66,7 +65,7 @@ public final class EntitySpellBat extends Monster implements TraceableEntity, IE
     public int damBonus;
 
     private @Nullable FocusPackage focusPackage;
-    private @Nullable EntityReference<LivingEntity> owner;
+    private @Nullable UUID owner;
     private @Nullable BlockPos currentFlightTarget;
     private int attackTime;
     private @Nullable List<FocusEffect> effects;
@@ -108,12 +107,15 @@ public final class EntitySpellBat extends Monster implements TraceableEntity, IE
     }
 
     public void setOwner(@Nullable LivingEntity owner) {
-        this.owner = EntityReference.of(owner);
+        this.owner = owner == null ? null : owner.getUUID();
     }
 
     @Override
     public @Nullable LivingEntity getOwner() {
-        return EntityReference.getLivingEntity(this.owner, this.level());
+        if (this.owner != null && this.level() instanceof ServerLevel serverLevel) {
+            return serverLevel.getEntity(this.owner) instanceof LivingEntity living ? living : null;
+        }
+        return null;
     }
 
     @Override
@@ -170,13 +172,13 @@ public final class EntitySpellBat extends Monster implements TraceableEntity, IE
     }
 
     @Override
-    protected boolean considersEntityAsAlly(Entity other) {
+    public boolean isAlliedTo(Entity other) {
         LivingEntity currentOwner = this.getOwner();
         if (other == currentOwner) {
             return true;
         }
         if (currentOwner == null) {
-            return super.considersEntityAsAlly(other);
+            return super.isAlliedTo(other);
         }
         return currentOwner.isAlliedTo(other) || other.isAlliedTo(currentOwner);
     }
@@ -361,18 +363,20 @@ public final class EntitySpellBat extends Monster implements TraceableEntity, IE
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
-        EntityReference.store(this.owner, output, "OwnerUUID");
+        if (this.owner != null) {
+            output.putUUID("OwnerUUID", this.owner);
+        }
         output.putBoolean("friendly", this.isFriendly());
         FocusPackages.save(output, this.focusPackage);
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
+    protected void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        this.owner = EntityReference.read(input, "OwnerUUID");
-        this.setFriendly(input.getBooleanOr("friendly", false));
+        this.owner = input.hasUUID("OwnerUUID") ? input.getUUID("OwnerUUID") : null;
+        this.setFriendly(input.getBoolean("friendly"));
         this.focusPackage = FocusPackages.load(input);
     }
 }

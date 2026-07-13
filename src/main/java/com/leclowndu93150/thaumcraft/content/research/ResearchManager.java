@@ -21,7 +21,7 @@ import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -38,12 +38,12 @@ public final class ResearchManager {
 
     private ResearchManager() {}
 
-    public static Identifier craftedKey(Identifier item) {
-        return Identifier.fromNamespaceAndPath("thaumcraft",
+    public static ResourceLocation craftedKey(ResourceLocation item) {
+        return ResourceLocation.fromNamespaceAndPath("thaumcraft",
                 CRAFTED_PREFIX + item.getNamespace() + "/" + item.getPath());
     }
 
-    public static boolean unlock(ServerPlayer player, Identifier research) {
+    public static boolean unlock(ServerPlayer player, ResourceLocation research) {
         if (research == null) return false;
         PlayerKnowledge knowledge = (PlayerKnowledge) KnowledgeAccess.of(player);
         if (knowledge.isResearchKnown(research)) return false;
@@ -58,11 +58,11 @@ public final class ResearchManager {
         return changed;
     }
 
-    public static boolean advanceStage(ServerPlayer player, Identifier research) {
+    public static boolean advanceStage(ServerPlayer player, ResourceLocation research) {
         return advanceStage(player, research, true);
     }
 
-    public static boolean advanceStage(ServerPlayer player, Identifier research, boolean checkRequisites) {
+    public static boolean advanceStage(ServerPlayer player, ResourceLocation research, boolean checkRequisites) {
         if (research == null) return false;
         IResearchEntry entry = entry(player, research).orElse(null);
         if (entry == null) return false;
@@ -97,7 +97,7 @@ public final class ResearchManager {
         return true;
     }
 
-    public static boolean setStage(ServerPlayer player, Identifier research, int stage) {
+    public static boolean setStage(ServerPlayer player, ResourceLocation research, int stage) {
         if (research == null || stage <= 0) return false;
         PlayerKnowledge knowledge = (PlayerKnowledge) KnowledgeAccess.of(player);
         if (!knowledge.isResearchKnown(research)) return false;
@@ -110,7 +110,7 @@ public final class ResearchManager {
         return true;
     }
 
-    public static boolean complete(ServerPlayer player, Identifier research) {
+    public static boolean complete(ServerPlayer player, ResourceLocation research) {
         if (research == null) return false;
         PlayerKnowledge knowledge = (PlayerKnowledge) KnowledgeAccess.of(player);
         if (!knowledge.isResearchKnown(research)) {
@@ -166,7 +166,7 @@ public final class ResearchManager {
     }
 
     public static boolean stageRequirementsMet(Player player, IPlayerKnowledge knowledge, IResearchStage stage) {
-        for (Identifier required : stage.requiredResearch()) {
+        for (ResourceLocation required : stage.requiredResearch()) {
             if (!knowledge.isResearchComplete(required)) return false;
         }
         for (ResearchRequirement req : stage.obtain()) {
@@ -184,7 +184,7 @@ public final class ResearchManager {
 
     public static boolean isCraftSatisfied(IPlayerKnowledge knowledge, ResearchRequirement req) {
         for (Holder<Item> holder : req.items()) {
-            Identifier itemId = holder.unwrapKey().map(ResourceKey::identifier).orElse(null);
+            ResourceLocation itemId = holder.unwrapKey().map(ResourceKey::identifier).orElse(null);
             if (itemId != null && knowledge.isResearchKnown(craftedKey(itemId))) return true;
         }
         return false;
@@ -230,7 +230,7 @@ public final class ResearchManager {
                 && stage.requiredResearch().isEmpty();
     }
 
-    private static boolean markCompleteInternal(ServerPlayer player, PlayerKnowledge knowledge, Identifier research) {
+    private static boolean markCompleteInternal(ServerPlayer player, PlayerKnowledge knowledge, ResourceLocation research) {
         ResearchEvent.Completed event = new ResearchEvent.Completed(player, research);
         if (NeoForge.EVENT_BUS.post(event).isCanceled()) return false;
         boolean changed = knowledge.markComplete(research);
@@ -240,7 +240,7 @@ public final class ResearchManager {
             knowledge.setResearchFlag(research, ResearchFlag.POPUP);
             knowledge.setResearchFlag(research, ResearchFlag.RESEARCH);
             notifyAddenda(player, knowledge, research);
-            for (Identifier sibling : entry.siblings()) {
+            for (ResourceLocation sibling : entry.siblings()) {
                 if (knowledge.isResearchComplete(sibling)) continue;
                 IResearchEntry siblingEntry = entry(player, sibling).orElse(null);
                 if (siblingEntry != null && !parentsSatisfied(knowledge, siblingEntry)) continue;
@@ -253,12 +253,12 @@ public final class ResearchManager {
         return true;
     }
 
-    private static void notifyAddenda(ServerPlayer player, PlayerKnowledge knowledge, Identifier completed) {
+    private static void notifyAddenda(ServerPlayer player, PlayerKnowledge knowledge, ResourceLocation completed) {
         player.registryAccess().lookup(IResearchEntry.REGISTRY_KEY).ifPresent(lookup ->
                 lookup.listElements().forEach(holder -> {
                     IResearchEntry other = holder.value();
                     if (other.addenda().isEmpty()) return;
-                    Identifier otherId = holder.key().identifier();
+                    ResourceLocation otherId = holder.key().identifier();
                     if (!knowledge.isResearchComplete(otherId)) return;
                     for (ResearchAddendum addendum : other.addenda()) {
                         if (addendum.requiredResearch().contains(completed)) {
@@ -271,7 +271,7 @@ public final class ResearchManager {
                 }));
     }
 
-    private static boolean unlockSilent(PlayerKnowledge knowledge, Identifier research) {
+    private static boolean unlockSilent(PlayerKnowledge knowledge, ResourceLocation research) {
         return knowledge.addResearch(research);
     }
 
@@ -298,7 +298,7 @@ public final class ResearchManager {
         }
     }
 
-    private static Optional<IResearchEntry> entry(ServerPlayer player, Identifier research) {
+    private static Optional<IResearchEntry> entry(ServerPlayer player, ResourceLocation research) {
         return player.registryAccess()
                 .lookup(IResearchEntry.REGISTRY_KEY)
                 .flatMap(lookup -> lookup.get(ResourceKey.create(IResearchEntry.REGISTRY_KEY, research)))

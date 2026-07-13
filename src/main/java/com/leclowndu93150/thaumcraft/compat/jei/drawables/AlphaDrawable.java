@@ -6,11 +6,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 public class AlphaDrawable implements IDrawableStatic {
-    private final Identifier identifier;
+    private final ResourceLocation identifier;
     private final int u;
     private final int v;
     private final int width;
@@ -20,11 +20,11 @@ public class AlphaDrawable implements IDrawableStatic {
     private final int paddingLeft;
     private final int paddingRight;
 
-    public AlphaDrawable(Identifier identifier, int u, int v, int width, int height) {
+    public AlphaDrawable(ResourceLocation identifier, int u, int v, int width, int height) {
         this(identifier, u, v, width, height, 0, 0, 0, 0);
     }
 
-    public AlphaDrawable(Identifier identifier, int u, int v, int width, int height, int paddingTop, int paddingBottom, int paddingLeft, int paddingRight) {
+    public AlphaDrawable(ResourceLocation identifier, int u, int v, int width, int height, int paddingTop, int paddingBottom, int paddingLeft, int paddingRight) {
         this.identifier = identifier;
 
         this.u = u;

@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.essentia.jar;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.*;
 import com.leclowndu93150.thaumcraft.api.essentia.EssentiaList;
@@ -21,14 +22,10 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
@@ -265,32 +262,32 @@ public class BlockEntityJar extends BlockEntity implements IEssentiaTransport, I
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        aspect = input.read("Aspect", ASPECT_KEY_CODEC).orElse(null);
-        aspectFilter = input.read("AspectFilter", ASPECT_KEY_CODEC).orElse(null);
-        amount = input.getIntOr("Amount", 0);
-        facing = input.read("Facing",Direction.CODEC).orElse(Direction.DOWN);
-        braced = input.getBooleanOr("Braced",false);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        aspect = TCNbt.read(input, "Aspect", ASPECT_KEY_CODEC, registries).orElse(null);
+        aspectFilter = TCNbt.read(input, "AspectFilter", ASPECT_KEY_CODEC, registries).orElse(null);
+        amount = input.getInt("Amount");
+        facing = TCNbt.read(input, "Facing", Direction.CODEC, registries).orElse(Direction.DOWN);
+        braced = input.getBoolean("Braced");
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        if (aspect != null) output.store("Aspect", ASPECT_KEY_CODEC, aspect);
-        if (aspectFilter != null) output.store("AspectFilter", ASPECT_KEY_CODEC, aspectFilter);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
+        if (aspect != null) TCNbt.store(output, "Aspect", ASPECT_KEY_CODEC, registries, aspect);
+        if (aspectFilter != null) TCNbt.store(output, "AspectFilter", ASPECT_KEY_CODEC, registries, aspectFilter);
         output.putInt("Amount", amount);
-        output.store("Facing",Direction.CODEC,facing);
+        TCNbt.store(output, "Facing", Direction.CODEC, registries, facing);
         output.putBoolean("Braced", braced);
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput tagvalueoutput = TagValueOutput.createWithContext(problemreporter$scopedcollector, registries);
-            saveAdditional(tagvalueoutput);
-            nbt.merge(tagvalueoutput.buildResult());
+        {
+            CompoundTag tagvalueoutput = new CompoundTag();
+            saveAdditional(tagvalueoutput, registries);
+            nbt.merge(tagvalueoutput);
         }
         return nbt;
     }

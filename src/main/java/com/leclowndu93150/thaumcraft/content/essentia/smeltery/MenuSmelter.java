@@ -11,8 +11,8 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
 public final class MenuSmelter extends AbstractContainerMenu {
     public static final int ITEM_X = 80;
@@ -29,13 +29,13 @@ public final class MenuSmelter extends AbstractContainerMenu {
     public static final int PLAYER_TOTAL_SLOTS = PLAYER_ROW_SLOTS * (PLAYER_ROWS + 1);
     public static final int TOTAL_INVENTORY_SLOTS = SLOT_COUNT + PLAYER_TOTAL_SLOTS;
 
-    private final ItemStacksResourceHandler items;
+    private final ItemStackHandler items;
     private final ContainerLevelAccess access;
     private final BlockPos pos;
 
     public MenuSmelter(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf buf) {
         BlockPos pos = buf.readBlockPos();
-        this(containerId, playerInventory, new ItemStacksResourceHandler(SLOT_COUNT), ContainerLevelAccess.create(playerInventory.player.level(),pos), pos);
+        this(containerId, playerInventory, new ItemStackHandler(SLOT_COUNT), ContainerLevelAccess.create(playerInventory.player.level(),pos), pos);
     }
 
     public MenuSmelter(int containerId, Inventory playerInventory, BlockEntitySmelter blockEntity) {
@@ -44,14 +44,14 @@ public final class MenuSmelter extends AbstractContainerMenu {
                 blockEntity.getBlockPos());
     }
 
-    private MenuSmelter(int containerId, Inventory playerInventory, ItemStacksResourceHandler items, ContainerLevelAccess access, BlockPos pos) {
+    private MenuSmelter(int containerId, Inventory playerInventory, ItemStackHandler items, ContainerLevelAccess access, BlockPos pos) {
         super(TCMenus.SMELTER.get(), containerId);
         this.items = items;
         this.access = access;
         this.pos = pos;
 
-        addSlot(new ResourceHandlerSlot(items, items::set, 0, ITEM_X, ITEM_Y));
-        addSlot(new ResourceHandlerSlot(items, items::set, 1, FUEL_X, FUEL_Y));
+        addSlot(new SlotItemHandler(items, 0, ITEM_X, ITEM_Y));
+        addSlot(new SlotItemHandler(items, 1, FUEL_X, FUEL_Y));
 
         for (int row = 0; row < PLAYER_ROWS; row++) {
             for (int col = 0; col < PLAYER_ROW_SLOTS; col++) {
@@ -70,7 +70,7 @@ public final class MenuSmelter extends AbstractContainerMenu {
         return pos;
     }
 
-    public ItemStacksResourceHandler items() {
+    public ItemStackHandler items() {
         return items;
     }
 

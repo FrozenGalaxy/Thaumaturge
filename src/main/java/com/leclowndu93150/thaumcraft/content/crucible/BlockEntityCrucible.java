@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.crucible;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.content.research.ResearchProgressionEvents;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
@@ -14,7 +15,6 @@ import com.leclowndu93150.thaumcraft.content.fx.FX;
 import com.leclowndu93150.thaumcraft.content.recipe.ThaumcraftCraftingManager;
 import com.leclowndu93150.thaumcraft.content.recipe.crucible.CrucibleRecipe;
 import com.leclowndu93150.thaumcraft.content.recipe.crucible.CrucibleRecipeInput;
-import com.leclowndu93150.thaumcraft.mixin.world.entity.item.ItemEntityAccessor;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import com.leclowndu93150.thaumcraft.registry.TCBlockTags;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
@@ -29,9 +29,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -43,17 +41,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import java.awt.*;
 
@@ -62,10 +56,10 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
     public static final int TANK_CAPACITY = 1000;
     public static final int MAX_ASPECT = 500;
 
-    private final FluidStacksResourceHandler tank = new FluidStacksResourceHandler(1,TANK_CAPACITY){
+    private final FluidTank tank = new FluidTank(TANK_CAPACITY){
         @Override
-        protected void onContentsChanged(int index, FluidStack previousContents) {
-            super.onContentsChanged(index, previousContents);
+        protected void onContentsChanged() {
+            super.onContentsChanged();
             setChanged();
             syncToClient();
         }
@@ -90,7 +84,7 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
         counter++;
         int prevHeat = heat;
         if (!level.isClientSide()){
-            if (tank.getAmountAsInt(0) > 0 ){
+            if (tank.getFluidAmount() > 0 ){
                 BlockState below = level.getBlockState(getBlockPos().below());
                 boolean hasHeatBelow = below.is(TCBlockTags.CRUCIBLE_HEAT_SOURCES);
                 if (!hasHeatBelow){
@@ -120,7 +114,7 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
                 counter = 0L;
             }
 
-            if (tank.getAmountAsInt(0) > 0) {
+            if (tank.getFluidAmount() > 0) {
                 this.sendEffects();
             }
         }
@@ -210,19 +204,21 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        output.store("Aspects",AspectList.CODEC,aspects);
-        tank.serialize(output.child("Tank"));
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
+        TCNbt.store(output, "Aspects", AspectList.CODEC, registries, aspects);
+        output.put("Tank", tank.writeToNBT(registries, new CompoundTag()));
         output.putShort("Heat",heat);
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        input.child("Tank").ifPresent(tank::deserialize);
-        aspects = input.read("Aspects",AspectList.CODEC).orElse(AspectList.EMPTY);
-        heat = (short) input.getShortOr("Heat", (short) 0);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        if (input.contains("Tank")) {
+            tank.readFromNBT(registries, input.getCompound("Tank"));
+        }
+        aspects = TCNbt.read(input, "Aspects", AspectList.CODEC, registries).orElse(AspectList.EMPTY);
+        heat = (short) input.getShort("Heat");
     }
 
     private void syncToClient() {
@@ -234,10 +230,10 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput tagvalueoutput = TagValueOutput.createWithContext(problemreporter$scopedcollector, registries);
-            saveAdditional(tagvalueoutput);
-            nbt.merge(tagvalueoutput.buildResult());
+        {
+            CompoundTag tagvalueoutput = new CompoundTag();
+            saveAdditional(tagvalueoutput, registries);
+            nbt.merge(tagvalueoutput);
         }
         return nbt;
     }
@@ -247,12 +243,12 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    public FluidStacksResourceHandler getTank() {
+    public FluidTank getTank() {
         return tank;
     }
 
     public float getFluidHeight() {
-        float base = 0.3F + 0.5F * ((float)this.tank.getAmountAsInt(0) / TANK_CAPACITY);
+        float base = 0.3F + 0.5F * ((float)this.tank.getFluidAmount() / TANK_CAPACITY);
         float out = base + (float) this.aspects.totalAmount() / MAX_ASPECT * (1.0F - base);
         if (out > 1.0F) {
             out = 1.001F;
@@ -268,8 +264,8 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
     public void spillRemnants() {
         if (level == null || level.isClientSide()) return;
         int total = aspects.totalAmount();
-        if (tank.getAmountAsInt(0) > 0 || total > 0){
-            tank.set(0, FluidResource.EMPTY,0);
+        if (tank.getFluidAmount() > 0 || total > 0){
+            tank.setFluid(FluidStack.EMPTY);
             AuraHelper.polluteAura(level,getBlockPos(),total * 0.25f, true);
             int fluxAmount = aspects.amountOf(level.registryAccess().getOrThrow(TCAspects.VITIUM));
             if (fluxAmount > 0)
@@ -357,7 +353,7 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
     public ItemStack attemptSmelt(ItemStack stack, Player owner){
         if (level == null || level.isClientSide()) return stack;
         if (owner == null || owner.isDeadOrDying()) return stack;
-        if (tank.getAmountAsInt(0) <= 0) return stack;
+        if (tank.getFluidAmount() <= 0) return stack;
         boolean bubble = false;
         boolean craftDone = false;
         int count = stack.getCount();
@@ -367,9 +363,8 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
             if (recipe != null){
                 ItemStack out = recipe.assemble(new CrucibleRecipeInput(stack,this.aspects));
                 this.aspects = recipe.removeMatching(aspects);
-                try (Transaction ctx = Transaction.openRoot()) {
-                    tank.extract(FluidResource.of(Fluids.WATER),50,ctx);
-                    ctx.commit();
+                {
+                    tank.drain(50, IFluidHandler.FluidAction.EXECUTE);
                 }
                 ejectItem(out);
                 if (owner instanceof ServerPlayer serverPlayer) {
@@ -410,14 +405,14 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
     public void attemptSmelt(ItemEntity entity){
         if (entity.level().isClientSide()) return;
         ItemStack stack = entity.getItem();
-        Entity throwerRef = EntityReference.getEntity(((ItemEntityAccessor)entity).thaumcraft$getThrower(),entity.level());
+        Entity throwerRef = entity.getOwner();
         if (!(throwerRef instanceof Player player)) return;
         ItemStack res = attemptSmelt(stack,player);
         if ( res != null && res.count()>0){
             stack.setCount(res.getCount());
             entity.setItem(stack);
         } else {
-            entity.discard();
+            entity.remove();
         }
     }
 }

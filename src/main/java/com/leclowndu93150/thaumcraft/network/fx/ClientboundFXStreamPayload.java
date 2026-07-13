@@ -4,7 +4,7 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record ClientboundFXStreamPayload(
         FXStreamKind kind,
@@ -23,7 +23,7 @@ public record ClientboundFXStreamPayload(
     public static final byte FLAG_WITH_SOURCE = 2;
 
     public static final Type<ClientboundFXStreamPayload> TYPE = new Type<>(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "fx_stream"));
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "fx_stream"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundFXStreamPayload> STREAM_CODEC = StreamCodec.of(
             (buf, data) -> {

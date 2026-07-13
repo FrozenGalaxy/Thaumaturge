@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.fx;
 
 import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.RandomSource;
 
 public final class WispFx {
@@ -34,7 +34,7 @@ public final class WispFx {
     public static FXGenericData mote(RandomSource random, int color) {
         return FXGenericData.builder()
                 .maxAge(MOTE_BASE_AGE + random.nextInt(MOTE_AGE_SPREAD))
-                .color(ARGB.red(color) / 255.0F, ARGB.green(color) / 255.0F, ARGB.blue(color) / 255.0F)
+                .color(ARGB32.red(color) / 255.0F, ARGB32.green(color) / 255.0F, ARGB32.blue(color) / 255.0F)
                 .alpha(MOTE_ALPHA)
                 .loop(true)
                 .grid(MOTE_GRID)

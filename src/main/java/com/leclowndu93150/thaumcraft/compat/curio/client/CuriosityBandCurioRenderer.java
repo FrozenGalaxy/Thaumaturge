@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -19,7 +19,7 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 public final class CuriosityBandCurioRenderer implements ICurioRenderer {
-    private static final Identifier TEXTURE = TCIds.rl("textures/item/curiosity_band_worn.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/item/curiosity_band_worn.png");
     private static final float HALF_WIDTH = 0.25F;
     private static final float TOP_Y = -0.5F;
     private static final float HEIGHT = 0.8125F;

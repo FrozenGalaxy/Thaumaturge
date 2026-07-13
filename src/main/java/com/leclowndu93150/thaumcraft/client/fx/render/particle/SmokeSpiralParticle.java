@@ -10,7 +10,7 @@ import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
@@ -81,7 +81,7 @@ public final class SmokeSpiralParticle extends SingleQuadParticle {
         float wz = baseZ + mZ;
         Quaternionf rotation = new Quaternionf();
         this.getFacingCameraMode().setRotation(rotation, camera, partialTickTime);
-        int color = ARGB.colorFromFloat(ALPHA * this.currentAlpha, this.rCol, this.gCol, this.bCol);
+        int color = ARGB32.colorFromFloat(ALPHA * this.currentAlpha, this.rCol, this.gCol, this.bCol);
         int light = this.getLightCoords(partialTickTime);
         renderState.add(
                 this.getLayer(),

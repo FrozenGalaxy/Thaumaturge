@@ -13,7 +13,7 @@ import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -29,7 +29,7 @@ import net.minecraft.world.phys.HitResult;
 import org.jspecify.annotations.Nullable;
 
 public final class FocusEffectCurse extends FocusEffect {
-    private static final Identifier KEY = TCIds.rl("curse");
+    private static final ResourceLocation KEY = TCIds.rl("curse");
 
     private static final int POWER_COMPLEXITY_FACTOR = 3;
     private static final int DURATION_TICKS_FACTOR = 20;
@@ -42,7 +42,7 @@ public final class FocusEffectCurse extends FocusEffect {
     private static final float COLOR_DIVISOR = 255.0F;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

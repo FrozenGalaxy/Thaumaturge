@@ -10,17 +10,17 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4fc;
 
 public final class ArcaneBoreRenderer
         extends MobRenderer<EntityArcaneBore, ArcaneBoreRenderState, ArcaneBoreModel> {
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/arcanebore.png");
-    private static final Identifier BEAM_TEXTURE = TCIds.rl("textures/misc/beam1.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/arcanebore.png");
+    private static final ResourceLocation BEAM_TEXTURE = TCIds.rl("textures/misc/beam1.png");
     private static final RenderType BEAM_TYPE = RenderType.create(
             "tc_bore_beam",
             RenderSetup.builder(TCRenderPipelines.FX_ADDITIVE)
@@ -32,7 +32,7 @@ public final class ArcaneBoreRenderer
     private static final double BEAM_LENGTH = 5.0;
     private static final float BEAM_RADIUS = 0.15F;
     private static final float BEAM_ALPHA = 0.4F;
-    private static final int BEAM_TINT = ARGB.colorFromFloat(BEAM_ALPHA, 0.0F, 1.0F, 0.4F);
+    private static final int BEAM_TINT = ARGB32.colorFromFloat(BEAM_ALPHA, 0.0F, 1.0F, 0.4F);
     private static final int BEAM_LIGHT = 0x000000C8;
     private static final int BEAM_STRIPS = 3;
 
@@ -93,7 +93,7 @@ public final class ArcaneBoreRenderer
     }
 
     @Override
-    public Identifier getTextureLocation(ArcaneBoreRenderState state) {
+    public ResourceLocation getTextureLocation(ArcaneBoreRenderState state) {
         return TEXTURE;
     }
 }

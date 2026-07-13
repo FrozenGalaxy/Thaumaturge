@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -42,7 +42,7 @@ public class SealPickup extends SealFiltered implements ISealConfigArea {
     private final Map<Integer, Integer> itemEntities = new HashMap<>();
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return TCIds.rl("pickup");
     }
 
@@ -139,7 +139,7 @@ public class SealPickup extends SealFiltered implements ISealConfigArea {
     }
 
     @Override
-    public Identifier getSealIcon() {
+    public ResourceLocation getSealIcon() {
         return TCIds.rl("textures/item/seal_pickup.png");
     }
 

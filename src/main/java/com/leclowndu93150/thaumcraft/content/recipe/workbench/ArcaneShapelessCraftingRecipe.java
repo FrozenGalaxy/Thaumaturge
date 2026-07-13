@@ -15,7 +15,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.PlacementInfo;
@@ -36,7 +35,7 @@ public class ArcaneShapelessCraftingRecipe extends ArcaneCraftingRecipe {
                     ExtraCodecs.POSITIVE_INT.fieldOf("vis").forGetter(o->o.vis),
                     ResearchGate.CODEC.optionalFieldOf("research").forGetter(o->o.gate),
                     ArcaneCraftingRecipe.PRIMAL_ASPECTS_CODEC.fieldOf("crystals").forGetter(o->o.aspects),
-                    ItemStackTemplate.CODEC.fieldOf("result").forGetter((o) -> o.result),
+                    ItemStack.CODEC.fieldOf("result").forGetter((o) -> o.result),
                     Codec.lazyInitialized(() -> Ingredient.CODEC.listOf(1, ArcaneShapedRecipePattern.maxHeight * ArcaneShapedRecipePattern.maxWidth)).fieldOf("ingredients").forGetter((o) -> o.ingredients)
             ).apply(i, ArcaneShapelessCraftingRecipe::new));
 
@@ -45,16 +44,16 @@ public class ArcaneShapelessCraftingRecipe extends ArcaneCraftingRecipe {
             ByteBufCodecs.VAR_INT, (o) -> o.vis,
             ByteBufCodecs.optional(ResearchGate.STREAM_CODEC), o -> o.gate,
             AspectList.STREAM_CODEC, o -> o.aspects,
-            ItemStackTemplate.STREAM_CODEC, (o) -> o.result,
+            ItemStack.STREAM_CODEC, (o) -> o.result,
             Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), (o) -> o.ingredients,
             ArcaneShapelessCraftingRecipe::new);
 
     public static final RecipeSerializer<ArcaneShapelessCraftingRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
-    private final ItemStackTemplate result;
+    private final ItemStack result;
     private final List<Ingredient> ingredients;
     private final boolean isSimple;
 
-    public ArcaneShapelessCraftingRecipe(Recipe.CommonInfo commonInfo, int vis, Optional<ResearchGate> researchGate, AspectList aspects, ItemStackTemplate result, List<Ingredient> ingredients) {
+    public ArcaneShapelessCraftingRecipe(Recipe.CommonInfo commonInfo, int vis, Optional<ResearchGate> researchGate, AspectList aspects, ItemStack result, List<Ingredient> ingredients) {
         super(commonInfo, vis, researchGate, aspects);
         this.result = result;
         this.ingredients = ingredients;
@@ -88,7 +87,7 @@ public class ArcaneShapelessCraftingRecipe extends ArcaneCraftingRecipe {
         }
     }
 
-    public @Nullable ItemStackTemplate result() {
+    public @Nullable ItemStack result() {
         return this.result;
     }
 

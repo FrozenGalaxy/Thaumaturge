@@ -11,13 +11,13 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
 
 public final class TurretCrossbowAdvancedRenderer
         extends EntityRenderer<EntityTurretCrossbowAdvanced, TurretCrossbowAdvancedRenderer.State> {
@@ -26,12 +26,12 @@ public final class TurretCrossbowAdvancedRenderer
         public float headPitch;
     }
 
-    private static final Identifier MODEL = TCIds.rl("models/obj/crossbow_advanced.obj");
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/crossbow_advanced.png");
+    private static final ResourceLocation MODEL = TCIds.rl("models/obj/crossbow_advanced.obj");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/crossbow_advanced.png");
     private static final float BASE_LIFT = 0.75F;
     private static final float SHADOW = 0.5F;
     private static final float HURT_JIGGLE_DIVISOR = 500.0F;
-    private static final int HURT_TINT = ARGB.colorFromFloat(1.0F, 1.0F, 0.5F, 0.5F);
+    private static final int HURT_TINT = ARGB32.colorFromFloat(1.0F, 1.0F, 0.5F, 0.5F);
 
     private final RandomSource jiggleRandom = RandomSource.create();
 

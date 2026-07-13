@@ -19,14 +19,13 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.PlacementInfo;
-import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -38,15 +37,15 @@ import org.jspecify.annotations.Nullable;
 public final class DustTriggerMultiblockRecipe implements DustTrigger {
 
     public static final MapCodec<DustTriggerMultiblockRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-                    Identifier.CODEC.fieldOf("blueprint").forGetter(r -> r.blueprintId),
-                    ItemStackTemplate.CODEC.fieldOf("result").forGetter(r -> r.result),
+                    ResourceLocation.CODEC.fieldOf("blueprint").forGetter(r -> r.blueprintId),
+                    ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
                     ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research)
             ).apply(i, DustTriggerMultiblockRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, DustTriggerMultiblockRecipe> STREAM_CODEC = StreamCodec.composite(
-            Identifier.STREAM_CODEC,
+            ResourceLocation.STREAM_CODEC,
             r -> r.blueprintId,
-            ItemStackTemplate.STREAM_CODEC,
+            ItemStack.STREAM_CODEC,
             r -> r.result,
             ByteBufCodecs.optional(ResearchGate.STREAM_CODEC),
             r -> r.research,
@@ -55,17 +54,17 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
 
     public static final RecipeSerializer<DustTriggerMultiblockRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
-    private final Identifier blueprintId;
-    private final ItemStackTemplate result;
+    private final ResourceLocation blueprintId;
+    private final ItemStack result;
     private final Optional<ResearchGate> research;
 
-    public DustTriggerMultiblockRecipe(Identifier blueprintId, ItemStackTemplate result, Optional<ResearchGate> research) {
+    public DustTriggerMultiblockRecipe(ResourceLocation blueprintId, ItemStack result, Optional<ResearchGate> research) {
         this.blueprintId = blueprintId;
         this.result = result;
         this.research = research;
     }
 
-    public Identifier blueprintId() {
+    public ResourceLocation blueprintId() {
         return this.blueprintId;
     }
 

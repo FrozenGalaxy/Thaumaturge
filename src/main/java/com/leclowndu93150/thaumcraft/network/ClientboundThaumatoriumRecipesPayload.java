@@ -6,7 +6,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -15,9 +15,9 @@ public record ClientboundThaumatoriumRecipesPayload(int containerId, List<Entry>
     public static final CustomPacketPayload.Type<ClientboundThaumatoriumRecipesPayload> TYPE =
             new CustomPacketPayload.Type<>(TCIds.rl("thaumatorium_recipes"));
 
-    public record Entry(Identifier id, ItemStack output, boolean queued, AspectList aspects) {
+    public record Entry(ResourceLocation id, ItemStack output, boolean queued, AspectList aspects) {
         public static final StreamCodec<RegistryFriendlyByteBuf, Entry> STREAM_CODEC = StreamCodec.composite(
-                Identifier.STREAM_CODEC, Entry::id,
+                ResourceLocation.STREAM_CODEC, Entry::id,
                 ItemStack.STREAM_CODEC, Entry::output,
                 ByteBufCodecs.BOOL, Entry::queued,
                 AspectList.STREAM_CODEC, Entry::aspects,

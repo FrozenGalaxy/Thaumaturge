@@ -3,11 +3,11 @@ package com.leclowndu93150.thaumcraft.content.golem.seals;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import com.leclowndu93150.thaumcraft.api.golems.seals.ISealConfigToggles;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class SealFillAdvanced extends SealFill implements ISealConfigToggles {
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return TCIds.rl("fill_advanced");
     }
 
@@ -17,7 +17,7 @@ public class SealFillAdvanced extends SealFill implements ISealConfigToggles {
     }
 
     @Override
-    public Identifier getSealIcon() {
+    public ResourceLocation getSealIcon() {
         return TCIds.rl("textures/item/seal_fill_advanced.png");
     }
 

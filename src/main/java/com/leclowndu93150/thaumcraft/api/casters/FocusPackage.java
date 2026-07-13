@@ -16,7 +16,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
@@ -29,7 +29,7 @@ import org.jspecify.annotations.Nullable;
  * @since 1.0.0
  */
 public class FocusPackage implements IFocusElement {
-    private static final Identifier KEY = Identifier.fromNamespaceAndPath("thaumcraft", "package");
+    private static final ResourceLocation KEY = ResourceLocation.fromNamespaceAndPath("thaumcraft", "package");
     private static final float DEFAULT_POWER = 1.0F;
 
     /**
@@ -39,7 +39,7 @@ public class FocusPackage implements IFocusElement {
      */
     public static final Codec<FocusPackage> CODEC = Codec.recursive("FocusPackage", self -> {
         Codec<NodeEntry> entryCodec = RecordCodecBuilder.create(i -> i.group(
-                Identifier.CODEC.fieldOf("key").forGetter(NodeEntry::key),
+                ResourceLocation.CODEC.fieldOf("key").forGetter(NodeEntry::key),
                 Codec.unboundedMap(Codec.STRING, Codec.INT).optionalFieldOf("settings", Map.of()).forGetter(NodeEntry::settings),
                 self.listOf().optionalFieldOf("packages", List.of()).forGetter(NodeEntry::packages)
         ).apply(i, NodeEntry::new));
@@ -88,7 +88,7 @@ public class FocusPackage implements IFocusElement {
     }
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 
@@ -394,7 +394,7 @@ public class FocusPackage implements IFocusElement {
         return DataResult.error(() -> "Focus element is neither a node nor a package: " + element.getKey());
     }
 
-    private record NodeEntry(Identifier key, Map<String, Integer> settings, List<FocusPackage> packages) {
+    private record NodeEntry(ResourceLocation key, Map<String, Integer> settings, List<FocusPackage> packages) {
     }
     /**
      * Compares packages by spell content: complexity and the node structure hash.

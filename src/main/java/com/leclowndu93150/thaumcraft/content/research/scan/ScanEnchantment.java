@@ -4,7 +4,7 @@ import com.leclowndu93150.thaumcraft.api.research.scan.IScanThing;
 import com.leclowndu93150.thaumcraft.api.research.scan.ScanKeys;
 import com.leclowndu93150.thaumcraft.api.research.scan.ScanningManager;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -12,9 +12,9 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.jspecify.annotations.Nullable;
 
 public final class ScanEnchantment implements IScanThing {
-    private final Identifier enchantment;
+    private final ResourceLocation enchantment;
 
-    public ScanEnchantment(Identifier enchantment) {
+    public ScanEnchantment(ResourceLocation enchantment) {
         this.enchantment = enchantment;
     }
 
@@ -33,7 +33,7 @@ public final class ScanEnchantment implements IScanThing {
     }
 
     @Override
-    public Identifier getResearchKey(Player player, @Nullable Object target) {
+    public ResourceLocation getResearchKey(Player player, @Nullable Object target) {
         return ScanKeys.enchantment(enchantment);
     }
 }

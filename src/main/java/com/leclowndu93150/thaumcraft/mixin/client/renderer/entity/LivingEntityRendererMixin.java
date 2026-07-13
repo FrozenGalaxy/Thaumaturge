@@ -6,7 +6,7 @@ import com.leclowndu93150.thaumcraft.content.entity.champion.ChampionModifier;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,8 +25,8 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, S extend
     @Inject(method = "getModelTint", at = @At("RETURN"), cancellable = true)
     private void thaumcraft$championTint(S state, CallbackInfoReturnable<Integer> cir) {
         if (((ChampionRenderState) state).thaumcraft$championType() == ChampionModifier.GRIM) {
-            cir.setReturnValue(ARGB.multiply(cir.getReturnValue(),
-                    ARGB.colorFromFloat(1.0F, 0.6F, 0.6F, 0.6F)));
+            cir.setReturnValue(ARGB32.multiply(cir.getReturnValue(),
+                    ARGB32.colorFromFloat(1.0F, 0.6F, 0.6F, 0.6F)));
         }
     }
 }

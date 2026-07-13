@@ -17,9 +17,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.PlacementInfo;
-import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -29,14 +28,14 @@ import net.minecraft.world.level.block.Block;
 public final class DustTriggerSimpleRecipe implements DustTrigger {
     public static final MapCodec<DustTriggerSimpleRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("target").forGetter(r -> r.target),
-                    ItemStackTemplate.CODEC.fieldOf("result").forGetter(r -> r.result),
+                    ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
                     ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research)
             ).apply(i, DustTriggerSimpleRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, DustTriggerSimpleRecipe> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.registry(Registries.BLOCK),
             r -> r.target,
-            ItemStackTemplate.STREAM_CODEC,
+            ItemStack.STREAM_CODEC,
             r -> r.result,
             ByteBufCodecs.optional(ResearchGate.STREAM_CODEC),
             r -> r.research,
@@ -46,10 +45,10 @@ public final class DustTriggerSimpleRecipe implements DustTrigger {
     public static final RecipeSerializer<DustTriggerSimpleRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     private final Block target;
-    private final ItemStackTemplate result;
+    private final ItemStack result;
     private final Optional<ResearchGate> research;
 
-    public DustTriggerSimpleRecipe(Block target, ItemStackTemplate result, Optional<ResearchGate> research) {
+    public DustTriggerSimpleRecipe(Block target, ItemStack result, Optional<ResearchGate> research) {
         this.target = target;
         this.result = result;
         this.research = research;

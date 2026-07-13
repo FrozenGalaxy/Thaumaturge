@@ -6,7 +6,7 @@ import com.leclowndu93150.thaumcraft.api.casters.IFocusElement;
 import com.leclowndu93150.thaumcraft.network.fx.ClientboundFocusImpactPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -42,7 +42,7 @@ public final class FocusImpactClientHandler {
         int budget = payload.burst() ? BURST_PARTICLE_BUDGET : IMPACT_PARTICLE_BUDGET;
         int amount = Math.max(1, budget / payload.parts().size());
         RandomSource rand = level.getRandom();
-        for (Identifier key : payload.parts()) {
+        for (ResourceLocation key : payload.parts()) {
             IFocusElement element = FocusEngine.getElement(key);
             if (!(element instanceof FocusEffect effect)) {
                 continue;

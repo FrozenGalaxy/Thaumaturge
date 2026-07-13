@@ -12,11 +12,11 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
@@ -24,8 +24,8 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public final class DioptraRenderer implements BlockEntityRenderer<BlockEntityDioptra, DioptraRenderState> {
-    private static final Identifier GRID_TEXTURE = TCIds.rl("textures/misc/gridblock.png");
-    private static final Identifier SIDE_TEXTURE = TCIds.rl("textures/entity/dioptra_side.png");
+    private static final ResourceLocation GRID_TEXTURE = TCIds.rl("textures/misc/gridblock.png");
+    private static final ResourceLocation SIDE_TEXTURE = TCIds.rl("textures/entity/dioptra_side.png");
     private static final RenderPipeline PIPELINE = TCFXPipelines.additiveTextured(TCIds.rl("pipeline/dioptra"));
     private static final RenderType GRID_TYPE = RenderType.create("tc_dioptra_grid",
             RenderSetup.builder(PIPELINE).withTexture("Sampler0", GRID_TEXTURE).createRenderSetup());
@@ -126,7 +126,7 @@ public final class DioptraRenderer implements BlockEntityRenderer<BlockEntityDio
         });
         poseStack.popPose();
 
-        int sideColor = ARGB.colorFromFloat(SIDE_ALPHA, Math.min(1.0F, rc), Math.min(1.0F, gc), Math.min(1.0F, bc));
+        int sideColor = ARGB32.colorFromFloat(SIDE_ALPHA, Math.min(1.0F, rc), Math.min(1.0F, gc), Math.min(1.0F, bc));
         collector.submitCustomGeometry(poseStack, SIDE_TYPE, (pose, buffer) -> {
             sideQuad(buffer, pose, 0.0F, 0.0F, 1.0F, 0.0F, sideColor);
             sideQuad(buffer, pose, 1.0F, 1.0F, 0.0F, 1.0F, sideColor);
@@ -146,7 +146,7 @@ public final class DioptraRenderer implements BlockEntityRenderer<BlockEntityDio
     }
 
     private static int cellColor(float r, float g, float b, float lum, float alpha) {
-        return ARGB.colorFromFloat(alpha,
+        return ARGB32.colorFromFloat(alpha,
                 Math.min(1.0F, r * 0.8F * lum), Math.min(1.0F, g * lum), Math.min(1.0F, b * lum));
     }
 

@@ -9,7 +9,6 @@
     "server.network.ServerGamePacketListenerImplAccessor",
     "world.entity.ExperienceOrbAccessor",
     "world.entity.MobAccessor",
-    "world.entity.item.ItemEntityAccessor",
     "world.entity.monster.SlimeAccessor",
     "world.item.alchemy.PotionBrewingAccessor",
     "world.item.alchemy.PotionBrewingMixAccessor",

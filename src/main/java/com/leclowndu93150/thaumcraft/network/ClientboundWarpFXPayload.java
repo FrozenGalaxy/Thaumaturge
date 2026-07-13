@@ -5,7 +5,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record ClientboundWarpFXPayload(byte kind) implements CustomPacketPayload {
     public static final byte KIND_HEARTBEAT = 0;
@@ -13,7 +13,7 @@ public record ClientboundWarpFXPayload(byte kind) implements CustomPacketPayload
     public static final byte KIND_MIST_SHORT = 2;
 
     public static final Type<ClientboundWarpFXPayload> TYPE = new Type<>(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "warp_fx"));
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "warp_fx"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundWarpFXPayload> STREAM_CODEC =
             StreamCodec.composite(

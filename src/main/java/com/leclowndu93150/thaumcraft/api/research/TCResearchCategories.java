@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.api.research;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 
 /**
@@ -24,6 +24,6 @@ public final class TCResearchCategories {
     private TCResearchCategories() {}
 
     private static ResourceKey<IResearchCategory> key(String path) {
-        return ResourceKey.create(IResearchCategory.REGISTRY_KEY, Identifier.fromNamespaceAndPath(TCIds.MODID, path));
+        return ResourceKey.create(IResearchCategory.REGISTRY_KEY, ResourceLocation.fromNamespaceAndPath(TCIds.MODID, path));
     }
 }

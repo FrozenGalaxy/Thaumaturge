@@ -10,7 +10,7 @@ import com.leclowndu93150.thaumcraft.content.aspect.AspectIndexHolder;
 import com.leclowndu93150.thaumcraft.content.aspect.EntityAspects;
 import com.leclowndu93150.thaumcraft.content.research.ResearchManager;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -41,7 +41,7 @@ public final class ScanGeneric implements IScanThing {
     }
 
     @Override
-    public @Nullable Identifier getResearchKey(Player player, @Nullable Object target) {
+    public @Nullable ResourceLocation getResearchKey(Player player, @Nullable Object target) {
         if (target instanceof Entity entity && !(target instanceof ItemEntity)) {
             return ScanKeys.entity(entity.getType());
         }

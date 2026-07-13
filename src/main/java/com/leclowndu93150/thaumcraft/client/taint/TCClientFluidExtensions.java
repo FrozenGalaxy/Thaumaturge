@@ -4,8 +4,8 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.registry.TCFluidTypes;
 import com.leclowndu93150.thaumcraft.registry.TCFluids;
 import net.minecraft.client.color.block.BlockTintSources;
-import net.minecraft.client.resources.model.sprite.Material;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -30,9 +30,9 @@ public final class TCClientFluidExtensions {
         event.register(new FluidModel.Unbaked(gooTexture, gooTexture, null, null),
                 TCFluids.FLUX_GOO_SOURCE.get(), TCFluids.FLUX_GOO_FLOWING.get());
         event.register(new FluidModel.Unbaked(
-                        new Material(Identifier.withDefaultNamespace("block/water_still")),
-                        new Material(Identifier.withDefaultNamespace("block/water_flow")),
-                        new Material(Identifier.withDefaultNamespace("block/water_overlay")),
+                        new Material(ResourceLocation.withDefaultNamespace("block/water_still")),
+                        new Material(ResourceLocation.withDefaultNamespace("block/water_flow")),
+                        new Material(ResourceLocation.withDefaultNamespace("block/water_overlay")),
                         BlockTintSources.constant(PURIFYING_TINT)),
                 TCFluids.PURIFYING_SOURCE.get(), TCFluids.PURIFYING_FLOWING.get());
     }

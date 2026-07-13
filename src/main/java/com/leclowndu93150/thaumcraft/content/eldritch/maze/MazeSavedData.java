@@ -6,7 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.datafix.DataFixTypes;
@@ -25,7 +25,7 @@ public final class MazeSavedData extends SavedData {
     ).apply(builder, MazeSavedData::new));
 
     public static final SavedDataType<MazeSavedData> TYPE = new SavedDataType<>(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "labyrinth"),
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "labyrinth"),
             MazeSavedData::new,
             CODEC,
             DataFixTypes.LEVEL);

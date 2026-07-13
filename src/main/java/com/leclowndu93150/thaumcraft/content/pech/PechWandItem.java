@@ -7,11 +7,10 @@ import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import com.leclowndu93150.thaumcraft.content.research.ResearchManager;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.List;
-import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -21,22 +20,20 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
 public final class PechWandItem extends Item {
-    private static final Identifier GATE_RESEARCH = TCIds.rl("base_auromancy");
-    private static final Identifier FOCUS_PECH = TCIds.rl("focuspech");
+    private static final ResourceLocation GATE_RESEARCH = TCIds.rl("base_auromancy");
+    private static final ResourceLocation FOCUS_PECH = TCIds.rl("focuspech");
 
     public PechWandItem(Properties properties) {
         super(properties);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display,
-                                Consumer<Component> tooltip, TooltipFlag flag) {
-        tooltip.accept(Component.translatable("item.curio.text"));
-        super.appendHoverText(stack, context, display, tooltip, flag);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(Component.translatable("item.curio.text"));
+        super.appendHoverText(stack, context, tooltip, flag);
     }
 
     @Override

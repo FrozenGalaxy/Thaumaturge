@@ -5,7 +5,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class FallingTaintRenderer extends EntityRenderer<EntityFallingTaint, EntityRenderState> {
     public FallingTaintRenderer(EntityRendererProvider.Context context) {
@@ -18,7 +18,7 @@ public final class FallingTaintRenderer extends EntityRenderer<EntityFallingTain
         return new EntityRenderState();
     }
 
-    public Identifier getTextureLocation(EntityRenderState state) {
+    public ResourceLocation getTextureLocation(EntityRenderState state) {
         return TextureAtlas.LOCATION_BLOCKS;
     }
 }

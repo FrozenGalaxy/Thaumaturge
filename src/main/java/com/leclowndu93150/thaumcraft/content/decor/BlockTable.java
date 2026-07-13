@@ -21,7 +21,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.transfer.item.ItemResource;
 
 public final class BlockTable extends Block {
     public static final MapCodec<BlockTable> CODEC = simpleCodec(BlockTable::new);
@@ -61,7 +60,7 @@ public final class BlockTable extends Block {
         level.setBlock(pos, table, 3);
         if (level.getBlockEntity(pos) instanceof BlockEntityResearchTable researchTable) {
             ItemStack tools = stack.copy();
-            researchTable.items().set(BlockEntityResearchTable.SLOT_SCRIBE_TOOLS, ItemResource.of(tools), tools.getCount());
+            researchTable.items().setStackInSlot(BlockEntityResearchTable.SLOT_SCRIBE_TOOLS, tools.copyWithCount(tools.getCount()));
             researchTable.setChanged();
         }
         player.setItemInHand(hand, ItemStack.EMPTY);

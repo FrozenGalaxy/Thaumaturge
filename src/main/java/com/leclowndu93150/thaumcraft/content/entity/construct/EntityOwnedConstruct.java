@@ -2,7 +2,9 @@ package com.leclowndu93150.thaumcraft.content.entity.construct;
 
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -15,25 +17,22 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.gamerules.GameRules;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.scores.PlayerTeam;
 import org.jspecify.annotations.Nullable;
 
 public abstract class EntityOwnedConstruct extends PathfinderMob implements OwnableEntity {
     private static final EntityDataAccessor<Byte> OWNED_FLAGS =
             SynchedEntityData.defineId(EntityOwnedConstruct.class, EntityDataSerializers.BYTE);
-    private static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> OWNER =
-            SynchedEntityData.defineId(EntityOwnedConstruct.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
+    private static final EntityDataAccessor<Optional<UUID>> OWNER =
+            SynchedEntityData.defineId(EntityOwnedConstruct.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final int OWNED_BIT = 4;
 
     private boolean validSpawn;
@@ -63,12 +62,12 @@ public abstract class EntityOwnedConstruct extends PathfinderMob implements Owna
     }
 
     @Override
-    public @Nullable EntityReference<LivingEntity> getOwnerReference() {
+    public @Nullable UUID getOwnerUUID() {
         return entityData.get(OWNER).orElse(null);
     }
 
     public void setOwner(LivingEntity owner) {
-        entityData.set(OWNER, Optional.of(EntityReference.of(owner)));
+        entityData.set(OWNER, Optional.of(owner.getUUID()));
         setOwned(true);
     }
 
@@ -127,19 +126,21 @@ public abstract class EntityOwnedConstruct extends PathfinderMob implements Owna
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("v", validSpawn);
-        EntityReference.store(getOwnerReference(), output, "Owner");
+        UUID owner = getOwnerUUID();
+        if (owner != null) {
+            output.putUUID("Owner", owner);
+        }
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
+    protected void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        validSpawn = input.getBooleanOr("v", false);
-        EntityReference<LivingEntity> owner = EntityReference.readWithOldOwnerConversion(input, "Owner", level());
-        if (owner != null) {
-            entityData.set(OWNER, Optional.of(owner));
+        validSpawn = input.getBoolean("v");
+        if (input.hasUUID("Owner")) {
+            entityData.set(OWNER, Optional.of(input.getUUID("Owner")));
             setOwned(true);
         } else {
             entityData.set(OWNER, Optional.empty());
@@ -159,7 +160,7 @@ public abstract class EntityOwnedConstruct extends PathfinderMob implements Owna
     }
 
     @Override
-    protected boolean considersEntityAsAlly(Entity other) {
+    public boolean isAlliedTo(Entity other) {
         if (isOwned()) {
             LivingEntity owner = getOwner();
             if (other == owner) {
@@ -169,13 +170,13 @@ public abstract class EntityOwnedConstruct extends PathfinderMob implements Owna
                 return owner.isAlliedTo(other);
             }
         }
-        return super.considersEntityAsAlly(other);
+        return super.isAlliedTo(other);
     }
 
     @Override
     public void die(DamageSource cause) {
         if (level() instanceof ServerLevel serverLevel
-                && serverLevel.getGameRules().get(GameRules.SHOW_DEATH_MESSAGES)
+                && serverLevel.getGameRules().getBoolean(GameRules.RULE_SHOWDEATHMESSAGES)
                 && hasCustomName()
                 && getOwner() instanceof ServerPlayer player) {
             player.sendSystemMessage(getCombatTracker().getDeathMessage());

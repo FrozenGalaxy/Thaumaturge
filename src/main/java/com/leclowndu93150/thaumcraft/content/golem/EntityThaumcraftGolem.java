@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.golem;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import com.leclowndu93150.thaumcraft.config.ThaumcraftCommonConfig;
 import com.leclowndu93150.thaumcraft.api.golems.IGolemAPI;
@@ -21,6 +22,7 @@ import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
@@ -38,7 +40,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -64,8 +66,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
@@ -293,7 +293,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                  EntitySpawnReason spawnReason, @Nullable SpawnGroupData spawnGroupData) {
+                                                  MobSpawnType spawnReason, @Nullable SpawnGroupData spawnGroupData) {
         setHomeTo(blockPosition(), HOME_RANGE);
         updateEntityAttributes();
         return spawnGroupData;
@@ -769,23 +769,23 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
-        output.store("props", GolemProperties.CODEC, props());
-        output.store("homepos", BlockPos.CODEC, getHomePosition());
+        TCNbt.store(output, "props", GolemProperties.CODEC, registryAccess(), props());
+        TCNbt.store(output, "homepos", BlockPos.CODEC, registryAccess(), getHomePosition());
         output.putByte("gflags", getFlags());
         output.putInt("rankXP", rankXp);
         output.putByte("color", getGolemColor());
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
+    protected void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        input.read("props", GolemProperties.CODEC).ifPresent(this::setProperties);
-        setHomeTo(input.read("homepos", BlockPos.CODEC).orElse(BlockPos.ZERO), HOME_RANGE);
-        entityData.set(FLAGS, input.getByteOr("gflags", (byte) 0));
-        rankXp = input.getIntOr("rankXP", 0);
-        setGolemColor(input.getByteOr("color", (byte) 0));
+        TCNbt.read(input, "props", GolemProperties.CODEC, registryAccess()).ifPresent(this::setProperties);
+        setHomeTo(TCNbt.read(input, "homepos", BlockPos.CODEC, registryAccess()).orElse(BlockPos.ZERO), HOME_RANGE);
+        entityData.set(FLAGS, input.getByte("gflags"));
+        rankXp = input.getInt("rankXP");
+        setGolemColor(input.getByte("color"));
         updateEntityAttributes();
     }
 

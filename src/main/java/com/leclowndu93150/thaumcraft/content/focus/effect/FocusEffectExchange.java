@@ -13,7 +13,7 @@ import com.leclowndu93150.thaumcraft.api.casters.Trajectory;
 import com.leclowndu93150.thaumcraft.content.casters.BlockBreakerEngine;
 import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
 import java.util.Optional;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -29,7 +29,7 @@ import net.minecraft.world.phys.HitResult;
 import org.jspecify.annotations.Nullable;
 
 public final class FocusEffectExchange extends FocusEffect implements IFocusBlockPicker {
-    private static final Identifier KEY = TCIds.rl("exchange");
+    private static final ResourceLocation KEY = TCIds.rl("exchange");
 
     private static final int BASE_COMPLEXITY = 5;
     private static final int SILK_COMPLEXITY_FACTOR = 4;
@@ -42,7 +42,7 @@ public final class FocusEffectExchange extends FocusEffect implements IFocusBloc
     private static final int PARTICLE_NUM = 9;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return KEY;
     }
 

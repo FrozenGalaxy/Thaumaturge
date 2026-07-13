@@ -10,13 +10,12 @@ import com.leclowndu93150.thaumcraft.api.items.InvHelper;
 import com.leclowndu93150.thaumcraft.content.golem.tasks.TaskHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.items.IItemHandler;
 
 public class SealFill extends SealFiltered {
     private static final int SCAN_INTERVAL = 20;
@@ -34,7 +33,7 @@ public class SealFill extends SealFiltered {
     private int watchedTask = Integer.MIN_VALUE;
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return TCIds.rl("fill");
     }
 
@@ -69,7 +68,7 @@ public class SealFill extends SealFiltered {
         InvHelper.FilterMatch match = InvHelper.findFirstMatchFromFilterWithSize(getInv(), getSizes(),
                 isBlacklist(), golem.getCarrying(), flags);
         if (!match.stack().isEmpty()) {
-            ResourceHandler<ItemResource> inv = InvHelper.getItemHandlerAt(level, task.getSealPos().pos(), task.getSealPos().face());
+            IItemHandler inv = InvHelper.getItemHandlerAt(level, task.getSealPos().pos(), task.getSealPos().face());
             int limit = match.stack().getCount();
             if (hasStacksizeLimiters() && match.sizeLimit() > 0) {
                 int present = inv == null
@@ -110,7 +109,7 @@ public class SealFill extends SealFiltered {
         if (match.stack().isEmpty()) {
             return false;
         }
-        ResourceHandler<ItemResource> inv = InvHelper.getItemHandlerAt(golem.getGolemWorld(), task.getSealPos().pos(),
+        IItemHandler inv = InvHelper.getItemHandlerAt(golem.getGolemWorld(), task.getSealPos().pos(),
                 task.getSealPos().face());
         if (inv != null) {
             if (props[4].getValue() && InvHelper.countTotalItemsIn(inv, match.stack(), flags) <= 0) {
@@ -138,7 +137,7 @@ public class SealFill extends SealFiltered {
     }
 
     @Override
-    public Identifier getSealIcon() {
+    public ResourceLocation getSealIcon() {
         return TCIds.rl("textures/item/seal_fill.png");
     }
 

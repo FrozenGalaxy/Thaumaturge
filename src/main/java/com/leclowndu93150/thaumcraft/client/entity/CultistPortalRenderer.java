@@ -9,10 +9,10 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4fc;
 
@@ -26,7 +26,7 @@ public final class CultistPortalRenderer extends EntityRenderer<EntityCultistPor
         public float halfHeight;
     }
 
-    private static final Identifier TEXTURE = TCIds.rl("textures/misc/cultist_portal.png");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/misc/cultist_portal.png");
     private static final RenderType PORTAL_TYPE = RenderType.create(
             "tc_cultist_portal",
             RenderSetup.builder(TCRenderPipelines.FX_TRANSLUCENT)
@@ -95,7 +95,7 @@ public final class CultistPortalRenderer extends EntityRenderer<EntityCultistPor
         int frame = FRAMES - 1 - (int) state.activeCounter % FRAMES;
         float u0 = frame * FRAME_WIDTH;
         float u1 = u0 + FRAME_WIDTH;
-        int tint = ARGB.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F);
+        int tint = ARGB32.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F);
         float sx = scale;
         float sy = scaleY;
         poseStack.pushPose();

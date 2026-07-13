@@ -8,7 +8,7 @@ import com.leclowndu93150.thaumcraft.network.ClientboundWarpFXPayload;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.server.level.ServerLevel;
@@ -72,7 +72,7 @@ public class EntityEldritchGuardian extends Monster implements RangedAttackMob, 
     }
 
     public static boolean checkGuardianSpawnRules(EntityType<EntityEldritchGuardian> type, ServerLevelAccessor level,
-                                                  EntitySpawnReason reason, BlockPos pos, RandomSource random) {
+                                                  MobSpawnType reason, BlockPos pos, RandomSource random) {
         boolean alone = level.getEntitiesOfClass(EntityEldritchGuardian.class,
                 new AABB(pos).inflate(32.0, 16.0, 32.0)).isEmpty();
         return alone && Monster.checkAnyLightMonsterSpawnRules(type, level, reason, pos, random);
@@ -184,8 +184,8 @@ public class EntityEldritchGuardian extends Monster implements RangedAttackMob, 
     }
 
     @Override
-    protected boolean considersEntityAsAlly(Entity entity) {
-        return entity instanceof IEldritchMob || super.considersEntityAsAlly(entity);
+    public boolean isAlliedTo(Entity entity) {
+        return entity instanceof IEldritchMob || super.isAlliedTo(entity);
     }
 
     @Override

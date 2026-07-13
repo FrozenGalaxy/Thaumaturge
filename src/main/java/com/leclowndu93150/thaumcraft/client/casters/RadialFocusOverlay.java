@@ -13,9 +13,9 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -25,13 +25,13 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.gui.GuiLayer;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
 public final class RadialFocusOverlay implements GuiLayer {
-    private static final Identifier RADIAL_1 = TCIds.rl("textures/misc/radial.png");
-    private static final Identifier RADIAL_2 = TCIds.rl("textures/misc/radial2.png");
+    private static final ResourceLocation RADIAL_1 = TCIds.rl("textures/misc/radial.png");
+    private static final ResourceLocation RADIAL_2 = TCIds.rl("textures/misc/radial2.png");
 
     private static final int RADIAL_TEX_SIZE = 256;
     private static final float BASE_RADIUS = 16.0F;
@@ -107,7 +107,7 @@ public final class RadialFocusOverlay implements GuiLayer {
                 for (String key : fociHover.keySet()) {
                     if (fociHover.get(key)) {
                         if (!CasterKeyHandler.radialActive && !CasterKeyHandler.radialLock) {
-                            ClientPacketDistributor.sendToServer(new ServerboundFocusChangePayload(key));
+                            PacketDistributor.sendToServer(new ServerboundFocusChangePayload(key));
                             CasterKeyHandler.radialLock = true;
                         }
                         if (fociScale.get(key) < HOVER_SCALE_MAX) {
@@ -218,7 +218,7 @@ public final class RadialFocusOverlay implements GuiLayer {
                     if (pendingClick) {
                         CasterKeyHandler.radialActive = false;
                         CasterKeyHandler.radialLock = true;
-                        ClientPacketDistributor.sendToServer(new ServerboundFocusChangePayload(key));
+                        PacketDistributor.sendToServer(new ServerboundFocusChangePayload(key));
                         if (mc.isWindowActive() && !mc.mouseHandler.isMouseGrabbed()) {
                             mc.mouseHandler.grabMouse();
                         }
@@ -242,7 +242,7 @@ public final class RadialFocusOverlay implements GuiLayer {
         }
     }
 
-    private static void drawRing(GuiGraphicsExtractor graphics, Identifier texture,
+    private static void drawRing(GuiGraphicsExtractor graphics, ResourceLocation texture,
                                  int cx, int cy, float angleDeg, float size) {
         if (size <= 0.0F) {
             return;

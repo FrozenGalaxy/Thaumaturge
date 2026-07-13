@@ -8,8 +8,8 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import java.util.function.Function;
 
@@ -37,7 +37,7 @@ public final class FireBatModel extends EntityModel<FireBatRenderState> {
         this.leftWingTip = this.leftWing.getChild("left_wing_tip");
     }
 
-    public FireBatModel(ModelPart root, Function<Identifier, RenderType> renderType) {
+    public FireBatModel(ModelPart root, Function<ResourceLocation, RenderType> renderType) {
         super(root, renderType);
         this.head = root.getChild("head");
         this.body = root.getChild("body");

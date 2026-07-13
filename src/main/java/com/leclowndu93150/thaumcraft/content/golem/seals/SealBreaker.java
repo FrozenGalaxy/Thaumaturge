@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
@@ -37,7 +37,7 @@ public class SealBreaker extends SealFiltered implements ISealConfigArea, ISealC
     private final Map<Integer, Long> cache = new HashMap<>();
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return TCIds.rl("breaker");
     }
 
@@ -133,7 +133,7 @@ public class SealBreaker extends SealFiltered implements ISealConfigArea, ISealC
     }
 
     @Override
-    public Identifier getSealIcon() {
+    public ResourceLocation getSealIcon() {
         return TCIds.rl("textures/item/seal_breaker.png");
     }
 

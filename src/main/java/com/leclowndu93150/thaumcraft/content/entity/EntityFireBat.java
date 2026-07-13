@@ -3,6 +3,7 @@ package com.leclowndu93150.thaumcraft.content.entity;
 import com.leclowndu93150.thaumcraft.content.entity.ai.FireBatAttackGoal;
 import com.leclowndu93150.thaumcraft.content.entity.ai.FlyingWanderGoal;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -24,8 +25,6 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
@@ -182,16 +181,16 @@ public final class EntityFireBat extends Monster {
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput output) {
+    protected void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("hang", isHanging());
         output.putByte("damBonus", (byte) this.damBonus);
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput input) {
+    protected void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
-        setHanging(input.getBooleanOr("hang", false));
-        this.damBonus = input.getByteOr("damBonus", (byte) 0);
+        setHanging(input.getBoolean("hang"));
+        this.damBonus = input.getByte("damBonus");
     }
 }

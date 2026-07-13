@@ -8,13 +8,13 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import org.jspecify.annotations.Nullable;
 
 public record Blueprint(int xSize, int ySize, int zSize, List<Optional<BlueprintPart>> cells) {
     public static final ResourceKey<Registry<Blueprint>> REGISTRY_KEY =
-            ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath("thaumcraft", "blueprint"));
+            ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("thaumcraft", "blueprint"));
 
     private static final Codec<Optional<BlueprintPart>> CELL_CODEC = BlueprintPart.CODEC
             .optionalFieldOf("part")

@@ -12,7 +12,6 @@ import com.leclowndu93150.thaumcraft.api.items.IArchitect;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,9 +22,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -53,7 +50,7 @@ public class ItemCaster extends Item implements ICaster, IArchitect {
 
     @Override
     public ItemStack getFocusStack(ItemStack stack) {
-        ItemStackTemplate template = stack.get(TCDataComponents.SOCKETED_FOCUS.get());
+        ItemStack template = stack.get(TCDataComponents.SOCKETED_FOCUS.get());
         return template == null ? ItemStack.EMPTY : template.create();
     }
 
@@ -62,7 +59,7 @@ public class ItemCaster extends Item implements ICaster, IArchitect {
         if (focus == null || focus.isEmpty()) {
             stack.remove(TCDataComponents.SOCKETED_FOCUS.get());
         } else {
-            stack.set(TCDataComponents.SOCKETED_FOCUS.get(), ItemStackTemplate.fromNonEmptyStack(focus));
+            stack.set(TCDataComponents.SOCKETED_FOCUS.get(), focus);
         }
     }
 
@@ -278,16 +275,15 @@ public class ItemCaster extends Item implements ICaster, IArchitect {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display,
-            Consumer<Component> builder, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> builder, TooltipFlag flag) {
         ItemStack focusStack = getFocusStack(stack);
         if (!(focusStack.getItem() instanceof ItemFocus focus)) {
             return;
         }
-        builder.accept(Component.translatable("tooltip.thaumcraft.caster.vis_cost",
+        builder.add(Component.translatable("tooltip.thaumcraft.caster.vis_cost",
                         ItemFocus.formatVis(focus.getVisCost(focusStack)))
                 .withStyle(ChatFormatting.ITALIC, ChatFormatting.AQUA));
-        builder.accept(focusStack.getHoverName().copy()
+        builder.add(focusStack.getHoverName().copy()
                 .withStyle(ChatFormatting.BOLD, ChatFormatting.ITALIC, ChatFormatting.GREEN));
         focus.addFocusInformation(focusStack, builder);
     }

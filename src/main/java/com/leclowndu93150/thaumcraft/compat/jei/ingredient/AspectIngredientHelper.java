@@ -8,14 +8,14 @@ import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 
 public final class AspectIngredientHelper implements IIngredientHelper<AspectInstance> {
     public static final AspectIngredientHelper INSTANCE = new AspectIngredientHelper();
 
-    private static final Identifier UNKNOWN = Identifier.fromNamespaceAndPath("thaumcraft", "unknown");
+    private static final ResourceLocation UNKNOWN = ResourceLocation.fromNamespaceAndPath("thaumcraft", "unknown");
 
     private AspectIngredientHelper() {}
 
@@ -37,7 +37,7 @@ public final class AspectIngredientHelper implements IIngredientHelper<AspectIns
     }
 
     @Override
-    public Identifier getIdentifier(AspectInstance ingredient) {
+    public ResourceLocation getIdentifier(AspectInstance ingredient) {
         return ingredient.aspect().unwrapKey()
                 .map(ResourceKey::identifier)
                 .orElse(UNKNOWN);

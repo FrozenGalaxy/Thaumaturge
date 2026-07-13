@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.research.theorycraft.cards;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import com.leclowndu93150.thaumcraft.api.research.TCResearchCategories;
@@ -9,17 +10,16 @@ import com.leclowndu93150.thaumcraft.registry.TCItems;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public final class CardInfuse extends TheorycraftCard {
@@ -90,24 +90,24 @@ public final class CardInfuse extends TheorycraftCard {
     }
 
     @Override
-    public void write(ValueOutput output, HolderLookup.Provider registries) {
+    public void write(CompoundTag output, HolderLookup.Provider registries) {
         super.write(output, registries);
         if (aspect != null) {
-            aspect.unwrapKey().ifPresent(key -> output.store("aspect", Identifier.CODEC, key.identifier()));
+            aspect.unwrapKey().ifPresent(key -> TCNbt.store(output, "aspect", ResourceLocation.CODEC, registries, key.identifier()));
         }
         if (!stack.isEmpty()) {
-            output.store("stack", ItemStack.CODEC, stack);
+            TCNbt.store(output, "stack", ItemStack.CODEC, registries, stack);
         }
     }
 
     @Override
-    public void read(ValueInput input, HolderLookup.Provider registries) {
+    public void read(CompoundTag input, HolderLookup.Provider registries) {
         super.read(input, registries);
-        aspect = input.read("aspect", Identifier.CODEC)
+        aspect = TCNbt.read(input, "aspect", ResourceLocation.CODEC, registries)
                 .flatMap(id -> registries.lookupOrThrow(IAspect.REGISTRY_KEY)
                         .get(ResourceKey.create(IAspect.REGISTRY_KEY, id)))
                 .map(holder -> (Holder<IAspect>) holder)
                 .orElse(null);
-        stack = input.read("stack", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+        stack = TCNbt.read(input, "stack", ItemStack.CODEC, registries).orElse(ItemStack.EMPTY);
     }
 }

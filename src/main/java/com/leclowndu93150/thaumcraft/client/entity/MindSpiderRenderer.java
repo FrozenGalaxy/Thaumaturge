@@ -4,22 +4,22 @@ import com.leclowndu93150.thaumcraft.content.entity.EntityMindSpider;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.model.monster.spider.SpiderModel;
+import net.minecraft.client.model.SpiderModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import org.jspecify.annotations.Nullable;
 
 public final class MindSpiderRenderer extends MobRenderer<EntityMindSpider, MindSpiderRenderState, SpiderModel> {
-    private static final Identifier TEXTURE = Identifier.withDefaultNamespace("textures/entity/spider/spider.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace("textures/entity/spider/spider.png");
     private static final float SHADOW = 0.5F;
     private static final float SCALE = 0.6F;
     private static final float MAX_ALPHA = 0.1F;
@@ -32,7 +32,7 @@ public final class MindSpiderRenderer extends MobRenderer<EntityMindSpider, Mind
 
     private static final class GhostSpiderEyesLayer extends RenderLayer<MindSpiderRenderState, SpiderModel> {
         private static final RenderType SPIDER_EYES =
-                RenderTypes.eyes(Identifier.withDefaultNamespace("textures/entity/spider/spider_eyes.png"));
+                RenderTypes.eyes(ResourceLocation.withDefaultNamespace("textures/entity/spider/spider_eyes.png"));
 
         GhostSpiderEyesLayer(RenderLayerParent<MindSpiderRenderState, SpiderModel> renderer) {
             super(renderer);
@@ -83,11 +83,11 @@ public final class MindSpiderRenderer extends MobRenderer<EntityMindSpider, Mind
     @Override
     protected int getModelTint(MindSpiderRenderState state) {
         float alpha = Math.min(MAX_ALPHA, state.ageInTicks / FADE_IN_TICKS);
-        return ARGB.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F);
+        return ARGB32.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F);
     }
 
     @Override
-    public Identifier getTextureLocation(MindSpiderRenderState state) {
+    public ResourceLocation getTextureLocation(MindSpiderRenderState state) {
         return TEXTURE;
     }
 }

@@ -3,19 +3,17 @@ package com.leclowndu93150.thaumcraft.content.device;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
-public final class BlockEntityVisGenerator extends BlockEntity implements EnergyHandler {
+public final class BlockEntityVisGenerator extends BlockEntity implements IEnergyStorage {
     private static final int CAPACITY = 1000;
     private static final int MAX_PUSH = 20;
     private static final float VIS_PER_CHARGE = 1.0F;
@@ -37,15 +35,9 @@ public final class BlockEntityVisGenerator extends BlockEntity implements Energy
             generator.setChanged();
         }
         Direction facing = state.getValue(BlockStateProperties.FACING);
-        EnergyHandler target = level.getCapability(Capabilities.Energy.BLOCK, pos.relative(facing), facing.getOpposite());
+        IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(facing), facing.getOpposite());
         if (target != null) {
-            int pushed;
-            try (Transaction ctx = Transaction.openRoot()) {
-                pushed = target.insert(Math.min(generator.energy, MAX_PUSH), ctx);
-                if (pushed > 0) {
-                    ctx.commit();
-                }
-            }
+            int pushed = target.receiveEnergy(Math.min(generator.energy, MAX_PUSH), false);
             if (pushed > 0) {
                 generator.energy -= pushed;
                 generator.setChanged();
@@ -58,34 +50,44 @@ public final class BlockEntityVisGenerator extends BlockEntity implements Energy
     }
 
     @Override
-    public long getAmountAsLong() {
+    public int getEnergyStored() {
         return energy;
     }
 
     @Override
-    public long getCapacityAsLong() {
+    public int getMaxEnergyStored() {
         return CAPACITY;
     }
 
     @Override
-    public int insert(int amount, TransactionContext transaction) {
+    public int receiveEnergy(int amount, boolean simulate) {
         return 0;
     }
 
     @Override
-    public int extract(int amount, TransactionContext transaction) {
+    public int extractEnergy(int amount, boolean simulate) {
         return 0;
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        energy = input.getIntOr("energy", 0);
+    public boolean canExtract() {
+        return false;
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    public boolean canReceive() {
+        return false;
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        energy = input.getInt("energy");
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
         output.putInt("energy", energy);
     }
 }

@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.essentia.tube;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
@@ -12,6 +13,8 @@ import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import com.mojang.serialization.Codec;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.Packet;
@@ -23,8 +26,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 public final class BlockEntityTubeBuffer extends BlockEntity implements IEssentiaTransport {
     public static final int MAX_AMOUNT = 10;
@@ -283,18 +284,18 @@ public final class BlockEntityTubeBuffer extends BlockEntity implements IEssenti
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        contents = input.read("Contents", AspectList.CODEC).orElse(AspectList.EMPTY);
-        List<Integer> choked = input.read("Choked", CHOKED_CODEC).orElse(List.of());
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        contents = TCNbt.read(input, "Contents", AspectList.CODEC, registries).orElse(AspectList.EMPTY);
+        List<Integer> choked = TCNbt.read(input, "Choked", CHOKED_CODEC, registries).orElse(List.of());
         for (int i = 0; i < 6 && i < choked.size(); i++) {
             chokedSides[i] = choked.get(i);
         }
-        List<Boolean> open = input.read("Open", OPEN_CODEC).orElse(List.of());
+        List<Boolean> open = TCNbt.read(input, "Open", OPEN_CODEC, registries).orElse(List.of());
         for (int i = 0; i < 6; i++) {
             openSides[i] = i < open.size() ? open.get(i) : true;
         }
-        int facingOrdinal = input.getIntOr("Facing", Direction.NORTH.ordinal());
+        int facingOrdinal = (input.contains("Facing") ? input.getInt("Facing") : Direction.NORTH.ordinal());
         if (facingOrdinal >= 0 && facingOrdinal < 6) {
             facing = Direction.values()[facingOrdinal];
         } else {
@@ -303,13 +304,13 @@ public final class BlockEntityTubeBuffer extends BlockEntity implements IEssenti
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        output.store("Contents", AspectList.CODEC, contents);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
+        TCNbt.store(output, "Contents", AspectList.CODEC, registries, contents);
         List<Integer> choked = List.of(chokedSides[0], chokedSides[1], chokedSides[2], chokedSides[3], chokedSides[4], chokedSides[5]);
-        output.store("Choked", CHOKED_CODEC, choked);
+        TCNbt.store(output, "Choked", CHOKED_CODEC, registries, choked);
         List<Boolean> open = List.of(openSides[0], openSides[1], openSides[2], openSides[3], openSides[4], openSides[5]);
-        output.store("Open", OPEN_CODEC, open);
+        TCNbt.store(output, "Open", OPEN_CODEC, registries, open);
         output.putInt("Facing", facing.ordinal());
     }
 

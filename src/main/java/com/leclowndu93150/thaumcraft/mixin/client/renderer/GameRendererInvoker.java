@@ -1,12 +1,12 @@
 package com.leclowndu93150.thaumcraft.mixin.client.renderer;
 
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(GameRenderer.class)
 public interface GameRendererInvoker {
     @Invoker("setPostEffect")
-    void thaumcraft$setPostEffect(Identifier id);
+    void thaumcraft$setPostEffect(ResourceLocation id);
 }

@@ -15,11 +15,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.phys.AABB;
@@ -32,8 +32,8 @@ import org.joml.Quaternionf;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
 public final class SealWorldRenderer {
-    private static final Identifier AREA_RING = TCIds.rl("textures/misc/seal_area.png");
-    private static final Identifier CORNER_FRAME = TCIds.rl("textures/misc/frame_corner.png");
+    private static final ResourceLocation AREA_RING = TCIds.rl("textures/misc/seal_area.png");
+    private static final ResourceLocation CORNER_FRAME = TCIds.rl("textures/misc/frame_corner.png");
     private static final double MAX_DIST_SQR = 256.0;
     private static final float RING_SCALE = 0.9F;
     private static final float ICON_SCALE = 0.5F;
@@ -42,7 +42,7 @@ public final class SealWorldRenderer {
 
     private static final RenderPipeline PIPELINE =
             TCFXPipelines.translucentTextured(TCIds.rl("pipeline/seal_overlay"));
-    private static final Map<Identifier, RenderType> TYPES = new ConcurrentHashMap<>();
+    private static final Map<ResourceLocation, RenderType> TYPES = new ConcurrentHashMap<>();
 
     private static final Direction[][] ROT_FACES = {
             {Direction.DOWN, Direction.NORTH, Direction.WEST},
@@ -61,7 +61,7 @@ public final class SealWorldRenderer {
 
     private SealWorldRenderer() {}
 
-    private static RenderType typeFor(Identifier texture) {
+    private static RenderType typeFor(ResourceLocation texture) {
         return TYPES.computeIfAbsent(texture, tex -> RenderType.create(
                 "tc_seal_overlay_" + tex.getPath().hashCode(),
                 RenderSetup.builder(PIPELINE)
@@ -115,7 +115,7 @@ public final class SealWorldRenderer {
                 -face.getStepY(), face.getStepX(), -face.getStepZ()));
         poseStack.translate(0.0, 0.0, face.getStepZ() < 0 ? -0.55 : 0.55);
         float shade = inactive ? 0.5F : 1.0F;
-        int color = ARGB.colorFromFloat(alpha, shade, shade, shade);
+        int color = ARGB32.colorFromFloat(alpha, shade, shade, shade);
         drawQuad(poseStack, buffers.getBuffer(typeFor(seal.getSeal().getSealIcon())), ICON_SCALE / 2.0F, color);
         poseStack.popPose();
     }
@@ -129,9 +129,9 @@ public final class SealWorldRenderer {
         float b;
         if (seal.getColor() > 0) {
             int dye = DyeColor.byId(seal.getColor() - 1).getTextureDiffuseColor();
-            r = ARGB.red(dye) / 255.0F;
-            g = ARGB.green(dye) / 255.0F;
-            b = ARGB.blue(dye) / 255.0F;
+            r = ARGB32.red(dye) / 255.0F;
+            g = ARGB32.green(dye) / 255.0F;
+            b = ARGB32.blue(dye) / 255.0F;
         } else {
             r = 0.7F + Mth.sin((time + pos.getX()) / 4.0F) * 0.1F;
             g = 0.7F + Mth.sin((time + pos.getY()) / 5.0F) * 0.1F;
@@ -144,7 +144,7 @@ public final class SealWorldRenderer {
         poseStack.translate(0.0, 0.0, face.getStepZ() < 0 ? -0.51 : 0.51);
         poseStack.mulPose(new Quaternionf().rotationAxis((float) Math.toRadians(time), 0.0F, 0.0F, 1.0F));
         drawQuad(poseStack, buffers.getBuffer(typeFor(AREA_RING)), RING_SCALE / 2.0F,
-                ARGB.colorFromFloat(alpha * RING_ALPHA, r, g, b));
+                ARGB32.colorFromFloat(alpha * RING_ALPHA, r, g, b));
         poseStack.popPose();
     }
 
@@ -175,7 +175,7 @@ public final class SealWorldRenderer {
                 {area.minX, area.minY, area.maxZ - 1.0},
                 {area.minX, area.maxY - 1.0, area.maxZ - 1.0}
         };
-        int color = ARGB.colorFromFloat(alpha * CORNER_ALPHA, r, g, b);
+        int color = ARGB32.colorFromFloat(alpha * CORNER_ALPHA, r, g, b);
         VertexConsumer buffer = buffers.getBuffer(typeFor(CORNER_FRAME));
         for (int q = 0; q < corners.length; q++) {
             poseStack.pushPose();

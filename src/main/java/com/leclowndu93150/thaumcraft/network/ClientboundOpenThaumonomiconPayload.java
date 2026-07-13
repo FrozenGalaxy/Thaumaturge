@@ -4,13 +4,13 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record ClientboundOpenThaumonomiconPayload() implements CustomPacketPayload {
     public static final ClientboundOpenThaumonomiconPayload INSTANCE = new ClientboundOpenThaumonomiconPayload();
 
     public static final Type<ClientboundOpenThaumonomiconPayload> TYPE = new Type<>(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "open_thaumonomicon"));
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "open_thaumonomicon"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundOpenThaumonomiconPayload> STREAM_CODEC =
             StreamCodec.unit(INSTANCE);

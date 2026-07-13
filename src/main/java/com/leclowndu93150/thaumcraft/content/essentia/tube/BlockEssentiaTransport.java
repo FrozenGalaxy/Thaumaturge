@@ -16,7 +16,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -128,13 +127,11 @@ public abstract class BlockEssentiaTransport extends BaseEntityBlock {
     @Override
     protected BlockState updateShape(
             BlockState state,
-            LevelReader level,
-            ScheduledTickAccess ticks,
-            BlockPos pos,
             Direction directionToNeighbour,
-            BlockPos neighbourPos,
             BlockState neighbourState,
-            RandomSource random
+            LevelAccessor level,
+            BlockPos pos,
+            BlockPos neighbourPos
     ) {
         if (level instanceof Level lvl) {
             boolean connect = canConnectTo(lvl, neighbourPos, directionToNeighbour.getOpposite());

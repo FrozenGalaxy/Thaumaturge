@@ -13,7 +13,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
@@ -55,7 +54,7 @@ public abstract class ArcaneCraftingRecipe implements IArcaneRecipe {
 
         for (int slot = 0; slot < result.size(); ++slot) {
             ItemStack item = input.getItem(slot);
-            ItemStackTemplate remainder = item.getCraftingRemainder();
+            ItemStack remainder = item.getCraftingRemainder();
             result.set(slot, remainder != null ? remainder.create() : ItemStack.EMPTY);
         }
 
@@ -113,7 +112,7 @@ public abstract class ArcaneCraftingRecipe implements IArcaneRecipe {
         for (AspectInstance entry : aspects.entries()) {
             ItemStack crystal = EssentiaCrystalFactory.of(entry.aspect(), entry.amount());
             displays.add(new SlotDisplay.ItemStackSlotDisplay(
-                    new ItemStackTemplate(crystal.typeHolder(), crystal.getCount(), crystal.getComponentsPatch())));
+                    new ItemStack(crystal.typeHolder(), crystal.getCount(), crystal.getComponentsPatch())));
         }
         return displays;
     }

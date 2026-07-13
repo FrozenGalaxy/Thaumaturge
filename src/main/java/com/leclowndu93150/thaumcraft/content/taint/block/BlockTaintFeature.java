@@ -6,7 +6,7 @@ import com.leclowndu93150.thaumcraft.content.taint.TaintHelper;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.registry.TCEntities;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -95,7 +95,7 @@ public final class BlockTaintFeature extends DirectionalBlock implements ITaintB
     protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
         super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
         if (level.getRandom().nextFloat() < CRAWLER_ON_BREAK_CHANCE) {
-            EntityTaintCrawler crawler = TCEntities.TAINT_CRAWLER.get().create(level, EntitySpawnReason.NATURAL);
+            EntityTaintCrawler crawler = TCEntities.TAINT_CRAWLER.get().create(level, MobSpawnType.NATURAL);
             if (crawler != null) {
                 crawler.snapTo(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                         level.getRandom().nextInt(360), 0.0F);

@@ -18,7 +18,7 @@ import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
@@ -30,7 +30,7 @@ public class SealLumber implements ISeal, ISealGui, ISealConfigArea {
     private final Map<Integer, Long> cache = new HashMap<>();
 
     @Override
-    public Identifier getKey() {
+    public ResourceLocation getKey() {
         return TCIds.rl("lumber");
     }
 
@@ -100,7 +100,7 @@ public class SealLumber implements ISeal, ISealGui, ISealConfigArea {
     }
 
     @Override
-    public Identifier getSealIcon() {
+    public ResourceLocation getSealIcon() {
         return TCIds.rl("textures/item/seal_lumber.png");
     }
 

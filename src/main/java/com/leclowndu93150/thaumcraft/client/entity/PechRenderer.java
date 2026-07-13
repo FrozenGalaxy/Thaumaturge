@@ -14,12 +14,12 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.Items;
 
 public final class PechRenderer extends MobRenderer<EntityPech, PechRenderState, PechModel> {
-    private static final Identifier[] TEXTURES = {
+    private static final ResourceLocation[] TEXTURES = {
             TCIds.rl("textures/entity/pech_forage.png"),
             TCIds.rl("textures/entity/pech_thaum.png"),
             TCIds.rl("textures/entity/pech_stalker.png")
@@ -87,7 +87,7 @@ public final class PechRenderer extends MobRenderer<EntityPech, PechRenderState,
     }
 
     @Override
-    public Identifier getTextureLocation(PechRenderState state) {
+    public ResourceLocation getTextureLocation(PechRenderState state) {
         return TEXTURES[Math.min(state.pechType, TEXTURES.length - 1)];
     }
 }

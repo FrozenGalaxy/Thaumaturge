@@ -18,7 +18,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -97,7 +97,7 @@ public final class BeamManager extends AbstractFXManager<IFXInstance> {
         float yaw = beam.yawAt(partialTick);
         float pitch = beam.pitchAt(partialTick);
         float length = (float)source.distanceTo(target);
-        int color = ARGB.colorFromFloat(op, beam.colorR(), beam.colorG(), beam.colorB());
+        int color = ARGB32.colorFromFloat(op, beam.colorR(), beam.colorG(), beam.colorB());
 
         poseStack.pushPose();
         poseStack.translate(source.x - camPos.x, source.y - camPos.y, source.z - camPos.z);
@@ -135,7 +135,7 @@ public final class BeamManager extends AbstractFXManager<IFXInstance> {
             if (beam.maxAge() - beam.age() <= 4) {
                 sourceOp = 0.8F - (4 - (beam.maxAge() - beam.age())) * 0.2F;
             }
-            int sourceColor = ARGB.colorFromFloat(sourceOp, beam.colorR(), beam.colorG(), beam.colorB());
+            int sourceColor = ARGB32.colorFromFloat(sourceOp, beam.colorR(), beam.colorG(), beam.colorB());
             float halfSize = SOURCE_QUAD_SIZE;
             poseStack.pushPose();
             poseStack.translate(source.x - camPos.x, source.y - camPos.y, source.z - camPos.z);
@@ -166,7 +166,7 @@ public final class BeamManager extends AbstractFXManager<IFXInstance> {
             poseStack.popPose();
             return;
         }
-        int color = ARGB.colorFromFloat(alpha, arc.colorR, arc.colorG, arc.colorB);
+        int color = ARGB32.colorFromFloat(alpha, arc.colorR, arc.colorG, arc.colorB);
         int n = arc.points.size();
         if (n < 2) {
             poseStack.popPose();

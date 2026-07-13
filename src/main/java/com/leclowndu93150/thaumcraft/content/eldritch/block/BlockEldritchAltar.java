@@ -1,6 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.eldritch.block;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
@@ -30,7 +30,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 public final class BlockEldritchAltar extends BlockEldritchStructure implements EntityBlock {
-    private static final Identifier OCULUS_RESEARCH = TCIds.rl("oculus");
+    private static final ResourceLocation OCULUS_RESEARCH = TCIds.rl("oculus");
 
     public static final MapCodec<BlockEldritchAltar> CODEC = simpleCodec(BlockEldritchAltar::new);
 

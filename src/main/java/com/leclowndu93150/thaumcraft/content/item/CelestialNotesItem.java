@@ -2,13 +2,13 @@ package com.leclowndu93150.thaumcraft.content.item;
 
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
-import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
+
+import java.util.List;
 
 public final class CelestialNotesItem extends Item {
     public CelestialNotesItem(Item.Properties properties) {
@@ -26,9 +26,8 @@ public final class CelestialNotesItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display,
-                                Consumer<Component> tooltip, TooltipFlag flag) {
-        tooltip.accept(Component.translatable("item.thaumcraft.celestial_notes." + bodyOf(stack).getSerializedName() + ".text")
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(Component.translatable("item.thaumcraft.celestial_notes." + bodyOf(stack).getSerializedName() + ".text")
                 .withStyle(ChatFormatting.AQUA));
     }
 }

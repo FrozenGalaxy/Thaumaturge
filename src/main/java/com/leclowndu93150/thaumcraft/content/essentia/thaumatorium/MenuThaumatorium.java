@@ -3,7 +3,7 @@ package com.leclowndu93150.thaumcraft.content.essentia.thaumatorium;
 import com.leclowndu93150.thaumcraft.network.ClientboundThaumatoriumRecipesPayload;
 import com.leclowndu93150.thaumcraft.registry.TCMenus;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,8 +12,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -46,9 +46,9 @@ public final class MenuThaumatorium extends AbstractContainerMenu {
         super(TCMenus.THAUMATORIUM.get(), containerId);
         this.blockEntity = blockEntity;
         this.player = playerInventory.player;
-        ItemStacksResourceHandler items = blockEntity != null ? blockEntity.catalyst() : new ItemStacksResourceHandler(1);
+        ItemStackHandler items = blockEntity != null ? blockEntity.catalyst() : new ItemStackHandler(1);
 
-        addSlot(new ResourceHandlerSlot(items, items::set, 0, CATALYST_X, CATALYST_Y));
+        addSlot(new SlotItemHandler(items, 0, CATALYST_X, CATALYST_Y));
 
         for (int row = 0; row < PLAYER_ROWS; row++) {
             for (int col = 0; col < PLAYER_ROW_SLOTS; col++) {
@@ -74,7 +74,7 @@ public final class MenuThaumatorium extends AbstractContainerMenu {
         }
         lastCatalyst = catalyst.copy();
         lastQueueSize = blockEntity.queue().size();
-        List<Identifier> ids = new ArrayList<>();
+        List<ResourceLocation> ids = new ArrayList<>();
         var recipes = blockEntity.candidateRecipes(server, serverPlayer, ids);
         List<ClientboundThaumatoriumRecipesPayload.Entry> entries = new ArrayList<>();
         for (int i = 0; i < recipes.size(); i++) {

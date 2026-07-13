@@ -15,23 +15,23 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.sprite.SpriteId;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public final class GolemBuilderRenderer implements BlockEntityRenderer<BlockEntityGolemBuilder, GolemBuilderRenderState> {
-    public static final Identifier MODEL = TCIds.rl("models/obj/golembuilder.obj");
-    private static final Identifier TEXTURE = TCIds.rl("textures/entity/golembuilder.png");
+    public static final ResourceLocation MODEL = TCIds.rl("models/obj/golembuilder.obj");
+    private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/golembuilder.png");
     private static final SpriteId LAVA_SPRITE = new SpriteId(TextureAtlas.LOCATION_BLOCKS,
-            Identifier.withDefaultNamespace("block/lava_still"));
+            ResourceLocation.withDefaultNamespace("block/lava_still"));
     private static final String PRESS_PART = "press";
     private static final float PRESS_DROP = 0.625F;
     private static final float LAVA_OFFSET_X = -0.3125F;

@@ -6,7 +6,7 @@ import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import net.minecraft.core.Holder;
-import net.minecraft.world.entity.player.StackedItemContents;
+import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeInput;
@@ -19,7 +19,7 @@ public class ArcaneCraftingInput  implements RecipeInput {
     private final int width;
     private final int height;
     private final List<ItemStack> items;
-    private final StackedItemContents stackedContents = new StackedItemContents();
+    private final StackedContents stackedContents = new StackedContents();
     private final int ingredientCount;
 
     protected ArcaneCraftingInput(int width, int height, List<ItemStack> items) {
@@ -126,7 +126,7 @@ public class ArcaneCraftingInput  implements RecipeInput {
         return this.ingredientCount == 0;
     }
 
-    public StackedItemContents stackedContents() {
+    public StackedContents stackedContents() {
         return this.stackedContents;
     }
 

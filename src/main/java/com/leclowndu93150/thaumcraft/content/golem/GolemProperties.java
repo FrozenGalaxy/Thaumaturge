@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import net.minecraft.core.Registry;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public final class GolemProperties implements IGolemProperties {
@@ -75,7 +75,7 @@ public final class GolemProperties implements IGolemProperties {
     }
 
     private static <T> StreamCodec<ByteBuf, T> registryStream(Supplier<Registry<T>> registry) {
-        return Identifier.STREAM_CODEC.map(
+        return ResourceLocation.STREAM_CODEC.map(
                 id -> registry.get().getValue(id),
                 value -> registry.get().getKey(value));
     }

@@ -5,11 +5,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record ClientboundInfusionSourcePayload(BlockPos matrixPos, BlockPos sourcePos) implements CustomPacketPayload {
     public static final Type<ClientboundInfusionSourcePayload> TYPE = new Type<>(
-            Identifier.fromNamespaceAndPath(TCIds.MODID, "fx_infusion_source"));
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "fx_infusion_source"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundInfusionSourcePayload> STREAM_CODEC = StreamCodec.of(
             (buf, data) -> {

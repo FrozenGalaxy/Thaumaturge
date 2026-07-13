@@ -4,12 +4,12 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
 public abstract class AbstractTCContainerScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
-    private final Identifier background;
+    private final ResourceLocation background;
     private final int backgroundWidth;
     private final int backgroundHeight;
     private final int backgroundTextureWidth;
@@ -19,7 +19,7 @@ public abstract class AbstractTCContainerScreen<T extends AbstractContainerMenu>
             T menu,
             Inventory inventory,
             Component title,
-            Identifier background,
+            ResourceLocation background,
             int imageWidth,
             int imageHeight
     ) {
@@ -30,7 +30,7 @@ public abstract class AbstractTCContainerScreen<T extends AbstractContainerMenu>
             T menu,
             Inventory inventory,
             Component title,
-            Identifier background,
+            ResourceLocation background,
             int imageWidth,
             int imageHeight,
             int textureWidth,
@@ -65,7 +65,7 @@ public abstract class AbstractTCContainerScreen<T extends AbstractContainerMenu>
     protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
     }
 
-    protected final Identifier background() {
+    protected final ResourceLocation background() {
         return background;
     }
 }

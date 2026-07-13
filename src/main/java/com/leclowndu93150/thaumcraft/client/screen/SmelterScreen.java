@@ -6,12 +6,12 @@ import com.leclowndu93150.thaumcraft.content.essentia.smeltery.MenuSmelter;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class SmelterScreen extends AbstractTCContainerScreen<MenuSmelter> {
 
-    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_smelter.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_smelter.png");
 
     protected SmelterScreen(MenuSmelter menu, Inventory inventory, Component title) {
         super(menu, inventory, title, TEXTURE, 176, 166);

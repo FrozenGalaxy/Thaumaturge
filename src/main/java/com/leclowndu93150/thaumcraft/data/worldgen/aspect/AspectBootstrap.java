@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 
 public final class AspectBootstrap {
@@ -66,7 +66,7 @@ public final class AspectBootstrap {
                 color,
                 List.of(),
                 Optional.of(chatColor),
-                Identifier.fromNamespaceAndPath(key.identifier().getNamespace(), "textures/aspects/" + key.identifier().getPath() + ".png"),
+                ResourceLocation.fromNamespaceAndPath(key.identifier().getNamespace(), "textures/aspects/" + key.identifier().getPath() + ".png"),
                 blend
         ));
     }
@@ -86,7 +86,7 @@ public final class AspectBootstrap {
                 color,
                 List.of(a, b),
                 Optional.empty(),
-                Identifier.fromNamespaceAndPath(key.identifier().getNamespace(), "textures/aspects/" + key.identifier().getPath() + ".png"),
+                ResourceLocation.fromNamespaceAndPath(key.identifier().getNamespace(), "textures/aspects/" + key.identifier().getPath() + ".png"),
                 blend
         ));
     }

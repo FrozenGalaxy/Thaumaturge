@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.api.research;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Icon shown on a research entry's node in the Thaumonomicon. An icon is a full texture path,
@@ -17,7 +17,7 @@ import net.minecraft.resources.Identifier;
  * @param kind how {@link #id} is resolved when the icon is rendered
  * @since 1.0.0
  */
-public record ResearchIcon(Identifier id, Kind kind) {
+public record ResearchIcon(ResourceLocation id, Kind kind) {
     /** String codec using the {@code focus:} prefix and {@code .png} suffix conventions. */
     public static final Codec<ResearchIcon> CODEC = Codec.STRING.xmap(ResearchIcon::parse, ResearchIcon::serialize);
 
@@ -37,7 +37,7 @@ public record ResearchIcon(Identifier id, Kind kind) {
      * @param id the full texture path, e.g. {@code thaumcraft:textures/research/r_wisp.png}
      * @return the icon
      */
-    public static ResearchIcon ofTexture(Identifier id) {
+    public static ResearchIcon ofTexture(ResourceLocation id) {
         return new ResearchIcon(id, Kind.TEXTURE);
     }
 
@@ -47,7 +47,7 @@ public record ResearchIcon(Identifier id, Kind kind) {
      * @param id the item identifier
      * @return the icon
      */
-    public static ResearchIcon ofItem(Identifier id) {
+    public static ResearchIcon ofItem(ResourceLocation id) {
         return new ResearchIcon(id, Kind.ITEM);
     }
 
@@ -57,7 +57,7 @@ public record ResearchIcon(Identifier id, Kind kind) {
      * @param id the focus element identifier
      * @return the icon
      */
-    public static ResearchIcon ofFocus(Identifier id) {
+    public static ResearchIcon ofFocus(ResourceLocation id) {
         return new ResearchIcon(id, Kind.FOCUS);
     }
 
@@ -72,9 +72,9 @@ public record ResearchIcon(Identifier id, Kind kind) {
 
     private static ResearchIcon parse(String value) {
         if (value.startsWith("focus:")) {
-            return ofFocus(Identifier.parse(value.substring("focus:".length())));
+            return ofFocus(ResourceLocation.parse(value.substring("focus:".length())));
         }
-        Identifier id = Identifier.parse(value);
+        ResourceLocation id = ResourceLocation.parse(value);
         return new ResearchIcon(id, id.getPath().endsWith(".png") ? Kind.TEXTURE : Kind.ITEM);
     }
 

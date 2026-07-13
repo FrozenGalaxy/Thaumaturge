@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.essentia.smeltery;
 
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
@@ -12,6 +13,7 @@ import com.leclowndu93150.thaumcraft.content.fx.FX;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -24,7 +26,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -33,19 +34,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -74,7 +69,7 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
         super(type, worldPosition, blockState);
     }
 
-    public ItemStacksResourceHandler getInventory() {
+    public ItemStackHandler getInventory() {
         return inventory;
     }
 
@@ -83,9 +78,9 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        output.store("Aspects", AspectList.CODEC, aspects);
+    protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
+        super.saveAdditional(output, registries);
+        TCNbt.store(output, "Aspects", AspectList.CODEC, registries, aspects);
         output.putInt("BurnTime", this.furnaceBurnTime);
         output.putBoolean("SpeedBoost", this.speedBoost);
         output.putInt("CookTime", this.furnaceCookTime);
@@ -94,14 +89,14 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        aspects = input.read("Aspects", AspectList.CODEC).orElse(AspectList.EMPTY);
+    protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
+        super.loadAdditional(input, registries);
+        aspects = TCNbt.read(input, "Aspects", AspectList.CODEC, registries).orElse(AspectList.EMPTY);
         this.vis = aspects.totalAmount();
-        this.furnaceBurnTime = input.getIntOr("BurnTime", 0);
-        this.speedBoost = input.getBooleanOr("SpeedBoost", false);
-        this.furnaceCookTime = input.getIntOr("CookTime", 0);
-        this.smeltTime = input.getIntOr("SmeltTime", 0);
+        this.furnaceBurnTime = input.getInt("BurnTime");
+        this.speedBoost = input.getBoolean("SpeedBoost");
+        this.furnaceCookTime = input.getInt("CookTime");
+        this.smeltTime = input.getInt("SmeltTime");
         inventory.deserialize(input);
     }
 
@@ -114,10 +109,10 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag nbt = super.getUpdateTag(registries);
-        try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(this.problemPath(), Thaumcraft.LOGGER)) {
-            TagValueOutput tagvalueoutput = TagValueOutput.createWithContext(problemreporter$scopedcollector, registries);
-            saveAdditional(tagvalueoutput);
-            nbt.merge(tagvalueoutput.buildResult());
+        {
+            CompoundTag tagvalueoutput = new CompoundTag();
+            saveAdditional(tagvalueoutput, registries);
+            nbt.merge(tagvalueoutput);
         }
         return nbt;
     }
@@ -184,27 +179,23 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
 
         if (furnaceBurnTime == 0){
             if (canSmelt()){
-                currentItemBurnTime = furnaceBurnTime = inventory.getResource(1).toStack().getBurnTime(null,level.fuelValues());
+                currentItemBurnTime = furnaceBurnTime = inventory.getStackInSlot(1).copy().getBurnTime(RecipeType.SMELTING);
                 if (furnaceBurnTime > 0){
                     level.setBlock(getBlockPos(), getBlockState().setValue(BlockSmelter.LIT, true), 3);
                     dirty = true;
                     this.speedBoost = false;
-                    ItemStack fuel = inventory.getResource(1).toStack(inventory.getAmountAsInt(1));
+                    ItemStack fuel = inventory.getStackInSlot(1).copy();
                     ItemStack copy = fuel.copy();
                     if (!fuel.isEmpty()){
                         if (fuel.is(TCItems.ALUMENTUM))
                             this.speedBoost = true;
 
                         Item item = fuel.getItem();
-                        Transaction transaction = Transaction.openRoot();
-                        inventory.extract(1, ItemResource.of(fuel),1, transaction);
-                        transaction.commit();
-                        if (inventory.getAmountAsInt(1) <= 0) {
-                            ItemStackTemplate containerItem = item.getCraftingRemainder(copy);
+                        inventory.extractItem(1, 1, false);
+                        if (inventory.getStackInSlot(1).getCount() <= 0) {
+                            ItemStack containerItem = item.getCraftingRemainder(copy);
                             if (containerItem != null) {
-                                Transaction t = Transaction.openRoot();
-                                inventory.set(1, ItemResource.of(containerItem), containerItem.count());
-                                t.commit();
+                                inventory.setStackInSlot(1, containerItem.copyWithCount(containerItem.count()));
                             }
                         }
                     }
@@ -240,7 +231,7 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
     private void smeltItem() {
         if (!this.canSmelt()) return;
         int flux = 0;
-        AspectList aspects = AspectIndexHolder.get().of(inventory.getResource(0).toStack());
+        AspectList aspects = AspectIndexHolder.get().of(inventory.getStackInSlot(0).copy());
         for (AspectInstance instance : aspects.entries()){
             if (getEfficiency() < 1.0F){
                 int amount = instance.amount();
@@ -297,9 +288,7 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
             AuraHelper.polluteAura(level,getBlockPos(),pp,true);
         }
         this.vis = aspects.totalAmount();
-        Transaction transaction = Transaction.openRoot();
-        inventory.extract(0, inventory.getResource(0),1, transaction);
-        transaction.commit();
+        inventory.extract(0, inventory.getStackInSlot(0),1, transaction);
 
     }
 
@@ -315,9 +304,9 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
     }
 
     private boolean canSmelt(){
-        if (inventory.getAmountAsInt(0) <= 0) return false;
+        if (inventory.getStackInSlot(0).getCount() <= 0) return false;
         this.vis = aspects.totalAmount();
-        AspectList aspects = AspectIndexHolder.get().of(inventory.getResource(0).toStack());
+        AspectList aspects = AspectIndexHolder.get().of(inventory.getStackInSlot(0).copy());
         if (!aspects.isEmpty()){
             int total = aspects.totalAmount();
             if (total > MAX_VIS - vis)
@@ -378,22 +367,22 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
         return new MenuSmelter(i,inventory,this);
     }
 
-    private final class SmelterInventory extends ItemStacksResourceHandler {
+    private final class SmelterInventory extends ItemStackHandler {
 
         public SmelterInventory() {
             super(2);
         }
 
         @Override
-        protected void onContentsChanged(int index, ItemStack previousContents) {
+        protected void onContentsChanged(int index) {
             setChanged();
         }
 
         @Override
-        public boolean isValid(int index, ItemResource resource) {
+        public boolean isItemValid(int index, ItemStack resource) {
             return switch (index) {
-                case 0 -> !AspectIndexHolder.get().of(resource.toStack()).isEmpty();
-                case 1 -> resource.toStack().getBurnTime(null,level.fuelValues()) > 0;
+                case 0 -> !AspectIndexHolder.get().of(resource.copy()).isEmpty();
+                case 1 -> resource.copy().getBurnTime(RecipeType.SMELTING) > 0;
                 default -> false;
             };
         }

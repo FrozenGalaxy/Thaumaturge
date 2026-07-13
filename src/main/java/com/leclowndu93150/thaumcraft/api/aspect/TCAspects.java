@@ -1,7 +1,8 @@
 package com.leclowndu93150.thaumcraft.api.aspect;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Typed handles to the built-in Thaumcraft aspects. Each constant is a {@link ResourceKey}
@@ -60,6 +61,6 @@ public final class TCAspects {
     private TCAspects() {}
 
     private static ResourceKey<IAspect> key(String tag) {
-        return ResourceKey.create(IAspect.REGISTRY_KEY, Identifier.fromNamespaceAndPath("thaumcraft", tag));
+        return ResourceKey.create(IAspect.REGISTRY_KEY, ResourceLocation.fromNamespaceAndPath("thaumcraft", tag));
     }
 }

@@ -15,7 +15,7 @@ import com.leclowndu93150.thaumcraft.content.golem.parts.GolemLegWheels;
 import java.util.List;
 import java.util.function.Supplier;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -195,19 +195,19 @@ public final class TCGolemParts {
 
     private TCGolemParts() {}
 
-    private static Identifier materialTexture(String name) {
+    private static ResourceLocation materialTexture(String name) {
         return TCIds.rl("textures/entity/golems/" + name + ".png");
     }
 
-    private static Identifier golemTexture(String name) {
+    private static ResourceLocation golemTexture(String name) {
         return TCIds.rl("textures/entity/golems/" + name + ".png");
     }
 
-    private static Identifier partIcon(String name) {
+    private static ResourceLocation partIcon(String name) {
         return TCIds.rl("textures/misc/golem/" + name + ".png");
     }
 
-    private static Identifier obj(String name) {
+    private static ResourceLocation obj(String name) {
         return TCIds.rl("models/obj/" + name + ".obj");
     }
 

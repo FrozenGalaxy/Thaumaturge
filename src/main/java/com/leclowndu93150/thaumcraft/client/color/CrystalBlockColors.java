@@ -4,7 +4,7 @@ import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.TCIds;
 import java.util.List;
 import net.minecraft.client.color.block.BlockTintSource;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -35,7 +35,7 @@ public final class CrystalBlockColors {
     }
 
     private static void register(RegisterColorHandlersEvent.BlockTintSources event, Block block, int rgb) {
-        int argb = ARGB.opaque(rgb);
+        int argb = ARGB32.opaque(rgb);
         BlockTintSource source = state -> argb;
         event.register(List.of(source), block);
     }

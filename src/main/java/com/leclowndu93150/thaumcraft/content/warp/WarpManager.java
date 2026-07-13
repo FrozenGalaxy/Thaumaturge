@@ -1,6 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.warp;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import com.leclowndu93150.thaumcraft.content.research.ResearchManager;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
 import com.leclowndu93150.thaumcraft.api.capability.IPlayerKnowledge;
@@ -52,8 +52,8 @@ public final class WarpManager {
         player.syncData(TCAttachments.WARP);
     }
 
-    private static final Identifier WARP_RESEARCH = TCIds.rl("warp");
-    private static final Identifier FIRST_STEPS_RESEARCH = TCIds.rl("first_steps");
+    private static final ResourceLocation WARP_RESEARCH = TCIds.rl("warp");
+    private static final ResourceLocation FIRST_STEPS_RESEARCH = TCIds.rl("first_steps");
 
     private static void grantWarpResearch(ServerPlayer player, WarpType type) {
         if (type == WarpType.TEMPORARY) {
