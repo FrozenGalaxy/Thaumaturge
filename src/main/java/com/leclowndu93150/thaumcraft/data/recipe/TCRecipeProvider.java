@@ -779,6 +779,9 @@ public final class TCRecipeProvider extends RecipeProvider {
         robeDyeRecipe(TCItems.CLOTH_CHEST.get());
         robeDyeRecipe(TCItems.CLOTH_LEGS.get());
         robeDyeRecipe(TCItems.CLOTH_BOOTS.get());
+        robeDyeRecipe(TCItems.VOID_ROBE_HELM.get());
+        robeDyeRecipe(TCItems.VOID_ROBE_CHEST.get());
+        robeDyeRecipe(TCItems.VOID_ROBE_LEGS.get());
     }
 
     private void robeDyeRecipe(Item target) {

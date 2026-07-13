@@ -45,7 +45,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
                     .createRenderSetup());
 
     private static final float PX = 0.0625F;
-    private static final int TEX_W = 64;
+    private static final int TEX_W = 32;
     private static final int TEX_H = 32;
     private static final int RUNE_LIGHT = 200;
     private static final float MODEL_LIFT = 0.5F;
@@ -143,7 +143,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
             int focusLight = (int) (195.0F + Mth.sin(ticks / 3.0F) * 10.0F + 10.0F);
             PoseStack.Pose focusPose = poseStack.last().copy();
             collector.submitCustomGeometry(poseStack, focusType, (pose, buffer) ->
-                    box(focusPose, buffer, -3.0F, -6.0F, -3.0F, 6, 6, 6, 0, 0, tint, focusLight, true));
+                    box(focusPose, buffer, -3.0F, -6.0F, -3.0F, 6, 6, 6, 0, 0, tint, focusLight));
             poseStack.popPose();
         }
 
@@ -199,7 +199,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
         poseStack.translate(0.0F, rotationPointY * PX, 0.0F);
         PoseStack.Pose pose = poseStack.last().copy();
         collector.submitCustomGeometry(poseStack, type, (p, buffer) ->
-                box(pose, buffer, -1.0F, -1.0F, -1.0F, 2, 2, 2, 0, 0, 0xFFFFFFFF, light, true));
+                box(pose, buffer, -1.0F, -1.0F, -1.0F, 2, 2, 2, 0, 0, 0xFFFFFFFF, light));
         poseStack.popPose();
     }
 
@@ -231,11 +231,6 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
 
     private static void box(PoseStack.Pose pose, VertexConsumer buffer, float x, float y, float z,
                             int dx, int dy, int dz, int u, int v, int tint, int light) {
-        box(pose, buffer, x, y, z, dx, dy, dz, u, v, tint, light, false);
-    }
-
-    private static void box(PoseStack.Pose pose, VertexConsumer buffer, float x, float y, float z,
-                            int dx, int dy, int dz, int u, int v, int tint, int light, boolean opaqueTop) {
         float x0 = x * PX;
         float y0 = y * PX;
         float z0 = z * PX;
@@ -244,10 +239,9 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
         float z1 = (z + dz) * PX;
         float uPx = u;
         float vPx = v;
-        float topU = opaqueTop ? uPx + dz + dx : uPx + dz;
         quad(pose, buffer, tint, light, 0.0F, -1.0F, 0.0F,
                 x0, y0, z1, x1, y0, z1, x1, y0, z0, x0, y0, z0,
-                topU, vPx, topU + dx, vPx + dz);
+                uPx + dz, vPx, uPx + dz + dx, vPx + dz);
         quad(pose, buffer, tint, light, 0.0F, 1.0F, 0.0F,
                 x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1,
                 uPx + dz + dx, vPx, uPx + dz + dx + dx, vPx + dz);
