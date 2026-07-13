@@ -752,6 +752,11 @@ public final class TCModelProvider extends ModelProvider {
         itemModels.generateFlatItem(TCItems.MODULE_VISION.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(TCItems.MODULE_AGGRESSION.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(TCItems.GOLEM_BELL.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(TCItems.GOLEM_TOP_HAT.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(TCItems.GOLEM_FEZ.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(TCItems.GOLEM_GLASSES.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(TCItems.GOLEM_BOWTIE.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(TCItems.GOLEM_VISOR.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(TCItems.SEAL_BLANK.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(TCItems.SEAL_PICKUP.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(TCItems.SEAL_PICKUP_ADVANCED.get(), ModelTemplates.FLAT_ITEM);

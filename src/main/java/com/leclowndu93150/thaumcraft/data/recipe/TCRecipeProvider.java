@@ -1549,6 +1549,61 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .unlockedBy("has", has(Tags.Items.GEMS_QUARTZ))
                 .save(output);
 
+        arcaneShaped(new ItemStackTemplate(TCItems.GOLEM_TOP_HAT), 16)
+                .aspect(TCAspects.ORDO, 1)
+                .aspect(TCAspects.IGNIS, 1)
+                .pattern(" C ")
+                .pattern(" G ")
+                .pattern("CCC")
+                .define('C', Items.BLACK_WOOL)
+                .define('G', Tags.Items.INGOTS_GOLD)
+                .gate(gate("golem_accessories"))
+                .unlockedBy("has", has(ItemTags.WOOL))
+                .save(output);
+
+        arcaneShaped(new ItemStackTemplate(TCItems.GOLEM_FEZ), 8)
+                .aspect(TCAspects.AQUA, 1)
+                .aspect(TCAspects.TERRA, 1)
+                .pattern("CCS")
+                .pattern("CCS")
+                .pattern("  S")
+                .define('C', Items.RED_WOOL)
+                .define('S', Tags.Items.STRINGS)
+                .gate(gate("golem_accessories"))
+                .unlockedBy("has", has(ItemTags.WOOL))
+                .save(output);
+
+        arcaneShaped(new ItemStackTemplate(TCItems.GOLEM_BOWTIE), 8)
+                .aspect(TCAspects.AER, 1)
+                .aspect(TCAspects.ORDO, 1)
+                .pattern("CSC")
+                .pattern("C C")
+                .define('C', Items.BLACK_WOOL)
+                .define('S', Tags.Items.STRINGS)
+                .gate(gate("golem_accessories"))
+                .unlockedBy("has", has(ItemTags.WOOL))
+                .save(output);
+
+        arcaneShaped(new ItemStackTemplate(TCItems.GOLEM_GLASSES), 8)
+                .aspect(TCAspects.AER, 1)
+                .aspect(TCAspects.AQUA, 1)
+                .pattern("GIG")
+                .define('G', Tags.Items.GLASS_BLOCKS)
+                .define('I', Tags.Items.INGOTS_IRON)
+                .gate(gate("golem_accessories"))
+                .unlockedBy("has", has(Tags.Items.INGOTS_IRON))
+                .save(output);
+
+        arcaneShaped(new ItemStackTemplate(TCItems.GOLEM_VISOR), 8)
+                .aspect(TCAspects.TERRA, 1)
+                .aspect(TCAspects.AQUA, 1)
+                .pattern("IHI")
+                .define('I', Tags.Items.INGOTS_IRON)
+                .define('H', Items.IRON_HELMET)
+                .gate(gate("golem_accessories"))
+                .unlockedBy("has", has(Tags.Items.INGOTS_IRON))
+                .save(output);
+
         arcaneShaped(new ItemStackTemplate(TCItems.MIND_CLOCKWORK), 25)
                 .aspect(TCAspects.IGNIS, 1)
                 .aspect(TCAspects.ORDO, 1)

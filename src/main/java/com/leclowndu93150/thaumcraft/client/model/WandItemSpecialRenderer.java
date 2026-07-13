@@ -4,6 +4,7 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.wands.WandCap;
 import com.leclowndu93150.thaumcraft.api.wands.WandRod;
 import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
+import com.leclowndu93150.thaumcraft.client.render.BoxGeometry;
 import com.leclowndu93150.thaumcraft.client.render.TCFlatRenderTypes;
 import com.leclowndu93150.thaumcraft.content.casters.ItemFocus;
 import com.leclowndu93150.thaumcraft.content.wands.WandParts;
@@ -231,51 +232,10 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
 
     private static void box(PoseStack.Pose pose, VertexConsumer buffer, float x, float y, float z,
                             int dx, int dy, int dz, int u, int v, int tint, int light) {
-        float x0 = x * PX;
-        float y0 = y * PX;
-        float z0 = z * PX;
-        float x1 = (x + dx) * PX;
-        float y1 = (y + dy) * PX;
-        float z1 = (z + dz) * PX;
-        float uPx = u;
-        float vPx = v;
-        quad(pose, buffer, tint, light, 0.0F, -1.0F, 0.0F,
-                x0, y0, z1, x1, y0, z1, x1, y0, z0, x0, y0, z0,
-                uPx + dz, vPx, uPx + dz + dx, vPx + dz);
-        quad(pose, buffer, tint, light, 0.0F, 1.0F, 0.0F,
-                x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1,
-                uPx + dz + dx, vPx, uPx + dz + dx + dx, vPx + dz);
-        quad(pose, buffer, tint, light, 0.0F, 0.0F, -1.0F,
-                x1, y0, z0, x1, y1, z0, x0, y1, z0, x0, y0, z0,
-                uPx + dz, vPx + dz, uPx + dz + dx, vPx + dz + dy);
-        quad(pose, buffer, tint, light, 0.0F, 0.0F, 1.0F,
-                x0, y0, z1, x0, y1, z1, x1, y1, z1, x1, y0, z1,
-                uPx + dz + dx + dz, vPx + dz, uPx + dz + dx + dz + dx, vPx + dz + dy);
-        quad(pose, buffer, tint, light, -1.0F, 0.0F, 0.0F,
-                x0, y0, z0, x0, y1, z0, x0, y1, z1, x0, y0, z1,
-                uPx, vPx + dz, uPx + dz, vPx + dz + dy);
-        quad(pose, buffer, tint, light, 1.0F, 0.0F, 0.0F,
-                x1, y0, z1, x1, y1, z1, x1, y1, z0, x1, y0, z0,
-                uPx + dz + dx, vPx + dz, uPx + dz + dx + dz, vPx + dz + dy);
-    }
-
-    private static void quad(PoseStack.Pose pose, VertexConsumer buffer, int tint, int light,
-                             float nx, float ny, float nz,
-                             float ax, float ay, float az, float bx, float by, float bz,
-                             float cx, float cy, float cz, float ex, float ey, float ez,
-                             float uMin, float vMin, float uMax, float vMax) {
-        float u0 = uMax / TEX_W;
-        float u1 = uMin / TEX_W;
-        float v0 = vMin / TEX_H;
-        float v1 = vMax / TEX_H;
-        buffer.addVertex(pose, ax, ay, az).setColor(tint).setUv(u0, v0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, nx, ny, nz);
-        buffer.addVertex(pose, bx, by, bz).setColor(tint).setUv(u1, v0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, nx, ny, nz);
-        buffer.addVertex(pose, cx, cy, cz).setColor(tint).setUv(u1, v1)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, nx, ny, nz);
-        buffer.addVertex(pose, ex, ey, ez).setColor(tint).setUv(u0, v1)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, nx, ny, nz);
+        BoxGeometry.box(pose, buffer,
+                x * PX, y * PX, z * PX,
+                (x + dx) * PX, (y + dy) * PX, (z + dz) * PX,
+                u, v, dx, dy, dz, TEX_W, TEX_H, tint, light, true);
     }
 
     @Override
