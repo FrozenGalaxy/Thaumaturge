@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.taint.flux;
 
+import net.minecraft.world.entity.player.Player;
 import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -79,7 +80,7 @@ public final class BlockFluxGoo extends LiquidBlock {
     }
 
     @Override
-    public ItemStack pickupBlock(@Nullable LivingEntity user, LevelAccessor level, BlockPos pos, BlockState state) {
+    public ItemStack pickupBlock(@Nullable Player user, LevelAccessor level, BlockPos pos, BlockState state) {
         return ItemStack.EMPTY;
     }
 }

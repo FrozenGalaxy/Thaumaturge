@@ -361,9 +361,10 @@ public class EntityArcaneBore extends EntityOwnedConstruct {
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+    public boolean hurt(DamageSource source, float amount) {
+        ServerLevel level = (ServerLevel) level();
         if (source.getEntity() instanceof LivingEntity living && isOwner(living)) {
-            Direction face = Direction.getApproximateNearest(
+            Direction face = Direction.getNearest(
                     living.getX() - getX(), living.getY() - getY(), living.getZ() - getZ());
             if (face != Direction.DOWN) {
                 setFacing(face);
@@ -372,7 +373,7 @@ public class EntityArcaneBore extends EntityOwnedConstruct {
         }
         setYRot((float) (getYRot() + random.nextGaussian() * 45.0));
         setXRot((float) (getXRot() + random.nextGaussian() * 20.0));
-        return super.hurtServer(level, source, amount);
+        return super.hurt(source, amount);
     }
 
     @Override
@@ -390,7 +391,7 @@ public class EntityArcaneBore extends EntityOwnedConstruct {
 
     private void dropHeld() {
         if (!getMainHandItem().isEmpty() && level() instanceof ServerLevel serverLevel) {
-            spawnAtLocation(serverLevel, getMainHandItem(), 0.5F);
+            spawnAtLocation(getMainHandItem(), 0.5F);
             setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
         }
     }
@@ -401,7 +402,7 @@ public class EntityArcaneBore extends EntityOwnedConstruct {
             if (player.isShiftKeyDown()) {
                 playSound(TCSounds.ZAP.get(), 1.0F, 1.0F);
                 dropHeld();
-                spawnAtLocation((ServerLevel) level(), new ItemStack(TCItems.TURRET_BORE.get()), 0.5F);
+                spawnAtLocation(new ItemStack(TCItems.TURRET_BORE.get()), 0.5F);
                 discard();
                 player.swing(hand);
             } else {
@@ -447,7 +448,7 @@ public class EntityArcaneBore extends EntityOwnedConstruct {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         charge = input.getFloat("charge");
         setFacing(Direction.values()[input.getByte("facing")]);
@@ -455,7 +456,7 @@ public class EntityArcaneBore extends EntityOwnedConstruct {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putFloat("charge", charge);
         output.putByte("facing", (byte) getFacing().ordinal());
@@ -467,25 +468,25 @@ public class EntityArcaneBore extends EntityOwnedConstruct {
         super.dropCustomDeathLoot(level, source, recentlyHit);
         float bonus = 0.0F;
         if (random.nextFloat() < 0.2F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCItems.MIND_CLOCKWORK.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCItems.MIND_CLOCKWORK.get()), 0.5F);
         }
         if (random.nextFloat() < 0.2F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCItems.MORPHIC_RESONATOR.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCItems.MORPHIC_RESONATOR.get()), 0.5F);
         }
         if (random.nextFloat() < 0.2F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCBlocks.CRYSTAL_AER.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCBlocks.CRYSTAL_AER.get()), 0.5F);
         }
         if (random.nextFloat() < 0.2F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCBlocks.CRYSTAL_TERRA.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCBlocks.CRYSTAL_TERRA.get()), 0.5F);
         }
         if (random.nextFloat() < 0.5F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCItems.MECHANISM_SIMPLE.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCItems.MECHANISM_SIMPLE.get()), 0.5F);
         }
         if (random.nextFloat() < 0.5F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCItems.PLATE_BRASS.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCItems.PLATE_BRASS.get()), 0.5F);
         }
         if (random.nextFloat() < 0.5F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCBlocks.PLANK_GREATWOOD.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCBlocks.PLANK_GREATWOOD.get()), 0.5F);
         }
     }
 

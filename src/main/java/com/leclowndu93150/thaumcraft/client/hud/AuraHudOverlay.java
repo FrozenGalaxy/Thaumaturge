@@ -85,7 +85,7 @@ public final class AuraHudOverlay implements LeftHudStack.Gauge {
         ClientAuraCache.tick();
         ChunkPos pos = ChunkPos.containing(player.blockPosition());
         if (ClientAuraCache.shouldRequest(pos)) {
-            PacketDistributor.sendToServer(new ServerboundRequestAuraChunkPayload(pos.x(), pos.z()));
+            PacketDistributor.sendToServer(new ServerboundRequestAuraChunkPayload(pos.x, pos.z));
         }
         ClientAuraCache.Snapshot snap = ClientAuraCache.get(pos);
         if (snap == null) {

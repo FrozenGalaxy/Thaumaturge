@@ -97,11 +97,12 @@ public class EntityEldritchGuardian extends Monster implements RangedAttackMob, 
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+    public boolean hurt(DamageSource source, float damage) {
+        ServerLevel level = (ServerLevel) level();
         if (source.is(DamageTypeTags.WITCH_RESISTANT_TO)) {
             damage /= 2.0F;
         }
-        return super.hurtServer(level, source, damage);
+        return super.hurt(source, damage);
     }
 
     @Override
@@ -128,8 +129,9 @@ public class EntityEldritchGuardian extends Monster implements RangedAttackMob, 
     }
 
     @Override
-    public boolean doHurtTarget(ServerLevel level, Entity target) {
-        boolean result = super.doHurtTarget(level, target);
+    public boolean doHurtTarget(Entity target) {
+        ServerLevel level = (ServerLevel) level();
+        boolean result = super.doHurtTarget(target);
         if (result) {
             int difficultyId = this.level().getDifficulty().getId();
             if (this.getMainHandItem().isEmpty()
@@ -180,7 +182,7 @@ public class EntityEldritchGuardian extends Monster implements RangedAttackMob, 
 
     @Override
     public boolean removeWhenFarAway(double distance) {
-        return !this.hasHome();
+        return !this.hasRestriction();
     }
 
     @Override

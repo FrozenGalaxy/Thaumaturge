@@ -1,5 +1,8 @@
 package com.leclowndu93150.thaumcraft.content.infusion;
 
+import java.util.Arrays;
+import net.minecraft.core.HolderLookup;
+import com.leclowndu93150.thaumcraft.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.items.InfusionEnchantment;
@@ -18,10 +21,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.client.RecipeBookCategories;
-import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -53,7 +53,7 @@ public final class InfusionEnchantmentRecipe implements Recipe<InfusionInput>, I
             InfusionEnchantmentRecipe::new
     );
 
-    public static final RecipeSerializer<InfusionEnchantmentRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+    public static final RecipeSerializer<InfusionEnchantmentRecipe> SERIALIZER = new SimpleRecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     private final InfusionEnchantment enchantment;
     private final List<Ingredient> components;
@@ -140,8 +140,8 @@ public final class InfusionEnchantmentRecipe implements Recipe<InfusionInput>, I
 
     @Override
     public ItemStack resultItem() {
-        ItemStack base = displayCatalyst.items().findFirst()
-                .map(holder -> new ItemStack(holder.value()))
+        ItemStack base = Arrays.stream(displayCatalyst.getItems()).findFirst()
+                .map(ItemStack::copy)
                 .orElse(ItemStack.EMPTY);
         if (!base.isEmpty()) {
             InfusionEnchantmentHelper.add(base, enchantment, 1);
@@ -155,11 +155,21 @@ public final class InfusionEnchantmentRecipe implements Recipe<InfusionInput>, I
     }
 
     @Override
-    public ItemStack assemble(InfusionInput input) {
+    public ItemStack assemble(InfusionInput input, HolderLookup.Provider registries) {
         ItemStack out = input.catalyst().copyWithCount(1);
         InfusionEnchantmentHelper.add(out, enchantment,
                 InfusionEnchantmentHelper.level(out, enchantment) + 1);
         return out;
+    }
+
+    @Override
+    public boolean canCraftInDimensions(int width, int height) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getResultItem(HolderLookup.Provider registries) {
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -172,23 +182,9 @@ public final class InfusionEnchantmentRecipe implements Recipe<InfusionInput>, I
         return TCRecipeTypes.INFUSION_ENCHANTMENT.get();
     }
 
-    @Override
-    public PlacementInfo placementInfo() {
-        return PlacementInfo.NOT_PLACEABLE;
-    }
-
-    @Override
-    public RecipeBookCategory recipeBookCategory() {
-        return RecipeBookCategories.CRAFTING_MISC;
-    }
-
-    @Override
+            @Override
     public boolean showNotification() {
         return false;
     }
 
-    @Override
-    public String group() {
-        return "";
-    }
 }

@@ -16,6 +16,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -78,7 +79,7 @@ public class BlockJar extends BaseEntityBlock implements ILabelable {
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         if (!(level.getBlockEntity(pos) instanceof BlockEntityJar jar)) return 0;
         int amt = jar.amount();
         if (amt <= 0) return 0;
@@ -87,7 +88,7 @@ public class BlockJar extends BaseEntityBlock implements ILabelable {
     }
 
     @Override
-    protected InteractionResult useItemOn(
+    protected ItemInteractionResult useItemOn(
             ItemStack stack,
             BlockState state,
             Level level,
@@ -96,19 +97,19 @@ public class BlockJar extends BaseEntityBlock implements ILabelable {
             InteractionHand hand,
             BlockHitResult hit
     ) {
-        if (!(level.getBlockEntity(pos) instanceof BlockEntityJar jar)) return InteractionResult.PASS;
-        if (level.isClientSide()) return InteractionResult.SUCCESS;
+        if (!(level.getBlockEntity(pos) instanceof BlockEntityJar jar)) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (level.isClientSide()) return ItemInteractionResult.SUCCESS;
 
         if (stack.is(TCItems.JAR_BRACE.get())) {
-            if (jar.isBlocked()) return InteractionResult.TRY_WITH_EMPTY_HAND;
+            if (jar.isBlocked()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             jar.setBraced(true);
             if (!player.getAbilities().instabuild) {
                 stack.shrink(1);
             }
             level.playSound(null, pos, TCSounds.KEY.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
-        return InteractionResult.TRY_WITH_EMPTY_HAND;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
 

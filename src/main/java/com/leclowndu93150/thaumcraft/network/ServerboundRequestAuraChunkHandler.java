@@ -15,12 +15,12 @@ public final class ServerboundRequestAuraChunkHandler {
         if (!(context.player() instanceof ServerPlayer player)) {
             return;
         }
-        ServerLevel level = player.level();
+        ServerLevel level = (ServerLevel) player.level();
         ChunkPos pos = new ChunkPos(payload.chunkX(), payload.chunkZ());
         AuraData data = AuraManager.getAuraChunk(level, pos);
         short base = data != null ? data.getBase() : 0;
         float vis = data != null ? data.getVis() : 0.0F;
         float flux = data != null ? data.getFlux() : 0.0F;
-        PacketDistributor.sendToPlayer(player, new ClientboundAuraSnapshotPayload(pos.x(), pos.z(), base, vis, flux));
+        PacketDistributor.sendToPlayer(player, new ClientboundAuraSnapshotPayload(pos.x, pos.z, base, vis, flux));
     }
 }

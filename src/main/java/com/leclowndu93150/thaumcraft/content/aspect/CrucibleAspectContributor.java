@@ -21,7 +21,7 @@ public final class CrucibleAspectContributor implements IAspectRecipeContributor
             if (!(recipe instanceof CrucibleRecipe crucible)) {
                 continue;
             }
-            ItemStack output = crucible.rawResult().create();
+            ItemStack output = crucible.rawResult().copy();
             if (output.isEmpty() || output.getItem() != item) {
                 continue;
             }

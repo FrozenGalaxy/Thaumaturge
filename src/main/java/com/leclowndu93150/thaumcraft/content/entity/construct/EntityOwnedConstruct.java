@@ -81,11 +81,6 @@ public abstract class EntityOwnedConstruct extends PathfinderMob implements Owna
     }
 
     @Override
-    public boolean canBreatheUnderwater() {
-        return true;
-    }
-
-    @Override
     protected SoundEvent getAmbientSound() {
         return TCSounds.CLACK.get();
     }
@@ -126,7 +121,7 @@ public abstract class EntityOwnedConstruct extends PathfinderMob implements Owna
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("v", validSpawn);
         UUID owner = getOwnerUUID();
@@ -136,7 +131,7 @@ public abstract class EntityOwnedConstruct extends PathfinderMob implements Owna
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         validSpawn = input.getBoolean("v");
         if (input.hasUUID("Owner")) {

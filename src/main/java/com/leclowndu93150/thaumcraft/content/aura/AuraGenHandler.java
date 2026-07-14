@@ -26,7 +26,9 @@ public final class AuraGenHandler {
         if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
             return;
         }
-        LevelChunk chunk = event.getChunk();
+        if (!(event.getChunk() instanceof LevelChunk chunk)) {
+            return;
+        }
         ChunkPos pos = chunk.getPos();
         AuraManager.onChunkLoaded(serverLevel, pos);
 
@@ -49,15 +51,15 @@ public final class AuraGenHandler {
     }
 
     private static void generate(ServerLevel level, LevelChunk chunk, AuraData data) {
-        int cx = chunk.getPos().x();
-        int cz = chunk.getPos().z();
+        int cx = chunk.getPos().x;
+        int cz = chunk.getPos().z;
         float life = sampleBiome(level, new BlockPos(cx * 16 + 8, 50, cz * 16 + 8));
         for (int a = 0; a < 4; a++) {
             Direction dir = Direction.from2DDataValue(a);
             life += sampleBiome(level, new BlockPos((cx + dir.getStepX()) * 16 + 8, 50, (cz + dir.getStepZ()) * 16 + 8));
         }
         life /= 5.0F;
-        Random rand = new Random(level.getSeed() ^ ChunkPos.pack(cx, cz));
+        Random rand = new Random(level.getSeed() ^ ChunkPos.asLong(cx, cz));
         float noise = (float) (1.0 + rand.nextGaussian() * 0.1F);
         short base = (short) (life * 500.0F * noise);
         base = (short) Mth.clamp(base, 0, 500);
@@ -65,7 +67,7 @@ public final class AuraGenHandler {
         data.setVis(base);
         data.setFlux(0.0F);
         data.setChunkPos(chunk.getPos());
-        chunk.markUnsaved();
+        chunk.setUnsaved(true);
     }
 
     private static float sampleBiome(ServerLevel level, BlockPos pos) {

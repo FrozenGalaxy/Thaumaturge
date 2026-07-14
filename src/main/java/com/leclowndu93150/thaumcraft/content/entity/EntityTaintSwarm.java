@@ -125,7 +125,7 @@ public final class EntityTaintSwarm extends Monster implements ITaintedMob {
             return;
         }
         if (isSummoned()) {
-            this.hurtServer(server, server.damageSources().generic(), SELF_DAMAGE_SUMMONED);
+            this.hurt(server.damageSources().generic(), SELF_DAMAGE_SUMMONED);
             return;
         }
         if (attackTicks > 0) {
@@ -141,7 +141,7 @@ public final class EntityTaintSwarm extends Monster implements ITaintedMob {
         double distSq = this.distanceToSqr(target);
         if (distSq < ATTACK_RANGE * ATTACK_RANGE) {
             attackTicks = ATTACK_COOLDOWN + this.random.nextInt(10);
-            this.doHurtTarget(server, target);
+            this.doHurtTarget(target);
             target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, WEAKNESS_DURATION, 0, true, false, false));
         }
     }
@@ -151,7 +151,7 @@ public final class EntityTaintSwarm extends Monster implements ITaintedMob {
     }
 
     @Override
-    public boolean causeFallDamage(double fallDistance, float multiplier, DamageSource source) {
+    public boolean causeFallDamage(float fallDistance, float multiplier, DamageSource source) {
         return false;
     }
 

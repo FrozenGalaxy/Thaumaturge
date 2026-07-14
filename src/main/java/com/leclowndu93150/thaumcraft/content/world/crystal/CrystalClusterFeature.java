@@ -42,7 +42,7 @@ public final class CrystalClusterFeature extends Feature<CrystalClusterConfig> {
             int x = origin.getX() + 8 + Mth.nextInt(random, -6, 6);
             int z = origin.getZ() + 8 + Mth.nextInt(random, -6, 6);
             int surface = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
-            int minY = level.getMinY();
+            int minY = level.getMinBuildHeight();
             int y = minY + random.nextInt(Math.max(5, surface - 5 - minY));
             BlockPos center = new BlockPos(x, y, z);
 

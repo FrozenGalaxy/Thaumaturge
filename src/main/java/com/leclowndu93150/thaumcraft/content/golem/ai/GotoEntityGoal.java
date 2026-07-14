@@ -36,7 +36,7 @@ public final class GotoEntityGoal extends GotoGoal {
         for (Task task : TaskHandler.getEntityTasksSorted(golem.level(), golem.getUUID(), golem)) {
             if (areGolemTagsValidForTask(task)
                     && task.canGolemPerformTask(golem)
-                    && golem.isWithinHome(task.getEntity().blockPosition())
+                    && golem.isWithinRestriction(task.getEntity().blockPosition())
                     && isValidDestination(golem.level(), task.getEntity().blockPosition())
                     && canEasilyReach(task.getEntity())) {
                 golem.setTask(task);

@@ -58,7 +58,7 @@ public class EntityEldritchOrb extends ThrowableProjectile {
         DamageSource source = this.damageSources().indirectMagic(this, owner);
         for (Entity entity : this.level().getEntities(owner, this.getBoundingBox().inflate(BLAST_RANGE))) {
             if (entity instanceof LivingEntity living && !living.isInvertedHealAndHarm()) {
-                living.hurtServer(server, source, damage);
+                living.hurt(source, damage);
                 living.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, WEAKNESS_TICKS));
             }
         }

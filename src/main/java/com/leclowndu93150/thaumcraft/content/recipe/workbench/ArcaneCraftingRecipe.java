@@ -1,9 +1,5 @@
 package com.leclowndu93150.thaumcraft.content.recipe.workbench;
 
-import net.minecraft.world.item.crafting.display.SlotDisplay;
-import java.util.List;
-import java.util.ArrayList;
-import com.leclowndu93150.thaumcraft.content.taint.item.EssentiaCrystalFactory;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.recipe.IArcaneRecipe;
@@ -11,24 +7,23 @@ import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumcraft.registry.TCRecipeTypes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import java.util.Optional;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import org.jspecify.annotations.Nullable;
-
-import java.util.Optional;
 
 public abstract class ArcaneCraftingRecipe implements IArcaneRecipe {
 
     public static Codec<AspectInstance> LIMITED_ASPECTS = AspectInstance.CODEC
-            .validate(instance -> instance.amount() > 64 ? DataResult.error(() -> "The amount for '" + instance.aspect().getKey().identifier() + "' aspect must not exceed 64.") : DataResult.success(instance));
+            .validate(instance -> instance.amount() > 64 ? DataResult.error(() -> "The amount for '" + instance.aspect().getKey().location() + "' aspect must not exceed 64.") : DataResult.success(instance));
     public static Codec<AspectList> PRIMAL_ASPECTS_CODEC = LIMITED_ASPECTS.listOf(0, 6).flatXmap(
                     entries -> {
                         AspectList result = AspectList.EMPTY;
                         for (AspectInstance entry : entries) {
                             if (!entry.aspect().value().isPrimal())
-                                return DataResult.error(() -> "'" + entry.aspect().getKey().identifier() + "' is not a primal aspect.",result);
+                                return DataResult.error(() -> "'" + entry.aspect().getKey().location() + "' is not a primal aspect.",result);
                             result = result.add(entry);
                         }
                         return DataResult.success(result);
@@ -36,14 +31,13 @@ public abstract class ArcaneCraftingRecipe implements IArcaneRecipe {
                     list -> DataResult.success(list.entries())
             );
 
-    protected final Recipe.CommonInfo commonInfo;
+    protected final String group;
     protected final int vis;
     protected final Optional<ResearchGate> gate;
     protected final AspectList aspects;
-    private @Nullable PlacementInfo placementInfo;
 
-    protected ArcaneCraftingRecipe(Recipe.CommonInfo commonInfo, int vis, Optional<ResearchGate> gate, AspectList aspects) {
-        this.commonInfo = commonInfo;
+    protected ArcaneCraftingRecipe(String group, int vis, Optional<ResearchGate> gate, AspectList aspects) {
+        this.group = group;
         this.vis = vis;
         this.gate = gate;
         this.aspects = aspects;
@@ -53,26 +47,10 @@ public abstract class ArcaneCraftingRecipe implements IArcaneRecipe {
         NonNullList<ItemStack> result = NonNullList.withSize(input.size(), ItemStack.EMPTY);
 
         for (int slot = 0; slot < result.size(); ++slot) {
-            ItemStack item = input.getItem(slot);
-            ItemStack remainder = item.getCraftingRemainder();
-            result.set(slot, remainder != null ? remainder.create() : ItemStack.EMPTY);
+            result.set(slot, input.getItem(slot).getCraftingRemainingItem());
         }
 
         return result;
-    }
-
-    public final boolean showNotification() {
-        return this.commonInfo.showNotification();
-    }
-
-    protected abstract PlacementInfo createPlacementInfo();
-
-    public final PlacementInfo placementInfo() {
-        if (this.placementInfo == null) {
-            this.placementInfo = this.createPlacementInfo();
-        }
-
-        return this.placementInfo;
     }
 
     @Override
@@ -83,18 +61,19 @@ public abstract class ArcaneCraftingRecipe implements IArcaneRecipe {
     @Override
     public abstract RecipeSerializer<? extends ArcaneCraftingRecipe> getSerializer();
 
+    @Override
     public NonNullList<ItemStack> getRemainingItems(ArcaneCraftingInput input) {
         return defaultCraftingReminder(input);
     }
 
     @Override
-    public String group() {
-        return "";
+    public String getGroup() {
+        return group;
     }
 
     @Override
-    public RecipeBookCategory recipeBookCategory() {
-        return RecipeBookCategories.CRAFTING_MISC;
+    public boolean canCraftInDimensions(int width, int height) {
+        return true;
     }
 
     @Override
@@ -107,16 +86,6 @@ public abstract class ArcaneCraftingRecipe implements IArcaneRecipe {
         return gate;
     }
 
-    public List<SlotDisplay> crystalDisplays() {
-        List<SlotDisplay> displays = new ArrayList<>();
-        for (AspectInstance entry : aspects.entries()) {
-            ItemStack crystal = EssentiaCrystalFactory.of(entry.aspect(), entry.amount());
-            displays.add(new SlotDisplay.ItemStackSlotDisplay(
-                    new ItemStack(crystal.typeHolder(), crystal.getCount(), crystal.getComponentsPatch())));
-        }
-        return displays;
-    }
-
     @Override
     public AspectList getCrystals() {
         return aspects;
@@ -124,11 +93,6 @@ public abstract class ArcaneCraftingRecipe implements IArcaneRecipe {
 
     @Override
     public boolean matches(ArcaneCraftingInput input, Level level) {
-        if (aspects.isEmpty()) return true;
-        if (input.getAspects().size() < aspects.size()) return false;
-        for (AspectInstance instance : aspects.entries()) {
-            if (input.getAspects().amountOf(instance.aspect()) < instance.amount()) return false;
-        }
         return true;
     }
 }

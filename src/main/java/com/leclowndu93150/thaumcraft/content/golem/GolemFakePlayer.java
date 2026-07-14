@@ -19,7 +19,7 @@ public final class GolemFakePlayer {
 
     public static FakePlayer at(ServerLevel level, IGolemAPI golem) {
         FakePlayer player = get(level);
-        player.snapTo(golem.getGolemEntity().getX(), golem.getGolemEntity().getY(), golem.getGolemEntity().getZ(),
+        player.moveTo(golem.getGolemEntity().getX(), golem.getGolemEntity().getY(), golem.getGolemEntity().getZ(),
                 golem.getGolemEntity().getYRot(), golem.getGolemEntity().getXRot());
         return player;
     }

@@ -105,13 +105,13 @@ public class EntityFollowingItem extends EntitySpecialItem implements IEntityWit
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putShort("type", (short) this.type);
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         this.type = (input.contains("type") ? input.getShort("type") : (short) 3);
     }

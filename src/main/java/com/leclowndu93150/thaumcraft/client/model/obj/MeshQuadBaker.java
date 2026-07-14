@@ -101,6 +101,6 @@ public final class MeshQuadBaker {
             return Direction.UP;
         }
         normal.normalize();
-        return Direction.getApproximateNearest(normal.x, normal.y, normal.z);
+        return Direction.getNearest(normal.x, normal.y, normal.z);
     }
 }

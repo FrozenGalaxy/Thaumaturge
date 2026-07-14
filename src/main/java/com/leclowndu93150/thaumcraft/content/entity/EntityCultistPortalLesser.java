@@ -129,8 +129,8 @@ public class EntityCultistPortalLesser extends Monster {
     private void spawnMinion() {
         ServerLevel server = (ServerLevel) this.level();
         EntityCultist cultist = this.random.nextFloat() < KNIGHT_CHANCE
-                ? TCEntities.CULTIST_KNIGHT.get().create(server, MobSpawnType.MOB_SUMMONED)
-                : TCEntities.CULTIST_CLERIC.get().create(server, MobSpawnType.MOB_SUMMONED);
+                ? TCEntities.CULTIST_KNIGHT.get().create(server)
+                : TCEntities.CULTIST_CLERIC.get().create(server);
         if (cultist == null) {
             return;
         }
@@ -143,14 +143,14 @@ public class EntityCultistPortalLesser extends Monster {
         server.addFreshEntity(cultist);
         cultist.spawnCultistArrivalParticles();
         cultist.playSound(TCSounds.WANDFAIL.get(), 1.0F, 1.0F);
-        this.hurtServer(server, this.damageSources().fellOutOfWorld(), 5 + this.random.nextInt(5));
+        this.hurt(this.damageSources().fellOutOfWorld(), 5 + this.random.nextInt(5));
     }
 
     @Override
     public void playerTouch(Player player) {
         if (this.level() instanceof ServerLevel server
                 && this.distanceToSqr(player) < TOUCH_RANGE_SQ
-                && player.hurtServer(server, this.damageSources().indirectMagic(this, this), TOUCH_DAMAGE)) {
+                && player.hurt(this.damageSources().indirectMagic(this, this), TOUCH_DAMAGE)) {
             this.playSound(TCSounds.ZAP.get(), 1.0F,
                     (this.random.nextFloat() - this.random.nextFloat()) * 0.1F + 1.0F);
         }
@@ -171,18 +171,18 @@ public class EntityCultistPortalLesser extends Monster {
     }
 
     @Override
-    public boolean causeFallDamage(double distance, float multiplier, DamageSource source) {
+    public boolean causeFallDamage(float distance, float multiplier, DamageSource source) {
         return false;
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("active", this.isActive());
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         this.setActive(input.getBoolean("active"));
     }

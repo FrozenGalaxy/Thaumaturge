@@ -134,7 +134,7 @@ public final class BlockEntityEldritchCrabSpawner extends BlockEntity {
                 ? (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 0.75 - crab.getBbHeight() : 0.25)
                 : 0.5 - crab.getBbHeight() / 2.0;
         double offsetZ = dir.getAxis() == Direction.Axis.Z ? crab.getBbWidth() / 2.0 : 0.5;
-        crab.snapTo(pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, dir.toYRot(), 0.0F);
+        crab.moveTo(pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, dir.toYRot(), 0.0F);
         crab.setDeltaMovement(dir.getStepX() * 0.2F, dir.getStepY() * 0.2F, dir.getStepZ() * 0.2F);
         crab.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(pos), MobSpawnType.SPAWNER, null);
         int difficulty = Math.max((int) (level.getDifficulty().getId()

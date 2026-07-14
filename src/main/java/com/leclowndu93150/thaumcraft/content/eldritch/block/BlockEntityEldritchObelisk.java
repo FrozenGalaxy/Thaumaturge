@@ -31,7 +31,7 @@ public final class BlockEntityEldritchObelisk extends BlockEntity {
                 new AABB(pos).inflate(BUFF_RANGE));
         for (LivingEntity entity : nearby) {
             if (entity instanceof IEldritchMob && !entity.hasEffect(MobEffects.REGENERATION)) {
-                entity.addEffect(new MobEffectInstance(MobEffects.STRENGTH, BUFF_DURATION, 0, true, true));
+                entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, BUFF_DURATION, 0, true, true));
                 entity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, BUFF_DURATION, 0, true, true));
             }
         }

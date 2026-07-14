@@ -4,34 +4,33 @@ import com.leclowndu93150.thaumcraft.api.items.IGoggles;
 import com.leclowndu93150.thaumcraft.api.items.IRevealer;
 import com.leclowndu93150.thaumcraft.api.items.IVisDiscountGear;
 import com.leclowndu93150.thaumcraft.api.items.IWarpingGear;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.Holder;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.equipment.Equippable;
-import org.jspecify.annotations.Nullable;
+import net.minecraft.world.level.Level;
 
-public final class VoidRobeArmorItem extends Item
+public final class VoidRobeArmorItem extends ArmorItem
         implements IVisDiscountGear, IWarpingGear, IGoggles, IRevealer {
     private static final int VIS_DISCOUNT = 5;
     private static final int WARP = 3;
 
-    public VoidRobeArmorItem(Properties properties) {
-        super(properties);
+    public VoidRobeArmorItem(Holder<ArmorMaterial> material, ArmorItem.Type type, Properties properties) {
+        super(material, type, properties);
     }
 
-    private static boolean isHelm(ItemStack stack) {
-        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
-        return equippable != null && equippable.slot() == EquipmentSlot.HEAD;
+    private boolean isHelm(ItemStack stack) {
+        return getType() == ArmorItem.Type.HELMET;
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
-        super.inventoryTick(stack, level, entity, slot);
-        VoidGearItem.selfRepairTick(stack, entity);
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        super.inventoryTick(stack, level, entity, slotId, isSelected);
+        if (!level.isClientSide()) {
+            VoidGearItem.selfRepairTick(stack, entity);
+        }
     }
 
     @Override

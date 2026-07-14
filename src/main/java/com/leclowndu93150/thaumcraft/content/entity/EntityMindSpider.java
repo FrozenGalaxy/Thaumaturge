@@ -63,8 +63,8 @@ public final class EntityMindSpider extends Spider implements IEldritchMob {
     }
 
     @Override
-    protected int getBaseExperienceReward(ServerLevel level) {
-        return isHarmless() ? 0 : super.getBaseExperienceReward(level);
+    protected int getBaseExperienceReward() {
+        return isHarmless() ? 0 : super.getBaseExperienceReward();
     }
 
     @Override
@@ -73,8 +73,8 @@ public final class EntityMindSpider extends Spider implements IEldritchMob {
     }
 
     @Override
-    public boolean doHurtTarget(ServerLevel level, Entity target) {
-        return !isHarmless() && super.doHurtTarget(level, target);
+    public boolean doHurtTarget(Entity target) {
+        return !isHarmless() && super.doHurtTarget(target);
     }
 
     @Override
@@ -91,14 +91,14 @@ public final class EntityMindSpider extends Spider implements IEldritchMob {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("harmless", isHarmless());
         output.putString("viewer", getViewer());
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         setHarmless(input.getBoolean("harmless"));
         setViewer(input.getString("viewer"));

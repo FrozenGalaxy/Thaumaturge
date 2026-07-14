@@ -1,7 +1,6 @@
 package com.leclowndu93150.thaumcraft.client.warp;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -33,7 +32,7 @@ public final class WarpFogEvents {
             return;
         }
         float intensity = WarpFogState.intensity();
-        FogData fog = event.getFogData();
+        FogData fog = event();
         fog.environmentalEnd = Mth.lerp(intensity, fog.environmentalEnd, MIST_FAR_PLANE);
         fog.environmentalStart = Mth.lerp(intensity, fog.environmentalStart, MIST_NEAR_PLANE);
     }

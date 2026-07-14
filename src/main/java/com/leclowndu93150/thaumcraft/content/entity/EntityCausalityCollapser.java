@@ -22,7 +22,8 @@ public final class EntityCausalityCollapser extends ThrowableItemProjectile {
     }
 
     public EntityCausalityCollapser(Level level, LivingEntity shooter, ItemStack stack) {
-        super(TCEntities.CAUSALITY_COLLAPSER.get(), shooter, level, stack);
+        super(TCEntities.CAUSALITY_COLLAPSER.get(), shooter, level);
+        this.setItem(stack);
     }
 
     @Override

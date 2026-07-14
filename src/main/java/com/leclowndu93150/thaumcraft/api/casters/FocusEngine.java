@@ -41,7 +41,7 @@ public final class FocusEngine {
      * @return a new element instance, or null when no element is registered under {@code key}
      */
     public static @Nullable IFocusElement getElement(ResourceLocation key) {
-        FocusElementType type = registry().getValue(key);
+        FocusElementType type = registry().get(key);
         if (type == null) {
             return null;
         }
@@ -59,7 +59,7 @@ public final class FocusEngine {
      * @return the icon texture, or null when no element is registered under {@code key}
      */
     public static @Nullable ResourceLocation getElementIcon(ResourceLocation key) {
-        FocusElementType type = registry().getValue(key);
+        FocusElementType type = registry().get(key);
         return type != null ? type.icon() : null;
     }
 
@@ -71,7 +71,7 @@ public final class FocusEngine {
      *         under {@code key}
      */
     public static int getElementColor(ResourceLocation key) {
-        FocusElementType type = registry().getValue(key);
+        FocusElementType type = registry().get(key);
         return type != null ? type.color() : 0xFFFFFF;
     }
 

@@ -272,8 +272,8 @@ public final class GenRooms extends GenCommonPieces {
                     * Mth.randomBetweenInclusive(ctx.random, -1, 1);
             double gz = z + 8.5 + Mth.randomBetweenInclusive(ctx.random, 1, 3)
                     * Mth.randomBetweenInclusive(ctx.random, -1, 1);
-            guardian.snapTo(gx, y + 2, gz, 0.0F, 0.0F);
-            guardian.setHomeTo(new BlockPos(x + 8, y + 2, z + 8), 16);
+            guardian.moveTo(gx, y + 2, gz, 0.0F, 0.0F);
+            guardian.restrictTo(new BlockPos(x + 8, y + 2, z + 8), 16);
             if (qq == 0 && guardians >= 4) {
                 ChampionHelper.makeChampion(guardian, true);
             }

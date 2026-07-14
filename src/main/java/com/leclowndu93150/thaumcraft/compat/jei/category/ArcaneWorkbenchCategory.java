@@ -7,6 +7,8 @@ import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumcraft.compat.jei.drawables.AlphaDrawable;
 import com.leclowndu93150.thaumcraft.compat.jei.utils.ResearchUtils;
 import com.leclowndu93150.thaumcraft.content.recipe.workbench.ArcaneCraftingRecipe;
+import com.leclowndu93150.thaumcraft.content.wands.WandEconomy;
+import com.leclowndu93150.thaumcraft.content.workbench.WorkbenchPayment;
 import com.leclowndu93150.thaumcraft.content.recipe.workbench.ArcaneShapedCraftingRecipe;
 import com.leclowndu93150.thaumcraft.content.recipe.workbench.ArcaneShapelessCraftingRecipe;
 import com.leclowndu93150.thaumcraft.content.taint.item.EssentiaCrystalFactory;
@@ -22,12 +24,9 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import mezz.jei.api.recipe.types.IRecipeHolderType;
-import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -41,8 +40,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class ArcaneWorkbenchCategory implements IRecipeCategory<RecipeHolder<ArcaneCraftingRecipe>> {
-    public static final IRecipeHolderType<ArcaneCraftingRecipe> RECIPE_TYPE =
-            IRecipeHolderType.create(TCRecipeTypes.ARCANE.get());
+    public static final IRecipeHo<ArcaneCraftingRecipe> RECIPE_TYPE =
+            IRecipeCategory.create(TCRecipeTypes.ARCANE.get());
 
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png");
 
@@ -87,7 +86,7 @@ public final class ArcaneWorkbenchCategory implements IRecipeCategory<RecipeHold
     }
 
     @Override
-    public IRecipeType<RecipeHolder<ArcaneCraftingRecipe>> getRecipeType() {
+    public IRecipeCategory<ArcaneCraftingRecipe> getRecipeType() {
         return RECIPE_TYPE;
     }
 
@@ -196,6 +195,10 @@ public final class ArcaneWorkbenchCategory implements IRecipeCategory<RecipeHold
         boolean inTopRow = mouseY > TOP_ZONE_MIN_Y && mouseY < TOP_ZONE_MAX_Y;
         if (inTopRow && mouseX > VIS_ZONE_MIN_X && mouseX < VIS_ZONE_MAX_X) {
             tooltip.add(Component.translatable("jei.thaumcraft.arcane_workbench.vis_cost"));
+            tooltip.add(Component.translatable("jei.thaumcraft.arcane_workbench.vis_cost_wand",
+                    WandEconomy.CRYSTAL_SUBSTITUTE_VIS));
+            tooltip.add(Component.translatable("jei.thaumcraft.arcane_workbench.vis_cost_aura",
+                    WorkbenchPayment.crudeCost(recipe.value())));
             return;
         }
 

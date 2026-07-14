@@ -112,7 +112,7 @@ public final class BlockEntityGolemBuilder extends BlockEntity implements IEssen
             output.setStackInSlot(SLOT_OUTPUT, placer.copyWithCount(1));
         } else if (current.getCount() < current.getMaxStackSize()
                 && ItemStack.isSameItemSameComponents(current, placer)) {
-            output.set(SLOT_OUTPUT, output.getStackInSlot(SLOT_OUTPUT), current.getCount() + 1);
+            output.setStackInSlot(SLOT_OUTPUT, current.copyWithCount(current.getCount() + 1));
         } else {
             return;
         }
@@ -252,7 +252,7 @@ public final class BlockEntityGolemBuilder extends BlockEntity implements IEssen
     @Override
     protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
         super.saveAdditional(output, registries);
-        this.output.serialize(output);
+        output.put("inventory", this.output.serializeNBT(registries));
         if (pendingGolem != null) {
             TCNbt.store(output, "golem", GolemProperties.CODEC, registries, pendingGolem);
         }
@@ -263,7 +263,7 @@ public final class BlockEntityGolemBuilder extends BlockEntity implements IEssen
     @Override
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
-        output.deserialize(input);
+        this.output.deserializeNBT(registries, input.getCompound("inventory"));
         pendingGolem = TCNbt.read(input, "golem", GolemProperties.CODEC, registries).orElse(null);
         cost = input.getInt("cost");
         maxCost = input.getInt("mcost");

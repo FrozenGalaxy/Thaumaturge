@@ -55,7 +55,7 @@ public final class BlockEffectSap extends Block {
     }
 
     @Override
-    protected boolean propagatesSkylightDown(BlockState state) {
+    protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
         return true;
     }
 
@@ -68,7 +68,7 @@ public final class BlockEffectSap extends Block {
             return;
         }
         living.addEffect(new MobEffectInstance(MobEffects.WITHER, EFFECT_DURATION_TICKS, 0, true, true));
-        living.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, EFFECT_DURATION_TICKS, SLOWNESS_AMPLIFIER, true, true));
+        living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, EFFECT_DURATION_TICKS, SLOWNESS_AMPLIFIER, true, true));
         living.addEffect(new MobEffectInstance(MobEffects.HUNGER, EFFECT_DURATION_TICKS, HUNGER_AMPLIFIER, true, true));
     }
 

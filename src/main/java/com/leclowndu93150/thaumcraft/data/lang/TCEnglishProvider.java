@@ -15,44 +15,44 @@ public final class TCEnglishProvider extends LanguageProvider {
     protected void addTranslations() {
         add("itemGroup.thaumcraft", "Thaumcraft");
 
-        aspect("aer", "Aer", "Air");
-        aspect("terra", "Terra", "Earth");
-        aspect("ignis", "Ignis", "Fire");
-        aspect("aqua", "Aqua", "Water");
-        aspect("ordo", "Ordo", "Order");
-        aspect("perditio", "Perditio", "Entropy");
+        aspect("aer", "Aer", "Air", "air");
+        aspect("terra", "Terra", "Earth", "earth");
+        aspect("ignis", "Ignis", "Fire", "fire");
+        aspect("aqua", "Aqua", "Water", "water");
+        aspect("ordo", "Ordo", "Order, Regularity, Purity", "order");
+        aspect("perditio", "Perditio", "Entropy, Chaos, Destruction", "broken things");
 
-        aspect("vacuos", "Vacuos", "Void");
-        aspect("lux", "Lux", "Light");
-        aspect("motus", "Motus", "Motion");
-        aspect("gelum", "Gelum", "Cold");
-        aspect("vitreus", "Vitreus", "Crystal");
-        aspect("metallum", "Metallum", "Metal");
-        aspect("victus", "Victus", "Life");
-        aspect("mortuus", "Mortuus", "Death");
-        aspect("potentia", "Potentia", "Energy");
-        aspect("permutatio", "Permutatio", "Exchange");
-        aspect("praecantatio", "Praecantatio", "Magic");
-        aspect("auram", "Auram", "Aura");
-        aspect("alkimia", "Alkimia", "Alchemy");
-        aspect("vitium", "Vitium", "Flux");
-        aspect("tenebrae", "Tenebrae", "Darkness");
-        aspect("alienis", "Alienis", "Eldritch");
-        aspect("volatus", "Volatus", "Flight");
-        aspect("herba", "Herba", "Plant");
-        aspect("instrumentum", "Instrumentum", "Tool");
-        aspect("fabrico", "Fabrico", "Craft");
-        aspect("machina", "Machina", "Mechanism");
-        aspect("vinculum", "Vinculum", "Trap");
-        aspect("spiritus", "Spiritus", "Soul");
-        aspect("cognitio", "Cognitio", "Mind");
-        aspect("sensus", "Sensus", "Senses");
-        aspect("aversio", "Aversio", "Aversion");
-        aspect("praemunio", "Praemunio", "Protect");
-        aspect("desiderium", "Desiderium", "Desire");
-        aspect("exanimis", "Exanimis", "Undead");
-        aspect("bestia", "Bestia", "Beast");
-        aspect("humanus", "Humanus", "Man");
+        aspect("vacuos", "Vacuos", "Void", "empty things");
+        aspect("lux", "Lux", "Light", "light");
+        aspect("motus", "Motus", "Motion, Animation", "things that move");
+        aspect("gelum", "Gelum", "Ice, Frost, Cold", "cold things");
+        aspect("vitreus", "Vitreus", "Crystal, Glass, Clear", "crystals");
+        aspect("metallum", "Metallum", "Metal", "metals");
+        aspect("victus", "Victus", "Life", "the sources of life");
+        aspect("mortuus", "Mortuus", "Death", "the nature of death");
+        aspect("potentia", "Potentia", "Energy, Power", "energy");
+        aspect("permutatio", "Permutatio", "Exchange, Barter", "trading and bartering");
+        aspect("praecantatio", "Praecantatio", "Structured Magic, Spells, Enchantment", "magical things");
+        aspect("auram", "Auram", "Aura, Vis", "the aura");
+        aspect("alkimia", "Alkimia", "Alchemy, Chemistry", "alchemy");
+        aspect("vitium", "Vitium", "Taint, Change, Mutation", "the corrupting influence of magic");
+        aspect("tenebrae", "Tenebrae", "Darkness", "darkness");
+        aspect("alienis", "Alienis", "Alien, Strange, The Eldritch", "strange things from other worlds");
+        aspect("volatus", "Volatus", "Flight", "flight");
+        aspect("herba", "Herba", "Plant", "plants");
+        aspect("instrumentum", "Instrumentum", "Tool, Instrument", "tools");
+        aspect("fabrico", "Fabrico", "Craft", "crafting");
+        aspect("machina", "Machina", "Mechanism, Machine", "mechanical things");
+        aspect("vinculum", "Vinculum", "Trap, Imprison", "things that entrap");
+        aspect("spiritus", "Spiritus", "Soul", "spirits");
+        aspect("cognitio", "Cognitio", "Mind, Memory, Cognition", "the mind");
+        aspect("sensus", "Sensus", "Senses", "perception");
+        aspect("aversio", "Aversio", "Aversion, Conflict", "conflict");
+        aspect("praemunio", "Praemunio", "Fortify, Protect, Ward", "protective things");
+        aspect("desiderium", "Desiderium", "Wish, Desire, Yearning, Want", "valuable things");
+        aspect("exanimis", "Exanimis", "Undead", "the nature of undeath");
+        aspect("bestia", "Bestia", "Beast", "beast");
+        aspect("humanus", "Humanus", "Man", "man");
 
         researchCategory("basics", "Thaumaturgy");
         researchCategory("auromancy", "Auromancy");
@@ -134,6 +134,40 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("recipe.type.construct", "Mystical Construct");
         add("wandtable.text1", "Vis Cost");
         add("gui.thaumcraft.research_table.title", "Research Table");
+        add("gui.thaumcraft.deconstruction_table.title", "Deconstruction Table");
+        add("block.thaumcraft.deconstruction_table", "Deconstruction Table");
+        add("item.thaumcraft.research_note", "Research Notes");
+        add("item.thaumcraft.research_note.complete", "Discovery!");
+        add("tc.researchtheory", "Theory: %s");
+        add("tc.researchnote.click", "Click to obtain research notes (requires paper and scribing tools)");
+        add("tc.researchnote.table", "Complete these notes at a research table");
+        add("tc.researchnote.use", "Right-click to learn this theory");
+        add("tc.researchnote.learned", "You have completed your research on %s!");
+        add("tc.addaspectdiscovery", "You have discovered the aspect %s!");
+        add("tc.discoveryerror", "To understand this you need to study %1$s.");
+        add("tc.aspectcost", "Required research points:");
+        add("tc.research.copy", "Duplicate these research notes");
+        add("tc.decon.collect", "Click to collect this research point");
+        add("tc.table.combine", "Combine the two aspects into their compound");
+        add("tc.table.helper", "Aspect combination reference");
+        add("tc.device.unknown", "You do not yet understand how this device works.");
+        add("tc.table.select", "Drag an aspect here to combine it");
+        add("tc.table.page.prev", "Previous page");
+        add("tc.table.page.next", "Next page");
+        add("tc.table.slot.tools", "Place scribing tools here");
+        add("tc.table.slot.note", "Place research notes here");
+        add("research.thaumcraft.research_expertise.title", "Research Expertise");
+        add("research.thaumcraft.research_expertise.stage.1", "There must be a more efficient way to work through my research notes. If I complete another theory I am sure I can find ways to recover some of the research points I expend.");
+        add("research.thaumcraft.research_expertise.stage.2", "You have become more efficient at performing research.<BR>Whenever you remove an aspect that you placed in a hex, there is a 25%% chance that you will regain the research point.");
+        add("research.thaumcraft.research_mastery.title", "Research Mastery");
+        add("research.thaumcraft.research_mastery.stage.1", "My expertise has grown, but true mastery of the research process still eludes me. More theory work should get me there, though I fear what prolonged exposure to these mysteries is doing to my mind.");
+        add("research.thaumcraft.research_mastery.stage.2", "You have become even more efficient at performing research.<BR>Whenever you remove an aspect that you placed in a hex, there is a 50%% chance that you will regain the research point.<BR>Additionally there is a 10%% chance that whenever you place an aspect that it will not cost any research points to do so.<BR>Lastly you are able to combine aspects in the research table by shift-clicking on the aspect you wish to create. If you have enough of the component aspects they will automatically combine to create the clicked aspect.");
+        add("research.thaumcraft.research_duplication.title", "Research Duplication");
+        add("research.thaumcraft.research_duplication.stage.1", "A completed discovery holds its pattern permanently. Surely I could copy one onto fresh paper for a colleague, given enough research points and one more theory to work out the method.");
+        add("research.thaumcraft.research_duplication.stage.2", "You have discovered a way to copy completed research notes.<BR>When you complete research or place a completed research note in the research table you will see a star icon. Clicking this will create a copy of this research as long as you are carrying paper and ink and have enough aspects available.<BR>The more copies are created of that research, the more expensive copying it will become.");
+        add("research.thaumcraft.deconstructor.title", "Deconstruction Table");
+        add("research.thaumcraft.deconstructor.stage.1", "Breaking things apart to see what makes them tick has always come naturally to me. A purpose-built table should let me reduce objects to their base essences and salvage research points from the wreckage.");
+        add("research.thaumcraft.deconstructor.stage.2", "There comes a point in any thaumaturge's career where he is unable to progress with research due to his lack of knowledge.<BR>One possible recourse is the Deconstruction Table. The table allows you to break down objects into their simplest parts which you can examine. There are limits however - the table breaks compound aspects into their component aspects until only primal aspects remain. During this process much knowledge is lost and at best the thaumaturge can hope for is a single piece of primal knowledge.<BR>For example iron (Metallum) <PAGE>will be simplified into §2Terra§0 and §7Ordo§0, only one of which will have a chance of being discovered.<BR>It is also fairly slow and the fewer aspects an object has, the lower the chance to discover something.");
         add("gui.thaumcraft.research_table.inspiration", "Inspiration: %s");
         add("gui.thaumcraft.research_table.draw", "Draw");
         add("gui.thaumcraft.research_table.play", "Play");
@@ -141,6 +175,8 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("gui.thaumcraft.arcane_workbench.vis_available", "%s available");
         add("gui.thaumcraft.arcane_workbench.required_vis", "%s vis");
         add("gui.thaumcraft.arcane_workbench.required_vis_discount", "%s vis (%s%% discount)");
+        add("gui.thaumcraft.arcane_workbench.required_vis_crude", "%s vis (unfocused)");
+        add("gui.thaumcraft.arcane_workbench.wand_pay.tooltip", "Primal vis the wand will contribute in place of crystals (%s per crystal)");
         add("button.thaumcraft.create_theory", "Create Theory");
         add("button.thaumcraft.complete_theory", "Complete Theory");
         add("button.thaumcraft.scrap_theory", "Scrap Theory");
@@ -222,6 +258,7 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("gui.thaumcraft.entry.advance", "Mark As Read");
         add("tc.stage.complete", "Complete");
         add("tc.stage.hold", "Completing...");
+        add("tc.research.complete", "Research Complete!");
         add("tc.aspect.name", "Aspects of Essentia");
         add("tc.knowledge.name", "Knowledge Totals");
         add("tc.aspect.primal", "Primal Aspect");
@@ -229,7 +266,9 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("tc.addendumtext", "§oAddendum %1$s§r");
 
         add("jei.thaumcraft.category.arcane_workbench", "Arcane Workbench");
-        add("jei.thaumcraft.arcane_workbench.vis_cost", "Vis Cost");
+        add("jei.thaumcraft.arcane_workbench.vis_cost", "Vis Cost, drained from the local aura");
+        add("jei.thaumcraft.arcane_workbench.vis_cost_wand", "A slotted wand focuses the craft: its cap discount applies and it can pay %s vis per required crystal instead of consuming them");
+        add("jei.thaumcraft.arcane_workbench.vis_cost_aura", "Paying with crystals instead runs unfocused: %s vis");
         add("jei.thaumcraft.category.crucible", "Crucible");
         add("jei.thaumcraft.category.dust_trigger", "Salis Mundus Trigger");
         add("jei.thaumcraft.category.multiblock_dust_trigger", "Multiblock Trigger");
@@ -304,9 +343,10 @@ public final class TCEnglishProvider extends LanguageProvider {
         langOuterLands();
     }
 
-    private void aspect(String tag, String name, String description) {
+    private void aspect(String tag, String name, String description, String help) {
         add("aspect.thaumcraft." + tag, name);
         add("aspect.thaumcraft." + tag + ".desc", description);
+        add("aspect.thaumcraft." + tag + ".help", help);
     }
 
     private void researchCategory(String path, String name) {
@@ -315,7 +355,6 @@ public final class TCEnglishProvider extends LanguageProvider {
 
     private void card(String path, String name, String text) {
         add("card.thaumcraft." + path + ".name", name);
-        add("card.thaumcraft." + path + ".text", text);
     }
 
 
@@ -748,17 +787,96 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("key.category.thaumcraft.main", "Thaumcraft");
         add("key.thaumcraft.change_focus", "Change Caster Focus");
         add("key.thaumcraft.misc_toggle", "Misc Caster Toggle");
-        add("item.thaumcraft.caster_basic", "Caster's Gauntlet");
+        add("item.thaumcraft.wand", "Wand");
+        add("item.thaumcraft.wand.named", "%1$s %2$s Wand");
+        add("item.thaumcraft.wand.sceptre", "%1$s %2$s Scepter");
+        add("item.thaumcraft.wand.staff", "%1$s %2$s Staff");
+        add("wand.thaumcraft.cap.iron", "Iron Capped");
+        add("wand.thaumcraft.cap.copper", "Copper Capped");
+        add("wand.thaumcraft.cap.gold", "Gold Banded");
+        add("wand.thaumcraft.cap.silver", "Silver Bossed");
+        add("wand.thaumcraft.cap.thaumium", "Thaumium Bossed");
+        add("wand.thaumcraft.cap.void", "Void Aspected");
+        add("wand.thaumcraft.rod.wood", "Wooden");
+        add("wand.thaumcraft.rod.greatwood", "Greatwood");
+        add("wand.thaumcraft.rod.silverwood", "Silverwood");
+        add("wand.thaumcraft.rod.obsidian", "Obsidian");
+        add("wand.thaumcraft.rod.blaze", "Blazing");
+        add("wand.thaumcraft.rod.ice", "Icy");
+        add("wand.thaumcraft.rod.bone", "Bone");
+        add("wand.thaumcraft.rod.reed", "Reed");
+        add("wand.thaumcraft.rod.quartz", "Quartz");
+        add("wand.thaumcraft.rod.primal", "Primal");
+        add("tooltip.thaumcraft.focus_pouch.count", "Holds %1$s/%2$s foci");
+        add("tc.wand.notenoughvis", "The wand does not hold enough vis");
+        add("tc.node.name", "Aura Node");
+        add("tc.node.jar.aspect", "%1$s %2$s");
+        add("tc.node.typemod", "%1$s, %2$s");
+        add("nodetype.thaumcraft.normal", "Normal");
+        add("nodetype.thaumcraft.unstable", "Unstable");
+        add("nodetype.thaumcraft.dark", "Sinister");
+        add("nodetype.thaumcraft.tainted", "Tainted");
+        add("nodetype.thaumcraft.hungry", "Hungry");
+        add("nodetype.thaumcraft.pure", "Pure");
+        add("nodemod.thaumcraft.bright", "Bright");
+        add("nodemod.thaumcraft.pale", "Pale");
+        add("nodemod.thaumcraft.fading", "Fading");
+        add("tc.wand.noaura", "The aura here is too weak to draw upon");
+        add("tc.jar.noresearch", "You sense potential in this arrangement, but lack the knowledge to exploit it");
+        add("tc.jar.structure", "The ritual fails - the node must be sealed in glass on all sides and capped with a roof of wooden slabs");
+        add("tc.jar.vis", "The ritual fails - it demands %s vis of each primal aspect from wands in your hotbar");
+        add("tc.dust.noresearch", "The dust sparkles with promise, but you lack the knowledge to direct it");
+        add("tc.workbench.staff", "A staff is too unwieldy to use at the workbench");
+        add("tooltip.thaumcraft.wand.capacity", "Capacity %s");
+        add("tooltip.thaumcraft.wand.cost", "Vis cost %s%%");
+        add("tooltip.thaumcraft.wand.cost.except", "Vis cost %1$s%% (%2$s)");
+        add("item.thaumcraft.wand_cap_iron", "Iron Cap");
+        add("item.thaumcraft.wand_cap_copper", "Copper Cap");
+        add("item.thaumcraft.wand_cap_gold", "Gold Cap");
+        add("item.thaumcraft.wand_cap_silver_inert", "Inert Silver Cap");
+        add("item.thaumcraft.wand_cap_silver", "Charged Silver Cap");
+        add("item.thaumcraft.wand_cap_thaumium_inert", "Inert Thaumium Cap");
+        add("item.thaumcraft.wand_cap_thaumium", "Charged Thaumium Cap");
+        add("item.thaumcraft.wand_cap_void_inert", "Inert Void metal Cap");
+        add("item.thaumcraft.wand_cap_void", "Charged Void metal Cap");
+        add("item.thaumcraft.wand_rod_greatwood", "Greatwood Rod");
+        add("item.thaumcraft.wand_rod_obsidian", "Obsidian Rod");
+        add("item.thaumcraft.wand_rod_blaze", "Blazing Rod");
+        add("item.thaumcraft.wand_rod_ice", "Icy Rod");
+        add("item.thaumcraft.wand_rod_quartz", "Quartz Rod");
+        add("item.thaumcraft.wand_rod_bone", "Bone Rod");
+        add("item.thaumcraft.wand_rod_reed", "Reed Rod");
+        add("item.thaumcraft.wand_rod_silverwood", "Silverwood Rod");
+        add("item.thaumcraft.staff_rod_greatwood", "Greatwood Staff Core");
+        add("item.thaumcraft.staff_rod_obsidian", "Obsidian Staff Core");
+        add("item.thaumcraft.staff_rod_blaze", "Blazing Staff Core");
+        add("item.thaumcraft.staff_rod_ice", "Icy Staff Core");
+        add("item.thaumcraft.staff_rod_quartz", "Quartz Staff Core");
+        add("item.thaumcraft.staff_rod_bone", "Bone Staff Core");
+        add("item.thaumcraft.staff_rod_reed", "Reed Staff Core");
+        add("item.thaumcraft.staff_rod_silverwood", "Silverwood Staff Core");
+        add("item.thaumcraft.staff_rod_primal", "Staff Core of the Primal");
+        add("item.thaumcraft.primal_charm", "Primal Charm");
+        add("tooltip.thaumcraft.primal_charm.0", "It seems to be leaking");
+        add("tooltip.thaumcraft.primal_charm.1", "You think you hear whispering");
+        add("tooltip.thaumcraft.primal_charm.2", "It is vibrating violently");
+        add("tooltip.thaumcraft.primal_charm.3", "It's humming is quite soothing");
+        add("tooltip.thaumcraft.primal_charm.4", "Wait, did it just flash a seventh color?");
         add("item.thaumcraft.focus_1", "Blank Lesser Focus");
         add("item.thaumcraft.focus_2", "Blank Advanced Focus");
         add("item.thaumcraft.focus_3", "Blank Greater Focus");
         add("tooltip.thaumcraft.caster.vis_cost", "Vis cost: %s Vis per cast");
         add("tooltip.thaumcraft.focus.vis_cost", "%s Vis per cast");
+        add("entity.thaumcraft.aspect_orb", "Aspect Orb");
         add("entity.thaumcraft.focus_projectile", "Focus Projectile");
         add("entity.thaumcraft.focus_cloud", "Focus Cloud");
         add("entity.thaumcraft.focus_mine", "Focus Mine");
         add("entity.thaumcraft.spell_bat", "Spellbat");
 
+        add("block.thaumcraft.node", "Aura Node");
+        add("block.thaumcraft.jar_node", "Node in a Jar");
+        add("block.thaumcraft.node_stabilizer", "Node Stabilizer");
+        add("block.thaumcraft.node_stabilizer_advanced", "Advanced Node Stabilizer");
         add("block.thaumcraft.hole", "Dimensional Tear");
         add("block.thaumcraft.effect_sap", "Sapping Field");
 
@@ -776,6 +894,11 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("focus.thaumcraft.cloud.text", "Creates a lingering cloud of magical energy that effects anything inside.");
         add("focus.thaumcraft.mine.name", "Arcane Mine");
         add("focus.thaumcraft.mine.text", "Creates a mystical construct that detonates when a hostile entity passes nearby, releasing the effects upon it.");
+        add("focus.thaumcraft.hellbat.name", "Nine Hells");
+        add("focus.thaumcraft.hellbat.text", "Summons vicious hellbats that harry the target with fire and fury.");
+        add("focus.hellbat.bats", "Bats");
+        add("focus.thaumcraft.primal.name", "Primal");
+        add("focus.thaumcraft.primal.text", "Unleashes a burst of raw primal energy. Devastating, erratic and occasionally... generative.");
         add("focus.thaumcraft.spellbat.name", "Summon Spellbat");
         add("focus.thaumcraft.spellbat.text", "Conjures a mystical bat that will hunt down enemies and inflict them with the focus's effects.");
 
@@ -877,6 +1000,11 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("item.thaumcraft.module_aggression", "Aggression Module");
         add("item.thaumcraft.golem_bell", "Golemancer's Bell");
         add("item.thaumcraft.golem", "Golem");
+        add("item.thaumcraft.golem_top_hat", "Golem Accessory: Top Hat");
+        add("item.thaumcraft.golem_fez", "Golem Accessory: Fez");
+        add("item.thaumcraft.golem_glasses", "Golem Accessory: Spectacles");
+        add("item.thaumcraft.golem_bowtie", "Golem Accessory: Bowtie");
+        add("item.thaumcraft.golem_visor", "Golem Accessory: Visor");
         add("item.thaumcraft.seal_blank", "Blank Seal");
         add("item.thaumcraft.seal_pickup", "Control Seal: Collect");
         add("item.thaumcraft.seal_pickup_advanced", "Advanced Control Seal: Collect");

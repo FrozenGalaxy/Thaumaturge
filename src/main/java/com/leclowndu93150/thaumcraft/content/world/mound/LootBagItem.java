@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -36,7 +37,7 @@ public final class LootBagItem extends Item {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (level instanceof ServerLevel server) {
             LootTable table = server.getServer().reloadableRegistries().getLootTable(lootTable);
             LootParams params = new LootParams.Builder(server)
@@ -49,6 +50,6 @@ public final class LootBagItem extends Item {
             player.playSound(TCSounds.COINS.get(), OPEN_VOLUME, 1.0F);
         }
         player.getItemInHand(hand).shrink(1);
-        return InteractionResult.SUCCESS;
+        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
 }

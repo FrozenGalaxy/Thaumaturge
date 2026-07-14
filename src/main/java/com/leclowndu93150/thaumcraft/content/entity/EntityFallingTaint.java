@@ -120,14 +120,14 @@ public final class EntityFallingTaint extends Entity implements IEntityWithCompl
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         output.putInt("BlockId", Block.getId(fallTile));
         output.putLong("Origin", originPos.asLong());
         output.putInt("Time", fallTime);
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         int id = (input.contains("BlockId") ? input.getInt("BlockId") : Block.getId(fallTile));
         BlockState resolved = Block.stateById(id);
         if (!resolved.isAir()) {
@@ -150,7 +150,8 @@ public final class EntityFallingTaint extends Entity implements IEntityWithCompl
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+    public boolean hurt(DamageSource source, float damage) {
+        ServerLevel level = (ServerLevel) level();
         return false;
     }
 }

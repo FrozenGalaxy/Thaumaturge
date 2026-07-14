@@ -1,13 +1,10 @@
 package com.leclowndu93150.thaumcraft.content.item;
 
 import com.leclowndu93150.thaumcraft.registry.TCItems;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.Nullable;
 
 public final class PrimordialPearlItem extends Item {
     public static final int MAX_DAMAGE = 8;
@@ -20,12 +17,19 @@ public final class PrimordialPearlItem extends Item {
     }
 
     @Override
-    public @Nullable ItemStack getCraftingRemainder(ItemInstance instance) {
-        if (instance.getOrDefault(DataComponents.DAMAGE,0) + 1 >= MAX_DAMAGE) {
-            return null;
+    public boolean hasCraftingRemainingItem(ItemStack stack) {
+        return stack.getOrDefault(DataComponents.DAMAGE, 0) + 1 < MAX_DAMAGE;
+    }
+
+    @Override
+    public ItemStack getCraftingRemainingItem(ItemStack stack) {
+        int nextDamage = stack.getOrDefault(DataComponents.DAMAGE, 0) + 1;
+        if (nextDamage >= MAX_DAMAGE) {
+            return ItemStack.EMPTY;
         }
-        return new ItemStack(TCItems.PRIMORDIAL_PEARL, DataComponentPatch.builder()
-                .set(DataComponents.DAMAGE,instance.getOrDefault(DataComponents.DAMAGE,0)+1).build());
+        ItemStack remainder = new ItemStack(TCItems.PRIMORDIAL_PEARL.get());
+        remainder.set(DataComponents.DAMAGE, nextDamage);
+        return remainder;
     }
 
     @Override

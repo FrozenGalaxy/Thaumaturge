@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.infernalfurnace;
 
+import net.minecraft.world.item.ItemStack;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.mojang.serialization.MapCodec;
@@ -29,17 +30,18 @@ import org.jspecify.annotations.Nullable;
 
 public class BlockInfernalFurnace extends BaseEntityBlock {
     @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-        if (level.getBlockEntity(pos) instanceof BlockEntityInfernalFurnace furnace) {
-            for (int i = 0; i < furnace.inventory().size(); i++) {
-                var resource = furnace.inventory().getResource(i);
-                int amount = furnace.inventory().getStackInSlot(i).getCount();
-                if (!resource.isEmpty() && amount > 0) {
-                    Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, resource.copyWithCount(amount));
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock())) {
+            if (level.getBlockEntity(pos) instanceof BlockEntityInfernalFurnace furnace) {
+                for (int i = 0; i < furnace.inventory().getSlots(); i++) {
+                    ItemStack resource = furnace.inventory().getStackInSlot(i);
+                    if (!resource.isEmpty()) {
+                        Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, resource.copy());
+                    }
                 }
             }
         }
-        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
 
@@ -122,7 +124,7 @@ public class BlockInfernalFurnace extends BaseEntityBlock {
 
 
     @Override
-    protected VoxelShape getOcclusionShape(BlockState state) {
+    protected VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
         return Shapes.box(-1,-1,-1,2,2,2);
     }
 

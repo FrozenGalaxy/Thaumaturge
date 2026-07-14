@@ -1,9 +1,15 @@
 package com.leclowndu93150.thaumcraft.content.entity;
 
+import com.leclowndu93150.thaumcraft.content.entity.ai.GhastLikeFlight;
+import com.leclowndu93150.thaumcraft.content.entity.ai.GhastLikeLookGoal;
+import com.leclowndu93150.thaumcraft.content.entity.ai.GhastLikeMoveControl;
 import com.leclowndu93150.thaumcraft.content.entity.ai.FireBatAttackGoal;
 import com.leclowndu93150.thaumcraft.content.entity.ai.FlyingWanderGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -20,7 +26,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -29,6 +34,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public final class EntityFireBat extends Monster {
+    private static final int SPAWN_LIGHT_CAP = 7;
     private static final EntityDataAccessor<Boolean> DATA_HANGING =
             SynchedEntityData.defineId(EntityFireBat.class, EntityDataSerializers.BOOLEAN);
 
@@ -43,10 +49,35 @@ public final class EntityFireBat extends Monster {
 
     public @Nullable LivingEntity owner;
     public int damBonus;
+    private int summonLife;
+
+    private static final int SUMMON_LIFESPAN_TICKS = 600;
+
+    public void summon(@Nullable LivingEntity summoner, @Nullable LivingEntity target, int bonus) {
+        this.owner = summoner;
+        this.damBonus = bonus;
+        this.summonLife = SUMMON_LIFESPAN_TICKS;
+        this.setHanging(false);
+        if (target != null) {
+            this.setTarget(target);
+        }
+    }
+
+    public boolean isSummoned() {
+        return summonLife > 0;
+    }
+
+    public static boolean checkFireBatSpawnRules(EntityType<EntityFireBat> type, ServerLevelAccessor level,
+                                                 MobSpawnType reason, BlockPos pos, RandomSource random) {
+        if (level.getMaxLocalRawBrightness(pos) > random.nextInt(SPAWN_LIGHT_CAP)) {
+            return false;
+        }
+        return Monster.checkMonsterSpawnRules(type, level, reason, pos, random);
+    }
 
     public EntityFireBat(EntityType<? extends EntityFireBat> type, Level level) {
         super(type, level);
-        this.moveControl = new Ghast.GhastMoveControl(this, false, () -> false);
+        this.moveControl = new GhastLikeMoveControl(this);
         this.setHanging(true);
     }
 
@@ -62,9 +93,10 @@ public final class EntityFireBat extends Monster {
     protected void registerGoals() {
         this.goalSelector.addGoal(4, new FireBatAttackGoal(this));
         this.goalSelector.addGoal(5, new FlyingWanderGoal(this, false, () -> !isHanging()));
-        this.goalSelector.addGoal(7, new Ghast.GhastLookGoal(this));
+        this.goalSelector.addGoal(7, new GhastLikeLookGoal(this));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, false));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class,
+                10, false, false, target -> target != this.owner));
     }
 
     @Override
@@ -83,7 +115,7 @@ public final class EntityFireBat extends Monster {
 
     @Override
     public void travel(Vec3 input) {
-        this.travelFlying(input, FLYING_FRICTION_IMPULSE);
+        GhastLikeFlight.travel(this, input, FLYING_FRICTION_IMPULSE);
     }
 
     @Override
@@ -130,21 +162,27 @@ public final class EntityFireBat extends Monster {
     }
 
     @Override
-    public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
-        return source.is(DamageTypeTags.IS_EXPLOSION) || super.isInvulnerableTo(level, source);
+    public boolean isInvulnerableTo(DamageSource source) {
+        return source.is(DamageTypeTags.IS_EXPLOSION) || super.isInvulnerableTo(source);
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+    public boolean hurt(DamageSource source, float damage) {
+        ServerLevel level = (ServerLevel) level();
         if (isHanging()) {
             setHanging(false);
         }
-        return super.hurtServer(level, source, damage);
+        return super.hurt(source, damage);
     }
 
     @Override
     public void tick() {
         super.tick();
+        if (!this.level().isClientSide() && this.summonLife > 0 && --this.summonLife == 0) {
+            this.level().levelEvent(2004, this.blockPosition(), 0);
+            this.discard();
+            return;
+        }
         if (isHanging()) {
             this.setDeltaMovement(Vec3.ZERO);
             this.setPosRaw(this.getX(), Mth.floor(this.getY()) + 1.0 - this.getBbHeight(), this.getZ());
@@ -161,7 +199,7 @@ public final class EntityFireBat extends Monster {
             return;
         }
         if (this.isInWaterOrRain()) {
-            this.hurtServer(server, this.damageSources().drown(), 1.0F);
+            this.hurt(this.damageSources().drown(), 1.0F);
         }
         BlockPos pos = this.blockPosition();
         BlockPos above = pos.above();
@@ -181,16 +219,18 @@ public final class EntityFireBat extends Monster {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("hang", isHanging());
         output.putByte("damBonus", (byte) this.damBonus);
+        output.putInt("SummonLife", this.summonLife);
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         setHanging(input.getBoolean("hang"));
         this.damBonus = input.getByte("damBonus");
+        this.summonLife = input.getInt("SummonLife");
     }
 }

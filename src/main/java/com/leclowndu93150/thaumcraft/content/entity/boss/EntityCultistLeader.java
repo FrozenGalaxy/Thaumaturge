@@ -107,13 +107,13 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements RangedA
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putByte("title", this.entityData.get(DATA_TITLE));
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         setTitle(input.getByte("title"));
     }
@@ -159,12 +159,13 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements RangedA
 
     @Override
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
-        this.spawnAtLocation(level, new ItemStack(TCItems.LOOT_BAG_RARE.get()), 1.5F);
+        this.spawnAtLocation(new ItemStack(TCItems.LOOT_BAG_RARE.get()), 1.5F);
     }
 
     @Override
-    protected void customServerAiStep(ServerLevel level) {
-        super.customServerAiStep(level);
+    protected void customServerAiStep() {
+        ServerLevel level = (ServerLevel) level();
+        super.customServerAiStep();
         for (EntityCultist cultist : level.getEntitiesOfClass(EntityCultist.class,
                 this.getBoundingBox().inflate(AURA_RANGE))) {
             if (cultist.getEffect(MobEffects.REGENERATION) == null) {

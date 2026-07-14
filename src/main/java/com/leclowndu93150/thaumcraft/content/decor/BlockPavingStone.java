@@ -67,8 +67,8 @@ public final class BlockPavingStone extends BaseEntityBlock {
     @Override
     public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
         if (!level.isClientSide() && !barrier && entity instanceof LivingEntity living) {
-            living.addEffect(new MobEffectInstance(MobEffects.SPEED, SPEED_DURATION, SPEED_AMPLIFIER, false, false));
-            living.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, SPEED_DURATION, 0, false, false));
+            living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, SPEED_DURATION, SPEED_AMPLIFIER, false, false));
+            living.addEffect(new MobEffectInstance(MobEffects.JUMP, SPEED_DURATION, 0, false, false));
         }
         super.stepOn(level, pos, state, entity);
     }

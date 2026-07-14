@@ -3,7 +3,6 @@ package com.leclowndu93150.thaumcraft.client.champion;
 import com.leclowndu93150.thaumcraft.TCIds;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;

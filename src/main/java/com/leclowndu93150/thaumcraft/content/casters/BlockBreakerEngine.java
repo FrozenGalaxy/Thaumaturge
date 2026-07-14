@@ -1,11 +1,11 @@
 package com.leclowndu93150.thaumcraft.content.casters;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
 import com.leclowndu93150.thaumcraft.content.casters.BlockWorkQueues.BreakerTask;
 import com.leclowndu93150.thaumcraft.content.casters.BlockWorkQueues.SwapContext;
 import com.leclowndu93150.thaumcraft.content.casters.BlockWorkQueues.SwapperTask;
 import com.leclowndu93150.thaumcraft.content.entity.EntitySpecialItem;
+import com.leclowndu93150.thaumcraft.content.wands.WandVisHelper;
 import com.leclowndu93150.thaumcraft.content.fx.FX;
 import com.leclowndu93150.thaumcraft.registry.TCAttachments;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jspecify.annotations.Nullable;
 
@@ -95,7 +95,7 @@ public final class BlockBreakerEngine {
             if (player == null) {
                 continue;
             }
-            if (task.visCost > 0.0F && AuraHelper.getVis(level, task.pos) < task.visCost) {
+            if (task.visCost > 0.0F && !WandVisHelper.consumeVisFromHotbar(player, task.visCost, false)) {
                 continue;
             }
             if (!player.mayInteract(level, task.pos) || current.getDestroySpeed(level, task.pos) < 0.0F) {
@@ -112,7 +112,7 @@ public final class BlockBreakerEngine {
                     level.destroyBlockProgress(task.pos.hashCode(), task.pos, -1);
                 }
                 if (task.visCost > 0.0F) {
-                    AuraHelper.drainVis(level, task.pos, task.visCost, false);
+                    WandVisHelper.consumeVisFromHotbar(player, task.visCost, true);
                 }
             } else {
                 queues.breakers().add(task);
@@ -125,7 +125,7 @@ public final class BlockBreakerEngine {
             return;
         }
         BlockState state = level.getBlockState(pos);
-        BreakBlockEvent event = CommonHooks.fireBlockBreak(level,
+        BlockEvent.BreakEvent event = CommonHooks.fireBlockBreak(level,
                 serverPlayer.gameMode.getGameModeForPlayer(), serverPlayer, pos, state);
         if (event.isCanceled()) {
             return;
@@ -146,7 +146,7 @@ public final class BlockBreakerEngine {
             tool = new ItemStack(Items.NETHERITE_PICKAXE);
         }
         if (!tool.isEmpty() && (silk || fortune > 0)) {
-            Registry<Enchantment> enchantments = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+            var enchantments = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
             if (silk) {
                 tool.enchant(enchantments.getOrThrow(Enchantments.SILK_TOUCH), 1);
             }
@@ -173,7 +173,7 @@ public final class BlockBreakerEngine {
             if (task.source != null && task.source != current) {
                 allow = false;
             }
-            if (task.visCost > 0.0F && AuraHelper.getVis(level, task.pos) < task.visCost) {
+            if (task.visCost > 0.0F && !WandVisHelper.consumeVisFromHotbar(player, task.visCost, false)) {
                 allow = false;
             }
             if (!allow || !player.mayInteract(level, task.pos)) {
@@ -211,7 +211,7 @@ public final class BlockBreakerEngine {
                     }
                 }
                 if (task.visCost > 0.0F) {
-                    AuraHelper.drainVis(level, task.pos, task.visCost, false);
+                    WandVisHelper.consumeVisFromHotbar(player, task.visCost, true);
                 }
             }
             if (task.target != null) {
@@ -257,7 +257,7 @@ public final class BlockBreakerEngine {
 
     static boolean isExposed(ServerLevel level, BlockPos pos) {
         for (Direction face : Direction.values()) {
-            if (!level.getBlockState(pos.relative(face)).isSolidRender()) {
+            if (!level.getBlockState(pos.relative(face)).isSolidRender(level, pos.relative(face))) {
                 return true;
             }
         }
@@ -265,7 +265,7 @@ public final class BlockBreakerEngine {
     }
 
     private static int findInventorySlot(Player player, ItemStack target) {
-        NonNullList<ItemStack> main = player.getInventory().getNonEquipmentItems();
+        NonNullList<ItemStack> main = player.getInventory().items;
         for (int slot = 0; slot < main.size(); slot++) {
             ItemStack stack = main.get(slot);
             if (!stack.isEmpty() && stack.is(target.getItem())) {

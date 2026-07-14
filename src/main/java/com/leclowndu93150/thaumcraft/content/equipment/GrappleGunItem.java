@@ -10,6 +10,7 @@ import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -41,8 +42,8 @@ public final class GrappleGunItem extends Item implements IRechargable {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
-        if (!Boolean.TRUE.equals(stack.get(TCDataComponents.GRAPPLE_LOADED))) {
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        if (level.isClientSide() || !Boolean.TRUE.equals(stack.get(TCDataComponents.GRAPPLE_LOADED))) {
             return;
         }
         int tracked = entity.getData(TCAttachments.GRAPPLE_ID.get());
@@ -52,7 +53,7 @@ public final class GrappleGunItem extends Item implements IRechargable {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         player.playSound(TCSounds.ICE.get(), 3.0F, 0.8F + level.getRandom().nextFloat() * 0.1F);
         ItemStack stack = player.getItemInHand(hand);
         if (!level.isClientSide() && RechargeAccess.getCharge(stack) > 0) {
@@ -69,6 +70,6 @@ public final class GrappleGunItem extends Item implements IRechargable {
                 stack.set(TCDataComponents.GRAPPLE_LOADED, true);
             }
         }
-        return InteractionResult.SUCCESS;
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 }

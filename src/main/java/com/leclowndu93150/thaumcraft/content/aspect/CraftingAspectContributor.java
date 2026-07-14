@@ -33,9 +33,9 @@ public final class CraftingAspectContributor implements IAspectRecipeContributor
             Recipe<?> recipe = holder.value();
             AspectList candidate;
             if (recipe instanceof ArcaneCraftingRecipe arcane) {
-                candidate = deriveArcane(arcane, item, partial, magic);
+                candidate = deriveArcane(arcane, item, partial, magic, registries);
             } else if (recipe instanceof CraftingRecipe crafting) {
-                candidate = deriveCrafting(crafting, item, partial);
+                candidate = deriveCrafting(crafting, item, partial, registries);
             } else {
                 continue;
             }
@@ -52,21 +52,21 @@ public final class CraftingAspectContributor implements IAspectRecipeContributor
         return Optional.ofNullable(best);
     }
 
-    private static AspectList deriveCrafting(CraftingRecipe recipe, Item item, IAspectIndex partial) {
-        ItemStack output = safeAssemble(recipe);
+    private static AspectList deriveCrafting(CraftingRecipe recipe, Item item, IAspectIndex partial, HolderLookup.Provider registries) {
+        ItemStack output = safeAssemble(recipe, registries);
         if (output.isEmpty() || output.getItem() != item) {
             return null;
         }
-        return RecipeAspectDerivation.fromIngredients(recipe.placementInfo().ingredients(), output.getCount(), partial);
+        return RecipeAspectDerivation.fromIngredients(recipe.getIngredients(), output.getCount(), partial);
     }
 
-    private static AspectList deriveArcane(ArcaneCraftingRecipe recipe, Item item, IAspectIndex partial, Holder<IAspect> magic) {
-        ItemStack output = safeAssembleArcane(recipe);
+    private static AspectList deriveArcane(ArcaneCraftingRecipe recipe, Item item, IAspectIndex partial, Holder<IAspect> magic, HolderLookup.Provider registries) {
+        ItemStack output = safeAssembleArcane(recipe, registries);
         if (output.isEmpty() || output.getItem() != item) {
             return null;
         }
         int count = Math.max(1, output.getCount());
-        List<Ingredient> ingredients = recipe.placementInfo().ingredients();
+        List<Ingredient> ingredients = recipe.getIngredients();
         AspectList out = RecipeAspectDerivation.fromIngredients(ingredients, count, partial);
         int vis = recipe.getBaseVis();
         if (vis > 0) {
@@ -78,17 +78,17 @@ public final class CraftingAspectContributor implements IAspectRecipeContributor
         return out;
     }
 
-    private static ItemStack safeAssemble(CraftingRecipe recipe) {
+    private static ItemStack safeAssemble(CraftingRecipe recipe, HolderLookup.Provider registries) {
         try {
-            return recipe.assemble(EMPTY_INPUT);
+            return recipe.assemble(EMPTY_INPUT, registries);
         } catch (Throwable ignored) {
             return ItemStack.EMPTY;
         }
     }
 
-    private static ItemStack safeAssembleArcane(ArcaneCraftingRecipe recipe) {
+    private static ItemStack safeAssembleArcane(ArcaneCraftingRecipe recipe, HolderLookup.Provider registries) {
         try {
-            return recipe.assemble(ArcaneCraftingInput.EMPTY);
+            return recipe.assemble(ArcaneCraftingInput.EMPTY, registries);
         } catch (Throwable ignored) {
             return ItemStack.EMPTY;
         }

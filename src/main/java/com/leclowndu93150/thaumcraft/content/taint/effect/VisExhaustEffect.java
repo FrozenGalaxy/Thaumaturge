@@ -16,7 +16,7 @@ public final class VisExhaustEffect extends MobEffect {
     }
 
     @Override
-    public boolean applyEffectTick(ServerLevel level, LivingEntity mob, int amplification) {
+    public boolean applyEffectTick(LivingEntity mob, int amplification) {
         return true;
     }
 }

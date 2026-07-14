@@ -6,22 +6,24 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import com.mojang.serialization.DataResult;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.level.saveddata.SavedDataType;
 
 public final class TaintSeedRegistry extends SavedData {
     public static final Codec<TaintSeedRegistry> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             BlockPos.CODEC.listOf().fieldOf("seeds").forGetter(reg -> Collections.unmodifiableList(reg.seeds))
     ).apply(builder, list -> new TaintSeedRegistry(new ArrayList<>(list))));
 
-    public static final SavedDataType<TaintSeedRegistry> TYPE = new SavedDataType<>(
-            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "taint_seeds"),
+    public static final SavedData.Factory<TaintSeedRegistry> FACTORY = new SavedData.Factory<>(
             TaintSeedRegistry::new,
-            CODEC,
+            TaintSeedRegistry::load,
             DataFixTypes.LEVEL);
 
     private final List<BlockPos> seeds;
@@ -35,7 +37,18 @@ public final class TaintSeedRegistry extends SavedData {
     }
 
     public static TaintSeedRegistry get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(TYPE);
+        return level.getDataStorage().computeIfAbsent(FACTORY, "thaumcraft_taint_seeds");
+    }
+
+    private static TaintSeedRegistry load(CompoundTag tag, HolderLookup.Provider registries) {
+        return CODEC.parse(NbtOps.INSTANCE, tag.get("data")).result().orElseGet(TaintSeedRegistry::new);
+    }
+
+    @Override
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+        DataResult<Tag> encoded = CODEC.encodeStart(NbtOps.INSTANCE, this);
+        tag.put("data", encoded.getOrThrow());
+        return tag;
     }
 
     public void addSeed(BlockPos pos) {

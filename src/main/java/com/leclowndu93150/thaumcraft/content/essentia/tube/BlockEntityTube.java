@@ -360,11 +360,7 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
     }
 
     protected void readOpenSides(CompoundTag input) {
-        byte[] data = TCNbt.read(input, "OpenSides", Codec.BYTE_BUFFER, registries).map(buf -> {
-            byte[] arr = new byte[buf.remaining()];
-            buf.get(arr);
-            return arr;
-        }).orElse(null);
+        byte[] data = input.contains("OpenSides") ? input.getByteArray("OpenSides") : null;
         if (data != null && data.length == 6) {
             for (int a = 0; a < 6; a++) {
                 openSides[a] = data[a] == 1;
@@ -381,7 +377,7 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
         for (int a = 0; a < 6; a++) {
             data[a] = (byte) (openSides[a] ? 1 : 0);
         }
-        TCNbt.store(output, "OpenSides", Codec.BYTE_BUFFER, registries, ByteBuffer.wrap(data));
+        output.putByteArray("OpenSides", data);
     }
 
     @Override

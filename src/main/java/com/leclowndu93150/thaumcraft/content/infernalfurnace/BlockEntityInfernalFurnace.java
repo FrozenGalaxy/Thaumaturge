@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.infernalfurnace;
 
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
@@ -101,7 +102,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
         super.loadAdditional(input, registries);
         furnaceCookTime = input.getShort("CookTime");
         speedyTime = input.getShort("SpeedyTime");
-        inventory.deserialize(input);
+        inventory.deserializeNBT(registries, input.getCompound("inventory"));
     }
 
     @Override
@@ -109,7 +110,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
         super.saveAdditional(output, registries);
         output.putShort("CookTime", (short) furnaceCookTime);
         output.putShort("SpeedyTime", (short) speedyTime);
-        inventory.serialize(output);
+        output.put("inventory", inventory.serializeNBT(registries));
     }
 
     private void tick() {
@@ -130,7 +131,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
 
         furnaceCookTime = Mth.clamp(furnaceCookTime, 0, furnaceMaxCookTime);
         if (furnaceCookTime <= 0 && cooking) {
-            for (int slot = 0; slot < inventory.size(); slot++) {
+            for (int slot = 0; slot < inventory.getSlots(); slot++) {
                 if (inventory.getStackInSlot(slot).getCount() > 0) {
                     ItemStack inputStack = inventory.getStackInSlot(slot).copy();
                     Optional<AbstractCookingRecipe> recipe = getCookingRecipe(inputStack);
@@ -138,7 +139,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
                         if (speedyTime > 0)
                             speedyTime--;
 
-                        ejectItem(recipe.get().assemble(new SingleRecipeInput(inputStack)), inputStack.copy(), recipe.get());
+                        ejectItem(recipe.get().assemble(new SingleRecipeInput(inputStack), level.registryAccess()), inputStack.copy(), recipe.get());
 
                         RandomSource rand = level.getRandom();
 
@@ -169,7 +170,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
             this.speedyTime = (int) AuraHelper.drainVis(level, getBlockPos(), 20, false);
 
         if (this.furnaceCookTime == 0 && !cooking) {
-            for (int slot = 0; slot < inventory.size(); slot++) {
+            for (int slot = 0; slot < inventory.getSlots(); slot++) {
                 if (inventory.getStackInSlot(slot).getCount() > 0) {
                     ItemStack inputStack = inventory.getStackInSlot(slot).copy();
                     if (canSmelt(inputStack)) {
@@ -184,7 +185,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
 
     public ItemStack addItemsToInventory(ItemStack item) {
         if (canSmelt(item)) {
-            item = item.copyWithCount(item.getCount() - inventory.insert(item, item.getCount(), transaction));
+            item = ItemHandlerHelper.insertItem(inventory, item, false);
         } else {
             destroyItemEffects();
             item = ItemStack.EMPTY;
@@ -231,7 +232,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
         }
 
         int count = item.getCount();
-        float xp = recipe.experience() * count;
+        float xp = recipe.getExperience() * count;
         if (xp == 0.0F) {
             return;
         } else if (xp < 1.0F) {
@@ -259,10 +260,11 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
     }
 
     @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
+    public void setRemoved() {
+        super.setRemoved();
         if (level == null || level.isClientSide()) return;
-        for (int slot = 0; slot < inventory.size(); slot++) {
+        BlockPos pos = getBlockPos();
+        for (int slot = 0; slot < inventory.getSlots(); slot++) {
             Direction direction = getBlockState().getValue(BlockInfernalFurnace.FACING).getOpposite();
             ItemEntity entity = new ItemEntity(
                     level, pos.getX() + direction.getStepX(), (float) pos.getY() + direction.getStepY(), pos.getZ() + direction.getStepZ(), inventory.getStackInSlot(slot).copy());
@@ -273,12 +275,12 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
 
     private ItemStack[] getSmeltingBonus(ItemStack in) {
         if (level == null) return new ItemStack[0];
-        List<InfernalBonus> bonuses = in.getData(InfernalBonus.DATA_MAP);
+        List<InfernalBonus> bonuses = in.getItemHolder().getData(InfernalBonus.DATA_MAP);
         if (bonuses == null || bonuses.isEmpty()) return new ItemStack[0];
         ArrayList<ItemStack> out = new ArrayList<>();
         for (InfernalBonus bonus : bonuses) {
             if (level.getRandom().nextFloat() > bonus.chance()) continue;
-            if (!bonus.items().isBound()) continue;
+            
             Optional<Holder<Item>> optItem = getRandomBoundItem(bonus);
             if (optItem.isEmpty()) continue;
 
@@ -289,7 +291,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
     }
 
     private Optional<Holder<Item>> getRandomBoundItem(InfernalBonus bonus) {
-        if (!bonus.items().isBound()) return Optional.empty();
+        
         if (level == null) return Optional.empty();
 
         Optional<Holder<Item>> optItem = Optional.empty();
@@ -349,7 +351,7 @@ public class BlockEntityInfernalFurnace extends BlockEntity {
 
     private Optional<AbstractCookingRecipe> getCookingRecipe(ItemStack input) {
         if (level == null || level.isClientSide()) return Optional.empty();
-        return ((ServerLevel) level).recipeAccess().getRecipeFor(
+        return ((ServerLevel) level).getRecipeManager().getRecipeFor(
                 RecipeType.SMELTING,
                 new SingleRecipeInput(input),
                 level

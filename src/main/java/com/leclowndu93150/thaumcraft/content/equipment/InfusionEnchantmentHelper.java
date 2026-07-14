@@ -11,7 +11,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.equipment.Equippable;
+import net.minecraft.world.item.Equipable;
 
 public final class InfusionEnchantmentHelper {
     private InfusionEnchantmentHelper() {}
@@ -66,9 +66,8 @@ public final class InfusionEnchantmentHelper {
         if (classes.contains("hoe") && stack.is(ItemTags.HOES)) {
             return true;
         }
-        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
-        if (equippable != null) {
-            String slot = armorSlotToken(equippable.slot());
+        if (stack.getItem() instanceof Equipable equipable) {
+            String slot = armorSlotToken(equipable.getEquipmentSlot());
             if (classes.contains("armor") || classes.contains(slot)) {
                 return true;
             }

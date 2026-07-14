@@ -112,7 +112,7 @@ public class ArcaneCraftingInput  implements RecipeInput {
         for (ItemStack crystal : crystals) {
             if (crystal.is(TCItems.ESSENTIA_CRYSTAL) && crystal.has(TCDataComponents.CRYSTAL_ASPECT)){
                 Holder<IAspect> aspect = crystal.get(TCDataComponents.CRYSTAL_ASPECT.get()).aspect();
-                aspects.add(new AspectInstance(aspect,crystal.count()));
+                aspects.add(new AspectInstance(aspect,crystal.getCount()));
             }
         }
         return AspectList.ofEntries(aspects);

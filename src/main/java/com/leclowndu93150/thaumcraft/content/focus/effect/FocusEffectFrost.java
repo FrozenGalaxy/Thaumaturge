@@ -79,9 +79,9 @@ public final class FocusEffectFrost extends FocusEffect {
             float damage = getDamageForDisplay(finalPower);
             int duration = SLOW_TICKS_PER_DURATION * getSettingValue("duration");
             int potency = (int) (1.0F + getSettingValue("power") * finalPower / POTENCY_DIVISOR);
-            struck.hurtServer(level, level.damageSources().thrown(struck, getPackage().getCaster()), damage);
+            struck.hurt(level.damageSources().thrown(struck, getPackage().getCaster()), damage);
             if (struck instanceof LivingEntity living) {
-                living.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, duration, potency));
+                living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, duration, potency));
             }
         } else if (target instanceof BlockHitResult blockHit) {
             float f = Math.min(MAX_FREEZE_RADIUS, FREEZE_RADIUS_FACTOR * getSettingValue("power") * finalPower);

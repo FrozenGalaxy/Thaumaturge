@@ -158,7 +158,7 @@ public class BlockAlembic extends BaseEntityBlock implements ILabelable {
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         if (!(level.getBlockEntity(pos) instanceof BlockEntityAlembic alembic)) return 0;
         float r = (float) alembic.amount() / BlockEntityAlembic.CAPACITY;
         return Mth.floor(r*14) + (alembic.amount() > 0 ? 1 : 0);

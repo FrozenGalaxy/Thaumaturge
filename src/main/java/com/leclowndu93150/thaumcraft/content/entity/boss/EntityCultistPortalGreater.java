@@ -76,13 +76,13 @@ public class EntityCultistPortalGreater extends EntityThaumcraftBoss {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putInt("stage", this.stage);
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         this.stage = input.getInt("stage");
     }
@@ -195,7 +195,7 @@ public class EntityCultistPortalGreater extends EntityThaumcraftBoss {
                 : new EntityCultistCleric(TCEntities.CULTIST_CLERIC.get(), server);
         this.spawnCultist(server, cultist);
         if (this.stage > BOSS_STAGE) {
-            this.hurtServer(server, this.damageSources().fellOutOfWorld(),
+            this.hurt(this.damageSources().fellOutOfWorld(),
                     OVERSPAWN_DAMAGE_BASE + this.random.nextInt(5));
         }
     }
@@ -211,7 +211,7 @@ public class EntityCultistPortalGreater extends EntityThaumcraftBoss {
                 this.getY() + 0.25, this.getZ() + this.random.nextFloat() - this.random.nextFloat());
         cultist.finalizeSpawn(server, server.getCurrentDifficultyAt(cultist.blockPosition()),
                 MobSpawnType.MOB_SUMMONED, null);
-        cultist.setHomeTo(this.blockPosition(), 32);
+        cultist.restrictTo(this.blockPosition(), 32);
         server.addFreshEntity(cultist);
         if (cultist instanceof EntityCultist minion) {
             minion.spawnCultistArrivalParticles();
@@ -224,8 +224,7 @@ public class EntityCultistPortalGreater extends EntityThaumcraftBoss {
         if (this.level().isClientSide() || this.distanceToSqr(player) >= TOUCH_RANGE_SQ) {
             return;
         }
-        if (player.hurtServer((ServerLevel) this.level(),
-                this.damageSources().indirectMagic(this, this), TOUCH_DAMAGE)) {
+        if (player.hurt(this.damageSources().indirectMagic(this, this), TOUCH_DAMAGE)) {
             this.playSound(TCSounds.ZAP.get(), 1.0F,
                     (this.random.nextFloat() - this.random.nextFloat()) * 0.1F + 1.0F);
         }

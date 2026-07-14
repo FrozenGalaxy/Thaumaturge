@@ -45,7 +45,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
 
 @EventBusSubscriber(modid = TCIds.MODID)
 public final class InfusionEnchantmentEvents {
@@ -88,7 +88,7 @@ public final class InfusionEnchantmentEvents {
                 continue;
             }
             float damage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
-            if (living.hurtServer(level, level.damageSources().playerAttack(player), damage * ARCING_DAMAGE_FRACTION)) {
+            if (living.hurt(level.damageSources().playerAttack(player), damage * ARCING_DAMAGE_FRACTION)) {
                 EnchantmentHelper.doPostAttackEffects(level, living, level.damageSources().playerAttack(player));
                 float yaw = player.getYRot() * ((float) Math.PI / 180.0F);
                 living.push(-Mth.sin(yaw) * 0.5F, 0.1, Mth.cos(yaw) * 0.5F);
@@ -133,7 +133,7 @@ public final class InfusionEnchantmentEvents {
     }
 
     @SubscribeEvent
-    public static void onBreakBlock(BreakBlockEvent event) {
+    public static void onBreakBlock(BlockEvent.BreakEvent event) {
         if (event.getLevel().isClientSide() || event.getPlayer() == null) {
             return;
         }
@@ -191,7 +191,7 @@ public final class InfusionEnchantmentEvents {
                 && !player.isShiftKeyDown() && held.isCorrectToolForDrops(state)) {
             DESTRUCTIVE_RECURSION.set(true);
             try {
-                Direction face = Direction.getApproximateNearest(player.getViewVector(1.0F));
+                Direction face = Direction.getNearest(player.getViewVector(1.0F));
                 for (int aa = -1; aa <= 1; aa++) {
                     for (int bb = -1; bb <= 1; bb++) {
                         if (aa == 0 && bb == 0) {

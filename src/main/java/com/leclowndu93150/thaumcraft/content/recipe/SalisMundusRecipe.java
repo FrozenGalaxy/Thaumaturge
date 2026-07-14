@@ -1,5 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.recipe;
 
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.core.HolderLookup;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
@@ -17,9 +19,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.display.RecipeDisplay;
-import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
@@ -29,7 +28,9 @@ public final class SalisMundusRecipe extends CustomRecipe {
     public static final StreamCodec<RegistryFriendlyByteBuf, SalisMundusRecipe> STREAM_CODEC =
             StreamCodec.unit(INSTANCE);
 
-    private SalisMundusRecipe() {}
+    private SalisMundusRecipe() {
+        super(CraftingBookCategory.MISC);
+    }
 
     private static final int REQUIRED_CRYSTALS = 3;
 
@@ -64,7 +65,7 @@ public final class SalisMundusRecipe extends CustomRecipe {
                 if (!stack.is(TCItems.ESSENTIA_CRYSTAL.get()) || aspect == null) {
                     return false;
                 }
-                if (crystals.size() >= REQUIRED_CRYSTALS || !crystals.add(aspect.aspect().getKey().identifier())) {
+                if (crystals.size() >= REQUIRED_CRYSTALS || !crystals.add(aspect.aspect().getKey().location())) {
                     return false;
                 }
             }
@@ -73,8 +74,18 @@ public final class SalisMundusRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input) {
+    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
         return new ItemStack(TCItems.SALIS_MUNDUS.get());
+    }
+
+    @Override
+    public ItemStack getResultItem(HolderLookup.Provider registries) {
+        return new ItemStack(TCItems.SALIS_MUNDUS.get());
+    }
+
+    @Override
+    public boolean canCraftInDimensions(int width, int height) {
+        return width * height >= 6;
     }
 
     @Override
@@ -87,30 +98,14 @@ public final class SalisMundusRecipe extends CustomRecipe {
             }
             if (stack.is(Items.FLINT) || stack.is(Items.BOWL)) {
                 result.set(slot, stack.copyWithCount(1));
-            } else {
-                ItemStack remainder = stack.getItem().getCraftingRemainder();
-                if (remainder != null) {
-                    result.set(slot, remainder.create());
-                }
+            } else if (stack.getItem().hasCraftingRemainingItem(stack)) {
+                result.set(slot, stack.getItem().getCraftingRemainingItem(stack));
             }
         }
         return result;
     }
 
-    @Override
-    public List<RecipeDisplay> display() {
-        SlotDisplay crystal = new SlotDisplay.ItemSlotDisplay(TCItems.ESSENTIA_CRYSTAL.get().builtInRegistryHolder());
-        return List.of(new ShapelessCraftingRecipeDisplay(
-                List.of(
-                        new SlotDisplay.ItemSlotDisplay(Items.FLINT.builtInRegistryHolder()),
-                        new SlotDisplay.ItemSlotDisplay(Items.BOWL.builtInRegistryHolder()),
-                        new SlotDisplay.ItemSlotDisplay(Items.REDSTONE.builtInRegistryHolder()),
-                        crystal, crystal, crystal),
-                new SlotDisplay.ItemSlotDisplay(TCItems.SALIS_MUNDUS.get().builtInRegistryHolder()),
-                new SlotDisplay.ItemSlotDisplay(Blocks.CRAFTING_TABLE.asItem().builtInRegistryHolder())));
-    }
-
-    @Override
+        @Override
     public RecipeSerializer<SalisMundusRecipe> getSerializer() {
         return TCRecipeSerializers.SALIS_MUNDUS.get();
     }

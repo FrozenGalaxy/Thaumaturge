@@ -15,7 +15,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -244,7 +244,7 @@ public final class MenuSealBase extends AbstractContainerMenu {
     }
 
     @Override
-    public void clicked(int slotId, int button, ContainerInput clickType, Player player) {
+    public void clicked(int slotId, int button, ClickType clickType, Player player) {
         if (slotId >= 0 && slotId < slots.size() && slots.get(slotId) instanceof GhostSlot ghost
                 && seal != null && seal.getSeal() instanceof ISealConfigFilter filter) {
             ghostClick(ghost, button, clickType, filter);
@@ -256,7 +256,7 @@ public final class MenuSealBase extends AbstractContainerMenu {
         super.clicked(slotId, button, clickType, player);
     }
 
-    private void ghostClick(GhostSlot slot, int button, ContainerInput clickType, ISealConfigFilter filter) {
+    private void ghostClick(GhostSlot slot, int button, ClickType clickType, ISealConfigFilter filter) {
         boolean limiters = filter.hasStacksizeLimiters();
         ItemStack carried = getCarried().copy();
         int index = slot.getContainerSlot();
@@ -267,7 +267,7 @@ public final class MenuSealBase extends AbstractContainerMenu {
             } else if (carried.isEmpty()) {
                 if (slot.hasItem()) {
                     filter.setFilterSlotSize(index,
-                            filter.getFilterSlotSize(index) - (clickType == ContainerInput.QUICK_MOVE ? 10 : 1));
+                            filter.getFilterSlotSize(index) - (clickType == ClickType.QUICK_MOVE ? 10 : 1));
                     if (filter.getFilterSlotSize(index) < 0) {
                         slot.set(ItemStack.EMPTY);
                         filter.setFilterSlotSize(index, 0);
@@ -283,7 +283,7 @@ public final class MenuSealBase extends AbstractContainerMenu {
         } else if (carried.isEmpty()) {
             if (limiters && slot.hasItem()) {
                 filter.setFilterSlotSize(index,
-                        filter.getFilterSlotSize(index) + (clickType == ContainerInput.QUICK_MOVE ? 10 : 1));
+                        filter.getFilterSlotSize(index) + (clickType == ClickType.QUICK_MOVE ? 10 : 1));
             }
         } else {
             if (!limiters) {

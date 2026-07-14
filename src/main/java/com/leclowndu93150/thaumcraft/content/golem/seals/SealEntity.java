@@ -62,7 +62,7 @@ public final class SealEntity implements ISealEntity {
     private static SealEntity fromCodec(SealPos pos, ResourceLocation typeId, byte priority, byte color,
                                         boolean locked, boolean redstone, Optional<UUID> owner,
                                         BlockPos area, CompoundTag data) {
-        SealType type = TCSeals.registry().getValue(typeId);
+        SealType type = TCSeals.registry().get(typeId);
         if (type == null) {
             throw new IllegalStateException("Unknown seal type " + typeId);
         }
@@ -92,7 +92,9 @@ public final class SealEntity implements ISealEntity {
         seal.readCustomNBT(data);
         if (seal instanceof ISealConfigToggles toggles) {
             for (ISealConfigToggles.SealToggle toggle : toggles.getToggles()) {
-                data.getBoolean(toggle.getKey()).ifPresent(toggle::setValue);
+                if (data.contains(toggle.getKey())) {
+                    toggle.setValue(data.getBoolean(toggle.getKey()));
+                }
             }
         }
     }

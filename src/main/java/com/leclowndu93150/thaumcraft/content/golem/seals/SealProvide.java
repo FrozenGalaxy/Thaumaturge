@@ -208,9 +208,9 @@ public class SealProvide extends SealFiltered implements ISealConfigToggles {
         if (request == null || !(golem.getGolemEntity() instanceof EntityThaumcraftGolem golemEntity)) {
             return false;
         }
-        boolean inHomeRange = request.getSeal() != null && golemEntity.isWithinHome(request.getSeal().getSealPos().pos())
-                || request.getEntity() != null && golemEntity.isWithinHome(request.getEntity().blockPosition())
-                || request.getPos() != null && golemEntity.isWithinHome(request.getPos());
+        boolean inHomeRange = request.getSeal() != null && golemEntity.isWithinRestriction(request.getSeal().getSealPos().pos())
+                || request.getEntity() != null && golemEntity.isWithinRestriction(request.getEntity().blockPosition())
+                || request.getPos() != null && golemEntity.isWithinRestriction(request.getPos());
         if (!inHomeRange || !areGolemTagsValidForTask(request.getSeal(), golem)) {
             return false;
         }
@@ -225,8 +225,8 @@ public class SealProvide extends SealFiltered implements ISealConfigToggles {
             return true;
         }
         if (golem.getGolemEntity() instanceof EntityThaumcraftGolem golemEntity && seal.isLocked()) {
-            if (golemEntity.getOwnerReference() == null
-                    || !golemEntity.getOwnerReference().getUUID().equals(seal.getOwner())) {
+            if (golemEntity.getOwnerUUID() == null
+                    || !golemEntity.getOwnerUUID().equals(seal.getOwner())) {
                 return false;
             }
         }

@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.spa;
 
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
@@ -27,7 +28,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jspecify.annotations.Nullable;
@@ -41,7 +41,6 @@ public class BlockEntitySpa extends BlockEntity implements MenuProvider {
     private final FluidTank tank = new FluidTank(TANK_CAPACITY) {
         @Override
         protected void onContentsChanged() {
-            super.onContentsChanged();
             setChanged();
             syncToClient();
         }
@@ -55,7 +54,6 @@ public class BlockEntitySpa extends BlockEntity implements MenuProvider {
 
         @Override
         protected void onContentsChanged(int index) {
-            super.onContentsChanged();
             setChanged();
         }
     };
@@ -116,7 +114,7 @@ public class BlockEntitySpa extends BlockEntity implements MenuProvider {
         if (mix) {
             return TCBlocks.PURIFYING_FLUID.get();
         }
-        Fluid fluid = tank.getStackInSlot(0).getFluid();
+        Fluid fluid = tank.getFluid().getFluid();
         if (!(fluid instanceof FlowingFluid)) {
             return null;
         }
@@ -126,7 +124,7 @@ public class BlockEntitySpa extends BlockEntity implements MenuProvider {
 
     private boolean hasIngredients() {
         if (mix) {
-            return tank.getStackInSlot(0).is(Fluids.WATER)
+            return tank.getFluid().is(Fluids.WATER)
                     && tank.getFluidAmount() >= FLUID_COST
                     && items.getStackInSlot(0).is(TCItems.BATH_SALTS.get());
         }
@@ -134,12 +132,10 @@ public class BlockEntitySpa extends BlockEntity implements MenuProvider {
     }
 
     private void consumeIngredients() {
-        {
-            if (mix) {
-                items.extract(items.getStackInSlot(0), 1, ctx);
-            }
-            tank.extract(tank.getStackInSlot(0), FLUID_COST, ctx);
+        if (mix) {
+            items.extractItem(0, 1, false);
         }
+        tank.drain(FLUID_COST, IFluidHandler.FluidAction.EXECUTE);
     }
 
     private boolean isValidLocation(BlockPos pos, boolean mustBeAdjacent, Block target) {

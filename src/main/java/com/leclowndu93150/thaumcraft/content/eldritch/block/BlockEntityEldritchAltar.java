@@ -93,13 +93,13 @@ public final class BlockEntityEldritchAltar extends BlockEntity {
         int z = pos.getZ() + Mth.randomBetweenInclusive(level.getRandom(), 4, 10)
                 * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
         BlockPos spawnPos = new BlockPos(x, y, z);
-        if (!level.getBlockState(spawnPos.below()).isSolidRender()) {
+        if (!level.getBlockState(spawnPos.below()).isSolidRender(level, spawnPos.below())) {
             return;
         }
-        knight.snapTo(x + 0.5, y, z + 0.5, 0.0F, 0.0F);
+        knight.moveTo(x + 0.5, y, z + 0.5, 0.0F, 0.0F);
         if (level.noCollision(knight) && !level.containsAnyLiquid(knight.getBoundingBox())) {
             knight.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos), MobSpawnType.EVENT, null);
-            knight.setHomeTo(pos, 16);
+            knight.restrictTo(pos, 16);
             level.addFreshEntity(knight);
         }
     }
@@ -113,13 +113,13 @@ public final class BlockEntityEldritchAltar extends BlockEntity {
         int z = pos.getZ() + Mth.randomBetweenInclusive(level.getRandom(), 4, 10)
                 * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
         BlockPos spawnPos = new BlockPos(x, y, z);
-        if (!level.getBlockState(spawnPos.below()).isSolidRender()) {
+        if (!level.getBlockState(spawnPos.below()).isSolidRender(level, spawnPos.below())) {
             return;
         }
-        guardian.snapTo(x + 0.5, y, z + 0.5, 0.0F, 0.0F);
+        guardian.moveTo(x + 0.5, y, z + 0.5, 0.0F, 0.0F);
         if (level.noCollision(guardian) && !level.containsAnyLiquid(guardian.getBoundingBox())) {
             guardian.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos), MobSpawnType.EVENT, null);
-            guardian.setHomeTo(pos, 16);
+            guardian.restrictTo(pos, 16);
             level.addFreshEntity(guardian);
         }
     }
@@ -129,13 +129,13 @@ public final class BlockEntityEldritchAltar extends BlockEntity {
         for (int a = 0; a < 4; a++) {
             int xx = a < 2 ? -2 : 2;
             int zz = a % 2 == 0 ? -2 : 2;
-            if (!level.getBlockState(pos.offset(xx, -1, zz)).isSolidRender()) {
+            if (!level.getBlockState(pos.offset(xx, -1, zz)).isSolidRender(level, pos.offset(xx, -1, zz))) {
                 continue;
             }
             EntityCultistCleric cleric = new EntityCultistCleric(TCEntities.CULTIST_CLERIC.get(), level);
-            cleric.snapTo(pos.getX() + 0.5 + xx, pos.getY(), pos.getZ() + 0.5 + zz, 0.0F, 0.0F);
+            cleric.moveTo(pos.getX() + 0.5 + xx, pos.getY(), pos.getZ() + 0.5 + zz, 0.0F, 0.0F);
             if (level.noCollision(cleric) && !level.containsAnyLiquid(cleric.getBoundingBox())) {
-                cleric.setHomeTo(pos, 8);
+                cleric.restrictTo(pos, 8);
                 cleric.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null);
                 if (level.addFreshEntity(cleric)) {
                     success++;

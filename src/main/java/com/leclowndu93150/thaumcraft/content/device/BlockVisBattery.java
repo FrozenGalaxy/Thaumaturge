@@ -87,7 +87,7 @@ public final class BlockVisBattery extends Block {
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         return state.getValue(CHARGE);
     }
 }

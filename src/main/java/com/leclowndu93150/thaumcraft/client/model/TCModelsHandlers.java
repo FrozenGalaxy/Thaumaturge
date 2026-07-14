@@ -8,6 +8,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterItemModelsEvent;
+import net.neoforged.neoforge.client.event.RegisterConditionalItemModelPropertyEvent;
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
@@ -19,11 +20,26 @@ public class TCModelsHandlers {
     public static final ResourceLocation JAR_BRAIN_MODEL_ID =
             ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "jar_brain");
 
+    public static final ResourceLocation JAR_NODE_MODEL_ID =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "jar_node");
+
     public static final ResourceLocation CENTRIFUGE_MODEL_ID =
             ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "centrifuge");
 
     public static final ResourceLocation GOLEM_BUILDER_MODEL_ID =
             ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "golem_builder");
+
+    public static final ResourceLocation DECON_TABLE_MODEL_ID =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "deconstruction_table");
+
+    public static final ResourceLocation WAND_MODEL_ID =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "wand");
+
+    public static final ResourceLocation NODE_STABILIZER_MODEL_ID =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "node_stabilizer");
+
+    public static final ResourceLocation WAND_IS_STAFF_PROPERTY_ID =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "wand_is_staff");
 
     public static final ResourceLocation OBJ_LOADER_ID =
             ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "obj");
@@ -32,8 +48,17 @@ public class TCModelsHandlers {
     public static void onRegisterItemModels(RegisterSpecialModelRendererEvent event){
         event.register(JAR_MODEL_ID, JarItemSpecialRenderer.Unbaked.MAP_CODEC);
         event.register(JAR_BRAIN_MODEL_ID, JarBrainItemSpecialRenderer.Unbaked.MAP_CODEC);
+        event.register(JAR_NODE_MODEL_ID, JarNodeItemSpecialRenderer.Unbaked.MAP_CODEC);
         event.register(CENTRIFUGE_MODEL_ID, CentrifugeItemSpecialRenderer.Unbaked.MAP_CODEC);
         event.register(GOLEM_BUILDER_MODEL_ID, GolemBuilderItemSpecialRenderer.Unbaked.MAP_CODEC);
+        event.register(DECON_TABLE_MODEL_ID, DeconTableItemSpecialRenderer.Unbaked.MAP_CODEC);
+        event.register(WAND_MODEL_ID, WandItemSpecialRenderer.Unbaked.MAP_CODEC);
+        event.register(NODE_STABILIZER_MODEL_ID, NodeStabilizerItemSpecialRenderer.Unbaked.MAP_CODEC);
+    }
+
+    @SubscribeEvent
+    public static void onRegisterConditionalProperties(RegisterConditionalItemModelPropertyEvent event) {
+        event.register(WAND_IS_STAFF_PROPERTY_ID, WandIsStaffProperty.MAP_CODEC);
     }
 
     @SubscribeEvent

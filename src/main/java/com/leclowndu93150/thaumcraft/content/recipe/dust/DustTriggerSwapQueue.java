@@ -69,11 +69,11 @@ public final class DustTriggerSwapQueue {
     }
 
     private static void enqueueInternal(ServerLevel level, PendingSwap entry) {
-        ChunkPos cp = ChunkPos.containing(entry.pos());
-        LevelChunk chunk = level.getChunk(cp.x(), cp.z());
+        ChunkPos cp = new ChunkPos(entry.pos());
+        LevelChunk chunk = level.getChunk(cp.x, cp.z);
         DustTriggerSwapQueue queue = chunk.getData(TCAttachments.DUST_TRIGGER_QUEUE.get());
         queue.add(entry);
-        chunk.markUnsaved();
+        chunk.setUnsaved(true);
         ACTIVE.computeIfAbsent(level.dimension(), k -> ConcurrentHashMap.newKeySet()).add(cp);
         markBlocked(level, entry.pos());
     }

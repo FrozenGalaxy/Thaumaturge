@@ -505,7 +505,7 @@ public final class InvHelper {
         int needed = stack.getCount();
         InvFilter filter = new InvFilter(false, stack.isComponentsPatchEmpty(), useTags, false)
                 .setRelaxedComponents();
-        for (ItemStack held : player.getInventory().getNonEquipmentItems()) {
+        for (ItemStack held : player.getInventory().items) {
             if (areItemStacksEqual(held, stack, filter)) {
                 needed -= held.getCount();
                 if (needed <= 0) {
@@ -529,7 +529,7 @@ public final class InvHelper {
         int remaining = stack.getCount();
         InvFilter filter = new InvFilter(false, stack.isComponentsPatchEmpty(), useTags, false)
                 .setRelaxedComponents();
-        List<ItemStack> items = player.getInventory().getNonEquipmentItems();
+        List<ItemStack> items = player.getInventory().items;
         for (int slot = 0; slot < items.size(); slot++) {
             ItemStack held = items.get(slot);
             if (!areItemStacksEqual(held, stack, filter)) {

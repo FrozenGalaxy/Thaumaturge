@@ -66,7 +66,7 @@ public final class BlockEntityDioptra extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
-        int[] read = input.getIntArray("grid_a").orElse(null);
+        int[] read = input.contains("grid_a") ? input.getIntArray("grid_a") : null;
         if (read != null && read.length == GRID_LENGTH) {
             for (int i = 0; i < GRID_LENGTH; i++) {
                 grid[i] = (byte) read[i];

@@ -16,6 +16,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -37,7 +38,7 @@ public final class PechWandItem extends Item {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (!KnowledgeAccess.of(player).isResearchKnown(GATE_RESEARCH)) {
             if (!level.isClientSide()) {
                 player.sendSystemMessage(Component.translatable("not.pechwand")
@@ -70,6 +71,6 @@ public final class PechWandItem extends Item {
                         Mth.nextInt(serverPlayer.getRandom(), tProg / 5, tProg / 4));
             }
         }
-        return InteractionResult.SUCCESS;
+        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
 }

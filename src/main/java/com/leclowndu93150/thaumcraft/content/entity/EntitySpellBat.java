@@ -198,7 +198,7 @@ public final class EntitySpellBat extends Monster implements TraceableEntity, IE
     }
 
     @Override
-    protected boolean shouldDropLoot(ServerLevel level) {
+    protected boolean shouldDropLoot() {
         return false;
     }
 
@@ -251,8 +251,9 @@ public final class EntitySpellBat extends Monster implements TraceableEntity, IE
     }
 
     @Override
-    protected void customServerAiStep(ServerLevel level) {
-        super.customServerAiStep(level);
+    protected void customServerAiStep() {
+        ServerLevel level = (ServerLevel) level();
+        super.customServerAiStep();
         if (this.attackTime > 0) {
             this.attackTime--;
         }
@@ -283,7 +284,7 @@ public final class EntitySpellBat extends Monster implements TraceableEntity, IE
 
     private void wanderFlight(ServerLevel level) {
         if (this.currentFlightTarget != null
-                && (!level.isEmptyBlock(this.currentFlightTarget) || this.currentFlightTarget.getY() <= level.getMinY())) {
+                && (!level.isEmptyBlock(this.currentFlightTarget) || this.currentFlightTarget.getY() <= level.getMinBuildHeight())) {
             this.currentFlightTarget = null;
         }
         if (this.currentFlightTarget == null
@@ -363,20 +364,20 @@ public final class EntitySpellBat extends Monster implements TraceableEntity, IE
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         if (this.owner != null) {
             output.putUUID("OwnerUUID", this.owner);
         }
         output.putBoolean("friendly", this.isFriendly());
-        FocusPackages.save(output, this.focusPackage);
+        FocusPackages.save(output, registryAccess(), this.focusPackage);
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         this.owner = input.hasUUID("OwnerUUID") ? input.getUUID("OwnerUUID") : null;
         this.setFriendly(input.getBoolean("friendly"));
-        this.focusPackage = FocusPackages.load(input);
+        this.focusPackage = FocusPackages.load(input, registryAccess());
     }
 }

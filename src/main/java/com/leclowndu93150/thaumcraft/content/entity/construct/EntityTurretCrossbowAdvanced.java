@@ -57,7 +57,7 @@ public class EntityTurretCrossbowAdvanced extends EntityTurretCrossbow {
         goalSelector.addGoal(2, new WatchTargetGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 5, true, false,
-                (entity, level) -> isValidTarget(entity)));
+                entity -> isValidTarget(entity)));
         setTargetMob(true);
     }
 
@@ -73,7 +73,7 @@ public class EntityTurretCrossbowAdvanced extends EntityTurretCrossbow {
         if (team != null && targetTeam != team && getTargetFriendly()) {
             return false;
         }
-        if (isOwned() && getOwnerReference() != null) {
+        if (isOwned() && getOwnerUUID() != null) {
             if (entity instanceof OwnableEntity ownable && sameOwner(ownable) && !getTargetFriendly()) {
                 return false;
             }
@@ -101,7 +101,7 @@ public class EntityTurretCrossbowAdvanced extends EntityTurretCrossbow {
             return true;
         }
         if (entity instanceof Player && getTargetPlayer()) {
-            if (level() instanceof ServerLevel serverLevel && !serverLevel.isPvpAllowed() && !getTargetFriendly()) {
+            if (level() instanceof ServerLevel serverLevel && !serverLevel.getServer().isPvpAllowed() && !getTargetFriendly()) {
                 setTargetPlayer(false);
                 return false;
             }
@@ -145,8 +145,8 @@ public class EntityTurretCrossbowAdvanced extends EntityTurretCrossbow {
     }
 
     private boolean sameOwner(OwnableEntity ownable) {
-        return getOwnerReference() != null && ownable.getOwnerReference() != null
-                && getOwnerReference().getUUID().equals(ownable.getOwnerReference().getUUID());
+        return getOwnerUUID() != null && ownable.getOwnerUUID() != null
+                && getOwnerUUID().equals(ownable.getOwnerUUID());
     }
 
     public boolean getTargetFriendly() {
@@ -160,20 +160,20 @@ public class EntityTurretCrossbowAdvanced extends EntityTurretCrossbow {
     @Override
     public void tick() {
         super.tick();
-        if (level() instanceof ServerLevel serverLevel && !serverLevel.isPvpAllowed()
+        if (level() instanceof ServerLevel serverLevel && !serverLevel.getServer().isPvpAllowed()
                 && getTarget() instanceof Player && getTarget() != getOwner()) {
             setTarget(null);
         }
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         entityData.set(FLAGS, input.getByte("targets"));
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putByte("targets", entityData.get(FLAGS));
     }
@@ -197,25 +197,25 @@ public class EntityTurretCrossbowAdvanced extends EntityTurretCrossbow {
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
         float bonus = 0.0F;
         if (random.nextFloat() < 0.2F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCItems.MIND_BIOTHAUMIC.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCItems.MIND_BIOTHAUMIC.get()), 0.5F);
         }
         if (random.nextFloat() < 0.5F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCItems.MECHANISM_SIMPLE.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCItems.MECHANISM_SIMPLE.get()), 0.5F);
         }
         if (random.nextFloat() < 0.5F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCBlocks.PLANK_GREATWOOD.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCBlocks.PLANK_GREATWOOD.get()), 0.5F);
         }
         if (random.nextFloat() < 0.5F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCBlocks.PLANK_GREATWOOD.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCBlocks.PLANK_GREATWOOD.get()), 0.5F);
         }
         if (random.nextFloat() < 0.3F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCItems.PLATE_BRASS.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCItems.PLATE_BRASS.get()), 0.5F);
         }
         if (random.nextFloat() < 0.4F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCItems.PLATE_IRON.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCItems.PLATE_IRON.get()), 0.5F);
         }
         if (random.nextFloat() < 0.4F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCItems.PLATE_IRON.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCItems.PLATE_IRON.get()), 0.5F);
         }
     }
 }

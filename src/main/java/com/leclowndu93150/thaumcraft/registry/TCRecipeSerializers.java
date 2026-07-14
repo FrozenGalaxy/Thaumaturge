@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.registry;
 
+import com.leclowndu93150.thaumcraft.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.infusion.InfusionEnchantmentRecipe;
 import com.leclowndu93150.thaumcraft.content.infusion.InfusionRecipe;
@@ -45,7 +46,7 @@ public final class TCRecipeSerializers {
             RECIPE_SERIALIZERS.register("arcane_workbench_shapeless", () -> ArcaneShapelessCraftingRecipe.SERIALIZER);
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<SalisMundusRecipe>> SALIS_MUNDUS =
-            RECIPE_SERIALIZERS.register("salis_mundus", () -> new RecipeSerializer<>(SalisMundusRecipe.MAP_CODEC, SalisMundusRecipe.STREAM_CODEC));
+            RECIPE_SERIALIZERS.register("salis_mundus", () -> new SimpleRecipeSerializer<>(SalisMundusRecipe.MAP_CODEC, SalisMundusRecipe.STREAM_CODEC));
 
 
 

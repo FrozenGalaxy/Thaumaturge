@@ -13,8 +13,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -24,12 +24,12 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-public final class ElementalShovelItem extends Item implements IArchitect {
+public final class ElementalShovelItem extends ShovelItem implements IArchitect {
     private static final int BAMF_COLOR = 8401408;
     private static final int ORIENTATION_COUNT = 3;
 
     public ElementalShovelItem(Properties properties) {
-        super(properties);
+        super(TCMaterials.TOOL_ELEMENTAL, properties);
     }
 
     public static int getOrientation(ItemStack stack) {
@@ -76,7 +76,7 @@ public final class ElementalShovelItem extends Item implements IArchitect {
         level.playSound(null, p2, state.getSoundType().getBreakSound(), SoundSource.BLOCKS,
                 0.6F, 0.9F + level.getRandom().nextFloat() * 0.2F);
         level.setBlockAndUpdate(p2, state);
-        context.getItemInHand().hurtAndBreak(1, player, context.getHand().asEquipmentSlot());
+        context.getItemInHand().hurtAndBreak(1, player, LivingEntity.getSlotForHand(context.getHand()));
         if (level instanceof ServerLevel serverLevel) {
             FX.bamf(serverLevel, p2)
                     .color(((BAMF_COLOR >> 16) & 0xFF) / 255.0F, ((BAMF_COLOR >> 8) & 0xFF) / 255.0F,

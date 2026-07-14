@@ -38,6 +38,16 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+tasks.named('compileJava') {
+    options.compilerArgs << '-Xmaxerrs' << '2000'
+    if (project.hasProperty('excludeClient')) {
+        exclude 'com/leclowndu93150/thaumcraft/client/**'
+        exclude 'com/leclowndu93150/thaumcraft/mixin/client/**'
+        exclude 'com/leclowndu93150/thaumcraft/compat/**'
+        exclude 'com/leclowndu93150/thaumcraft/data/**'
+    }
+}
+
 neoForge {
     version = project.neo_version
 

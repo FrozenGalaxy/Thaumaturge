@@ -2,12 +2,13 @@ package com.leclowndu93150.thaumcraft.client.hud;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
+import com.leclowndu93150.thaumcraft.content.wands.WandEconomy;
+import com.leclowndu93150.thaumcraft.content.wands.WandVisHelper;
 import com.leclowndu93150.thaumcraft.api.aspect.TCAspects;
+import net.minecraft.resources.ResourceKey;
 import com.leclowndu93150.thaumcraft.api.casters.ICaster;
-import com.leclowndu93150.thaumcraft.client.aura.ClientAuraCache;
 import com.leclowndu93150.thaumcraft.config.ThaumcraftClientConfig;
 import com.leclowndu93150.thaumcraft.content.casters.ItemFocus;
-import com.leclowndu93150.thaumcraft.network.ServerboundRequestAuraChunkPayload;
 import java.text.DecimalFormat;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -15,24 +16,38 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.NonNullList;
+import com.leclowndu93150.thaumcraft.registry.TCAttachments;
+import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.gui.GuiLayer;
-import net.neoforged.neoforge.network.PacketDistributor;
+
 
 public final class CasterHudOverlay implements GuiLayer {
     private static final ResourceLocation HUD = TCIds.rl("textures/gui/hud.png");
+    private static final ResourceLocation HUD_WAND = TCIds.rl("textures/gui/hud_wand.png");
+
+    private static final int[] previousVis = new int[WandEconomy.PRIMAL_COUNT];
+    private static long changeSyncTime;
     private static final int TEX_SIZE = 256;
 
-    public static final int STACK_HEIGHT = 33;
+    public static final int STACK_HEIGHT = 60;
     private static final int DIAL_SIZE = 32;
     private static final int DIAL_SRC_SIZE = 64;
     private static final int ANCHOR = 16;
-    private static final int BAR_OFFSET_X = 16;
-    private static final int BAR_OFFSET_Y = -10;
+    private static final float SPOKE_BASE_DEG = -15.0F;
+    private static final float SPOKE_STEP_DEG = 24.0F;
+    private static final int SPOKE_RADIUS = -32;
+    private static final int MARKER_SIZE = 8;
+    private static final int MARKER_HALF = 4;
+    private static final float COST_MARKER_U = 136.0F;
+    private static final float RISE_MARKER_U = 120.0F;
+    private static final float FALL_MARKER_U = 128.0F;
+    private static final int COST_TEXT_X = 8;
+    private static final long CHANGE_SYNC_INTERVAL_MS = 1000L;
     private static final float BAR_SPACE_SCALE = 0.5F;
     private static final int BAR_MAX_HEIGHT = 30;
     private static final int BAR_BOTTOM = 35;
@@ -46,7 +61,6 @@ public final class CasterHudOverlay implements GuiLayer {
     private static final float BAR_FILL_ALPHA = 0.8F;
     private static final int AMOUNT_TEXT_X = -32;
     private static final int AMOUNT_TEXT_Y = -4;
-    private static final int COST_TEXT_Y = 32;
     private static final int ITEM_HALF = 8;
     private static final int COUNT_TEXT_LIFT = 9;
     private static final int COUNT_TEXT_X = 16;
@@ -111,51 +125,82 @@ public final class CasterHudOverlay implements GuiLayer {
         }
         ICaster wand = (ICaster) casterStack.getItem();
 
-        ClientAuraCache.tick();
-        ChunkPos pos = ChunkPos.containing(player.blockPosition());
-        if (ClientAuraCache.shouldRequest(pos)) {
-            PacketDistributor.sendToServer(new ServerboundRequestAuraChunkPayload(pos.x(), pos.z()));
-        }
-        ClientAuraCache.Snapshot snap = ClientAuraCache.get(pos);
-        if (snap == null) {
-            snap = ClientAuraCache.latest();
-        }
-        int max = snap == null ? 0 : snap.base();
-        int amt = snap == null ? 0 : (int) snap.vis();
-
-        graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
+        graphics.blit(RenderPipelines.GUI_TEXTURED, HUD_WAND,
                 0, dialY, 0.0F, 0.0F, DIAL_SIZE, DIAL_SIZE, DIAL_SRC_SIZE, DIAL_SRC_SIZE, TEX_SIZE, TEX_SIZE);
 
+        int max = WandVisHelper.getMaxVis(casterStack);
         ItemStack focusStack = wand.getFocusStack(casterStack);
         boolean hasFocus = focusStack.getItem() instanceof ItemFocus;
+        float perAspectCost = 0.0F;
+        if (hasFocus && focusStack.getItem() instanceof ItemFocus focus && focus.getVisCost(focusStack) > 0.0F) {
+            perAspectCost = focus.getVisCost(focusStack)
+                    * wand.getConsumptionModifier(casterStack, player, false) / WandEconomy.PRIMAL_COUNT;
+        }
+        boolean sneak = player.isShiftKeyDown();
+        long now = Util.getMillis();
+        boolean snapshot = now >= changeSyncTime;
+        if (snapshot) {
+            changeSyncTime = now + CHANGE_SYNC_INTERVAL_MS;
+        }
 
         graphics.pose().pushMatrix();
-        graphics.pose().translate(ANCHOR + BAR_OFFSET_X, dialY + ANCHOR + BAR_OFFSET_Y);
-        graphics.pose().scale(BAR_SPACE_SCALE, BAR_SPACE_SCALE);
-        int loc = max > 0 ? (int) (BAR_MAX_HEIGHT * (float) amt / max) : 0;
-        if (loc > 0) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
-                    -BAR_FILL_W / 2, BAR_BOTTOM - loc, BAR_FILL_U, 0.0F,
-                    BAR_FILL_W, loc, BAR_FILL_W, loc, TEX_SIZE, TEX_SIZE,
-                    ARGB32.color(Math.round(BAR_FILL_ALPHA * 255.0F), energyColor(mc)));
-        }
-        graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
-                BAR_FRAME_X, BAR_FRAME_Y, BAR_FRAME_U, 0.0F,
-                BAR_FRAME_W, BAR_FRAME_H, BAR_FRAME_W, BAR_FRAME_H, TEX_SIZE, TEX_SIZE);
-        if (player.isShiftKeyDown()) {
+        graphics.pose().translate(ANCHOR, dialY + ANCHOR);
+        int count = 0;
+        for (ResourceKey<IAspect> primal : TCAspects.PRIMALS) {
+            int amt = WandVisHelper.getVis(casterStack, primal);
             graphics.pose().pushMatrix();
-            graphics.pose().rotate((float) Math.toRadians(-90.0));
-            graphics.text(mc.font, AMOUNT_FORMAT.format(amt), AMOUNT_TEXT_X, AMOUNT_TEXT_Y, WHITE, false);
-            graphics.pose().popMatrix();
-            if (hasFocus && focusStack.getItem() instanceof ItemFocus focus) {
-                float cost = focus.getVisCost(focusStack);
-                if (cost > 0.0F) {
-                    float modifier = wand.getConsumptionModifier(casterStack, player, false);
-                    String msg = AMOUNT_FORMAT.format(cost * modifier);
-                    graphics.text(mc.font, msg,
-                            AMOUNT_TEXT_X - mc.font.width(msg) / 2, COST_TEXT_Y, WHITE, false);
+            if (!ThaumcraftClientConfig.dialBottom()) {
+                graphics.pose().rotate((float) Math.toRadians(90.0));
+            }
+            graphics.pose().rotate((float) Math.toRadians(SPOKE_BASE_DEG + count * SPOKE_STEP_DEG));
+            graphics.pose().translate(0.0F, SPOKE_RADIUS);
+            graphics.pose().scale(BAR_SPACE_SCALE, BAR_SPACE_SCALE);
+            int loc = max > 0 ? (int) (BAR_MAX_HEIGHT * (float) amt / max) : 0;
+            if (loc > 0) {
+                int color = primalColor(mc, primal);
+                graphics.blit(RenderPipelines.GUI_TEXTURED, HUD_WAND,
+                        -BAR_FILL_W / 2, BAR_BOTTOM - loc, BAR_FILL_U, 0.0F,
+                        BAR_FILL_W, loc, BAR_FILL_W, loc, TEX_SIZE, TEX_SIZE,
+                        ARGB32.color(Math.round(BAR_FILL_ALPHA * 255.0F), color));
+            }
+            graphics.blit(RenderPipelines.GUI_TEXTURED, HUD_WAND,
+                    BAR_FRAME_X, BAR_FRAME_Y, BAR_FRAME_U, 0.0F,
+                    BAR_FRAME_W, BAR_FRAME_H, BAR_FRAME_W, BAR_FRAME_H, TEX_SIZE, TEX_SIZE);
+            int markerShift = 0;
+            if (perAspectCost > 0.0F) {
+                graphics.blit(RenderPipelines.GUI_TEXTURED, HUD_WAND,
+                        -MARKER_HALF, -MARKER_SIZE, COST_MARKER_U, 0.0F,
+                        MARKER_SIZE, MARKER_SIZE, MARKER_SIZE, MARKER_SIZE, TEX_SIZE, TEX_SIZE);
+                markerShift = MARKER_SIZE;
+            }
+            if (previousVis[count] > amt) {
+                graphics.blit(RenderPipelines.GUI_TEXTURED, HUD_WAND,
+                        -MARKER_HALF, -MARKER_SIZE - markerShift, FALL_MARKER_U, 0.0F,
+                        MARKER_SIZE, MARKER_SIZE, MARKER_SIZE, MARKER_SIZE, TEX_SIZE, TEX_SIZE);
+            } else if (previousVis[count] < amt) {
+                graphics.blit(RenderPipelines.GUI_TEXTURED, HUD_WAND,
+                        -MARKER_HALF, -MARKER_SIZE - markerShift, RISE_MARKER_U, 0.0F,
+                        MARKER_SIZE, MARKER_SIZE, MARKER_SIZE, MARKER_SIZE, TEX_SIZE, TEX_SIZE);
+            }
+            if (snapshot) {
+                previousVis[count] = amt;
+            }
+            if (sneak) {
+                graphics.pose().pushMatrix();
+                graphics.pose().rotate((float) Math.toRadians(-90.0));
+                graphics.text(mc.font, AMOUNT_FORMAT.format(amt / (float) WandEconomy.CENTIVIS_PER_VIS),
+                        AMOUNT_TEXT_X, AMOUNT_TEXT_Y, WHITE, false);
+                graphics.pose().popMatrix();
+                if (perAspectCost > 0.0F) {
+                    graphics.pose().pushMatrix();
+                    graphics.pose().rotate((float) Math.toRadians(-90.0));
+                    graphics.text(mc.font, AMOUNT_FORMAT.format(perAspectCost),
+                            COST_TEXT_X, AMOUNT_TEXT_Y, WHITE, false);
+                    graphics.pose().popMatrix();
                 }
             }
+            graphics.pose().popMatrix();
+            count++;
         }
         graphics.pose().popMatrix();
 
@@ -170,10 +215,18 @@ public final class CasterHudOverlay implements GuiLayer {
         }
     }
 
+    private static int primalColor(Minecraft mc, ResourceKey<IAspect> primal) {
+        if (mc.level == null) {
+            return DEFAULT_ENERGY_COLOR;
+        }
+        return mc.level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY)
+                .getOrThrow(primal).value().color();
+    }
+
     private static void renderTradeHud(GuiGraphicsExtractor graphics, Minecraft mc, LocalPlayer player,
                                        ItemStack picked, int dialY) {
         int amount = 0;
-        NonNullList<ItemStack> main = player.getInventory().getNonEquipmentItems();
+        NonNullList<ItemStack> main = player.getInventory().items;
         for (ItemStack stack : main) {
             if (!stack.isEmpty() && ItemStack.isSameItem(stack, picked)) {
                 amount += stack.getCount();
@@ -196,13 +249,4 @@ public final class CasterHudOverlay implements GuiLayer {
         graphics.pose().popMatrix();
     }
 
-    private static int energyColor(Minecraft mc) {
-        if (mc.level == null) {
-            return DEFAULT_ENERGY_COLOR;
-        }
-        return mc.level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY)
-                .get(TCAspects.POTENTIA)
-                .map(holder -> holder.value().color())
-                .orElse(DEFAULT_ENERGY_COLOR);
-    }
 }

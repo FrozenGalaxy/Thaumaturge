@@ -24,15 +24,18 @@ public record BoltData(double targetX, double targetY, double targetZ,
             ).apply(instance, BoltData::new)
     );
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, BoltData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.DOUBLE, BoltData::targetX,
-            ByteBufCodecs.DOUBLE, BoltData::targetY,
-            ByteBufCodecs.DOUBLE, BoltData::targetZ,
-            ByteBufCodecs.FLOAT, BoltData::r,
-            ByteBufCodecs.FLOAT, BoltData::g,
-            ByteBufCodecs.FLOAT, BoltData::b,
-            ByteBufCodecs.FLOAT, BoltData::width,
-            BoltData::new
+    public static final StreamCodec<RegistryFriendlyByteBuf, BoltData> STREAM_CODEC = StreamCodec.of(
+            (buffer, data) -> {
+                buffer.writeDouble(data.targetX);
+                buffer.writeDouble(data.targetY);
+                buffer.writeDouble(data.targetZ);
+                buffer.writeFloat(data.r);
+                buffer.writeFloat(data.g);
+                buffer.writeFloat(data.b);
+                buffer.writeFloat(data.width);
+            },
+            buffer -> new BoltData(buffer.readDouble(), buffer.readDouble(), buffer.readDouble(),
+                    buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readFloat())
     );
 
     @Override

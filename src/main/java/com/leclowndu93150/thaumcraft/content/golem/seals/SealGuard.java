@@ -67,7 +67,7 @@ public class SealGuard implements ISeal, ISealGui, ISealConfigArea {
         }
         return props[2].getValue()
                 && level instanceof ServerLevel serverLevel
-                && serverLevel.isPvpAllowed()
+                && serverLevel.getServer().isPvpAllowed()
                 && target instanceof Player;
     }
 

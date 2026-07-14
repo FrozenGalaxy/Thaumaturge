@@ -1,5 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.essentia.thaumatorium;
 
+import com.leclowndu93150.thaumcraft.content.research.DeviceGate;
+import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.mojang.serialization.MapCodec;
@@ -52,6 +54,9 @@ public final class BlockThaumatorium extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (!level.isClientSide() && !DeviceGate.passes(player, TCIds.rl("thaumatorium"))) {
+            return InteractionResult.CONSUME;
+        }
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
@@ -72,11 +77,14 @@ public final class BlockThaumatorium extends BaseEntityBlock {
     }
 
     @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
-        if (level.getBlockState(pos.above()).is(TCBlocks.THAUMATORIUM_TOP.get())) {
-            level.destroyBlock(pos.above(), true);
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock())) {
+        
+            if (level.getBlockState(pos.above()).is(TCBlocks.THAUMATORIUM_TOP.get())) {
+                level.destroyBlock(pos.above(), true);
+            }
         }
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Override

@@ -42,13 +42,14 @@ public abstract class SealFiltered implements ISeal, ISealGui, ISealConfigFilter
                 filter.set(i, stack);
             }
         }
-        blacklist = nbt.getBooleanOr("bl", true);
+        blacklist = !nbt.contains("bl") || nbt.getBoolean("bl");
         filterSize = NonNullList.withSize(getFilterSize(), 0);
-        nbt.getIntArray("sizes").ifPresent(sizes -> {
+        if (nbt.contains("sizes")) {
+            int[] sizes = nbt.getIntArray("sizes");
             for (int i = 0; i < sizes.length && i < filterSize.size(); i++) {
                 filterSize.set(i, sizes[i]);
             }
-        });
+        }
     }
 
     @Override

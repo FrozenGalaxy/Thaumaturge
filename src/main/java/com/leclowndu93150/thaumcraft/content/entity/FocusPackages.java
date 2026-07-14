@@ -5,6 +5,7 @@ import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEffect;
 import com.leclowndu93150.thaumcraft.api.casters.FocusPackage;
 import java.util.List;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.jspecify.annotations.Nullable;
@@ -33,11 +34,11 @@ public final class FocusPackages {
         }
     }
 
-    public static void save(CompoundTag output, @Nullable FocusPackage focusPackage) {
+    public static void save(CompoundTag output, HolderLookup.Provider registries, @Nullable FocusPackage focusPackage) {
         TCNbt.storeNullable(output, PACK_KEY, FocusPackage.CODEC, registries, focusPackage);
     }
 
-    public static @Nullable FocusPackage load(CompoundTag input) {
+    public static @Nullable FocusPackage load(CompoundTag input, HolderLookup.Provider registries) {
         return TCNbt.read(input, PACK_KEY, FocusPackage.CODEC, registries).orElse(null);
     }
 

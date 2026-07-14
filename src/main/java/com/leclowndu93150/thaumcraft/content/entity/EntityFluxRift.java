@@ -149,10 +149,11 @@ public final class EntityFluxRift extends Entity {
     }
 
     @Override
-    protected AABB makeBoundingBox(Vec3 pos) {
+    protected AABB makeBoundingBox() {
         if (points == null || points.isEmpty()) {
-            return super.makeBoundingBox(pos);
+            return super.makeBoundingBox();
         }
+        Vec3 pos = position();
         double x0 = Double.MAX_VALUE;
         double y0 = Double.MAX_VALUE;
         double z0 = Double.MAX_VALUE;
@@ -180,7 +181,8 @@ public final class EntityFluxRift extends Entity {
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+    public boolean hurt(DamageSource source, float amount) {
+        ServerLevel level = (ServerLevel) level();
         return false;
     }
 
@@ -317,15 +319,15 @@ public final class EntityFluxRift extends Entity {
     }
 
     private boolean spawnWisp(ServerLevel level) {
-        WispEntity wisp = TCEntities.WISP.get().create(level, MobSpawnType.EVENT);
+        WispEntity wisp = TCEntities.WISP.get().create(level);
         if (wisp == null) {
             return false;
         }
-        wisp.snapTo(getX() + this.random.nextGaussian() * 5.0,
+        wisp.moveTo(getX() + this.random.nextGaussian() * 5.0,
                 getY() + this.random.nextGaussian() * 5.0,
                 getZ() + this.random.nextGaussian() * 5.0, 0.0F, 0.0F);
         if (this.random.nextInt(5) == 0) {
-            wisp.setAspect(TCAspects.VITIUM.identifier());
+            wisp.setAspect(TCAspects.VITIUM.location());
         }
         if (level.noCollision(wisp)) {
             return level.addFreshEntity(wisp);
@@ -335,11 +337,11 @@ public final class EntityFluxRift extends Entity {
     }
 
     private boolean spawnTaintSeed(ServerLevel level) {
-        EntityTaintSeedPrime seed = TCEntities.TAINT_SEED_PRIME.get().create(level, MobSpawnType.EVENT);
+        EntityTaintSeedPrime seed = TCEntities.TAINT_SEED_PRIME.get().create(level);
         if (seed == null) {
             return false;
         }
-        seed.snapTo((int) (getX() + this.random.nextGaussian() * 5.0) + 0.5,
+        seed.moveTo((int) (getX() + this.random.nextGaussian() * 5.0) + 0.5,
                 (int) (getY() + this.random.nextGaussian() * 5.0),
                 (int) (getZ() + this.random.nextGaussian() * 5.0) + 0.5,
                 this.random.nextInt(360), 0.0F);
@@ -370,10 +372,10 @@ public final class EntityFluxRift extends Entity {
         if (this.random.nextInt(100) < strength) {
             ItemStack pearl = new ItemStack(TCItems.PRIMORDIAL_PEARL.get());
             pearl.setDamageValue(4 + this.random.nextInt(4));
-            spawnAtLocation(level, pearl, 0.0F);
+            spawnAtLocation(pearl, 0.0F);
         }
         for (int a = 0; a < strength; a++) {
-            spawnAtLocation(level, new ItemStack(TCItems.VOID_SEED.get()), 0.0F);
+            spawnAtLocation(new ItemStack(TCItems.VOID_SEED.get()), 0.0F);
         }
         level.explode(this, getX(), getY(), getZ(), 0.0F, Level.ExplosionInteraction.NONE);
         List<LivingEntity> nearby = level.getEntitiesOfClass(LivingEntity.class,
@@ -440,7 +442,7 @@ public final class EntityFluxRift extends Entity {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         output.putInt("MaxSize", maxSize);
         output.putInt("RiftSize", getRiftSize());
         output.putInt("RiftSeed", getRiftSeed());
@@ -449,7 +451,7 @@ public final class EntityFluxRift extends Entity {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         maxSize = input.getInt("MaxSize");
         setRiftSize((input.contains("RiftSize") ? input.getInt("RiftSize") : 5));
         setRiftSeed(input.getInt("RiftSeed"));
@@ -464,25 +466,25 @@ public final class EntityFluxRift extends Entity {
         if (!level.dimensionType().hasSkyLight()) {
             target = new BlockPos(target.getX(), 10, target.getZ());
             while (!level.isEmptyBlock(target)) {
-                if (target.getY() > level.getMaxY() - 5) {
+                if (target.getY() > level.getMaxBuildHeight() - 5) {
                     return;
                 }
                 target = target.above(rand.nextInt(5) + 1);
             }
         }
-        if (target.getY() >= level.getMaxY() - 4) {
+        if (target.getY() >= level.getMaxBuildHeight() - 4) {
             return;
         }
         AABB exclusion = new AABB(target).inflate(RIFT_EXCLUSION_RANGE);
         if (!level.getEntitiesOfClass(EntityFluxRift.class, exclusion).isEmpty()) {
             return;
         }
-        EntityFluxRift rift = TCEntities.FLUX_RIFT.get().create(level, MobSpawnType.EVENT);
+        EntityFluxRift rift = TCEntities.FLUX_RIFT.get().create(level);
         if (rift == null) {
             return;
         }
         rift.setRiftSeed(rand.nextInt());
-        rift.snapTo(target.getX() + 0.5, target.getY() + 0.5, target.getZ() + 0.5, rand.nextInt(360), 0.0F);
+        rift.moveTo(target.getX() + 0.5, target.getY() + 0.5, target.getZ() + 0.5, rand.nextInt(360), 0.0F);
         float flux = AuraHelper.getFlux(level, target);
         double size = Math.sqrt(flux * 3.0F);
         if (size > MIN_SPAWN_SIZE && level.addFreshEntity(rift)) {

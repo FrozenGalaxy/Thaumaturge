@@ -1,5 +1,13 @@
 package com.leclowndu93150.thaumcraft.compat.jei;
 
+import java.util.List;
+import java.util.ArrayList;
+import mezz.jei.api.registration.IExtraIngredientRegistration;
+import com.leclowndu93150.thaumcraft.content.research.note.ResearchNotes;
+import com.leclowndu93150.thaumcraft.content.research.note.ResearchNoteData;
+import com.leclowndu93150.thaumcraft.content.research.note.NoteGenerator;
+import com.leclowndu93150.thaumcraft.api.research.IResearchEntry;
+import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.*;
@@ -41,7 +49,10 @@ import mezz.jei.api.recipe.types.IRecipeHolderType;
 import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.registration.*;
 import mezz.jei.api.runtime.IJeiRuntime;
+import mezz.jei.library.recipes.collect.RecipeMap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
+import com.leclowndu93150.thaumcraft.content.research.pool.AspectPools;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -83,6 +94,42 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
         registration.registerSubtypeInterpreter(TCItems.ESSENTIA_CRYSTAL.get(), crystalAspectInterpreter);
         registration.registerSubtypeInterpreter(TCItems.PHIAL.get(), aspectsInterpreter);
         registration.registerFromDataComponentTypes(TCItems.CELESTIAL_NOTES.asItem(), TCDataComponents.CELESTIAL_BODY.get());
+        registration.registerFromDataComponentTypes(TCItems.RESEARCH_NOTE.get(), TCDataComponents.RESEARCH_NOTE.get());
+    }
+
+    @Override
+    public void registerExtraIngredients(IExtraIngredientRegistration registration) {
+        RegistryAccess registryAccess = clientRegistryAccess();
+        if (registryAccess == null) {
+            return;
+        }
+        List<ItemStack> notes = new ArrayList<>();
+        for (Holder.Reference<IResearchEntry> holder
+                : registryAccess.lookupOrThrow(IResearchEntry.REGISTRY_KEY).listElements().toList()) {
+            IResearchEntry entry = holder.value();
+            int theoryRows = ResearchNotes.theoryRowsBefore(entry, entry.stages().size());
+            if (theoryRows == 0) {
+                continue;
+            }
+            ResourceLocation entryId = holder.key().location();
+            AspectList anchors = ResearchNotes.anchors(registryAccess, entry);
+            int color = NoteGenerator.primaryColor(anchors);
+            for (int ordinal = 0; ordinal < theoryRows; ordinal++) {
+                notes.add(displayNote(entryId, ordinal, color, false));
+                notes.add(displayNote(entryId, ordinal, color, true));
+            }
+        }
+        registration.addExtraItemStacks(notes);
+    }
+
+    private static ItemStack displayNote(ResourceLocation entry, int ordinal, int color, boolean complete) {
+        ItemStack stack = new ItemStack(TCItems.RESEARCH_NOTE.get());
+        stack.set(TCDataComponents.RESEARCH_NOTE.get(),
+                new ResearchNoteData(entry, ordinal, color, complete, 0, List.of()));
+        if (complete) {
+            stack.set(TCDataComponents.NOTE_COMPLETE.get(), true);
+        }
+        return stack;
     }
 
     @Override
@@ -96,8 +143,11 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
             return;
         }
         Registry<IAspect> registry = registryOpt.get();
+        Player player = Minecraft.getInstance().player;
         List<Holder<IAspect>> all = new ArrayList<>(registry.size());
-        registry.listElements().forEach(all::add);
+        registry.listElements()
+                .filter(ref -> player != null && AspectPools.isDiscovered(player, ref))
+                .forEach(all::add);
         registration.register(
                 AspectIngredientType.INSTANCE,
                 all.stream().sorted(Comparator.comparingInt(e->clientRegistryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).getId(e.getKey()))).sorted(Comparator.comparing(h->!h.value().isPrimal())).map(aspect->new AspectInstance(aspect,1)).toList(),
@@ -140,6 +190,11 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
         registerAspectFromStacksPages(registration);
     }
 
+    @Override
+    public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
+        AspectJeiSync.onRuntimeAvailable(jeiRuntime);
+    }
+
   /*  @Override
     public  void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
         runtime = jeiRuntime;
@@ -161,15 +216,15 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addCraftingStation(RecipeTypes.CRAFTING, TCItems.ARCANE_WORKBENCH.get());
-        registration.addCraftingStation(ArcaneWorkbenchCategory.RECIPE_TYPE, TCItems.ARCANE_WORKBENCH.get());
-        registration.addCraftingStation(InfusionCategory.RECIPE_TYPE, TCItems.INFUSION_MATRIX.get());
-        registration.addCraftingStation(InfusionCategory.ENCHANTMENT_RECIPE_TYPE, TCItems.INFUSION_MATRIX.get());
-        registration.addCraftingStation(DustTriggerCategory.RECIPE_TYPE, TCItems.SALIS_MUNDUS.get());
-        registration.addCraftingStation(MultiblockCategory.RECIPE_TYPE, TCItems.SALIS_MUNDUS.get());
-        registration.addCraftingStation(CrucibleCategory.RECIPE_TYPE, TCItems.CRUCIBLE.get());
-        registration.addCraftingStation(AspectCompositionCategory.RECIPE_TYPE, TCItems.THAUMONOMICON.get());
-        registration.addCraftingStation(AspectFromStacksCategory.RECIPE_TYPE, TCItems.THAUMONOMICON.get());
+        registration.addRecipeCatalysts(RecipeTypes.CRAFTING, TCItems.ARCANE_WORKBENCH.get());
+        registration.addRecipeCatalysts(ArcaneWorkbenchCategory.RECIPE_TYPE, TCItems.ARCANE_WORKBENCH.get());
+        registration.addRecipeCatalysts(InfusionCategory.RECIPE_TYPE, TCItems.INFUSION_MATRIX.get());
+        registration.addRecipeCatalysts(InfusionCategory.ENCHANTMENT_RECIPE_TYPE, TCItems.INFUSION_MATRIX.get());
+        registration.addRecipeCatalysts(DustTriggerCategory.RECIPE_TYPE, TCItems.SALIS_MUNDUS.get());
+        registration.addRecipeCatalysts(MultiblockCategory.RECIPE_TYPE, TCItems.SALIS_MUNDUS.get());
+        registration.addRecipeCatalysts(CrucibleCategory.RECIPE_TYPE, TCItems.CRUCIBLE.get());
+        registration.addRecipeCatalysts(AspectCompositionCategory.RECIPE_TYPE, TCItems.THAUMONOMICON.get());
+        registration.addRecipeCatalysts(AspectFromStacksCategory.RECIPE_TYPE, TCItems.THAUMONOMICON.get());
     }
 
     @Override

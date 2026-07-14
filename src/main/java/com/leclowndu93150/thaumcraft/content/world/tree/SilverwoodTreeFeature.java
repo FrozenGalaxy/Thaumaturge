@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.world.tree;
 
+import com.leclowndu93150.thaumcraft.content.aura.node.NodeGenerator;
 import com.mojang.serialization.Codec;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,7 +37,7 @@ public final class SilverwoodTreeFeature extends Feature<SilverwoodTreeConfig> {
         int x = origin.getX();
         int y = origin.getY();
         int z = origin.getZ();
-        if (y < level.getMinY() + 1 || y + height + 1 > level.getMaxY()) {
+        if (y < level.getMinBuildHeight() + 1 || y + height + 1 > level.getMaxBuildHeight()) {
             return false;
         }
 
@@ -50,7 +51,7 @@ public final class SilverwoodTreeFeature extends Feature<SilverwoodTreeConfig> {
             }
             for (int cx = x - spread; cx <= x + spread; cx++) {
                 for (int cz = z - spread; cz <= z + spread; cz++) {
-                    if (cy < level.getMinY() || cy > level.getMaxY()) {
+                    if (cy < level.getMinBuildHeight() || cy > level.getMaxBuildHeight()) {
                         return false;
                     }
                     BlockState state = level.getBlockState(new BlockPos(cx, cy, cz));
@@ -97,6 +98,11 @@ public final class SilverwoodTreeFeature extends Feature<SilverwoodTreeConfig> {
                     }
                 }
             }
+        }
+
+        if (config.node()) {
+            NodeGenerator.createRandomNodeAt(level, new BlockPos(x + 1, y + height - 1, z), random,
+                    true, false, false, NodeGenerator.DEFAULT_SPECIAL_RARITY, NodeGenerator.DEFAULT_BASE_AURA);
         }
 
         int trunkY;

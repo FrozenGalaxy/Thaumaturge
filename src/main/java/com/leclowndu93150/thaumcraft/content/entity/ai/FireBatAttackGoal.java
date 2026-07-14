@@ -70,7 +70,7 @@ public final class FireBatAttackGoal extends Goal {
                 bat.discard();
                 return;
             }
-            bat.doHurtTarget(server, target);
+            bat.doHurtTarget(target);
         }
         bat.playSound(SoundEvents.BAT_HURT, 0.5F, 0.9F + bat.getRandom().nextFloat() * 0.2F);
     }

@@ -11,8 +11,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.equipment.ArmorType;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
@@ -90,9 +90,9 @@ public final class FortressArmorEvents {
             }
             ItemStack piece = victim.getItemBySlot(slot);
             if (piece.getItem() instanceof FortressArmorItem) {
-                fortressDefense += TCMaterials.ARMOR_FORTRESS.defense().get(armorType(slot));
+                fortressDefense += TCMaterials.ARMOR_FORTRESS.value().defense().get(armorType(slot));
             } else if (piece.getItem() instanceof VoidRobeArmorItem) {
-                robeDefense += TCMaterials.ARMOR_VOID_ROBE.defense().get(armorType(slot));
+                robeDefense += TCMaterials.ARMOR_VOID_ROBE.value().defense().get(armorType(slot));
             }
         }
         float ratio = 0.0F;
@@ -130,12 +130,12 @@ public final class FortressArmorEvents {
         }
     }
 
-    private static ArmorType armorType(EquipmentSlot slot) {
+    private static ArmorItem.Type armorType(EquipmentSlot slot) {
         return switch (slot) {
-            case HEAD -> ArmorType.HELMET;
-            case CHEST -> ArmorType.CHESTPLATE;
-            case LEGS -> ArmorType.LEGGINGS;
-            default -> ArmorType.BOOTS;
+            case HEAD -> ArmorItem.Type.HELMET;
+            case CHEST -> ArmorItem.Type.CHESTPLATE;
+            case LEGS -> ArmorItem.Type.LEGGINGS;
+            default -> ArmorItem.Type.BOOTS;
         };
     }
 }

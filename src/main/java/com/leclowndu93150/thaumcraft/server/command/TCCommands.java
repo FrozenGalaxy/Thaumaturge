@@ -1,6 +1,12 @@
 package com.leclowndu93150.thaumcraft.server.command;
 
 import com.leclowndu93150.thaumcraft.TCIds;
+import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
+import com.leclowndu93150.thaumcraft.api.aspect.TCAspects;
+import com.leclowndu93150.thaumcraft.api.nodes.NodeModifier;
+import com.leclowndu93150.thaumcraft.api.nodes.NodeType;
+import com.leclowndu93150.thaumcraft.content.aura.node.NodeGenerator;
+import net.minecraft.core.HolderLookup;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;
@@ -30,6 +36,7 @@ import java.util.Locale;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeType;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
 import com.leclowndu93150.thaumcraft.api.research.scan.ScanKeys;
+import com.leclowndu93150.thaumcraft.content.research.pool.AspectPools;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import com.leclowndu93150.thaumcraft.api.research.IResearchEntry;
 import com.leclowndu93150.thaumcraft.api.taint.TaintApi;
@@ -39,19 +46,20 @@ import com.leclowndu93150.thaumcraft.content.research.ResearchRegistration;
 import com.leclowndu93150.thaumcraft.data.worldgen.feature.TCConfiguredFeatures;
 import com.leclowndu93150.thaumcraft.content.entity.ThaumicSlime;
 import com.leclowndu93150.thaumcraft.network.ClientboundKnowledgeGainPayload;
-import com.leclowndu93150.thaumcraft.content.research.theorycraft.TheorycraftManager;
 import com.leclowndu93150.thaumcraft.content.taint.item.EssentiaCrystalFactory;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.registry.TCEntities;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.leclowndu93150.thaumcraft.registry.TCMobEffects;
 import java.util.Optional;
+import net.minecraft.core.Registry;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.ChatFormatting;
@@ -107,15 +115,14 @@ public final class TCCommands {
     private static final double CHAMPION_SPAWN_DISTANCE = 4.0;
 
     private static final DynamicCommandExceptionType ERROR_INVALID_GATE = new DynamicCommandExceptionType((value) -> Component.literal("Unknown Research Entry : " + value));
+    private static final DynamicCommandExceptionType ERROR_INVALID_ASPECT = new DynamicCommandExceptionType((value) -> Component.literal("Unknown Aspect : " + value));
 
     @SubscribeEvent
     public static void onRegister(RegisterCommandsEvent event) {
         LiteralArgumentBuilder<CommandSourceStack> tc = Commands.literal("tc")
-                .then(Commands.literal("theorycraft").then(Commands.literal("test")
-                        .executes(TCCommands::startTestSession)))
                 .then(Commands.literal("table").executes(TCCommands::giveResearchTable))
                 .then(Commands.literal("outermaze")
-                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .executes(ctx -> generateOuterMaze(ctx, 0, 0))
                         .then(Commands.argument("width", IntegerArgumentType.integer(5, 31))
                                 .then(Commands.argument("height", IntegerArgumentType.integer(5, 31))
@@ -144,7 +151,7 @@ public final class TCCommands {
                         .then(Commands.literal("taint_swarm").executes(ctx -> spawnEntity(ctx, "taint_swarm")))
                         .then(Commands.literal("taintacle").executes(ctx -> spawnEntity(ctx, "taintacle")))
                         .then(Commands.literal("taintacle_small").executes(ctx -> spawnEntity(ctx, "taintacle_small"))))
-                .then(Commands.literal("champion").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .then(Commands.literal("champion").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("modifier", StringArgumentType.word())
                                 .suggests(CHAMPION_MODS)
                                 .executes(ctx -> spawnChampion(ctx, null))
@@ -152,19 +159,29 @@ public final class TCCommands {
                                                 ResourceArgument.resource(event.getBuildContext(), Registries.ENTITY_TYPE))
                                         .executes(ctx -> spawnChampion(ctx,
                                                 ResourceArgument.getResource(ctx, "entity", Registries.ENTITY_TYPE))))))
-                .then(Commands.literal("rift").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .then(Commands.literal("rift").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .executes(ctx -> spawnRift(ctx, DEFAULT_RIFT_SIZE))
                         .then(Commands.argument("size", IntegerArgumentType.integer(1, COMMAND_MAX_RIFT_SIZE))
                                 .executes(ctx -> spawnRift(ctx, IntegerArgumentType.getInteger(ctx, "size")))))
                 .then(Commands.literal("crystal")
                         .then(Commands.argument("aspect", StringArgumentType.word())
                                 .executes(TCCommands::giveCrystal)))
-                .then(Commands.literal("focus").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .then(Commands.literal("node").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .executes(ctx -> spawnNode(ctx, "random", "random"))
+                        .then(Commands.argument("type", StringArgumentType.word())
+                                .suggests(NODE_TYPES)
+                                .executes(ctx -> spawnNode(ctx, StringArgumentType.getString(ctx, "type"), "none"))
+                                .then(Commands.argument("modifier", StringArgumentType.word())
+                                        .suggests(NODE_MODIFIERS)
+                                        .executes(ctx -> spawnNode(ctx,
+                                                StringArgumentType.getString(ctx, "type"),
+                                                StringArgumentType.getString(ctx, "modifier"))))))
+                .then(Commands.literal("focus").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("tier", IntegerArgumentType.integer(1, 3))
                                 .then(Commands.argument("elements", StringArgumentType.greedyString())
                                         .suggests(FOCUS_ELEMENTS)
                                         .executes(TCCommands::giveFocus))))
-                .then(Commands.literal("warp").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .then(Commands.literal("warp").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.literal("info").executes(TCCommands::warpInfo))
                         .then(Commands.literal("add")
                                 .then(Commands.argument("type", StringArgumentType.word())
@@ -178,7 +195,7 @@ public final class TCCommands {
                                                 .executes(ctx -> warpModify(ctx, true)))))
                         .then(Commands.literal("clear").executes(TCCommands::warpClear))
                         .then(Commands.literal("event").executes(TCCommands::warpEvent)))
-                .then(Commands.literal("aura").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .then(Commands.literal("aura").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.literal("info").executes(TCCommands::auraInfo))
                         .then(Commands.literal("vis")
                                 .then(Commands.literal("add")
@@ -194,20 +211,29 @@ public final class TCCommands {
                                 .then(Commands.literal("remove")
                                         .then(Commands.argument("amount", FloatArgumentType.floatArg(0.0F))
                                                 .executes(ctx -> auraFlux(ctx, true))))))
-                .then(Commands.literal("taint").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .then(Commands.literal("taint").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.literal("seed").executes(ctx -> spawnEntity(ctx, "taint_seed")))
                         .then(Commands.literal("spread").executes(TCCommands::taintSpread)))
-                .then(Commands.literal("tree").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .then(Commands.literal("tree").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.literal("greatwood").executes(ctx -> placeFeature(ctx, TCConfiguredFeatures.GREATWOOD_TREE)))
                         .then(Commands.literal("silverwood").executes(ctx -> placeFeature(ctx, TCConfiguredFeatures.SILVERWOOD_TREE)))
                         .then(Commands.literal("magic").executes(ctx -> placeFeature(ctx, TCConfiguredFeatures.BIG_MAGIC_TREE))))
-                .then(Commands.literal("research").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .then(Commands.literal("research").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.literal("grant")
                                 .then(Commands.argument("entry", ResourceKeyArgument.key(IResearchEntry.REGISTRY_KEY)).executes(TCCommands::grantGate)))
                         .then(Commands.literal("revoke")
                                 .then(Commands.argument("entry", ResourceKeyArgument.key(IResearchEntry.REGISTRY_KEY)).executes(TCCommands::revokeGate)))
                         .then(Commands.literal("reset").executes(TCCommands::resetResearch))
-                        .then(Commands.literal("all").executes(TCCommands::grantAllResearch)));
+                        .then(Commands.literal("all").executes(TCCommands::grantAllResearch)))
+                .then(Commands.literal("aspect").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .then(Commands.literal("all")
+                                .executes(ctx -> grantAllAspects(ctx, AspectPools.SOFT_CAP))
+                                .then(Commands.argument("amount", IntegerArgumentType.integer(1, 10000))
+                                        .executes(ctx -> grantAllAspects(ctx, IntegerArgumentType.getInteger(ctx, "amount")))))
+                        .then(Commands.argument("aspect", ResourceKeyArgument.key(IAspect.REGISTRY_KEY))
+                                .executes(ctx -> grantAspect(ctx, AspectPools.SOFT_CAP))
+                                .then(Commands.argument("amount", IntegerArgumentType.integer(1, 10000))
+                                        .executes(ctx -> grantAspect(ctx, IntegerArgumentType.getInteger(ctx, "amount"))))));
         event.getDispatcher().register(tc);
     }
 
@@ -235,7 +261,7 @@ public final class TCCommands {
             int granted = 0;
             for (Holder.Reference<IResearchEntry> entry
                     : player.registryAccess().lookupOrThrow(IResearchEntry.REGISTRY_KEY).listElements().toList()) {
-                ResourceLocation id = entry.key().identifier();
+                ResourceLocation id = entry.key().location();
                 if (knowledge.isResearchComplete(id)) {
                     continue;
                 }
@@ -251,9 +277,41 @@ public final class TCCommands {
                     : player.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).listElements().toList()) {
                 ResearchManager.unlock(player, ScanKeys.aspect(aspect.key()));
             }
+            int aspects = AspectPools.grantAllForCommand(player, AspectPools.SOFT_CAP);
             int total = granted;
             ctx.getSource().sendSuccess(() -> Component.literal(
-                    String.format("Granted %d research entries and all aspect discoveries", total)), false);
+                    String.format("Granted %d research entries and %d aspects x%d research points",
+                            total, aspects, AspectPools.SOFT_CAP)), false);
+            return Command.SINGLE_SUCCESS;
+        } catch (Exception e) {
+            ctx.getSource().sendFailure(Component.literal("Failed: " + e.getMessage()));
+            return 0;
+        }
+    }
+
+    private static int grantAllAspects(CommandContext<CommandSourceStack> ctx, int amount) {
+        try {
+            ServerPlayer player = ctx.getSource().getPlayerOrException();
+            int count = AspectPools.grantAllForCommand(player, amount);
+            ctx.getSource().sendSuccess(() -> Component.literal(
+                    String.format("Granted %d research points to all %d aspects", amount, count)), false);
+            return Command.SINGLE_SUCCESS;
+        } catch (Exception e) {
+            ctx.getSource().sendFailure(Component.literal("Failed: " + e.getMessage()));
+            return 0;
+        }
+    }
+
+    private static int grantAspect(CommandContext<CommandSourceStack> ctx, int amount) {
+        try {
+            ServerPlayer player = ctx.getSource().getPlayerOrException();
+            ResourceKey<IAspect> key = getRegistryKey(ctx, "aspect",
+                    IAspect.REGISTRY_KEY, ERROR_INVALID_ASPECT);
+            Holder<IAspect> aspect = player.registryAccess()
+                    .lookupOrThrow(IAspect.REGISTRY_KEY).getOrThrow(key);
+            AspectPools.grantForCommand(player, aspect, amount);
+            ctx.getSource().sendSuccess(() -> Component.literal(
+                    String.format("Granted %d research points of %s", amount, key.location())), false);
             return Command.SINGLE_SUCCESS;
         } catch (Exception e) {
             ctx.getSource().sendFailure(Component.literal("Failed: " + e.getMessage()));
@@ -264,12 +322,12 @@ public final class TCCommands {
     private static int revokeGate(CommandContext<CommandSourceStack> ctx) {
         try {
             ServerPlayer player = ctx.getSource().getPlayerOrException();
-            ResourceKey<IResearchEntry> key = ResourceKeyArgument.getRegistryKey(ctx, "entry", IResearchEntry.REGISTRY_KEY,ERROR_INVALID_GATE);
+            ResourceKey<IResearchEntry> key = getRegistryKey(ctx, "entry", IResearchEntry.REGISTRY_KEY,ERROR_INVALID_GATE);
             PlayerKnowledge knowledge = (PlayerKnowledge) KnowledgeAccess.of(player);
-            if (knowledge.removeResearch(key.identifier())) {
+            if (knowledge.removeResearch(key.location())) {
                 knowledge.sync(player);
                 ctx.getSource().sendSuccess(() -> Component.literal(
-                        String.format("Revoked research %s ", key.identifier())), false);
+                        String.format("Revoked research %s ", key.location())), false);
                 return Command.SINGLE_SUCCESS;
             } else {
                 ctx.getSource().sendFailure(Component.literal("Failed to revoke research entry"));
@@ -286,14 +344,14 @@ public final class TCCommands {
             ServerPlayer player = ctx.getSource().getPlayerOrException();
             ServerLevel level = (ServerLevel) player.level();
             BlockPos pos = player.blockPosition();
-            ResourceKey<IResearchEntry> key = ResourceKeyArgument.getRegistryKey(ctx, "entry", IResearchEntry.REGISTRY_KEY,ERROR_INVALID_GATE);
+            ResourceKey<IResearchEntry> key = getRegistryKey(ctx, "entry", IResearchEntry.REGISTRY_KEY,ERROR_INVALID_GATE);
             Holder<IResearchEntry> holder = level.registryAccess()
                     .lookupOrThrow(IResearchEntry.REGISTRY_KEY)
                     .getOrThrow(key);
-            if (ResearchManager.complete(player,key.identifier())) {
-                ResearchManager.setStage(player,key.identifier(),holder.value().stages().size());
+            if (ResearchManager.complete(player,key.location())) {
+                ResearchManager.setStage(player,key.location(),holder.value().stages().size());
                 ctx.getSource().sendSuccess(() -> Component.literal(
-                        String.format("Unlocked research %s ", key.identifier())), false);
+                        String.format("Unlocked research %s ", key.location())), false);
                 return Command.SINGLE_SUCCESS;
             } else {
                 ctx.getSource().sendFailure(Component.literal("Failed to grant research entry"));
@@ -430,7 +488,7 @@ public final class TCCommands {
                     .getOrThrow(key);
             boolean placed = holder.value().place(level, level.getChunkSource().getGenerator(), level.getRandom(), pos);
             if (placed) {
-                ctx.getSource().sendSuccess(() -> Component.literal("Placed " + key.identifier()), false);
+                ctx.getSource().sendSuccess(() -> Component.literal("Placed " + key.location()), false);
                 return Command.SINGLE_SUCCESS;
             }
             ctx.getSource().sendFailure(Component.literal("Feature refused to place here (bad soil or no clearance)"));
@@ -496,14 +554,14 @@ public final class TCCommands {
         try {
             ServerPlayer player = ctx.getSource().getPlayerOrException();
             ServerLevel level = (ServerLevel) player.level();
-            EntityFluxRift rift = TCEntities.FLUX_RIFT.get().create(level, MobSpawnType.COMMAND);
+            EntityFluxRift rift = TCEntities.FLUX_RIFT.get().create(level);
             if (rift == null) {
                 ctx.getSource().sendFailure(Component.literal("Failed to create rift"));
                 return 0;
             }
             Vec3 pos = player.getEyePosition().add(player.getLookAngle().scale(RIFT_SPAWN_DISTANCE));
             rift.setRiftSeed(level.getRandom().nextInt());
-            rift.snapTo(pos.x, pos.y, pos.z, level.getRandom().nextInt(360), 0.0F);
+            rift.moveTo(pos.x, pos.y, pos.z, level.getRandom().nextInt(360), 0.0F);
             rift.setRiftSize(size);
             level.addFreshEntity(rift);
             ctx.getSource().sendSuccess(() -> Component.literal("Spawned flux rift (size " + size + ")"), false);
@@ -536,7 +594,7 @@ public final class TCCommands {
                 return 0;
             }
             EntityType<?> toSpawn = entityType == null ? EntityType.ZOMBIE : entityType.value();
-            Entity entity = toSpawn.create(level, MobSpawnType.COMMAND);
+            Entity entity = toSpawn.create(level);
             if (!(entity instanceof Monster monster)) {
                 if (entity != null) {
                     entity.discard();
@@ -547,7 +605,7 @@ public final class TCCommands {
             }
             Vec3 pos = player.position().add(player.getLookAngle()
                     .multiply(1.0, 0.0, 1.0).normalize().scale(CHAMPION_SPAWN_DISTANCE));
-            monster.snapTo(pos.x, pos.y, pos.z, player.getYRot() + 180.0F, 0.0F);
+            monster.moveTo(pos.x, pos.y, pos.z, player.getYRot() + 180.0F, 0.0F);
             ChampionHelper.makeChampion(monster, true, type);
             level.addFreshEntity(monster);
             String finalName = ChampionModifier.MODS.get(type).name();
@@ -578,7 +636,7 @@ public final class TCCommands {
                 ctx.getSource().sendFailure(Component.literal("Unknown entity: " + name));
                 return 0;
             }
-            var entity = type.create(level, MobSpawnType.COMMAND);
+            var entity = type.create(level);
             if (entity == null) {
                 ctx.getSource().sendFailure(Component.literal("Failed to create " + name));
                 return 0;
@@ -667,17 +725,6 @@ public final class TCCommands {
         }
     }
 
-    private static int startTestSession(CommandContext<CommandSourceStack> ctx) {
-        try {
-            ServerPlayer player = ctx.getSource().getPlayerOrException();
-            TheorycraftManager.beginSession(player, player.level(), player.blockPosition());
-            ctx.getSource().sendSuccess(() -> Component.literal("Theorycraft session started; open a Research Table."), false);
-            return Command.SINGLE_SUCCESS;
-        } catch (Exception e) {
-            ctx.getSource().sendFailure(Component.literal("Failed: " + e.getMessage()));
-            return 0;
-        }
-    }
 
     private static int generateOuterMaze(CommandContext<CommandSourceStack> ctx, int w, int h) {
         try {
@@ -754,5 +801,68 @@ public final class TCCommands {
             ctx.getSource().sendFailure(Component.literal("Failed: " + e.getMessage()));
             return 0;
         }
+    }
+
+    private static final SuggestionProvider<CommandSourceStack> NODE_TYPES = (ctx, builder) -> {
+        for (NodeType type : NodeType.values()) {
+            builder.suggest(type.getSerializedName());
+        }
+        builder.suggest("random");
+        return builder.buildFuture();
+    };
+
+    private static final SuggestionProvider<CommandSourceStack> NODE_MODIFIERS = (ctx, builder) -> {
+        for (NodeModifier modifier : NodeModifier.values()) {
+            builder.suggest(modifier.getSerializedName());
+        }
+        builder.suggest("none");
+        return builder.buildFuture();
+    };
+
+    private static int spawnNode(CommandContext<CommandSourceStack> ctx, String typeName, String modifierName) {
+        ServerLevel level = ctx.getSource().getLevel();
+        BlockPos pos = BlockPos.containing(ctx.getSource().getPosition()).above(2);
+        if ("random".equals(typeName)) {
+            boolean placed = NodeGenerator.createRandomNodeAt(level, pos, level.getRandom(), false, false, false,
+                    NodeGenerator.DEFAULT_SPECIAL_RARITY, NodeGenerator.DEFAULT_BASE_AURA);
+            ctx.getSource().sendSuccess(() -> Component.literal(placed ? "Random node created" : "Could not place node"), true);
+            return placed ? 1 : 0;
+        }
+        NodeType type = null;
+        for (NodeType candidate : NodeType.values()) {
+            if (candidate.getSerializedName().equals(typeName)) {
+                type = candidate;
+            }
+        }
+        if (type == null) {
+            ctx.getSource().sendFailure(Component.literal("Unknown node type: " + typeName));
+            return 0;
+        }
+        NodeModifier modifier = null;
+        for (NodeModifier candidate : NodeModifier.values()) {
+            if (candidate.getSerializedName().equals(modifierName)) {
+                modifier = candidate;
+            }
+        }
+        HolderLookup.RegistryLookup<IAspect> aspects = level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY);
+        AspectList list = AspectList.EMPTY
+                .add(aspects.getOrThrow(TCAspects.AER), 20)
+                .add(aspects.getOrThrow(TCAspects.IGNIS), 20)
+                .add(aspects.getOrThrow(TCAspects.AQUA), 20)
+                .add(aspects.getOrThrow(TCAspects.TERRA), 20)
+                .add(aspects.getOrThrow(TCAspects.ORDO), 10)
+                .add(aspects.getOrThrow(TCAspects.PERDITIO), 10);
+        boolean placed = NodeGenerator.createNodeAt(level, pos, type, modifier, list);
+        ctx.getSource().sendSuccess(() -> Component.literal(placed ? "Node created" : "Could not place node"), true);
+        return placed ? 1 : 0;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ResourceKey<T> getRegistryKey(CommandContext<CommandSourceStack> ctx, String name,
+                                                     ResourceKey<Registry<T>> registryKey,
+                                                     DynamicCommandExceptionType error) throws CommandSyntaxException {
+        ResourceKey<?> key = ctx.getArgument(name, ResourceKey.class);
+        Optional<ResourceKey<T>> cast = key.cast(registryKey);
+        return cast.orElseThrow(() -> error.create(key.location()));
     }
 }

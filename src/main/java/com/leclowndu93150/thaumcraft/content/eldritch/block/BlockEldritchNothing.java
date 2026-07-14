@@ -77,7 +77,7 @@ public final class BlockEldritchNothing extends Block implements EntityBlock {
         for (Direction dir : Direction.values()) {
             cursor.setWithOffset(pos, dir);
             BlockState neighbor = level.getBlockState(cursor);
-            if (!neighbor.isSolidRender()) {
+            if (!neighbor.isSolidRender(level, cursor)) {
                 return true;
             }
         }
@@ -93,7 +93,7 @@ public final class BlockEldritchNothing extends Block implements EntityBlock {
             return;
         }
         if (level instanceof ServerLevel serverLevel) {
-            entity.hurtServer(serverLevel, serverLevel.damageSources().fellOutOfWorld(), VOID_DAMAGE);
+            entity.hurt(serverLevel.damageSources().fellOutOfWorld(), VOID_DAMAGE);
         }
     }
 }

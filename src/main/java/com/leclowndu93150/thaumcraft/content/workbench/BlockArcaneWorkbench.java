@@ -1,5 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.workbench;
 
+import com.leclowndu93150.thaumcraft.content.research.DeviceGate;
+import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.crucible.BlockCrucible;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -20,11 +22,13 @@ import org.jspecify.annotations.Nullable;
 
 public class BlockArcaneWorkbench extends BaseEntityBlock {
     @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-        if (level.getBlockEntity(pos) instanceof BlockEntityArcaneWorkbench workbench) {
-            Containers.dropContents(level, pos, workbench.getInventory());
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock())) {
+            if (level.getBlockEntity(pos) instanceof BlockEntityArcaneWorkbench workbench) {
+                Containers.dropContents(level, pos, workbench.getInventory());
+            }
         }
-        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
 
@@ -66,6 +70,9 @@ public class BlockArcaneWorkbench extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!level.isClientSide() && !DeviceGate.passes(player, TCIds.rl("gotdream"))) {
+            return InteractionResult.CONSUME;
+        }
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }

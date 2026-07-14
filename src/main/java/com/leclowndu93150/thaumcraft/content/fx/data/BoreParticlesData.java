@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.fx.data;
 
+import io.netty.buffer.ByteBuf;
 import com.leclowndu93150.thaumcraft.registry.TCParticles;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -27,15 +28,22 @@ public record BoreParticlesData(BlockState state, double tx, double ty, double t
             Codec.DOUBLE.fieldOf("sz").forGetter(BoreParticlesData::sz)
     ).apply(inst, BoreParticlesData::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, BoreParticlesData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY), BoreParticlesData::state,
-            ByteBufCodecs.DOUBLE, BoreParticlesData::tx,
-            ByteBufCodecs.DOUBLE, BoreParticlesData::ty,
-            ByteBufCodecs.DOUBLE, BoreParticlesData::tz,
-            ByteBufCodecs.DOUBLE, BoreParticlesData::sx,
-            ByteBufCodecs.DOUBLE, BoreParticlesData::sy,
-            ByteBufCodecs.DOUBLE, BoreParticlesData::sz,
-            BoreParticlesData::new);
+    private static final StreamCodec<ByteBuf, BlockState> STATE_STREAM_CODEC =
+            ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY);
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, BoreParticlesData> STREAM_CODEC = StreamCodec.of(
+            (buffer, data) -> {
+                STATE_STREAM_CODEC.encode(buffer, data.state());
+                buffer.writeDouble(data.tx());
+                buffer.writeDouble(data.ty());
+                buffer.writeDouble(data.tz());
+                buffer.writeDouble(data.sx());
+                buffer.writeDouble(data.sy());
+                buffer.writeDouble(data.sz());
+            },
+            buffer -> new BoreParticlesData(STATE_STREAM_CODEC.decode(buffer),
+                    buffer.readDouble(), buffer.readDouble(), buffer.readDouble(),
+                    buffer.readDouble(), buffer.readDouble(), buffer.readDouble()));
 
     @Override
     public ParticleType<?> getType() {

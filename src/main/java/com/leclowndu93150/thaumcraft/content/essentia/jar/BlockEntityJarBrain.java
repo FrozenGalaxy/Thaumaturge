@@ -6,7 +6,6 @@ import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -92,9 +91,9 @@ public final class BlockEntityJarBrain extends BlockEntity {
         }
         for (ExperienceOrb orb : orbs) {
             jar.xp += orb.getValue();
-            orb.playSound(SoundEvents.GENERIC_EAT.value(), 0.1F,
+            orb.playSound(SoundEvents.GENERIC_EAT, 0.1F,
                     (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * 0.2F + 1.0F);
-            orb.remove();
+            orb.discard();
         }
         jar.setChanged();
         jar.syncToClient();
@@ -219,7 +218,7 @@ public final class BlockEntityJarBrain extends BlockEntity {
     }
 
     @Override
-    protected void applyImplicitComponents(DataComponentGetter input) {
+    protected void applyImplicitComponents(DataComponentInput input) {
         super.applyImplicitComponents(input);
         Integer stored = input.get(TCDataComponents.STORED_XP.get());
         if (stored != null) {

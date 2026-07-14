@@ -65,7 +65,7 @@ public final class ItemBlockMirror extends BlockItem {
         if (link != null) {
             tooltip.add(Component.translatable("tc.handmirrorlinkedto.full",
                     link.pos().getX(), link.pos().getY(), link.pos().getZ(),
-                    link.dimension().identifier().toString()));
+                    link.dimension().location().toString()));
         }
     }
 }

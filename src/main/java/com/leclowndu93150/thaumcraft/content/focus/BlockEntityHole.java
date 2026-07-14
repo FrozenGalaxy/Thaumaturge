@@ -96,15 +96,15 @@ public final class BlockEntityHole extends BlockEntity {
     private void surroundWithSparkles(Level level, BlockPos pos) {
         for (Direction d1 : Direction.values()) {
             BlockState b1 = level.getBlockState(pos.relative(d1));
-            if (b1.is(getBlockState().getBlock()) || b1.isSolidRender()) {
+            if (b1.is(getBlockState().getBlock()) || b1.isSolidRender(level, pos.relative(d1))) {
                 continue;
             }
             for (Direction d2 : Direction.values()) {
                 if (d1.getAxis() == d2.getAxis()) {
                     continue;
                 }
-                if (!level.getBlockState(pos.relative(d2)).isSolidRender()
-                        && !level.getBlockState(pos.relative(d1).relative(d2)).isSolidRender()) {
+                if (!level.getBlockState(pos.relative(d2)).isSolidRender(level, pos.relative(d2))
+                        && !level.getBlockState(pos.relative(d1).relative(d2)).isSolidRender(level, pos.relative(d1).relative(d2))) {
                     continue;
                 }
                 RandomSource rand = level.getRandom();

@@ -21,6 +21,7 @@ import net.minecraft.world.level.biome.FixedBiomeSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.blending.Blender;
@@ -60,17 +61,17 @@ public final class ChunkGeneratorOuter extends ChunkGenerator {
     public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager) {
         super.applyBiomeDecoration(level, chunk, structureManager);
         ChunkPos chunkPos = chunk.getPos();
-        MazeCell cell = MazeSavedData.get(level.getLevel()).getCell(chunkPos.x(), chunkPos.z());
+        MazeCell cell = MazeSavedData.get(level.getLevel()).getCell(chunkPos.x, chunkPos.z);
         if (cell != null) {
             RandomSource random = RandomSource.create(level.getSeed()
-                    + chunkPos.x() * 341873128712L + chunkPos.z() * 132897987541L);
-            MazeChunkStamper.stamp(level, random, chunkPos.x(), chunkPos.z(), cell);
+                    + chunkPos.x * 341873128712L + chunkPos.z * 132897987541L);
+            MazeChunkStamper.stamp(level, random, chunkPos.x, chunkPos.z, cell);
         }
     }
 
     @Override
     public void applyCarvers(WorldGenRegion region, long seed, RandomState randomState, BiomeManager biomeManager,
-                             StructureManager structureManager, ChunkAccess chunk) {
+                             StructureManager structureManager, ChunkAccess chunk, GenerationStep.Carving step) {
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspectIndex;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
@@ -56,7 +57,6 @@ final class RecipeAspectDerivation {
     }
 
     static ItemStack representativeStack(Ingredient ingredient) {
-        Optional<Holder<Item>> first = ingredient.items().findFirst();
-        return first.map(ItemStack::new).orElse(ItemStack.EMPTY);
+        return Arrays.stream(ingredient.getItems()).findFirst().map(found -> found.copyWithCount(1)).orElse(ItemStack.EMPTY);
     }
 }

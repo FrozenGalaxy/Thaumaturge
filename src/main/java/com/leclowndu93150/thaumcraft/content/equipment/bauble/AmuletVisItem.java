@@ -1,8 +1,14 @@
 package com.leclowndu93150.thaumcraft.content.equipment.bauble;
 
 import com.leclowndu93150.thaumcraft.TCIds;
+import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
+import com.leclowndu93150.thaumcraft.api.aspect.TCAspects;
+import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
 import com.leclowndu93150.thaumcraft.api.items.RechargeAccess;
 import com.leclowndu93150.thaumcraft.compat.curio.ThaumcraftCuriosCompat;
+import com.leclowndu93150.thaumcraft.content.wands.ItemWand;
+import com.leclowndu93150.thaumcraft.content.wands.WandVisHelper;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -30,11 +36,14 @@ public final class AmuletVisItem extends Item {
                 || player.tickCount % rechargeInterval != 0) {
             return;
         }
-        for (int slot = 0; slot < Inventory.SELECTION_SIZE; slot++) {
+        for (int slot = 0; slot < Inventory.getSelectionSize(); slot++) {
             if (RechargeAccess.rechargeItem(player.level(), player.getInventory().getItem(slot),
                     player.blockPosition(), player, 1) > 0.0F) {
                 return;
             }
+        }
+        if (topUpWand(player)) {
+            return;
         }
         if (ModList.get().isLoaded(TCIds.CURIOS)
                 && ThaumcraftCuriosCompat.rechargeFirstCurio(player)) {
@@ -46,6 +55,33 @@ public final class AmuletVisItem extends Item {
                 return;
             }
         }
+    }
+
+    private boolean topUpWand(Player player) {
+        for (int slot = 0; slot < Inventory.getSelectionSize(); slot++) {
+            ItemStack candidate = player.getInventory().getItem(slot);
+            if (!(candidate.getItem() instanceof ItemWand)) {
+                continue;
+            }
+            int max = WandVisHelper.getMaxVis(candidate);
+            ResourceKey<IAspect> lowest = null;
+            int lowestAmount = Integer.MAX_VALUE;
+            for (ResourceKey<IAspect> primal : TCAspects.PRIMALS) {
+                int amount = WandVisHelper.getVis(candidate, primal);
+                if (amount < max && amount < lowestAmount) {
+                    lowestAmount = amount;
+                    lowest = primal;
+                }
+            }
+            if (lowest == null) {
+                continue;
+            }
+            if (AuraHelper.drainVis(player.level(), player.blockPosition(), 1.0F, false) > 0.0F) {
+                WandVisHelper.addVis(candidate, lowest, 1, true);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

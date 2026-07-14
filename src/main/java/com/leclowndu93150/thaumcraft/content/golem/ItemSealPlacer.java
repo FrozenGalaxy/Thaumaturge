@@ -51,7 +51,7 @@ public final class ItemSealPlacer extends Item implements ISealDisplayer {
                 && !player.hasInfiniteMaterials()) {
             context.getItemInHand().shrink(1);
         }
-        return InteractionResult.SUCCESS_SERVER;
+        return InteractionResult.CONSUME;
     }
 
     @Override

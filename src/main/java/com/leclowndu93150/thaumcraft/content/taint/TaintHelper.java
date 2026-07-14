@@ -198,11 +198,11 @@ public final class TaintHelper {
         if (!isAtTaintSeedEdge(level, target)) {
             return;
         }
-        EntityTaintSeed seed = TCEntities.TAINT_SEED.get().create(level, MobSpawnType.NATURAL);
+        EntityTaintSeed seed = TCEntities.TAINT_SEED.get().create(level);
         if (seed == null) {
             return;
         }
-        seed.snapTo(target.getX() + 0.5, target.getY() + 1, target.getZ() + 0.5,
+        seed.moveTo(target.getX() + 0.5, target.getY() + 1, target.getZ() + 0.5,
                 random.nextInt(360), 0.0F);
         if (!canSeedSpawnAt(level, seed)) {
             seed.discard();

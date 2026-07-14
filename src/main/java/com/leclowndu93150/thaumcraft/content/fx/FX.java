@@ -1260,7 +1260,7 @@ public final class FX {
             for (Direction face : Direction.values()) {
                 BlockPos neighbor = pos.relative(face);
                 var neighborState = level.getBlockState(neighbor);
-                if (neighborState.isSolidRender() && neighborState.isFaceSturdy(level, neighbor, face.getOpposite())) continue;
+                if (neighborState.isSolidRender(level, neighbor) && neighborState.isFaceSturdy(level, neighbor, face.getOpposite())) continue;
                 boolean rx = face.getStepX() == 0;
                 boolean ry = face.getStepY() == 0;
                 boolean rz = face.getStepZ() == 0;

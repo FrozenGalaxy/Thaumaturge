@@ -34,8 +34,12 @@ public final class MenuSmelter extends AbstractContainerMenu {
     private final BlockPos pos;
 
     public MenuSmelter(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf buf) {
-        BlockPos pos = buf.readBlockPos();
-        this(containerId, playerInventory, new ItemStackHandler(SLOT_COUNT), ContainerLevelAccess.create(playerInventory.player.level(),pos), pos);
+        this(containerId, playerInventory, buf.readBlockPos());
+    }
+
+    private MenuSmelter(int containerId, Inventory playerInventory, BlockPos pos) {
+        this(containerId, playerInventory, new ItemStackHandler(SLOT_COUNT),
+                ContainerLevelAccess.create(playerInventory.player.level(), pos), pos);
     }
 
     public MenuSmelter(int containerId, Inventory playerInventory, BlockEntitySmelter blockEntity) {

@@ -23,7 +23,6 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import java.util.ArrayList;
@@ -179,7 +178,7 @@ public final class BlockEntityEverfullUrn extends BlockEntity {
             tank.readFromNBT(registries, input.getCompound("Tank"));
         }
         handlers.clear();
-        int[] zones = input.getIntArray("Handlers").orElse(new int[0]);
+        int[] zones = input.getIntArray("Handlers");
         for (int zone : zones) {
             handlers.add(zone);
         }

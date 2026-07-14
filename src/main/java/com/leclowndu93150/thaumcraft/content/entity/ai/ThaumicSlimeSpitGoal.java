@@ -55,7 +55,7 @@ public final class ThaumicSlimeSpitGoal extends Goal {
             return;
         }
         cooldown = COOLDOWN_RESET_TICKS;
-        ThaumicSlime child = TCEntities.THAUMIC_SLIME.get().create(serverLevel, MobSpawnType.MOB_SUMMONED);
+        ThaumicSlime child = TCEntities.THAUMIC_SLIME.get().create(serverLevel);
         if (child == null) {
             return;
         }
@@ -69,7 +69,7 @@ public final class ThaumicSlimeSpitGoal extends Goal {
         if (hDist >= 1.0E-7) {
             float yaw = (float) (Math.atan2(dz, dx) * 180.0 / Math.PI) - 90.0F;
             float pitch = (float) (-(Math.atan2(dy, hDist) * 180.0 / Math.PI));
-            child.snapTo(slime.getX() + dx / hDist, originY, slime.getZ() + dz / hDist, yaw, pitch);
+            child.moveTo(slime.getX() + dx / hDist, originY, slime.getZ() + dz / hDist, yaw, pitch);
             shoot(child, dx, dy + hDist * ARC_COMPENSATION, dz, SPIT_SPEED, SPIT_SPREAD);
         }
         serverLevel.addFreshEntity(child);

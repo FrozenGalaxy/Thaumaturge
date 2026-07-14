@@ -36,7 +36,7 @@ public final class FocusTargeting {
         }
         return target instanceof Player
                 && target.level() instanceof ServerLevel serverLevel
-                && !serverLevel.isPvpAllowed();
+                && !serverLevel.getServer().isPvpAllowed();
     }
 
     public static boolean canEntityBeSeen(Entity looking, Entity target) {

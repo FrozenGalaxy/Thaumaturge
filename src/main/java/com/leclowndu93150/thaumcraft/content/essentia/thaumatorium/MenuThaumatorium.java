@@ -80,7 +80,7 @@ public final class MenuThaumatorium extends AbstractContainerMenu {
         for (int i = 0; i < recipes.size(); i++) {
             entries.add(new ClientboundThaumatoriumRecipesPayload.Entry(
                     ids.get(i),
-                    recipes.get(i).rawResult().create(),
+                    recipes.get(i).rawResult().copy(),
                     blockEntity.queue().contains(ids.get(i)),
                     recipes.get(i).aspects()));
         }

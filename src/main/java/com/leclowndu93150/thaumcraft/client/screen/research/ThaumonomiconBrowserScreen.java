@@ -1,6 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.screen.research;
 
 import com.leclowndu93150.thaumcraft.api.capability.IPlayerKnowledge;
+import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
 import com.leclowndu93150.thaumcraft.api.capability.ResearchFlag;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
@@ -215,13 +216,13 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         if (persistedCategoryId != null) {
             for (Holder.Reference<IResearchCategory> ref : categoriesTC) {
                 ref.unwrapKey().ifPresent(key -> {
-                    if (key.identifier().equals(persistedCategoryId)) activeCategory = ref;
+                    if (key.location().equals(persistedCategoryId)) activeCategory = ref;
                 });
             }
             if (activeCategory == null) {
                 for (Holder.Reference<IResearchCategory> ref : categoriesOther) {
                     ref.unwrapKey().ifPresent(key -> {
-                        if (key.identifier().equals(persistedCategoryId)) activeCategory = ref;
+                        if (key.location().equals(persistedCategoryId)) activeCategory = ref;
                     });
                 }
             }
@@ -249,14 +250,18 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
 
     @Override
     public void onClose() {
+        persistState();
+        super.onClose();
+    }
+
+    private void persistState() {
         persistedX = guiMapX;
         persistedY = guiMapY;
         persistedCatScrollPos = catScrollPos;
         persistedSearching = searching;
         if (activeCategory != null) {
-            activeCategory.unwrapKey().ifPresent(key -> persistedCategoryId = key.identifier());
+            activeCategory.unwrapKey().ifPresent(key -> persistedCategoryId = key.location());
         }
-        super.onClose();
     }
 
     private void loadRegistryData() {
@@ -267,7 +272,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         allEntries.clear();
         minecraft.player.registryAccess().lookup(IResearchCategory.REGISTRY_KEY).ifPresent(lookup ->
                 lookup.listElements().forEach(ref -> ref.unwrapKey().ifPresent(key -> {
-                    if (key.identifier().getNamespace().equals("thaumcraft")) {
+                    if (key.location().getNamespace().equals("thaumcraft")) {
                         categoriesTC.add(ref);
                     } else {
                         categoriesOther.add(ref);
@@ -278,7 +283,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
                     IResearchEntry entry = holder.value();
                     @SuppressWarnings("unchecked")
                     Holder.Reference<IResearchCategory> categoryRef = (Holder.Reference<IResearchCategory>) entry.category();
-                    EntryNode node = new EntryNode(key.identifier(), entry, holder, categoryRef);
+                    EntryNode node = new EntryNode(key.location(), entry, holder, categoryRef);
                     nodesByCategory.computeIfAbsent(categoryRef, k -> new ArrayList<>()).add(node);
                     allEntries.add(node);
                 })));
@@ -411,7 +416,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
 
     private Component categoryDisplayName(Holder.Reference<IResearchCategory> ref) {
         return ref.unwrapKey().<Component>map(key ->
-                Component.translatable("research_category." + key.identifier().getNamespace() + "." + key.identifier().getPath())
+                Component.translatable("research_category." + key.location().getNamespace() + "." + key.location().getPath())
         ).orElse(Component.empty());
     }
 
@@ -660,7 +665,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
             if (icon.texture()) {
                 return icon.id();
             }
-            Item item = BuiltInRegistries.ITEM.getValue(icon.id());
+            Item item = BuiltInRegistries.ITEM.get(icon.id());
             return new ItemStack(item);
         }
         List<? extends IResearchStage> stages = node.entry.stages();
@@ -971,6 +976,21 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         return null;
     }
 
+    private static final float BUTTON_CLACK_VOLUME = 0.4F;
+    private static final float PAGE_OPEN_VOLUME = 0.66F;
+
+    private void playButtonClack() {
+        if (minecraft != null && minecraft.player != null) {
+            minecraft.player.playSound(TCSounds.CLACK.get(), BUTTON_CLACK_VOLUME, 1.0F);
+        }
+    }
+
+    private void playPageOpen() {
+        if (minecraft != null && minecraft.player != null) {
+            minecraft.player.playSound(TCSounds.PAGE.get(), PAGE_OPEN_VOLUME, 1.0F);
+        }
+    }
+
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         popupTimeMs = System.currentTimeMillis() - 1L;
@@ -980,11 +1000,13 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         if (minecraft == null || minecraft.player == null) return super.mouseClicked(event, doubleClick);
         IPlayerKnowledge knowledge = KnowledgeAccess.of(minecraft.player);
         if (hitSearchButton(mx, my)) {
+            playButtonClack();
             toggleSearch();
             return true;
         }
         if (hitScrollUp(mx, my)) {
             if (catScrollPos > 0) {
+                playButtonClack();
                 catScrollPos--;
                 updateResearch();
             }
@@ -992,6 +1014,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         }
         if (hitScrollDown(mx, my)) {
             if (catScrollPos < catScrollMax) {
+                playButtonClack();
                 catScrollPos++;
                 updateResearch();
             }
@@ -999,6 +1022,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         }
         Holder.Reference<IResearchCategory> tabHit = hitCategoryButton(mx, my);
         if (tabHit != null && !tabHit.equals(activeCategory)) {
+            playButtonClack();
             searching = false;
             if (searchField != null) {
                 searchField.setVisible(false);
@@ -1016,6 +1040,8 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
             PacketDistributor.sendToServer(new ServerboundUnlockResearchPayload(hl.id));
             popupTimeMs = System.currentTimeMillis() + POPUP_DURATION_MS;
             popupMessage = Component.translatable("tc.research.popup", Component.translatable(hl.entry.nameKey()).getString());
+            persistState();
+            playPageOpen();
             minecraft.setScreen(new EntryDetailScreen(hl.holder, hl.id, this));
             return true;
         } else if (currentHighlight != null && knowledge.isResearchKnown(currentHighlight.id)) {
@@ -1028,6 +1054,8 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
             if (stage > 1 && stage >= hl.entry.stages().size()) {
                 PacketDistributor.sendToServer(new ServerboundUnlockResearchPayload(hl.id));
             }
+            persistState();
+            playPageOpen();
             minecraft.setScreen(new EntryDetailScreen(hl.holder, hl.id, this));
             return true;
         } else if (searching) {
@@ -1046,7 +1074,9 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
                     return true;
                 }
                 if ((sr.kind == SearchResult.Kind.ENTRY || sr.kind == SearchResult.Kind.RECIPE) && sr.entryNode != null) {
-                    minecraft.setScreen(new EntryDetailScreen(sr.entryNode.holder, sr.entryNode.id, this));
+                    persistState();
+                    playPageOpen();
+            minecraft.setScreen(new EntryDetailScreen(sr.entryNode.holder, sr.entryNode.id, this));
                     return true;
                 }
             }

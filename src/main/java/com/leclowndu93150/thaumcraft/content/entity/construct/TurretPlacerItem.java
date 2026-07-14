@@ -56,7 +56,7 @@ public final class TurretPlacerItem extends Item {
         level.removeBlock(base, false);
         level.removeBlock(above, false);
         EntityOwnedConstruct construct = factory.apply(level);
-        construct.snapTo(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0.0F, 0.0F);
+        construct.moveTo(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0.0F, 0.0F);
         if (construct instanceof EntityArcaneBore bore) {
             bore.setFacing(player.getDirection());
         }

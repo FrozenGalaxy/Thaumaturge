@@ -87,7 +87,7 @@ public final class SealHandler {
         if (!data.seals().contains(seal)) {
             data.seals().add(seal);
         }
-        chunk.markUnsaved();
+        chunk.setUnsaved(true);
         seal.syncToClient(level);
         return true;
     }
@@ -101,7 +101,7 @@ public final class SealHandler {
         if (level.hasChunkAt(pos.pos())) {
             LevelChunk chunk = level.getChunkAt(pos.pos());
             chunk.getData(TCAttachments.SEALS).seals().remove(seal);
-            chunk.markUnsaved();
+            chunk.setUnsaved(true);
         }
         if (!quiet) {
             ItemStack drop = TCSeals.registry().getOptional(seal.getTypeId())
@@ -156,7 +156,7 @@ public final class SealHandler {
 
     public static void markDirty(ServerLevel level, BlockPos pos) {
         if (level.hasChunkAt(pos)) {
-            level.getChunkAt(pos).markUnsaved();
+            level.getChunkAt(pos).setUnsaved(true);
         }
     }
 

@@ -91,7 +91,7 @@ public final class ThaumicSlime extends Slime implements ITaintedMob {
             double reachSq = ATTACK_REACH_FACTOR * reach * ATTACK_REACH_FACTOR * reach;
             if (this.distanceToSqr(target) < reachSq && this.hasLineOfSight(target)) {
                 DamageSource source = this.damageSources().mobAttack(this);
-                if (target.hurtServer(server, source, this.getAttackDamage())) {
+                if (target.hurt(source, this.getAttackDamage())) {
                     this.playSound(SoundEvents.SLIME_ATTACK, 1.0F,
                             (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
                     EnchantmentHelper.doPostAttackEffects(server, target, source);
@@ -156,10 +156,10 @@ public final class ThaumicSlime extends Slime implements ITaintedMob {
             for (int k = 0; k < size; k++) {
                 float xd = (k % 2 - 0.5F) * size / 4.0F;
                 float zd = (k / 2 - 0.5F) * size / 4.0F;
-                ThaumicSlime child = TCEntities.THAUMIC_SLIME.get().create(server, MobSpawnType.TRIGGERED);
+                ThaumicSlime child = TCEntities.THAUMIC_SLIME.get().create(server);
                 if (child != null) {
                     child.setSize(1, true);
-                    child.snapTo(this.getX() + xd, this.getY() + 0.5, this.getZ() + zd,
+                    child.moveTo(this.getX() + xd, this.getY() + 0.5, this.getZ() + zd,
                             this.random.nextFloat() * 360.0F, 0.0F);
                     server.addFreshEntity(child);
                 }
@@ -173,7 +173,7 @@ public final class ThaumicSlime extends Slime implements ITaintedMob {
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
         super.dropCustomDeathLoot(level, damageSource, recentlyHit);
         if (this.getSize() > 1) {
-            this.spawnAtLocation(level, EssentiaCrystalFactory.of(level.registryAccess(), TCAspects.VITIUM));
+            this.spawnAtLocation(EssentiaCrystalFactory.of(level.registryAccess(), TCAspects.VITIUM));
         }
     }
 

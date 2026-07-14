@@ -54,7 +54,7 @@ public final class BlockEffectShock extends Block {
     }
 
     @Override
-    protected boolean propagatesSkylightDown(BlockState state) {
+    protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
         return true;
     }
 
@@ -64,8 +64,8 @@ public final class BlockEffectShock extends Block {
             return;
         }
         if (entity instanceof LivingEntity living && level instanceof ServerLevel serverLevel) {
-            living.hurtServer(serverLevel, serverLevel.damageSources().magic(), SHOCK_DAMAGE);
-            living.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, SLOWNESS_DURATION, 0, true, true));
+            living.hurt(serverLevel.damageSources().magic(), SHOCK_DAMAGE);
+            living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, SLOWNESS_DURATION, 0, true, true));
         }
         if (level.getRandom().nextInt(SELF_REMOVE_ONE_IN) == 0) {
             level.removeBlock(pos, false);

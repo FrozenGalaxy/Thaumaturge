@@ -22,6 +22,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -72,14 +73,14 @@ public final class ItemCurio extends Item {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         level.playSound(null, player.getX(), player.getY(), player.getZ(), TCSounds.LEARN.get(),
                 SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
         if (player instanceof ServerPlayer serverPlayer) {
             if (variant.rites && WarpHelper.getActualWarp(player) <= RITES_WARP_THRESHOLD) {
                 player.sendSystemMessage(Component.translatable("fail.crimsonrites")
                         .withStyle(ChatFormatting.DARK_PURPLE));
-                return InteractionResult.SUCCESS;
+                return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
             }
             if (variant.rites && !KnowledgeAccess.of(player).isResearchKnown(CRIMSON_RITES_RESEARCH)) {
                 ResearchManager.complete(serverPlayer, CRIMSON_RITES_RESEARCH);
@@ -106,7 +107,7 @@ public final class ItemCurio extends Item {
                     .withStyle(ChatFormatting.DARK_PURPLE));
         }
         player.awardStat(Stats.ITEM_USED.get(this));
-        return InteractionResult.SUCCESS;
+        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
 
     private static void grantKnowledge(ServerPlayer player, Holder<IResearchCategory> category) {

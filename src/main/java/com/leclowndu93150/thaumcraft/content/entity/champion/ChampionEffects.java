@@ -39,7 +39,7 @@ final class ChampionEffects {
     static float spined(LivingEntity mob, @Nullable LivingEntity target, @Nullable DamageSource source, float amount) {
         if (target != null && source != null && !source.is(DamageTypes.THORNS)
                 && mob.level() instanceof ServerLevel server) {
-            target.hurtServer(server, mob.damageSources().thorns(mob),
+            target.hurt(mob.damageSources().thorns(mob),
                     1 + mob.getRandom().nextInt(3));
             server.playSound(null, target.getX(), target.getY(), target.getZ(),
                     SoundEvents.THORNS_HIT, SoundSource.HOSTILE, 0.5F, 1.0F);
@@ -113,9 +113,9 @@ final class ChampionEffects {
 
     static float infested(LivingEntity mob, @Nullable LivingEntity target, @Nullable DamageSource source, float amount) {
         if (mob.getRandom().nextFloat() < PROC_CHANCE && mob.level() instanceof ServerLevel server) {
-            EntityTaintCrawler crawler = TCEntities.TAINT_CRAWLER.get().create(server, MobSpawnType.REINFORCEMENT);
+            EntityTaintCrawler crawler = TCEntities.TAINT_CRAWLER.get().create(server);
             if (crawler != null) {
-                crawler.snapTo(mob.getX(), mob.getY() + mob.getBbHeight() / 2.0F, mob.getZ(),
+                crawler.moveTo(mob.getX(), mob.getY() + mob.getBbHeight() / 2.0F, mob.getZ(),
                         mob.getRandom().nextFloat() * 360.0F, 0.0F);
                 server.addFreshEntity(crawler);
                 mob.playSound(TCSounds.GORE.get(), 0.5F, 1.0F);

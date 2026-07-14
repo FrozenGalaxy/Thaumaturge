@@ -86,12 +86,12 @@ public final class FocusEffectCurse extends FocusEffect {
             if (eff < 0) {
                 eff = 0;
             }
-            struck.hurtServer(level, level.damageSources().indirectMagic(struck, getPackage().getCaster()), damage);
+            struck.hurt(level.damageSources().indirectMagic(struck, getPackage().getCaster()), damage);
             if (struck instanceof LivingEntity living) {
                 living.addEffect(new MobEffectInstance(MobEffects.POISON, duration, eff));
                 float c = CASCADE_START;
                 if (level.getRandom().nextFloat() < c) {
-                    living.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, duration, eff));
+                    living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, duration, eff));
                     c -= CASCADE_STEP;
                 }
                 if (level.getRandom().nextFloat() < c) {
@@ -99,7 +99,7 @@ public final class FocusEffectCurse extends FocusEffect {
                     c -= CASCADE_STEP;
                 }
                 if (level.getRandom().nextFloat() < c) {
-                    living.addEffect(new MobEffectInstance(MobEffects.MINING_FATIGUE, duration * 2, eff));
+                    living.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, duration * 2, eff));
                     c -= CASCADE_STEP;
                 }
                 if (level.getRandom().nextFloat() < c) {

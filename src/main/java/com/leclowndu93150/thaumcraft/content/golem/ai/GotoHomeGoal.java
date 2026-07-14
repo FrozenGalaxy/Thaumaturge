@@ -35,13 +35,13 @@ public final class GotoHomeGoal extends Goal {
             return false;
         }
         idleCounter = IDLE_INTERVAL;
-        double distSqr = golem.distanceToSqr(Vec3.atCenterOf(golem.getHomePosition()));
+        double distSqr = golem.distanceToSqr(Vec3.atCenterOf(golem.getRestrictCenter()));
         if (distSqr < NEAR_HOME_DIST_SQR) {
             return false;
         }
         if (distSqr > FAR_HOME_DIST_SQR) {
             Vec3 target = DefaultRandomPos.getPosTowards(golem, 16, 7,
-                    Vec3.atLowerCornerOf(golem.getHomePosition()), Math.PI / 2.0);
+                    Vec3.atLowerCornerOf(golem.getRestrictCenter()), Math.PI / 2.0);
             if (target == null) {
                 return false;
             }
@@ -50,9 +50,9 @@ public final class GotoHomeGoal extends Goal {
             moveZ = target.z;
             return true;
         }
-        moveX = golem.getHomePosition().getX();
-        moveY = golem.getHomePosition().getY();
-        moveZ = golem.getHomePosition().getZ();
+        moveX = golem.getRestrictCenter().getX();
+        moveY = golem.getRestrictCenter().getY();
+        moveZ = golem.getRestrictCenter().getZ();
         return true;
     }
 
@@ -65,7 +65,7 @@ public final class GotoHomeGoal extends Goal {
     public boolean canContinueToUse() {
         return golem.getTask() == null
                 && !golem.getNavigation().isDone()
-                && golem.distanceToSqr(Vec3.atCenterOf(golem.getHomePosition())) > CONTINUE_DIST_SQR;
+                && golem.distanceToSqr(Vec3.atCenterOf(golem.getRestrictCenter())) > CONTINUE_DIST_SQR;
     }
 
     @Override

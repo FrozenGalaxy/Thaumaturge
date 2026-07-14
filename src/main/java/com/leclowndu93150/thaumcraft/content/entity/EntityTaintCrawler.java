@@ -93,8 +93,9 @@ public final class EntityTaintCrawler extends Monster implements ITaintedMob {
     }
 
     @Override
-    public boolean doHurtTarget(ServerLevel level, Entity target) {
-        boolean attacked = super.doHurtTarget(level, target);
+    public boolean doHurtTarget(Entity target) {
+        ServerLevel level = (ServerLevel) level();
+        boolean attacked = super.doHurtTarget(target);
         if (attacked && target instanceof LivingEntity living) {
             if (level.getRandom().nextFloat() < 0.3F) {
                 living.addEffect(new MobEffectInstance(TCMobEffects.FLUX_TAINT, FLUX_TAINT_BASE_TICKS, 0, true, false, false));

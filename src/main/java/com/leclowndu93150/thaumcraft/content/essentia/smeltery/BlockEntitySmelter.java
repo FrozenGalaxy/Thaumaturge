@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.essentia.smeltery;
 
+import net.minecraft.core.NonNullList;
 import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
@@ -85,7 +86,7 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
         output.putBoolean("SpeedBoost", this.speedBoost);
         output.putInt("CookTime", this.furnaceCookTime);
         output.putInt("SmeltTime",this.smeltTime);
-        this.inventory.serialize(output);
+        output.put("inventory", inventory.serializeNBT(registries));
     }
 
     @Override
@@ -97,7 +98,7 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
         this.speedBoost = input.getBoolean("SpeedBoost");
         this.furnaceCookTime = input.getInt("CookTime");
         this.smeltTime = input.getInt("SmeltTime");
-        inventory.deserialize(input);
+        inventory.deserializeNBT(registries, input.getCompound("inventory"));
     }
 
     private void syncToClient() {
@@ -123,10 +124,14 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
+    public void setRemoved() {
+        super.setRemoved();
         if (level == null || level.isClientSide()) return;
-        Containers.dropContents(level,getBlockPos(),getInventory().copyToList());
+        NonNullList<ItemStack> drops = NonNullList.withSize(getInventory().getSlots(), ItemStack.EMPTY);
+        for (int slot = 0; slot < getInventory().getSlots(); slot++) {
+            drops.set(slot, getInventory().getStackInSlot(slot));
+        }
+        Containers.dropContents(level, getBlockPos(), drops);
         if (aspects.totalAmount() > 0){
             AuraHelper.polluteAura(level,getBlockPos(),aspects.totalAmount(), true);
             setChanged();
@@ -192,11 +197,8 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
 
                         Item item = fuel.getItem();
                         inventory.extractItem(1, 1, false);
-                        if (inventory.getStackInSlot(1).getCount() <= 0) {
-                            ItemStack containerItem = item.getCraftingRemainder(copy);
-                            if (containerItem != null) {
-                                inventory.setStackInSlot(1, containerItem.copyWithCount(containerItem.count()));
-                            }
+                        if (inventory.getStackInSlot(1).getCount() <= 0 && item.hasCraftingRemainingItem(copy)) {
+                            inventory.setStackInSlot(1, item.getCraftingRemainingItem(copy));
                         }
                     }
                 } else {
@@ -288,7 +290,7 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
             AuraHelper.polluteAura(level,getBlockPos(),pp,true);
         }
         this.vis = aspects.totalAmount();
-        inventory.extract(0, inventory.getStackInSlot(0),1, transaction);
+        inventory.extractItem(0, 1, false);
 
     }
 

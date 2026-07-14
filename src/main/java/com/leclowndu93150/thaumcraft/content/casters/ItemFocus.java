@@ -119,7 +119,7 @@ public class ItemFocus extends Item {
         addFocusInformation(stack, builder);
     }
 
-    public void addFocusInformation(ItemStack focusStack, Consumer<Component> builder) {
+    public void addFocusInformation(ItemStack focusStack, List<Component> builder) {
         FocusPackage core = getPackage(focusStack);
         if (core == null) {
             return;
@@ -132,7 +132,7 @@ public class ItemFocus extends Item {
         }
     }
 
-    private void buildInfo(Consumer<Component> builder, FocusNode node, int depth) {
+    private void buildInfo(List<Component> builder, FocusNode node, int depth) {
         MutableComponent line = Component.literal(INDENT.repeat(depth));
         line.append(Component.translatable(node.getNameKey()).withStyle(ChatFormatting.DARK_PURPLE));
         if (!node.getSettingList().isEmpty()) {

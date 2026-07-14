@@ -71,7 +71,7 @@ public class EntityTurretCrossbow extends EntityOwnedConstruct implements Ranged
         goalSelector.addGoal(2, new WatchTargetGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 5, true, false,
-                (entity, level) -> entity instanceof Enemy));
+                entity -> entity instanceof Enemy));
     }
 
     @Override
@@ -220,10 +220,11 @@ public class EntityTurretCrossbow extends EntityOwnedConstruct implements Ranged
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+    public boolean hurt(DamageSource source, float amount) {
+        ServerLevel level = (ServerLevel) level();
         setYRot((float) (getYRot() + random.nextGaussian() * 45.0));
         setXRot((float) (getXRot() + random.nextGaussian() * 20.0));
-        return super.hurtServer(level, source, amount);
+        return super.hurt(source, amount);
     }
 
     @Override
@@ -241,7 +242,7 @@ public class EntityTurretCrossbow extends EntityOwnedConstruct implements Ranged
             if (player.isShiftKeyDown()) {
                 playSound(TCSounds.ZAP.get(), 1.0F, 1.0F);
                 dropAmmo();
-                spawnAtLocation((ServerLevel) level(), placerItem(), 0.5F);
+                spawnAtLocation(placerItem(), 0.5F);
                 discard();
                 player.swing(hand);
             } else {
@@ -279,7 +280,7 @@ public class EntityTurretCrossbow extends EntityOwnedConstruct implements Ranged
 
     protected void dropAmmo() {
         if (!getMainHandItem().isEmpty() && level() instanceof ServerLevel serverLevel) {
-            spawnAtLocation(serverLevel, getMainHandItem(), 0.5F);
+            spawnAtLocation(getMainHandItem(), 0.5F);
             setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
         }
     }
@@ -289,16 +290,16 @@ public class EntityTurretCrossbow extends EntityOwnedConstruct implements Ranged
         super.dropCustomDeathLoot(level, source, recentlyHit);
         float bonus = 0.0F;
         if (random.nextFloat() < 0.2F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCItems.MIND_CLOCKWORK.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCItems.MIND_CLOCKWORK.get()), 0.5F);
         }
         if (random.nextFloat() < 0.5F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCItems.MECHANISM_SIMPLE.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCItems.MECHANISM_SIMPLE.get()), 0.5F);
         }
         if (random.nextFloat() < 0.5F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCBlocks.PLANK_GREATWOOD.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCBlocks.PLANK_GREATWOOD.get()), 0.5F);
         }
         if (random.nextFloat() < 0.5F + bonus) {
-            spawnAtLocation(level, new ItemStack(TCBlocks.PLANK_GREATWOOD.get()), 0.5F);
+            spawnAtLocation(new ItemStack(TCBlocks.PLANK_GREATWOOD.get()), 0.5F);
         }
     }
 

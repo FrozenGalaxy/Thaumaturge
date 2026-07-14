@@ -1,5 +1,8 @@
 package com.leclowndu93150.thaumcraft.content.infusion;
 
+import java.util.Arrays;
+import net.minecraft.core.HolderLookup;
+import com.leclowndu93150.thaumcraft.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.recipe.IInfusionRecipe;
 import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
@@ -16,10 +19,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.client.RecipeBookCategories;
-import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -38,25 +38,36 @@ public final class InfusionRecipe implements Recipe<InfusionInput>, IInfusionRec
                     ? DataResult.error(() -> "Infusion recipe needs exactly one of result or catalyst_patch")
                     : DataResult.success(recipe));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, InfusionRecipe> STREAM_CODEC = StreamCodec.composite(
-            Ingredient.CONTENTS_STREAM_CODEC,
-            r -> r.catalyst,
-            Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()),
-            r -> r.components,
-            AspectList.STREAM_CODEC,
-            r -> r.aspects,
-            ByteBufCodecs.VAR_INT,
-            r -> r.instability,
-            ByteBufCodecs.optional(ItemStack.STREAM_CODEC),
-            r -> r.result,
-            ByteBufCodecs.optional(DataComponentPatch.STREAM_CODEC),
-            r -> r.catalystPatch,
-            ByteBufCodecs.optional(ResearchGate.STREAM_CODEC),
-            r -> r.research,
-            InfusionRecipe::new
+    private static final StreamCodec<RegistryFriendlyByteBuf, List<Ingredient>> COMPONENTS_STREAM_CODEC =
+            Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list());
+    private static final StreamCodec<RegistryFriendlyByteBuf, Optional<ItemStack>> RESULT_STREAM_CODEC =
+            ByteBufCodecs.optional(ItemStack.STREAM_CODEC);
+    private static final StreamCodec<RegistryFriendlyByteBuf, Optional<DataComponentPatch>> PATCH_STREAM_CODEC =
+            ByteBufCodecs.optional(DataComponentPatch.STREAM_CODEC);
+    private static final StreamCodec<RegistryFriendlyByteBuf, Optional<ResearchGate>> RESEARCH_STREAM_CODEC =
+            ByteBufCodecs.optional(ResearchGate.STREAM_CODEC);
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, InfusionRecipe> STREAM_CODEC = StreamCodec.of(
+            (buffer, recipe) -> {
+                Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.catalyst);
+                COMPONENTS_STREAM_CODEC.encode(buffer, recipe.components);
+                AspectList.STREAM_CODEC.encode(buffer, recipe.aspects);
+                ByteBufCodecs.VAR_INT.encode(buffer, recipe.instability);
+                RESULT_STREAM_CODEC.encode(buffer, recipe.result);
+                PATCH_STREAM_CODEC.encode(buffer, recipe.catalystPatch);
+                RESEARCH_STREAM_CODEC.encode(buffer, recipe.research);
+            },
+            buffer -> new InfusionRecipe(
+                    Ingredient.CONTENTS_STREAM_CODEC.decode(buffer),
+                    COMPONENTS_STREAM_CODEC.decode(buffer),
+                    AspectList.STREAM_CODEC.decode(buffer),
+                    ByteBufCodecs.VAR_INT.decode(buffer),
+                    RESULT_STREAM_CODEC.decode(buffer),
+                    PATCH_STREAM_CODEC.decode(buffer),
+                    RESEARCH_STREAM_CODEC.decode(buffer))
     );
 
-    public static final RecipeSerializer<InfusionRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+    public static final RecipeSerializer<InfusionRecipe> SERIALIZER = new SimpleRecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     private final Ingredient catalyst;
     private final List<Ingredient> components;
@@ -114,10 +125,10 @@ public final class InfusionRecipe implements Recipe<InfusionInput>, IInfusionRec
     @Override
     public ItemStack resultItem() {
         if (result.isPresent()) {
-            return result.get().create();
+            return result.get().copy();
         }
-        ItemStack display = catalyst.items().findFirst()
-                .map(ItemStack::new)
+        ItemStack display = Arrays.stream(catalyst.getItems()).findFirst()
+                .map(ItemStack::copy)
                 .orElse(ItemStack.EMPTY);
         catalystPatch.ifPresent(display::applyComponents);
         return display;
@@ -129,13 +140,23 @@ public final class InfusionRecipe implements Recipe<InfusionInput>, IInfusionRec
     }
 
     @Override
-    public ItemStack assemble(InfusionInput input) {
+    public ItemStack assemble(InfusionInput input, HolderLookup.Provider registries) {
         if (result.isPresent()) {
-            return result.get().create();
+            return result.get().copy();
         }
         ItemStack out = input.catalyst().copyWithCount(1);
         catalystPatch.ifPresent(out::applyComponents);
         return out;
+    }
+
+    @Override
+    public boolean canCraftInDimensions(int width, int height) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getResultItem(HolderLookup.Provider registries) {
+        return this.result.map(ItemStack::copy).orElse(ItemStack.EMPTY);
     }
 
     @Override
@@ -148,23 +169,9 @@ public final class InfusionRecipe implements Recipe<InfusionInput>, IInfusionRec
         return TCRecipeTypes.INFUSION.get();
     }
 
-    @Override
-    public PlacementInfo placementInfo() {
-        return PlacementInfo.NOT_PLACEABLE;
-    }
-
-    @Override
-    public RecipeBookCategory recipeBookCategory() {
-        return RecipeBookCategories.CRAFTING_MISC;
-    }
-
-    @Override
+            @Override
     public boolean showNotification() {
         return false;
     }
 
-    @Override
-    public String group() {
-        return "";
-    }
 }

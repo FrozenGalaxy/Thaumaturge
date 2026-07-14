@@ -1,5 +1,8 @@
 package com.leclowndu93150.thaumcraft.content.entity;
 
+import com.leclowndu93150.thaumcraft.content.entity.ai.GhastLikeFlight;
+import com.leclowndu93150.thaumcraft.content.entity.ai.GhastLikeLookGoal;
+import com.leclowndu93150.thaumcraft.content.entity.ai.GhastLikeMoveControl;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aspect.IEntityAspectSource;
@@ -29,7 +32,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -61,7 +63,7 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
     public WispEntity(EntityType<? extends WispEntity> type, Level level) {
         super(type, level);
         this.xpReward = XP_REWARD;
-        this.moveControl = new Ghast.GhastMoveControl(this, false, () -> false);
+        this.moveControl = new GhastLikeMoveControl(this);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -75,7 +77,7 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(5, new FlyingWanderGoal(this, true, () -> true));
-        this.goalSelector.addGoal(7, new Ghast.GhastLookGoal(this));
+        this.goalSelector.addGoal(7, new GhastLikeLookGoal(this));
         this.goalSelector.addGoal(7, new WispZapGoal(this));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, RANDOM_AGGRO_INTERVAL, true, false, null));
@@ -121,7 +123,7 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
 
     @Override
     public void travel(Vec3 input) {
-        this.travelFlying(input, FLYING_FRICTION_IMPULSE);
+        GhastLikeFlight.travel(this, input, FLYING_FRICTION_IMPULSE);
     }
 
     @Override
@@ -176,7 +178,7 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
                 .filter(holder -> holder.value().isPrimal() != compound)
                 .toList();
         if (!pool.isEmpty()) {
-            setAspect(pool.get(this.random.nextInt(pool.size())).key().identifier());
+            setAspect(pool.get(this.random.nextInt(pool.size())).key().location());
         }
     }
 
@@ -205,7 +207,7 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
         super.dropCustomDeathLoot(level, damageSource, recentlyHit);
         Holder<IAspect> self = aspect();
         if (self != null) {
-            this.spawnAtLocation(level, EssentiaCrystalFactory.of(self));
+            this.spawnAtLocation(EssentiaCrystalFactory.of(self));
         }
     }
 
@@ -223,13 +225,13 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putString("Type", this.entityData.get(DATA_ASPECT));
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         this.entityData.set(DATA_ASPECT, input.getString("Type"));
     }

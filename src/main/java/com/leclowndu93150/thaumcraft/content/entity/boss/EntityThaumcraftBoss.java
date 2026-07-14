@@ -64,8 +64,7 @@ public class EntityThaumcraftBoss extends Monster {
     private static final double PLAYER_DMG_BUFF = 0.5;
     private static final float PEARL_DROP_LIFT = 1.5F;
 
-    protected final ServerBossEvent bossEvent = new ServerBossEvent(Mth.createInsecureUUID(this.random),
-            getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
+    protected final ServerBossEvent bossEvent = new ServerBossEvent(getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
     private final Map<Integer, Integer> aggro = new HashMap<>();
     protected int spawnTimer;
 
@@ -100,9 +99,10 @@ public class EntityThaumcraftBoss extends Monster {
     }
 
     @Override
-    protected void customServerAiStep(ServerLevel level) {
+    protected void customServerAiStep() {
+        ServerLevel level = (ServerLevel) level();
         if (this.getSpawnTimer() == 0) {
-            super.customServerAiStep(level);
+            super.customServerAiStep();
         }
         if (this.getTarget() != null && !this.getTarget().isAlive()) {
             this.setTarget(null);
@@ -125,7 +125,7 @@ public class EntityThaumcraftBoss extends Monster {
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
                                                   MobSpawnType reason, @Nullable SpawnGroupData data) {
-        this.setHomeTo(this.blockPosition(), HOME_RADIUS);
+        this.restrictTo(this.blockPosition(), HOME_RADIUS);
         this.generateName();
         this.bossEvent.setName(this.getDisplayName());
         return data;
@@ -214,7 +214,8 @@ public class EntityThaumcraftBoss extends Monster {
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+    public boolean hurt(DamageSource source, float damage) {
+        ServerLevel level = (ServerLevel) level();
         if (source.getEntity() instanceof LivingEntity attacker) {
             this.aggro.merge(attacker.getId(), (int) damage, Integer::sum);
         }
@@ -222,9 +223,9 @@ public class EntityThaumcraftBoss extends Monster {
             if (this.getAnger() == 0) {
                 this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, ENRAGE_TICKS,
                         (int) (damage / ENRAGE_REGEN_DIVISOR)));
-                this.addEffect(new MobEffectInstance(MobEffects.STRENGTH, ENRAGE_TICKS,
+                this.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, ENRAGE_TICKS,
                         (int) (damage / ENRAGE_STRENGTH_DIVISOR)));
-                this.addEffect(new MobEffectInstance(MobEffects.HASTE, ENRAGE_TICKS,
+                this.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, ENRAGE_TICKS,
                         (int) (damage / ENRAGE_HASTE_DIVISOR)));
                 this.setAnger(ENRAGE_TICKS);
                 if (source.getEntity() instanceof ServerPlayer player) {
@@ -236,12 +237,12 @@ public class EntityThaumcraftBoss extends Monster {
             }
             damage = ENRAGE_THRESHOLD;
         }
-        return super.hurtServer(level, source, damage);
+        return super.hurt(source, damage);
     }
 
     @Override
-    public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
-        return super.isInvulnerableTo(level, source) || this.getSpawnTimer() > 0;
+    public boolean isInvulnerableTo(DamageSource source) {
+        return super.isInvulnerableTo(source) || this.getSpawnTimer() > 0;
     }
 
     @Override
@@ -277,7 +278,7 @@ public class EntityThaumcraftBoss extends Monster {
         level.addFreshEntity(new EntitySpecialItem(level, this.getX(),
                 this.getY() + this.getBbHeight() / 2.0F, this.getZ(),
                 new ItemStack(TCItems.PRIMORDIAL_PEARL.get())));
-        this.spawnAtLocation(level, new ItemStack(TCItems.LOOT_BAG_RARE.get()), PEARL_DROP_LIFT);
+        this.spawnAtLocation(new ItemStack(TCItems.LOOT_BAG_RARE.get()), PEARL_DROP_LIFT);
     }
 
     public void generateName() {

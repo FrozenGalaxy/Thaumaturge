@@ -40,7 +40,7 @@ public final class BlockPlantVishroom extends AbstractTCPlant {
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         if (!level.isClientSide() && entity instanceof LivingEntity living && level.getRandom().nextInt(5) == 0) {
-            living.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0));
+            living.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0));
         }
     }
 

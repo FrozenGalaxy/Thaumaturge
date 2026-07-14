@@ -62,11 +62,11 @@ public final class AspectBootstrap {
             int blend
     ) {
         ctx.register(key, new Aspect(
-                key.identifier().getPath(),
+                key.location().getPath(),
                 color,
                 List.of(),
                 Optional.of(chatColor),
-                ResourceLocation.fromNamespaceAndPath(key.identifier().getNamespace(), "textures/aspects/" + key.identifier().getPath() + ".png"),
+                ResourceLocation.fromNamespaceAndPath(key.location().getNamespace(), "textures/aspects/" + key.location().getPath() + ".png"),
                 blend
         ));
     }
@@ -82,11 +82,11 @@ public final class AspectBootstrap {
         Holder<IAspect> a = ctx.lookup(IAspect.REGISTRY_KEY).getOrThrow(componentA);
         Holder<IAspect> b = ctx.lookup(IAspect.REGISTRY_KEY).getOrThrow(componentB);
         ctx.register(key, new Aspect(
-                key.identifier().getPath(),
+                key.location().getPath(),
                 color,
                 List.of(a, b),
                 Optional.empty(),
-                ResourceLocation.fromNamespaceAndPath(key.identifier().getNamespace(), "textures/aspects/" + key.identifier().getPath() + ".png"),
+                ResourceLocation.fromNamespaceAndPath(key.location().getNamespace(), "textures/aspects/" + key.location().getPath() + ".png"),
                 blend
         ));
     }

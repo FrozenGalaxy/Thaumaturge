@@ -8,7 +8,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -31,7 +31,7 @@ public final class MenuHandMirror extends AbstractContainerMenu {
     public MenuHandMirror(int containerId, Inventory inventory) {
         super(TCMenus.HAND_MIRROR.get(), containerId);
         this.player = inventory.player;
-        this.mirrorHotbarSlot = inventory.getSelectedSlot();
+        this.mirrorHotbarSlot = inventory.selected;
         addSlot(new Slot(input, 0, INPUT_SLOT_X, INPUT_SLOT_Y));
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 9; column++) {
@@ -72,11 +72,11 @@ public final class MenuHandMirror extends AbstractContainerMenu {
     }
 
     @Override
-    public void clicked(int slotId, int button, ContainerInput containerInput, Player clickPlayer) {
+    public void clicked(int slotId, int button, ClickType containerInput, Player clickPlayer) {
         if (slotId >= 0 && slotId < slots.size() && slots.get(slotId).getItem().getItem() instanceof ItemHandMirror) {
             return;
         }
-        if (containerInput == ContainerInput.SWAP && button == mirrorHotbarSlot) {
+        if (containerInput == ClickType.SWAP && button == mirrorHotbarSlot) {
             return;
         }
         super.clicked(slotId, button, containerInput, clickPlayer);

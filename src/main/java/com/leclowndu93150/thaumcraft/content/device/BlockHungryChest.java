@@ -18,17 +18,12 @@ public final class BlockHungryChest extends ChestBlock {
     public static final MapCodec<BlockHungryChest> CODEC = simpleCodec(BlockHungryChest::new);
 
     public BlockHungryChest(BlockBehaviour.Properties properties) {
-        super(() -> TCBlockEntities.HUNGRY_CHEST.get(), SoundEvents.CHEST_OPEN, SoundEvents.CHEST_CLOSE, properties);
+        super(properties, () -> TCBlockEntities.HUNGRY_CHEST.get());
     }
 
     @Override
     public MapCodec<BlockHungryChest> codec() {
         return CODEC;
-    }
-
-    @Override
-    public boolean chestCanConnectTo(BlockState blockState) {
-        return false;
     }
 
     @Override

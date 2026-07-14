@@ -6,7 +6,6 @@ import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -48,7 +47,7 @@ public final class BlockEntityBanner extends BlockEntity {
     @Override
     protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
         super.saveAdditional(output, registries);
-        output.putString("aspect", aspect == null ? "" : aspect.identifier().toString());
+        output.putString("aspect", aspect == null ? "" : aspect.location().toString());
     }
 
     @Override
@@ -76,7 +75,7 @@ public final class BlockEntityBanner extends BlockEntity {
     }
 
     @Override
-    public void applyImplicitComponents(DataComponentGetter components) {
+    public void applyImplicitComponents(DataComponentInput components) {
         super.applyImplicitComponents(components);
         this.aspect = components.get(TCDataComponents.ASPECT_FILTER.get());
     }

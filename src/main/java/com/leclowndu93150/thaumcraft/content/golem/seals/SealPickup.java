@@ -100,7 +100,7 @@ public class SealPickup extends SealFiltered implements ISealConfigArea {
             if (itemEntities.containsKey(next.getId())
                     && next.canGolemPerformTask(golem)
                     && golem.getGolemEntity() instanceof EntityThaumcraftGolem golemEntity
-                    && golemEntity.isWithinHome(next.getEntity().blockPosition())) {
+                    && golemEntity.isWithinRestriction(next.getEntity().blockPosition())) {
                 golemEntity.setTask(next);
                 next.setReserved(true);
                 if (ThaumcraftCommonConfig.SHOW_GOLEM_EMOTES.get()) {

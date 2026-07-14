@@ -55,7 +55,7 @@ public final class BlockEntityLevitator extends BlockEntity {
             rangeActual = 0;
         }
         int probe = counter % RANGES[range];
-        if (level.getBlockState(pos.relative(facing, 1 + probe)).isSolidRender()) {
+        if (level.getBlockState(pos.relative(facing, 1 + probe)).isSolidRender(level, pos.relative(facing, 1 + probe))) {
             if (1 + probe < rangeActual) {
                 rangeActual = 1 + probe;
             }

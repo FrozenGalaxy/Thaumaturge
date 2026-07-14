@@ -42,7 +42,7 @@ public final class GotoBlockGoal extends GotoGoal {
         for (Task task : TaskHandler.getBlockTasksSorted(golem.level(), golem.getUUID(), golem)) {
             if (areGolemTagsValidForTask(task)
                     && task.canGolemPerformTask(golem)
-                    && golem.isWithinHome(task.getPos())
+                    && golem.isWithinRestriction(task.getPos())
                     && isValidDestination(golem.level(), task.getPos())
                     && canEasilyReach(task.getPos())) {
                 targetBlock = getAdjacentSpace(task.getPos());

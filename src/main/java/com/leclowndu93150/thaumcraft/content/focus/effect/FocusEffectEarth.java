@@ -68,7 +68,7 @@ public final class FocusEffectEarth extends FocusEffect {
         FocusFX.impact(level, target.getLocation(), getKey());
         if (target instanceof EntityHitResult entityHit && entityHit.getEntity() != null) {
             Entity struck = entityHit.getEntity();
-            struck.hurtServer(level, level.damageSources().thrown(struck, getPackage().getCaster()),
+            struck.hurt(level.damageSources().thrown(struck, getPackage().getCaster()),
                     getDamageForDisplay(finalPower));
             return true;
         }

@@ -52,6 +52,6 @@ public final class ScanPotion implements IScanThing {
 
     @Override
     public ResourceLocation getResearchKey(Player player, @Nullable Object target) {
-        return ScanKeys.effect(effect.unwrapKey().orElseThrow().identifier());
+        return ScanKeys.effect(effect.unwrapKey().orElseThrow().location());
     }
 }

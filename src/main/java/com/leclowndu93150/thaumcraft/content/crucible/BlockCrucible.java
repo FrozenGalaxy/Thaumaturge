@@ -11,6 +11,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -82,14 +83,14 @@ public class BlockCrucible extends BaseEntityBlock {
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (level.isClientSide()) return InteractionResult.SUCCESS;
-        if (!(level.getBlockEntity(pos) instanceof BlockEntityCrucible crucible)) return InteractionResult.PASS;
-        FluidStack fs = FluidUtil.getFirstStackContained(itemStack);
-        if (fs.is(Fluids.WATER) && fs.amount() >= BlockEntityCrucible.TANK_CAPACITY) {
+    protected ItemInteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (level.isClientSide()) return ItemInteractionResult.SUCCESS;
+        if (!(level.getBlockEntity(pos) instanceof BlockEntityCrucible crucible)) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        FluidStack fs = FluidUtil.getFluidContained(itemStack).orElse(FluidStack.EMPTY);
+        if (fs.is(Fluids.WATER) && fs.getAmount() >= BlockEntityCrucible.TANK_CAPACITY) {
             if (crucible.getTank().getFluidAmount() < BlockEntityCrucible.TANK_CAPACITY){
-                if (FluidUtil.interactWithFluidHandler(player,hand,level,pos,hitResult.getDirection(), null)){
-                    return InteractionResult.SUCCESS;
+                if (FluidUtil.interactWithFluidHandler(player,hand,level,pos,hitResult.getDirection())){
+                    return ItemInteractionResult.SUCCESS;
                 }
             }
         } else if (!player.isCrouching() /*&& (!(player.getItemInHand(hand).getItem() instanceof ICaster))*/ && hitResult.getDirection() == Direction.UP){
@@ -120,7 +121,7 @@ public class BlockCrucible extends BaseEntityBlock {
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         if (!(level.getBlockEntity(pos) instanceof BlockEntityCrucible crucible)) return 0;
         float ratio = (float) crucible.getAspects().totalAmount() / BlockEntityCrucible.MAX_ASPECT;
 

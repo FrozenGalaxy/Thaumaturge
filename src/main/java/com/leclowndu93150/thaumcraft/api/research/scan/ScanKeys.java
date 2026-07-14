@@ -49,7 +49,7 @@ public final class ScanKeys {
      * @return the research key
      */
     public static ResourceLocation aspect(ResourceKey<IAspect> aspect) {
-        ResourceLocation id = aspect.identifier();
+        ResourceLocation id = aspect.location();
         return key("aspect/" + id.getNamespace() + "/" + id.getPath());
     }
 

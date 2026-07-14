@@ -1,5 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.recipe.crucible;
 
+import net.minecraft.core.HolderLookup;
+import com.leclowndu93150.thaumcraft.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
@@ -39,7 +41,7 @@ public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGate
             CrucibleRecipe::new
     );
 
-    public static final RecipeSerializer<CrucibleRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+    public static final RecipeSerializer<CrucibleRecipe> SERIALIZER = new SimpleRecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
 
     private final Ingredient catalyst;
@@ -79,8 +81,8 @@ public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGate
 
 
     @Override
-    public ItemStack assemble(CrucibleRecipeInput crucibleRecipeInput) {
-        return result.create();
+    public ItemStack assemble(CrucibleRecipeInput crucibleRecipeInput, HolderLookup.Provider registries) {
+        return result.copy();
     }
 
     @Override
@@ -89,8 +91,13 @@ public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGate
     }
 
     @Override
-    public String group() {
-        return "";
+    public boolean canCraftInDimensions(int width, int height) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getResultItem(HolderLookup.Provider registries) {
+        return this.result.copy();
     }
 
     @Override
@@ -103,17 +110,7 @@ public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGate
         return TCRecipeTypes.CRUCIBLE.get();
     }
 
-    @Override
-    public PlacementInfo placementInfo() {
-        return PlacementInfo.NOT_PLACEABLE;
-    }
-
-    @Override
-    public RecipeBookCategory recipeBookCategory() {
-        return RecipeBookCategories.CRAFTING_MISC;
-    }
-
-    public AspectList aspects() {
+            public AspectList aspects() {
         return aspects;
     }
 

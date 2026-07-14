@@ -15,12 +15,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.MoonPhase;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -57,11 +54,7 @@ public final class AuraTickHandler {
             return;
         }
         state.lastWorldTime = worldTime;
-        MoonPhase moonPhase = level.environmentAttributes().getValue(
-                EnvironmentAttributes.MOON_PHASE,
-                Vec3.ZERO
-        );
-        int phaseIndex = moonPhase.index();
+        int phaseIndex = level.getMoonPhase();
         state.phaseVis = PHASE_TABLE[phaseIndex];
         state.phaseMax = 1.0F + MAX_TABLE[phaseIndex];
         state.phaseFlux = 0.25F - state.phaseVis;
@@ -69,10 +62,10 @@ public final class AuraTickHandler {
         RandomSource rand = level.getRandom();
         Set<ChunkPos> loaded = AuraManager.loadedChunksSnapshot(level);
         for (ChunkPos pos : loaded) {
-            if (!level.hasChunk(pos.x(), pos.z())) {
+            if (!level.hasChunk(pos.x, pos.z)) {
                 continue;
             }
-            LevelChunk chunk = level.getChunk(pos.x(), pos.z());
+            LevelChunk chunk = level.getChunk(pos.x, pos.z);
             AuraData data = chunk.getData(TCAttachments.AURA.get());
             if (data.getBase() == 0) {
                 continue;
@@ -85,8 +78,8 @@ public final class AuraTickHandler {
     private static void processAuraChunk(ServerLevel level, LevelChunk chunk, AuraData auraChunk, PhaseState state, RandomSource rand) {
         List<Integer> directions = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
         Collections.shuffle(directions, new java.util.Random(rand.nextLong()));
-        int x = auraChunk.getChunkPos().x();
-        int z = auraChunk.getChunkPos().z();
+        int x = auraChunk.getChunkPos().x;
+        int z = auraChunk.getChunkPos().z;
         float base = auraChunk.getBase() * state.phaseMax;
         boolean dirty = false;
         float currentVis = auraChunk.getVis();
@@ -128,7 +121,7 @@ public final class AuraTickHandler {
             currentVis -= inc;
             neighbourVisChunk.setVis(lowestVis + inc);
             dirty = true;
-            neighbourVisLevelChunk.markUnsaved();
+            neighbourVisLevelChunk.setUnsaved(true);
         }
 
         if (neighbourFluxChunk != null && currentFlux > Math.max(5.0F, auraChunk.getBase() / 10.0F) && lowestFlux < currentFlux / 1.75F) {
@@ -136,7 +129,7 @@ public final class AuraTickHandler {
             currentFlux -= inc;
             neighbourFluxChunk.setFlux(lowestFlux + inc);
             dirty = true;
-            neighbourFluxLevelChunk.markUnsaved();
+            neighbourFluxLevelChunk.setUnsaved(true);
         }
 
         if (currentVis + currentFlux < base) {
@@ -155,7 +148,7 @@ public final class AuraTickHandler {
         if (dirty) {
             auraChunk.setVis(currentVis);
             auraChunk.setFlux(currentFlux);
-            chunk.markUnsaved();
+            chunk.setUnsaved(true);
         }
 
         if (currentFlux > base * 0.75F && rand.nextFloat() < currentFlux / 500.0F / 10.0F) {

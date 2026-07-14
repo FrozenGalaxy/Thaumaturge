@@ -254,7 +254,7 @@ public final class GenPassage extends GenCommonPieces {
 
     private static boolean isAdjacentToSolid(GenContext ctx, BlockPos pos) {
         for (Direction dir : Direction.values()) {
-            if (ctx.level.getBlockState(pos.relative(dir)).isSolidRender()) {
+            if (ctx.level.getBlockState(pos.relative(dir)).isSolidRender(ctx.level, pos.relative(dir))) {
                 return true;
             }
         }

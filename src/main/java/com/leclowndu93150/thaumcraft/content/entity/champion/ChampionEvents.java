@@ -171,7 +171,7 @@ public final class ChampionEvents {
             return;
         }
         Entity killer = event.getSource().getEntity();
-        if (killer instanceof Player player && player.getGameProfile().name().startsWith("FakeThaumcraft")) {
+        if (killer instanceof Player player && player.getGameProfile().getName().startsWith("FakeThaumcraft")) {
             return;
         }
         int xp = XP_BASE + entity.getRandom().nextInt(XP_SPREAD);

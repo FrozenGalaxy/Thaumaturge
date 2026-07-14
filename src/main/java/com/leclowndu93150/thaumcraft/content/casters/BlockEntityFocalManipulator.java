@@ -329,7 +329,7 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
     @Override
     protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
         super.saveAdditional(output, registries);
-        inventory.serialize(output);
+        output.put("inventory", inventory.serializeNBT(registries));
         output.putFloat("Vis", vis);
         output.putString("FocusName", focusName);
         TCNbt.store(output, "Crystals", AspectList.CODEC, registries, crystalsSync);
@@ -339,7 +339,7 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
     @Override
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
-        inventory.deserialize(input);
+        inventory.deserializeNBT(registries, input.getCompound("inventory"));
         vis = input.getFloat("Vis");
         focusName = input.getString("FocusName");
         crystalsSync = TCNbt.read(input, "Crystals", AspectList.CODEC, registries).orElse(AspectList.EMPTY);

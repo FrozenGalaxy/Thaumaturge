@@ -1,8 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.recipe;
 
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
-import com.leclowndu93150.thaumcraft.api.recipe.IArcaneRecipe;
-import com.leclowndu93150.thaumcraft.client.recipes.TCClientRecipes;
 import com.leclowndu93150.thaumcraft.content.recipe.crucible.CrucibleRecipe;
 import com.leclowndu93150.thaumcraft.content.recipe.crucible.CrucibleRecipeInput;
 import com.leclowndu93150.thaumcraft.content.recipe.workbench.ArcaneCraftingInput;
@@ -11,9 +9,7 @@ import com.leclowndu93150.thaumcraft.registry.TCRecipeTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,12 +17,10 @@ import java.util.List;
 
 public final class ThaumcraftCraftingManager {
 
-    @SuppressWarnings("unchecked")
     public static @Nullable ArcaneCraftingRecipe findMatchingArcaneRecipe(Level level, ArcaneCraftingInput input, Player player) {
-        RecipeMap recipes = level.isClientSide() ? TCClientRecipes.getRecipeMapForType(level, TCRecipeTypes.ARCANE.get()) : ((ServerLevel)level).recipeAccess().recipeMap();
-        return recipes.byType(TCRecipeTypes.ARCANE.get()).stream()
+        return level.getRecipeManager().getAllRecipesFor(TCRecipeTypes.ARCANE.get()).stream()
             .filter(r -> r.value().matches(input, level))
-            .filter(r->r.value().doesPassGate(player))
+            .filter(r -> r.value().doesPassGate(player))
             .findFirst()
             .map(RecipeHolder::value)
             .orElse(null);
@@ -36,7 +30,7 @@ public final class ThaumcraftCraftingManager {
         int highest = 0;
         CrucibleRecipe out = null;
 
-        List<CrucibleRecipe> recipes = level.recipeAccess().getRecipes().stream()
+        List<CrucibleRecipe> recipes = level.getRecipeManager().getRecipes().stream()
             .filter(r -> r.value() instanceof CrucibleRecipe)
             .map(RecipeHolder::value)
             .map(CrucibleRecipe.class::cast)

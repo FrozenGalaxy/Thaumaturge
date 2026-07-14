@@ -6,7 +6,6 @@ import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -204,7 +203,7 @@ public abstract class BlockEntityMirrorBase extends BlockEntity {
         output.putInt("instability", instability);
         if (link != null) {
             output.putLong("linkPos", link.pos().asLong());
-            output.putString("linkDim", link.dimension().identifier().toString());
+            output.putString("linkDim", link.dimension().location().toString());
         }
     }
 
@@ -217,7 +216,7 @@ public abstract class BlockEntityMirrorBase extends BlockEntity {
     }
 
     @Override
-    protected void applyImplicitComponents(DataComponentGetter components) {
+    protected void applyImplicitComponents(DataComponentInput components) {
         super.applyImplicitComponents(components);
         GlobalPos stored = components.get(TCDataComponents.MIRROR_LINK.get());
         if (stored != null) {
@@ -227,8 +226,8 @@ public abstract class BlockEntityMirrorBase extends BlockEntity {
     }
 
     @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
+    public void setRemoved() {
+        super.setRemoved();
         if (linked) {
             invalidateLink();
         }

@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -37,12 +38,12 @@ public final class ItemCreativeFluxSponge extends Item {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (level.isClientSide()) {
             player.swing(hand);
             level.playLocalSound(player.getX(), player.getY(), player.getZ(),
                     TCSounds.CRAFTSTART.get(), SoundSource.PLAYERS, 0.15F, 1.0F, false);
-            return InteractionResult.SUCCESS;
+            return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
         }
         int drained = 0;
         BlockPos pos = player.blockPosition();
@@ -62,6 +63,6 @@ public final class ItemCreativeFluxSponge extends Item {
             player.sendSystemMessage(Component.translatable("tc.flux_sponge.rifts", rifts.size())
                     .withStyle(ChatFormatting.DARK_AQUA));
         }
-        return InteractionResult.SUCCESS;
+        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
 }

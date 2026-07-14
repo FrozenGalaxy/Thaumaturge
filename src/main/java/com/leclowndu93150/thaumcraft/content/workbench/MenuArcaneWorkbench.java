@@ -1,16 +1,14 @@
 package com.leclowndu93150.thaumcraft.content.workbench;
 
-import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
-import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aspect.TCAspects;
 import com.leclowndu93150.thaumcraft.api.recipe.IArcaneRecipe;
+import com.leclowndu93150.thaumcraft.content.misc.TCActionBar;
 import com.leclowndu93150.thaumcraft.content.recipe.ThaumcraftCraftingManager;
 import com.leclowndu93150.thaumcraft.content.recipe.workbench.ArcaneCraftingInput;
-import com.leclowndu93150.thaumcraft.content.taint.item.ItemEssentiaCrystal;
+import com.leclowndu93150.thaumcraft.content.wands.ItemWand;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.registry.TCMenus;
-import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -19,6 +17,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -35,10 +34,11 @@ import java.util.Optional;
 public final class MenuArcaneWorkbench extends AbstractContainerMenu {
     private static final int RESULT_SLOT = 0;
     private static final int CRYSTAL_START = 10;
-    private static final int PLAYER_INV_START = 16;
-    private static final int PLAYER_INV_END = 43;
-    private static final int HOTBAR_START = 43;
-    private static final int HOTBAR_END = 52;
+    private static final int WAND_SLOT = 16;
+    private static final int PLAYER_INV_START = 17;
+    private static final int PLAYER_INV_END = 44;
+    private static final int HOTBAR_START = 44;
+    private static final int HOTBAR_END = 53;
 
     private static final int RESULT_X = 160;
     private static final int RESULT_Y = 64;
@@ -47,6 +47,8 @@ public final class MenuArcaneWorkbench extends AbstractContainerMenu {
     private static final int CRAFT_SPACING = 24;
     public static final int[] CRYSTAL_X = {64, 17, 112, 17, 112, 64};
     public static final int[] CRYSTAL_Y = {13, 35, 35, 93, 93, 115};
+    public static final int WAND_X = 160;
+    public static final int WAND_Y = 100;
     private static final int PLAYER_INV_X = 16;
     private static final int PLAYER_INV_Y = 151;
     private static final int HOTBAR_Y = 209;
@@ -112,6 +114,8 @@ public final class MenuArcaneWorkbench extends AbstractContainerMenu {
                 CRYSTAL_X[i], CRYSTAL_Y[i], PRIMAL_ORDER.get(i)));
         }
 
+        addSlot(new SlotWorkbenchWand(craftingInventory, InventoryArcaneWorkbench.WAND_SLOT, WAND_X, WAND_Y));
+
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(playerInventory, col + row * 9 + 9,
@@ -140,8 +144,9 @@ public final class MenuArcaneWorkbench extends AbstractContainerMenu {
         IArcaneRecipe arcane = ThaumcraftCraftingManager.findMatchingArcaneRecipe(level, input, sp);
         if (arcane != null) {
             tile.refreshAura();
-            if (tile.auraVis >= arcane.getReducedVis(sp) && hasSufficientCrystals(arcane.getCrystals())) {
-                result = arcane.assemble(input);
+            WorkbenchPayment.Plan plan = WorkbenchPayment.plan(arcane, craftingInventory, sp);
+            if (WorkbenchPayment.canCraft(plan, tile)) {
+                result = arcane.assemble(input, level.registryAccess());
             }
         }
 
@@ -149,7 +154,7 @@ public final class MenuArcaneWorkbench extends AbstractContainerMenu {
         if (result.isEmpty()) {
             Optional<RecipeHolder<CraftingRecipe>> vanilla = findVanillaRecipe(level, vanillaInput);
             if (vanilla.isPresent()) {
-                result = vanilla.get().value().assemble(vanillaInput);
+                result = vanilla.get().value().assemble(vanillaInput, level.registryAccess());
                 recipeToStore = vanilla.get();
             }
         }
@@ -160,29 +165,11 @@ public final class MenuArcaneWorkbench extends AbstractContainerMenu {
 
     @SuppressWarnings("unchecked")
     private Optional<RecipeHolder<CraftingRecipe>> findVanillaRecipe(ServerLevel level, CraftingInput input) {
-        return level.recipeAccess().getRecipes().stream()
+        return level.getRecipeManager().getRecipes().stream()
             .filter(r -> r.value() instanceof CraftingRecipe && !(r.value() instanceof IArcaneRecipe))
             .map(r -> (RecipeHolder<CraftingRecipe>) r)
             .filter(r -> r.value().matches(input, level))
             .findFirst();
-    }
-
-    private boolean hasSufficientCrystals(AspectList needed) {
-        if (needed.isEmpty()) return true;
-        for (AspectInstance entry : needed.entries()) {
-            int found = 0;
-            for (int i = 9; i < 15; i++) {
-                ItemStack crystal = craftingInventory.getItem(i);
-                if (!crystal.isEmpty() && crystal.getItem() instanceof ItemEssentiaCrystal) {
-                    Holder<IAspect> holder = ItemEssentiaCrystal.aspectOf(crystal);
-                    if (holder != null && holder.value().tag().equals(entry.aspect().value().tag())) {
-                        found += crystal.getCount();
-                    }
-                }
-            }
-            if (found < entry.amount()) return false;
-        }
-        return true;
     }
 
     @Override
@@ -225,6 +212,15 @@ public final class MenuArcaneWorkbench extends AbstractContainerMenu {
     }
 
     @Override
+    public void clicked(int slotId, int button, ClickType containerInput, Player player) {
+        if (slotId == WAND_SLOT && getCarried().getItem() instanceof ItemWand wand
+                && wand.isStaff(getCarried())) {
+            TCActionBar.sendPurple(player, "tc.workbench.staff");
+        }
+        super.clicked(slotId, button, containerInput, player);
+    }
+
+    @Override
     public ItemStack quickMoveStack(Player player, int slotIndex) {
         Slot slot = this.slots.get(slotIndex);
         if (!slot.hasItem()) return ItemStack.EMPTY;
@@ -238,6 +234,10 @@ public final class MenuArcaneWorkbench extends AbstractContainerMenu {
             }
             slot.onQuickCraft(stack, copy);
         } else if (slotIndex >= PLAYER_INV_START && slotIndex < HOTBAR_END) {
+            if (SlotWorkbenchWand.isUsableWand(stack) && !this.slots.get(WAND_SLOT).hasItem()
+                    && !this.moveItemStackTo(stack, WAND_SLOT, WAND_SLOT + 1, false)) {
+                return ItemStack.EMPTY;
+            }
             for (int i = 0; i < PRIMAL_ORDER.size(); i++) {
                 if (SlotCrystalEssentia.isValidCrystal(stack, PRIMAL_ORDER.get(i))) {
                     if (!this.moveItemStackTo(stack, CRYSTAL_START + i, CRYSTAL_START + i + 1, false)) {

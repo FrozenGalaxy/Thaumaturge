@@ -32,11 +32,13 @@ public class ThrownAlumentum extends ThrowableItemProjectile {
     }
 
     public ThrownAlumentum(Level level, LivingEntity mob, ItemStack itemStack) {
-        super(TCEntities.ALUMENTUM.get(), mob, level, itemStack);
+        super(TCEntities.ALUMENTUM.get(), mob, level);
+        this.setItem(itemStack);
     }
 
     public ThrownAlumentum(Level level, double x, double y, double z, ItemStack itemStack) {
-        super(TCEntities.ALUMENTUM.get(), x, y, z, level, itemStack);
+        super(TCEntities.ALUMENTUM.get(), x, y, z, level);
+        this.setItem(itemStack);
     }
 
     @Override

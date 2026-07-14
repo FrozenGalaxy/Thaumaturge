@@ -63,7 +63,7 @@ public final class FocusEffectFlux extends FocusEffect {
         FocusFX.impact(level, target.getLocation(), getKey());
         if (target instanceof EntityHitResult entityHit && entityHit.getEntity() != null) {
             Entity struck = entityHit.getEntity();
-            struck.hurtServer(level, level.damageSources().indirectMagic(struck, getPackage().getCaster()),
+            struck.hurt(level.damageSources().indirectMagic(struck, getPackage().getCaster()),
                     getDamageForDisplay(finalPower));
         }
         return false;

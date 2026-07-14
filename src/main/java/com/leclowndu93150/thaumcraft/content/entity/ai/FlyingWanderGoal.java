@@ -70,7 +70,7 @@ public final class FlyingWanderGoal extends Goal {
         if (!mob.level().isEmptyBlock(pos)) {
             return false;
         }
-        if (pos.getY() <= mob.level().getMinY()) {
+        if (pos.getY() <= mob.level().getMinBuildHeight()) {
             return false;
         }
         if (!clampToSurface) {

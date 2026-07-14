@@ -46,7 +46,6 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import java.awt.*;
@@ -125,8 +124,8 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
     }
 
     @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        super.preRemoveSideEffects(pos, state);
+    public void setRemoved() {
+        super.setRemoved();
         if (level instanceof ServerLevel) spillRemnants();
     }
 
@@ -267,7 +266,7 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
         if (tank.getFluidAmount() > 0 || total > 0){
             tank.setFluid(FluidStack.EMPTY);
             AuraHelper.polluteAura(level,getBlockPos(),total * 0.25f, true);
-            int fluxAmount = aspects.amountOf(level.registryAccess().getOrThrow(TCAspects.VITIUM));
+            int fluxAmount = aspects.amountOf(level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).getOrThrow(TCAspects.VITIUM));
             if (fluxAmount > 0)
                 AuraHelper.polluteAura(level,getBlockPos(), fluxAmount * 0.75f, false);
             this.aspects = AspectList.EMPTY;
@@ -361,7 +360,7 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
         for (int i = 0; i < count; i++) {
             CrucibleRecipe recipe = ThaumcraftCraftingManager.findMatchingCrucibleRecipe((ServerLevel) level,owner, this.aspects, stack);
             if (recipe != null){
-                ItemStack out = recipe.assemble(new CrucibleRecipeInput(stack,this.aspects));
+                ItemStack out = recipe.assemble(new CrucibleRecipeInput(stack,this.aspects), level.registryAccess());
                 this.aspects = recipe.removeMatching(aspects);
                 {
                     tank.drain(50, IFluidHandler.FluidAction.EXECUTE);
@@ -408,11 +407,11 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
         Entity throwerRef = entity.getOwner();
         if (!(throwerRef instanceof Player player)) return;
         ItemStack res = attemptSmelt(stack,player);
-        if ( res != null && res.count()>0){
+        if ( res != null && res.getCount()>0){
             stack.setCount(res.getCount());
             entity.setItem(stack);
         } else {
-            entity.remove();
+            entity.discard();
         }
     }
 }

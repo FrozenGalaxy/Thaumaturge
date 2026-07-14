@@ -62,8 +62,7 @@ public final class FocusEffectHeal extends FocusEffect {
         FocusFX.impact(level, target.getLocation(), getKey());
         if (target instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof LivingEntity living) {
             if (living.isInvertedHealAndHarm()) {
-                living.hurtServer(level,
-                        level.damageSources().indirectMagic(getPackage().getCaster(), getPackage().getCaster()),
+                living.hurt(level.damageSources().indirectMagic(getPackage().getCaster(), getPackage().getCaster()),
                         getSettingValue("power") * finalPower * UNDEAD_DAMAGE_FACTOR);
             } else {
                 living.heal(getSettingValue("power") * finalPower);

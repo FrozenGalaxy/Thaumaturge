@@ -15,6 +15,7 @@ import com.leclowndu93150.thaumcraft.content.entity.construct.EntityTurretCrossb
 import com.leclowndu93150.thaumcraft.content.entity.construct.EntityTurretCrossbowAdvanced;
 import com.leclowndu93150.thaumcraft.content.entity.projectile.EntityGrapple;
 import com.leclowndu93150.thaumcraft.content.golem.EntityThaumcraftGolem;
+import com.leclowndu93150.thaumcraft.content.wands.EntityAspectOrb;
 import com.leclowndu93150.thaumcraft.content.misc.alumentum.ThrownAlumentum;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -35,7 +36,6 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityBrainyZombie::new, MobCategory.MONSTER)
                     .sized(0.6F, 1.95F)
                     .eyeHeight(1.74F)
-                    .notInPeaceful()
                     .clientTrackingRange(8)
                     .updateInterval(3));
 
@@ -44,7 +44,6 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityGiantBrainyZombie::new, MobCategory.MONSTER)
                     .sized(0.6F, 1.95F)
                     .eyeHeight(1.74F)
-                    .notInPeaceful()
                     .clientTrackingRange(8)
                     .updateInterval(3));
 
@@ -53,7 +52,6 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityMindSpider::new, MobCategory.MONSTER)
                     .sized(0.7F, 0.5F)
                     .eyeHeight(0.45F)
-                    .notInPeaceful()
                     .clientTrackingRange(8)
                     .updateInterval(3));
 
@@ -62,7 +60,6 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityFireBat::new, MobCategory.MONSTER)
                     .sized(0.5F, 0.9F)
                     .fireImmune()
-                    .notInPeaceful()
                     .clientTrackingRange(8)
                     .updateInterval(3));
 
@@ -70,7 +67,6 @@ public final class TCEntities {
             "wisp",
             () -> EntityType.Builder.of(WispEntity::new, MobCategory.MONSTER)
                     .sized(0.9F, 0.9F)
-                    .notInPeaceful()
                     .clientTrackingRange(10)
                     .updateInterval(3));
 
@@ -80,7 +76,6 @@ public final class TCEntities {
                     .sized(0.52F, 0.52F)
                     .eyeHeight(0.325F)
                     .spawnDimensionsScale(4.0F)
-                    .notInPeaceful()
                     .clientTrackingRange(8)
                     .updateInterval(3));
 
@@ -89,42 +84,36 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityTaintCrawler::new, MobCategory.MONSTER)
                     .sized(0.5F, 0.4F)
                     .eyeHeight(0.1F)
-                    .notInPeaceful()
                     .clientTrackingRange(8));
 
     public static final DeferredHolder<EntityType<?>, EntityType<EntityTaintSeed>> TAINT_SEED = register(
             "taint_seed",
             () -> EntityType.Builder.of(EntityTaintSeed::new, MobCategory.MONSTER)
                     .sized(1.5F, 1.25F)
-                    .notInPeaceful()
                     .clientTrackingRange(8));
 
     public static final DeferredHolder<EntityType<?>, EntityType<EntityTaintSeedPrime>> TAINT_SEED_PRIME = register(
             "taint_seed_prime",
             () -> EntityType.Builder.of(EntityTaintSeedPrime::new, MobCategory.MONSTER)
                     .sized(2.0F, 2.0F)
-                    .notInPeaceful()
                     .clientTrackingRange(8));
 
     public static final DeferredHolder<EntityType<?>, EntityType<EntityTaintSwarm>> TAINT_SWARM = register(
             "taint_swarm",
             () -> EntityType.Builder.of(EntityTaintSwarm::new, MobCategory.MONSTER)
                     .sized(2.0F, 2.0F)
-                    .notInPeaceful()
                     .clientTrackingRange(8));
 
     public static final DeferredHolder<EntityType<?>, EntityType<EntityTaintacle>> TAINTACLE = register(
             "taintacle",
             () -> EntityType.Builder.of(EntityTaintacle::new, MobCategory.MONSTER)
                     .sized(0.8F, 3.0F)
-                    .notInPeaceful()
                     .clientTrackingRange(8));
 
     public static final DeferredHolder<EntityType<?>, EntityType<EntityTaintacleSmall>> TAINTACLE_SMALL = register(
             "taintacle_small",
             () -> EntityType.Builder.of(EntityTaintacleSmall::new, MobCategory.MONSTER)
                     .sized(0.22F, 1.0F)
-                    .notInPeaceful()
                     .clientTrackingRange(8));
 
     public static final DeferredHolder<EntityType<?>, EntityType<EntityCausalityCollapser>> CAUSALITY_COLLAPSER = register(
@@ -182,7 +171,6 @@ public final class TCEntities {
             "spell_bat",
             () -> EntityType.Builder.<EntitySpellBat>of(EntitySpellBat::new, MobCategory.MONSTER)
                     .sized(0.5F, 0.9F)
-                    .notInPeaceful()
                     .clientTrackingRange(8)
                     .updateInterval(3));
 
@@ -221,7 +209,6 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityPech::new, MobCategory.MONSTER)
                     .sized(0.6F, 1.8F)
                     .eyeHeight(1.188F)
-                    .notInPeaceful()
                     .clientTrackingRange(8)
                     .updateInterval(3));
 
@@ -229,7 +216,6 @@ public final class TCEntities {
             "eldritch_crab",
             () -> EntityType.Builder.of(EntityEldritchCrab::new, MobCategory.MONSTER)
                     .sized(0.8F, 0.6F)
-                    .notInPeaceful()
                     .clientTrackingRange(8)
                     .updateInterval(3));
 
@@ -238,7 +224,6 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityInhabitedZombie::new, MobCategory.MONSTER)
                     .sized(0.6F, 1.95F)
                     .eyeHeight(1.74F)
-                    .notInPeaceful()
                     .clientTrackingRange(8)
                     .updateInterval(3));
 
@@ -247,7 +232,6 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityEldritchGuardian::new, MobCategory.MONSTER)
                     .sized(0.8F, 2.25F)
                     .eyeHeight(2.1F)
-                    .notInPeaceful()
                     .clientTrackingRange(8)
                     .updateInterval(3));
 
@@ -256,7 +240,6 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityCultistKnight::new, MobCategory.MONSTER)
                     .sized(0.6F, 1.8F)
                     .eyeHeight(1.62F)
-                    .notInPeaceful()
                     .clientTrackingRange(8)
                     .updateInterval(3));
 
@@ -265,7 +248,6 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityCultistCleric::new, MobCategory.MONSTER)
                     .sized(0.6F, 1.8F)
                     .eyeHeight(1.62F)
-                    .notInPeaceful()
                     .clientTrackingRange(8)
                     .updateInterval(3));
 
@@ -273,7 +255,6 @@ public final class TCEntities {
             "cultist_leader",
             () -> EntityType.Builder.of(EntityCultistLeader::new, MobCategory.MONSTER)
                     .sized(0.75F, 2.25F)
-                    .notInPeaceful()
                     .clientTrackingRange(10)
                     .updateInterval(3));
 
@@ -282,7 +263,6 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityCultistPortalGreater::new, MobCategory.MONSTER)
                     .sized(1.5F, 3.0F)
                     .fireImmune()
-                    .notInPeaceful()
                     .clientTrackingRange(10)
                     .updateInterval(3));
 
@@ -292,7 +272,6 @@ public final class TCEntities {
                     .sized(1.75F, 3.5F)
                     .eyeHeight(3.0F)
                     .fireImmune()
-                    .notInPeaceful()
                     .clientTrackingRange(10)
                     .updateInterval(3));
 
@@ -301,7 +280,6 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityEldritchWarden::new, MobCategory.MONSTER)
                     .sized(1.5F, 3.5F)
                     .eyeHeight(3.1F)
-                    .notInPeaceful()
                     .clientTrackingRange(10)
                     .updateInterval(3));
 
@@ -309,7 +287,6 @@ public final class TCEntities {
             "taintacle_giant",
             () -> EntityType.Builder.of(EntityTaintacleGiant::new, MobCategory.MONSTER)
                     .sized(1.1F, 6.0F)
-                    .notInPeaceful()
                     .clientTrackingRange(10)
                     .updateInterval(3));
 
@@ -318,7 +295,6 @@ public final class TCEntities {
             () -> EntityType.Builder.of(EntityCultistPortalLesser::new, MobCategory.MONSTER)
                     .sized(1.5F, 3.0F)
                     .fireImmune()
-                    .notInPeaceful()
                     .clientTrackingRange(10)
                     .updateInterval(3));
 
@@ -335,6 +311,13 @@ public final class TCEntities {
                     .sized(0.25F, 0.25F)
                     .clientTrackingRange(4)
                     .updateInterval(10));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<EntityAspectOrb>> ASPECT_ORB = register(
+            "aspect_orb",
+            () -> EntityType.Builder.<EntityAspectOrb>of(EntityAspectOrb::new, MobCategory.MISC)
+                    .sized(0.125F, 0.125F)
+                    .clientTrackingRange(6)
+                    .updateInterval(20));
 
     public static final DeferredHolder<EntityType<?>, EntityType<EntityThaumcraftGolem>> THAUMCRAFT_GOLEM = register(
             "golem",
@@ -379,9 +362,7 @@ public final class TCEntities {
 
     private static <T extends Entity> DeferredHolder<EntityType<?>, EntityType<T>> register(
             String name, Supplier<EntityType.Builder<T>> builderSupplier) {
-        return ENTITIES.register(name, () -> builderSupplier.get().build(
-                ResourceKey.create(Registries.ENTITY_TYPE,
-                        ResourceLocation.fromNamespaceAndPath(TCIds.MODID, name))));
+        return ENTITIES.register(name, () -> builderSupplier.get().build(TCIds.MODID + ":" + name));
     }
 
     public static void register(IEventBus modBus) {

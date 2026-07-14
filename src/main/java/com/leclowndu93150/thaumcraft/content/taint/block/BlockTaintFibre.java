@@ -200,7 +200,7 @@ public final class BlockTaintFibre extends Block implements ITaintBlock {
         if (living instanceof ITaintedMob) {
             return;
         }
-        if (living.is(EntityTypeTags.UNDEAD)) {
+        if (living.getType().is(EntityTypeTags.UNDEAD)) {
             return;
         }
         if (serverLevel.getRandom().nextInt(WALK_EFFECT_CHANCE) == 0) {

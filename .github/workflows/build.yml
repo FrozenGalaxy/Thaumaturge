@@ -31,6 +31,9 @@ jobs:
           cache-disabled: ${{ inputs.is-release }}
           cache-read-only: false
 
+      - name: Data Generation
+        run: ./gradlew runData
+
       - name: Build
         run: ./gradlew build
 
@@ -51,3 +54,12 @@ jobs:
           DISCORD_WEBHOOK_DRY_RUN: ${{ secrets.DISCORD_WEBHOOK_DRY_RUN }}
           DRY_RUN: ${{ inputs.dry-run }}
         run: ./gradlew publishMods
+      - name: Upload Build Artifact
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-jars
+          path: |
+            build/libs/*.jar
+          if-no-files-found: error
+          retention-days: 1

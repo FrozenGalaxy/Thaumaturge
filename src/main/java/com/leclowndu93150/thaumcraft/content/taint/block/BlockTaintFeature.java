@@ -92,18 +92,21 @@ public final class BlockTaintFeature extends DirectionalBlock implements ITaintB
     }
 
     @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
-        if (level.getRandom().nextFloat() < CRAWLER_ON_BREAK_CHANCE) {
-            EntityTaintCrawler crawler = TCEntities.TAINT_CRAWLER.get().create(level, MobSpawnType.NATURAL);
-            if (crawler != null) {
-                crawler.snapTo(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                        level.getRandom().nextInt(360), 0.0F);
-                level.addFreshEntity(crawler);
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock())) {
+        
+            if (level.getRandom().nextFloat() < CRAWLER_ON_BREAK_CHANCE) {
+                EntityTaintCrawler crawler = TCEntities.TAINT_CRAWLER.get().create(level);
+                if (crawler != null) {
+                    crawler.moveTo(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                            level.getRandom().nextInt(360), 0.0F);
+                    level.addFreshEntity(crawler);
+                }
+            } else {
+                AuraHelper.polluteAura(level, pos, BREAK_POLLUTE_AMOUNT, true);
             }
-        } else {
-            AuraHelper.polluteAura(level, pos, BREAK_POLLUTE_AMOUNT, true);
         }
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Override

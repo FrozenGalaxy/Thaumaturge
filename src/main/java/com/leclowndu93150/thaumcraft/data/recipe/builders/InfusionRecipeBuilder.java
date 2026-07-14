@@ -76,6 +76,6 @@ public class InfusionRecipeBuilder extends SimpleRecipeBuilder {
     @Override
     public ResourceKey<Recipe<?>> defaultId() {
         return ResourceKey.create(Registries.RECIPE,
-                result.typeHolder().unwrapKey().orElseThrow().identifier().withPrefix("infusion/"));
+                result.typeHolder().unwrapKey().orElseThrow().location().withPrefix("infusion/"));
     }
 }

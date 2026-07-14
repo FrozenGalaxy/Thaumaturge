@@ -87,7 +87,7 @@ public final class AspectIndex implements IAspectIndex {
     private static AspectIndex fromEntries(List<Entry> entries) {
         Map<Item, AspectList> map = new HashMap<>(entries.size());
         for (Entry entry : entries) {
-            Item item = BuiltInRegistries.ITEM.getValue(entry.itemId);
+            Item item = BuiltInRegistries.ITEM.get(entry.itemId);
             if (item != null) {
                 map.put(item, entry.aspects);
             }
@@ -104,7 +104,7 @@ public final class AspectIndex implements IAspectIndex {
     private static AspectIndex fromIdMap(Map<ResourceLocation, AspectList> map) {
         Map<Item, AspectList> out = new HashMap<>(map.size());
         map.forEach((id, aspects) -> {
-            Item item = BuiltInRegistries.ITEM.getValue(id);
+            Item item = BuiltInRegistries.ITEM.get(id);
             if (item != null) {
                 out.put(item, aspects);
             }

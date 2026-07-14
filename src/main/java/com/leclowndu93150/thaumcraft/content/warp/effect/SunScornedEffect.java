@@ -23,7 +23,8 @@ public final class SunScornedEffect extends MobEffect {
     }
 
     @Override
-    public boolean applyEffectTick(ServerLevel level, LivingEntity mob, int amplification) {
+    public boolean applyEffectTick(LivingEntity mob, int amplification) {
+        ServerLevel level = (ServerLevel) mob.level();
         float brightness = mob.getLightLevelDependentMagicValue();
         BlockPos pos = BlockPos.containing(mob.getX(), mob.getY(), mob.getZ());
         if (brightness > BURN_BRIGHTNESS

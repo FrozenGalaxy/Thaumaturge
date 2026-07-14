@@ -17,6 +17,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
@@ -199,8 +200,8 @@ public class FocusPackage implements IFocusElement {
      * @return the caster, or null when it cannot be resolved
      */
     public @Nullable LivingEntity getCaster() {
-        if (caster == null && level != null && getCasterUUID() != null
-                && level.getEntity(getCasterUUID()) instanceof LivingEntity living) {
+        if (caster == null && level instanceof ServerLevel serverLevel && getCasterUUID() != null
+                && serverLevel.getEntity(getCasterUUID()) instanceof LivingEntity living) {
             caster = living;
         }
         return caster;

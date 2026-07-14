@@ -1,7 +1,10 @@
 package com.leclowndu93150.thaumcraft.content.golem;
 
+import net.minecraft.world.item.DyeItem;
 import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
+import com.leclowndu93150.thaumcraft.api.golems.accessory.GolemAccessories;
+import com.leclowndu93150.thaumcraft.api.golems.accessory.GolemAccessory;
 import com.leclowndu93150.thaumcraft.config.ThaumcraftCommonConfig;
 import com.leclowndu93150.thaumcraft.api.golems.IGolemAPI;
 import com.leclowndu93150.thaumcraft.api.golems.IGolemProperties;
@@ -20,9 +23,11 @@ import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCEntityDataSerializers;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
+import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
@@ -81,11 +86,14 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
             SynchedEntityData.defineId(EntityThaumcraftGolem.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Byte> CLIMBING =
             SynchedEntityData.defineId(EntityThaumcraftGolem.class, EntityDataSerializers.BYTE);
+    private static final EntityDataAccessor<String> ACCESSORIES =
+            SynchedEntityData.defineId(EntityThaumcraftGolem.class, EntityDataSerializers.STRING);
 
     private static final int FLAG_FOLLOWING = 1 << 1;
     private static final int FLAG_COMBAT = 1 << 3;
     private static final int HOME_RANGE = 32;
     private static final int HOME_RANGE_SCOUT = 48;
+    private static final double BASE_MOVEMENT_SPEED = 0.3;
     private static final int RANGED_TARGET_FORGET_DIST_SQR = 1024;
     private static final int EVENT_EMOTE_TASK = 5;
     private static final int EVENT_EMOTE_FAIL = 6;
@@ -123,6 +131,73 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
         entityData.define(COLOR, (byte) 0);
         entityData.define(FLAGS, (byte) 0);
         entityData.define(CLIMBING, (byte) 0);
+        entityData.define(ACCESSORIES, "");
+    }
+
+    public String getAccessoryString() {
+        return entityData.get(ACCESSORIES);
+    }
+
+    public List<GolemAccessory> getAccessories() {
+        String joined = entityData.get(ACCESSORIES);
+        if (joined.isEmpty()) {
+            return List.of();
+        }
+        List<GolemAccessory> accessories = new ArrayList<>();
+        for (String id : joined.split(",")) {
+            GolemAccessory accessory = GolemAccessories.get(ResourceLocation.parse(id));
+            if (accessory != null) {
+                accessories.add(accessory);
+            }
+        }
+        return accessories;
+    }
+
+    private boolean addAccessory(GolemAccessory accessory) {
+        List<GolemAccessory> current = getAccessories();
+        for (GolemAccessory worn : current) {
+            if (worn == accessory) {
+                return false;
+            }
+            if (accessory.group() != GolemAccessory.Group.NONE && worn.group() == accessory.group()) {
+                return false;
+            }
+        }
+        String joined = entityData.get(ACCESSORIES);
+        entityData.set(ACCESSORIES, joined.isEmpty() ? accessory.id().toString()
+                : joined + "," + accessory.id());
+        updateEntityAttributes();
+        return true;
+    }
+
+    private void dropAccessories() {
+        if (!(level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        for (GolemAccessory accessory : getAccessories()) {
+            ItemStack stack = ItemGolemAccessory.stackFor(accessory);
+            if (!stack.isEmpty()) {
+                spawnAtLocation(stack, 0.5F);
+            }
+        }
+        entityData.set(ACCESSORIES, "");
+    }
+
+    private float accessoryRegenFactor() {
+        float factor = 1.0F;
+        for (GolemAccessory accessory : getAccessories()) {
+            factor *= accessory.regenFactor();
+        }
+        return factor;
+    }
+
+    private boolean hasKillCreditAccessory() {
+        for (GolemAccessory accessory : getAccessories()) {
+            if (accessory.killCredit()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -185,17 +260,31 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
 
     public void updateEntityAttributes() {
         GolemProperties props = props();
+        List<GolemAccessory> accessories = getAccessories();
+        int accessoryHealth = 0;
+        int accessoryArmor = 0;
+        float rangeFactor = 1.0F;
+        float speedFactor = 1.0F;
+        for (GolemAccessory accessory : accessories) {
+            accessoryHealth += accessory.healthBonus();
+            accessoryArmor += accessory.armorBonus();
+            rangeFactor *= accessory.rangeFactor();
+            speedFactor *= accessory.speedFactor();
+        }
         int maxHealth = 10 + props.getMaterial().healthMod();
         if (props.hasTrait(GolemTrait.FRAGILE)) {
             maxHealth = (int) (maxHealth * 0.75);
         }
-        maxHealth += props.getRank();
+        maxHealth += props.getRank() + accessoryHealth;
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHealth);
         getAttribute(Attributes.STEP_HEIGHT).setBaseValue(props.hasTrait(GolemTrait.WHEELED) ? 0.5 : 0.6);
-        setHomeTo(getHomePosition().equals(BlockPos.ZERO) ? blockPosition() : getHomePosition(),
-                props.hasTrait(GolemTrait.SCOUT) ? HOME_RANGE_SCOUT : HOME_RANGE);
-        getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(props.hasTrait(GolemTrait.SCOUT) ? 56.0 : 40.0);
-        getAttribute(Attributes.ARMOR).setBaseValue(computeArmor(props));
+        getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(BASE_MOVEMENT_SPEED * speedFactor);
+        int homeRange = props.hasTrait(GolemTrait.SCOUT) ? HOME_RANGE_SCOUT : HOME_RANGE;
+        restrictTo(getRestrictCenter().equals(BlockPos.ZERO) ? blockPosition() : getRestrictCenter(),
+                (int) (homeRange * rangeFactor));
+        getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(
+                (props.hasTrait(GolemTrait.SCOUT) ? 56.0 : 40.0) * rangeFactor);
+        getAttribute(Attributes.ARMOR).setBaseValue(computeArmor(props) + accessoryArmor);
         this.navigation = createGolemNavigation();
         if (props.hasTrait(GolemTrait.FLYER)) {
             this.moveControl = new GolemFlyingMoveControl(this);
@@ -294,7 +383,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
                                                   MobSpawnType spawnReason, @Nullable SpawnGroupData spawnGroupData) {
-        setHomeTo(blockPosition(), HOME_RANGE);
+        restrictTo(blockPosition(), HOME_RANGE);
         updateEntityAttributes();
         return spawnGroupData;
     }
@@ -307,7 +396,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
     }
 
     @Override
-    public boolean causeFallDamage(double fallDistance, float damageMultiplier, DamageSource source) {
+    public boolean causeFallDamage(float fallDistance, float damageMultiplier, DamageSource source) {
         if (props().hasTrait(GolemTrait.FLYER) || props().hasTrait(GolemTrait.CLIMBER)) {
             return false;
         }
@@ -324,7 +413,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
         if (!level().isClientSide()) {
             if (firstRun) {
                 firstRun = false;
-                if (hasHome() && !blockPosition().equals(getHomePosition())) {
+                if (hasRestriction() && !blockPosition().equals(getRestrictCenter())) {
                     goHome();
                 }
             }
@@ -338,11 +427,12 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
                     && distanceToSqr(getTarget()) > RANGED_TARGET_FORGET_DIST_SQR) {
                 setTarget(null);
             }
-            if (level() instanceof ServerLevel serverLevel && !serverLevel.isPvpAllowed()
+            if (level() instanceof ServerLevel serverLevel && !serverLevel.getServer().isPvpAllowed()
                     && getTarget() instanceof Player) {
                 setTarget(null);
             }
-            if (tickCount % (props.hasTrait(GolemTrait.REPAIR) ? 40 : 100) == 0) {
+            int healInterval = (int) ((props.hasTrait(GolemTrait.REPAIR) ? 40 : 100) * accessoryRegenFactor());
+            if (tickCount % Math.max(1, healInterval) == 0) {
                 heal(1.0F);
             }
             if (props.hasTrait(GolemTrait.CLIMBER)) {
@@ -384,12 +474,12 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
         double oldX = getX();
         double oldY = getY();
         double oldZ = getZ();
-        double homeX = getHomePosition().getX() + 0.5;
-        double homeY = getHomePosition().getY();
-        double homeZ = getHomePosition().getZ() + 0.5;
+        double homeX = getRestrictCenter().getX() + 0.5;
+        double homeY = getRestrictCenter().getY();
+        double homeZ = getRestrictCenter().getZ() + 0.5;
         BlockPos probe = BlockPos.containing(homeX, homeY, homeZ);
         boolean foundCeiling = false;
-        while (!foundCeiling && probe.getY() < level().getMaxY()) {
+        while (!foundCeiling && probe.getY() < level().getMaxBuildHeight()) {
             BlockPos above = probe.above();
             if (!level().getBlockState(above).getCollisionShape(level(), above).isEmpty()) {
                 foundCeiling = true;
@@ -413,7 +503,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
     }
 
     @Override
-    protected void actuallyHurt(ServerLevel level, DamageSource source, float damage) {
+    protected void actuallyHurt(DamageSource source, float damage) {
         GolemProperties props = props();
         if (source.is(DamageTypeTags.IS_FIRE) && props.hasTrait(GolemTrait.FIREPROOF)) {
             return;
@@ -424,10 +514,10 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
         if (source.is(DamageTypes.CACTUS)) {
             return;
         }
-        if (hasHome() && (source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FELL_OUT_OF_WORLD))) {
+        if (hasRestriction() && (source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FELL_OUT_OF_WORLD))) {
             goHome();
         }
-        super.actuallyHurt(level, source, damage);
+        super.actuallyHurt(source, damage);
     }
 
     @Override
@@ -440,21 +530,29 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
         }
         if (player.isShiftKeyDown()) {
             pickUpGolem(player, hand);
-            return InteractionResult.SUCCESS_SERVER;
+            return InteractionResult.CONSUME;
         }
         if (player.getItemInHand(hand).is(TCItems.GOLEM_BELL.get())) {
             toggleFollow(player, hand);
-            return InteractionResult.SUCCESS_SERVER;
+            return InteractionResult.CONSUME;
         }
-        DyeColor dyeColor = player.getItemInHand(hand).get(DataComponents.DYE);
+        if (player.getItemInHand(hand).getItem() instanceof ItemGolemAccessory accessoryItem) {
+            if (addAccessory(accessoryItem.accessory())) {
+                playSound(TCSounds.CLACK.get(), 1.0F, 1.0F);
+                player.getItemInHand(hand).shrink(1);
+                player.swing(hand, true);
+            }
+            return InteractionResult.CONSUME;
+        }
+        DyeColor dyeColor = player.getItemInHand(hand).getItem() instanceof DyeItem dyeItem ? dyeItem.getDyeColor() : null;
         if (dyeColor != null) {
             playSound(TCSounds.ZAP.get(), 1.0F, 1.0F);
             setGolemColor((byte) (1 + dyeColor.getId()));
             player.getItemInHand(hand).shrink(1);
             player.swing(hand, true);
-            return InteractionResult.SUCCESS_SERVER;
+            return InteractionResult.CONSUME;
         }
-        return InteractionResult.SUCCESS_SERVER;
+        return InteractionResult.CONSUME;
     }
 
     private void pickUpGolem(Player player, InteractionHand hand) {
@@ -463,10 +561,11 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
             task.setReserved(false);
         }
         dropCarried();
+        dropAccessories();
         ItemStack placer = new ItemStack(TCItems.GOLEM_PLACER.get());
         placer.set(TCDataComponents.GOLEM_PROPERTIES.get(), props().copy());
         placer.set(TCDataComponents.GOLEM_XP.get(), rankXp);
-        spawnAtLocation((ServerLevel) level(), placer, 0.5F);
+        spawnAtLocation(placer, 0.5F);
         discard();
         player.swing(hand, true);
     }
@@ -482,13 +581,13 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
             if (ThaumcraftCommonConfig.SHOW_GOLEM_EMOTES.get()) {
                 level().broadcastEntityEvent(this, (byte) EVENT_EMOTE_TASK);
             }
-            clearHome();
+            restrictTo(BlockPos.ZERO, -1);
         } else {
             sendActionBar(player, "golem.stay");
             if (ThaumcraftCommonConfig.SHOW_GOLEM_EMOTES.get()) {
                 level().broadcastEntityEvent(this, (byte) EVENT_EMOTE_STAY);
             }
-            setHomeTo(blockPosition(), props().hasTrait(GolemTrait.SCOUT) ? HOME_RANGE_SCOUT : HOME_RANGE);
+            restrictTo(blockPosition(), props().hasTrait(GolemTrait.SCOUT) ? HOME_RANGE_SCOUT : HOME_RANGE);
         }
         updateEntityAttributes();
         player.swing(hand, true);
@@ -517,7 +616,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
         }
         for (ItemStack stack : getCarrying()) {
             if (!stack.isEmpty()) {
-                spawnAtLocation(serverLevel, stack, 0.25F);
+                spawnAtLocation(stack, 0.25F);
             }
         }
     }
@@ -525,13 +624,14 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
     @Override
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean playerKill) {
         super.dropCustomDeathLoot(level, source, playerKill);
+        dropAccessories();
         for (ItemStack stack : props().generateComponents()) {
             ItemStack copy = stack.copy();
             if (random.nextFloat() < 0.3F) {
                 if (copy.getCount() > 0) {
                     copy.shrink(random.nextInt(copy.getCount()));
                 }
-                spawnAtLocation(level, copy, 0.25F);
+                spawnAtLocation(copy, 0.25F);
             }
         }
     }
@@ -543,13 +643,14 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
     }
 
     @Override
-    public boolean doHurtTarget(ServerLevel level, Entity target) {
+    public boolean doHurtTarget(Entity target) {
         float damage = (float) getAttributeValue(Attributes.ATTACK_DAMAGE);
-        boolean hurt = target.hurtServer(level, damageSources().mobAttack(this), damage);
+        boolean hurt = target.hurt(damageSources().mobAttack(this), damage);
         if (hurt) {
-            if (target instanceof LivingEntity living && props().hasTrait(GolemTrait.DEFT)
-                    && getOwnerReference() != null) {
-                living.setLastHurtByPlayer(getOwnerReference().getUUID(), 100);
+            if (target instanceof LivingEntity living
+                    && (props().hasTrait(GolemTrait.DEFT) || hasKillCreditAccessory())
+                    && getOwner() instanceof Player ownerPlayer) {
+                living.setLastHurtByPlayer(ownerPlayer);
             }
             if (props().getArms().function() != null) {
                 props().getArms().function().onMeleeAttack(this, target);
@@ -769,23 +870,25 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         TCNbt.store(output, "props", GolemProperties.CODEC, registryAccess(), props());
-        TCNbt.store(output, "homepos", BlockPos.CODEC, registryAccess(), getHomePosition());
+        TCNbt.store(output, "homepos", BlockPos.CODEC, registryAccess(), getRestrictCenter());
         output.putByte("gflags", getFlags());
         output.putInt("rankXP", rankXp);
         output.putByte("color", getGolemColor());
+        output.putString("accessories", entityData.get(ACCESSORIES));
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         TCNbt.read(input, "props", GolemProperties.CODEC, registryAccess()).ifPresent(this::setProperties);
-        setHomeTo(TCNbt.read(input, "homepos", BlockPos.CODEC, registryAccess()).orElse(BlockPos.ZERO), HOME_RANGE);
+        restrictTo(TCNbt.read(input, "homepos", BlockPos.CODEC, registryAccess()).orElse(BlockPos.ZERO), HOME_RANGE);
         entityData.set(FLAGS, input.getByte("gflags"));
         rankXp = input.getInt("rankXP");
         setGolemColor(input.getByte("color"));
+        entityData.set(ACCESSORIES, input.getString("accessories"));
         updateEntityAttributes();
     }
 

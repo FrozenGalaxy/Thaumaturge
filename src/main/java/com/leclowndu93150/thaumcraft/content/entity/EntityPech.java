@@ -148,7 +148,7 @@ public class EntityPech extends Monster implements RangedAttackMob {
         this.goalSelector.addGoal(11, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class,
-                10, true, false, (target, level) -> this.getAnger() > 0));
+                10, true, false, target -> this.getAnger() > 0));
     }
 
     @Override
@@ -222,8 +222,7 @@ public class EntityPech extends Monster implements RangedAttackMob {
                 arrowStack = new ItemStack(Items.TIPPED_ARROW);
                 arrowStack.set(DataComponents.POTION_CONTENTS,
                         new PotionContents(Optional.empty(), Optional.empty(),
-                                List.of(new MobEffectInstance(MobEffects.POISON, 40)),
-                                Optional.empty()));
+                                List.of(new MobEffectInstance(MobEffects.POISON, 40))));
             }
             Arrow arrow = new Arrow(this.level(), this, arrowStack, null);
             double dx = target.getX() - this.getX();
@@ -377,8 +376,9 @@ public class EntityPech extends Monster implements RangedAttackMob {
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
-        if (this.isInvulnerableTo(level, source)) {
+    public boolean hurt(DamageSource source, float damage) {
+        ServerLevel level = (ServerLevel) level();
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
         Entity attacker = source.getEntity();
@@ -391,7 +391,7 @@ public class EntityPech extends Monster implements RangedAttackMob {
             }
             this.becomeAngryAt(attacker);
         }
-        return super.hurtServer(level, source, damage);
+        return super.hurt(source, damage);
     }
 
     @Override
@@ -432,8 +432,9 @@ public class EntityPech extends Monster implements RangedAttackMob {
     }
 
     @Override
-    protected void customServerAiStep(ServerLevel level) {
-        super.customServerAiStep(level);
+    protected void customServerAiStep() {
+        ServerLevel level = (ServerLevel) level();
+        super.customServerAiStep();
         if (this.tickCount % HEAL_INTERVAL_TICKS == 0) {
             this.heal(1.0F);
         }
@@ -480,7 +481,7 @@ public class EntityPech extends Monster implements RangedAttackMob {
         super.dropCustomDeathLoot(level, source, hitByPlayer);
         for (ItemStack stack : this.loot) {
             if (!stack.isEmpty() && this.random.nextFloat() < LOOT_DROP_CHANCE) {
-                this.spawnAtLocation(level, stack.copy(), 1.5F);
+                this.spawnAtLocation(stack.copy(), 1.5F);
             }
         }
     }
@@ -582,22 +583,22 @@ public class EntityPech extends Monster implements RangedAttackMob {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putByte("PechType", (byte) this.getPechType());
         output.putShort("Anger", (short) this.getAnger());
         output.putBoolean("Tamed", this.isTamed());
-        ContainerHelper.saveAllItems(output, this.loot);
+        ContainerHelper.saveAllItems(output, this.loot, registryAccess());
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         this.setPechType(input.getByte("PechType"));
         this.setAnger(input.getShort("Anger"));
         this.setTamed(input.getBoolean("Tamed"));
         this.loot = NonNullList.withSize(LOOT_SLOTS, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(input, this.loot);
+        ContainerHelper.loadAllItems(input, this.loot, registryAccess());
         this.setCombatTask();
     }
 }

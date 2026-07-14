@@ -5,7 +5,6 @@ import com.leclowndu93150.thaumcraft.content.fx.helper.Sprites;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Blocks;
@@ -26,8 +25,7 @@ public final class BlockGrassAmbient extends GrassBlock {
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         int skyLight = level.getBrightness(LightLayer.SKY, pos.above()) - level.getSkyDarken();
-        float angle = level.environmentAttributes().getValue(EnvironmentAttributes.SUN_ANGLE, pos)
-                * (float) (Math.PI / 180.0);
+        float angle = level.getTimeOfDay(1.0F) * 360.0F * (float) (Math.PI / 180.0);
         float target = angle < (float) Math.PI ? 0.0F : (float) (Math.PI * 2);
         angle += (target - angle) * 0.2F;
         skyLight = Math.round(skyLight * Mth.cos(angle));

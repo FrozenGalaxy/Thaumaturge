@@ -83,6 +83,6 @@ public abstract class ArcaneWorkbenchRecipeBuilder<R extends ArcaneWorkbenchReci
 
     @Override
     public ResourceKey<Recipe<?>> defaultId() {
-        return ResourceKey.create(Registries.RECIPE, result.typeHolder().unwrapKey().orElseThrow().identifier().withPrefix("arcane_workbench/"));
+        return ResourceKey.create(Registries.RECIPE, result.typeHolder().unwrapKey().orElseThrow().location().withPrefix("arcane_workbench/"));
     }
 }

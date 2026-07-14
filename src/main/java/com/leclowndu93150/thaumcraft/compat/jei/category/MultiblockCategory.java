@@ -196,7 +196,7 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
         if (registry == null) {
             return null;
         }
-        Holder<Blueprint> holder = registry.get(key).orElse(null);
+        Holder<Blueprint> holder = registry.get(key);
         return holder == null ? null : holder.value();
     }
 

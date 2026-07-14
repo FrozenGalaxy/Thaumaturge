@@ -52,13 +52,13 @@ public class BlockEntityArcaneWorkbench extends BlockEntity implements MenuProvi
     @Override
     protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
         super.saveAdditional(output, registries);
-        ContainerHelper.saveAllItems(output, inventory.getItems());
+        ContainerHelper.saveAllItems(output, inventory.getItems(), registries);
     }
 
     @Override
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
-        ContainerHelper.loadAllItems(input, inventory.getItems());
+        ContainerHelper.loadAllItems(input, inventory.getItems(), registries);
         inventory.setChanged();
     }
 
@@ -72,11 +72,11 @@ public class BlockEntityArcaneWorkbench extends BlockEntity implements MenuProvi
             if (!(level.getBlockState(getBlockPos().above()).getBlock() instanceof BlockArcaneWorkbenchCharger)){
                 auraVis = (int) AuraHelper.getVis(level, getBlockPos());
             } else {
-                ChunkPos chunkPos = ChunkPos.containing(getBlockPos());
+                ChunkPos chunkPos = new ChunkPos(getBlockPos());
 
                 for (int x = -1; x <= 1; x++) {
                     for (int z = -1; z <= 1; z++) {
-                        ChunkPos current = new ChunkPos(chunkPos.x() + x, chunkPos.z() + z);
+                        ChunkPos current = new ChunkPos(chunkPos.x + x, chunkPos.z + z);
                         auraVis += (int)  AuraHelper.getVis(level, current.getMiddleBlockPosition(getBlockPos().getY()));
                     }
                 }
@@ -89,7 +89,7 @@ public class BlockEntityArcaneWorkbench extends BlockEntity implements MenuProvi
             if (!(level.getBlockState(getBlockPos().above()).getBlock() instanceof BlockArcaneWorkbenchCharger)){
                 AuraHelper.drainVis(level, getBlockPos(), vis, false);
             } else {
-                ChunkPos chunkPos = ChunkPos.containing(getBlockPos());
+                ChunkPos chunkPos = new ChunkPos(getBlockPos());
                 int remaining = vis;
                 int max = Math.max(1, vis / 9);
                 int attempts = 0;
@@ -98,7 +98,7 @@ public class BlockEntityArcaneWorkbench extends BlockEntity implements MenuProvi
                     attempts++;
                     for (int x = -1; x <= 1; x++) {
                         for (int z = -1; z <= 1; z++) {
-                            ChunkPos current = new ChunkPos(chunkPos.x() + x, chunkPos.z() + z);
+                            ChunkPos current = new ChunkPos(chunkPos.x + x, chunkPos.z + z);
                             if (max > remaining)
                                 max = remaining;
                             remaining = (int)(remaining - AuraHelper.drainVis(level, current.getMiddleBlockPosition(getBlockPos().getY()), max,false));

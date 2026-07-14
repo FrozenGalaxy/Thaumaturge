@@ -38,8 +38,8 @@ public final class BlockEntityLampArcane extends BlockEntity {
         if (target.getY() > surface.getY() + SURFACE_CLEARANCE) {
             target = surface.above(SURFACE_CLEARANCE);
         }
-        if (target.getY() < level.getMinY() + SURFACE_CLEARANCE + 1) {
-            target = new BlockPos(target.getX(), level.getMinY() + SURFACE_CLEARANCE + 1, target.getZ());
+        if (target.getY() < level.getMinBuildHeight() + SURFACE_CLEARANCE + 1) {
+            target = new BlockPos(target.getX(), level.getMinBuildHeight() + SURFACE_CLEARANCE + 1, target.getZ());
         }
         if (level.getBlockState(target).isAir()
                 && !level.getBlockState(target).is(TCBlocks.EFFECT_GLIMMER.get())
@@ -75,8 +75,8 @@ public final class BlockEntityLampArcane extends BlockEntity {
     }
 
     @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+    public void setRemoved() {
         removeLights();
-        super.preRemoveSideEffects(pos, state);
+        super.setRemoved();
     }
 }

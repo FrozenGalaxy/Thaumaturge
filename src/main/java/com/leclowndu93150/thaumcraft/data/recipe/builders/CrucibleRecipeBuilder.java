@@ -72,6 +72,6 @@ public class CrucibleRecipeBuilder extends SimpleRecipeBuilder {
 
     @Override
     public ResourceKey<Recipe<?>> defaultId() {
-        return ResourceKey.create(Registries.RECIPE, result.typeHolder().unwrapKey().orElseThrow().identifier().withPrefix("crucible/"));
+        return ResourceKey.create(Registries.RECIPE, result.typeHolder().unwrapKey().orElseThrow().location().withPrefix("crucible/"));
     }
 }

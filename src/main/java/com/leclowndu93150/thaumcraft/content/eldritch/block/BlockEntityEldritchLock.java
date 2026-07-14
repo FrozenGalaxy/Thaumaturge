@@ -211,7 +211,7 @@ public final class BlockEntityEldritchLock extends BlockEntity {
         faceBoss(boss, lockPos, x2 + 0.5, y + 3, z2 + 0.5);
         boss.finalizeSpawn(level, level.getCurrentDifficultyAt(new BlockPos(x2, y + 3, z2)),
                 MobSpawnType.EVENT, null);
-        boss.setHomeTo(new BlockPos(x, y + 2, z), 32);
+        boss.restrictTo(new BlockPos(x, y + 2, z), 32);
         level.addFreshEntity(boss);
     }
 
@@ -299,7 +299,7 @@ public final class BlockEntityEldritchLock extends BlockEntity {
             }
         }
         EntityCultistPortalGreater boss = new EntityCultistPortalGreater(TCEntities.CULTIST_PORTAL_GREATER.get(), level);
-        boss.snapTo(x + 0.5, y + 2, z + 0.5, 0.0F, 0.0F);
+        boss.moveTo(x + 0.5, y + 2, z + 0.5, 0.0F, 0.0F);
         boss.finalizeSpawn(level, level.getCurrentDifficultyAt(new BlockPos(x, y + 2, z)),
                 MobSpawnType.EVENT, null);
         level.addFreshEntity(boss);
@@ -346,7 +346,7 @@ public final class BlockEntityEldritchLock extends BlockEntity {
         Monster boss = giant
                 ? new EntityTaintacleGiant(TCEntities.TAINTACLE_GIANT.get(), level)
                 : new EntityTaintacle(TCEntities.TAINTACLE.get(), level);
-        boss.snapTo(x, y, z, 0.0F, 0.0F);
+        boss.moveTo(x, y, z, 0.0F, 0.0F);
         ChampionHelper.makeChampion(boss, true);
         boss.finalizeSpawn(level, level.getCurrentDifficultyAt(boss.blockPosition()),
                 MobSpawnType.EVENT, null);
@@ -355,7 +355,7 @@ public final class BlockEntityEldritchLock extends BlockEntity {
 
     private static boolean isAdjacentToSolid(ServerLevel level, BlockPos pos) {
         for (Direction dir : Direction.values()) {
-            if (level.getBlockState(pos.relative(dir)).isSolidRender()) {
+            if (level.getBlockState(pos.relative(dir)).isSolidRender(level, pos.relative(dir))) {
                 return true;
             }
         }
@@ -369,7 +369,7 @@ public final class BlockEntityEldritchLock extends BlockEntity {
         double d3 = Math.sqrt(d0 * d0 + d2 * d2);
         float yaw = (float) (Mth.atan2(d2, d0) * 180.0 / Math.PI) - 90.0F;
         float pitch = (float) (-(Mth.atan2(d1, d3) * 180.0 / Math.PI));
-        boss.snapTo(x, y, z, yaw, pitch);
+        boss.moveTo(x, y, z, yaw, pitch);
     }
 
     private static BlockState urnState(RandomSource rand, float rareChance, float uncommonChance) {

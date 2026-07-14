@@ -123,8 +123,8 @@ public class EntityEldritchCrab extends Monster implements IEldritchMob {
 
     private static Holder<MobEffect> randomGroupEffect(RandomSource rand) {
         return switch (rand.nextInt(4)) {
-            case 0 -> MobEffects.SPEED;
-            case 1 -> MobEffects.STRENGTH;
+            case 0 -> MobEffects.MOVEMENT_SPEED;
+            case 1 -> MobEffects.DAMAGE_BOOST;
             case 2 -> MobEffects.REGENERATION;
             default -> MobEffects.INVISIBILITY;
         };
@@ -153,7 +153,7 @@ public class EntityEldritchCrab extends Monster implements IEldritchMob {
         }
         if (this.getVehicle() != null && this.isAlive() && this.attackTime <= 0) {
             this.attackTime = 10 + this.random.nextInt(10);
-            this.doHurtTarget((ServerLevel) this.level(), this.getVehicle());
+            this.doHurtTarget(this.getVehicle());
             if (this.random.nextFloat() < DISMOUNT_CHANCE) {
                 this.stopRiding();
             }
@@ -161,8 +161,8 @@ public class EntityEldritchCrab extends Monster implements IEldritchMob {
     }
 
     @Override
-    public boolean doHurtTarget(ServerLevel level, Entity target) {
-        if (super.doHurtTarget(level, target)) {
+    public boolean doHurtTarget(Entity target) {
+        if (super.doHurtTarget(target)) {
             this.playSound(TCSounds.CRABCLAW.get(), 1.0F, 0.9F + this.random.nextFloat() * 0.2F);
             return true;
         }
@@ -170,12 +170,13 @@ public class EntityEldritchCrab extends Monster implements IEldritchMob {
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
-        boolean result = super.hurtServer(level, source, damage);
+    public boolean hurt(DamageSource source, float damage) {
+        ServerLevel level = (ServerLevel) level();
+        boolean result = super.hurt(source, damage);
         if (this.hasHelm() && this.getHealth() / this.getMaxHealth() <= HELM_BREAK_HEALTH_FRACTION) {
             this.setHelm(false);
             level.sendParticles(
-                    new ItemParticleOption(ParticleTypes.ITEM, TCItems.CRIMSON_PLATE_CHEST.get()),
+                    new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(TCItems.CRIMSON_PLATE_CHEST.get())),
                     this.getX(), this.getY() + this.getBbHeight() / 2.0, this.getZ(),
                     BREAK_PARTICLES, 0.1, 0.1, 0.1, 0.05);
         }
@@ -183,13 +184,13 @@ public class EntityEldritchCrab extends Monster implements IEldritchMob {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         this.setHelm(input.getBoolean("helm"));
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("helm", this.hasHelm());
     }

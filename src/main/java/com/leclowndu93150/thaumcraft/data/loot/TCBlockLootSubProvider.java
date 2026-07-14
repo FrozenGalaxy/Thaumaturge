@@ -7,7 +7,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
-import com.leclowndu93150.thaumcraft.registry.TCItems;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Items;
@@ -81,6 +80,15 @@ public final class TCBlockLootSubProvider extends BlockLootSubProvider {
 
     @Override
     protected void generate() {
+        dropSelf(TCBlocks.NODE_STABILIZER.get());
+        dropSelf(TCBlocks.NODE_STABILIZER_ADVANCED.get());
+        add(TCBlocks.JAR_NODE.get(), LootTable.lootTable()
+                .withPool(this.applyExplosionCondition(TCBlocks.JAR_NODE.get(), LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1))
+                        .add(LootItem.lootTableItem(TCBlocks.JAR_NODE.get())
+                                .apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
+                                        .include(TCDataComponents.NODE_DATA.get()))))));
+
         for (DyeColor dye : DyeColor.values()) {
             dropSelf(TCBlocks.CANDLES.get(dye).get());
             add(TCBlocks.BANNERS.get(dye).get(), bannerTable(TCItems.BANNERS.get(dye).get()));
@@ -97,7 +105,8 @@ public final class TCBlockLootSubProvider extends BlockLootSubProvider {
         add(TCBlocks.LOOT_CRATE_UNCOMMON.get(), lootContainerTable(TCBlocks.LOOT_CRATE_UNCOMMON.get(), 1));
         add(TCBlocks.LOOT_CRATE_RARE.get(), lootContainerTable(TCBlocks.LOOT_CRATE_RARE.get(), 2));
 
-        dropSelf(TCBlocks.RESEARCH_TABLE.get());
+        dropOther(TCBlocks.RESEARCH_TABLE.get(), TCBlocks.TABLE_WOOD.get());
+        dropSelf(TCBlocks.DECONSTRUCTION_TABLE.get());
         dropSelf(TCBlocks.SPA.get());
         dropSelf(TCBlocks.FOCAL_MANIPULATOR.get());
         dropSelf(TCBlocks.ARCANE_WORKBENCH.get());

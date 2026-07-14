@@ -35,7 +35,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CocoaBlock;
-import net.minecraft.world.level.block.FarmlandBlock;
+import net.minecraft.world.level.block.FarmBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.tags.BlockTags;
@@ -121,7 +121,7 @@ public class SealHarvest implements ISeal, ISealGui, ISealConfigArea, ISealConfi
         FakePlayer player = GolemFakePlayer.at(level, golem);
         BlockState state = level.getBlockState(task.getPos());
         if (CropUtils.isClickableCrop(state)) {
-            Direction face = Direction.getApproximateNearest(
+            Direction face = Direction.getNearest(
                     task.getPos().getX() + 0.5 - golem.getGolemEntity().getX(),
                     task.getPos().getY() + 0.5 - golem.getGolemEntity().getY(),
                     task.getPos().getZ() + 0.5 - golem.getGolemEntity().getZ()).getOpposite();
@@ -145,7 +145,7 @@ public class SealHarvest implements ISeal, ISealGui, ISealConfigArea, ISealConfi
         BlockState below = level.getBlockState(task.getPos().below());
         Direction replantFace = null;
         boolean cocoa = state.getBlock() instanceof CocoaBlock;
-        if (!cocoa && below.is(BlockTags.DIRT) || below.getBlock() instanceof FarmlandBlock) {
+        if (!cocoa && below.is(BlockTags.DIRT) || below.getBlock() instanceof FarmBlock) {
             replantFace = Direction.DOWN;
         } else if (cocoa) {
             replantFace = state.getValue(CocoaBlock.FACING);
@@ -156,7 +156,7 @@ public class SealHarvest implements ISeal, ISealGui, ISealConfigArea, ISealConfi
             replant.setLifespan(REPLANT_LIFESPAN);
             TaskHandler.addTask(level, replant);
             replantTasks.put(replant.getPos().asLong(), new ReplantInfo(replant.getPos(), replantFace,
-                    replant.getId(), seed.copy(), below.getBlock() instanceof FarmlandBlock));
+                    replant.getId(), seed.copy(), below.getBlock() instanceof FarmBlock));
         }
     }
 
@@ -169,7 +169,7 @@ public class SealHarvest implements ISeal, ISealGui, ISealConfigArea, ISealConfi
         }
         FakePlayer player = GolemFakePlayer.at(level, golem);
         BlockState below = level.getBlockState(task.getPos().below());
-        if (info.farmland && below.is(BlockTags.DIRT) && !(below.getBlock() instanceof FarmlandBlock)) {
+        if (info.farmland && below.is(BlockTags.DIRT) && !(below.getBlock() instanceof FarmBlock)) {
             ItemStack hoe = new ItemStack(Items.DIAMOND_HOE);
             player.setItemInHand(InteractionHand.MAIN_HAND, hoe);
             hoe.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND,
@@ -183,7 +183,7 @@ public class SealHarvest implements ISeal, ISealGui, ISealConfigArea, ISealConfi
                 new BlockHitResult(Vec3.atCenterOf(task.getPos().relative(info.face)), info.face.getOpposite(),
                         task.getPos().relative(info.face), false)));
         player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
-        if (result instanceof InteractionResult.Success) {
+        if (result.consumesAction()) {
             level.globalLevelEvent(LEVEL_EVENT_BLOCK_BREAK, task.getPos(),
                     Block.getId(level.getBlockState(task.getPos())));
             golem.dropItem(seed);
@@ -215,20 +215,18 @@ public class SealHarvest implements ISeal, ISealGui, ISealConfigArea, ISealConfi
     @Override
     public void readCustomNBT(CompoundTag nbt) {
         replantTasks.clear();
-        nbt.getList("replant").ifPresent(list -> {
-            for (int i = 0; i < list.size(); i++) {
-                list.getCompound(i).ifPresent(entry -> {
-                    long loc = entry.getLongOr("taskloc", 0L);
-                    byte face = entry.getByteOr("taskface", (byte) 0);
-                    boolean farmland = entry.getBooleanOr("farmland", false);
-                    Tag seedTag = entry.get("seed");
-                    ItemStack stack = seedTag == null ? ItemStack.EMPTY
-                            : ItemStack.OPTIONAL_CODEC.parse(NbtOps.INSTANCE, seedTag).result()
-                                    .orElse(ItemStack.EMPTY);
-                    replantTasks.put(loc, new ReplantInfo(BlockPos.of(loc), Direction.values()[face], 0, stack, farmland));
-                });
-            }
-        });
+        ListTag list = nbt.getList("replant", Tag.TAG_COMPOUND);
+        for (int i = 0; i < list.size(); i++) {
+            CompoundTag entry = list.getCompound(i);
+            long loc = entry.getLong("taskloc");
+            byte face = entry.getByte("taskface");
+            boolean farmland = entry.getBoolean("farmland");
+            Tag seedTag = entry.get("seed");
+            ItemStack stack = seedTag == null ? ItemStack.EMPTY
+                    : ItemStack.OPTIONAL_CODEC.parse(NbtOps.INSTANCE, seedTag).result()
+                            .orElse(ItemStack.EMPTY);
+            replantTasks.put(loc, new ReplantInfo(BlockPos.of(loc), Direction.values()[face], 0, stack, farmland));
+        }
     }
 
     @Override

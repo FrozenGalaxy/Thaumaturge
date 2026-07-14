@@ -1,5 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.workbench;
 
+import com.leclowndu93150.thaumcraft.content.research.DeviceGate;
+import com.leclowndu93150.thaumcraft.TCIds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
@@ -37,6 +39,9 @@ public class BlockArcaneWorkbenchCharger extends Block {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!level.isClientSide() && !DeviceGate.passes(player, TCIds.rl("workbench_charger"))) {
+            return InteractionResult.CONSUME;
+        }
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }

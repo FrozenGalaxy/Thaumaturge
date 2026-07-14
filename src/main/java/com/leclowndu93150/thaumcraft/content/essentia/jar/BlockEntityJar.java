@@ -15,7 +15,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -312,7 +311,7 @@ public class BlockEntityJar extends BlockEntity implements IEssentiaTransport, I
     }
 
     @Override
-    protected void applyImplicitComponents(DataComponentGetter input) {
+    protected void applyImplicitComponents(DataComponentInput input) {
         super.applyImplicitComponents(input);
         EssentiaList contents = input.get(TCDataComponents.ESSENTIA_CONTENTS.get());
         if (contents != null && !contents.isEmpty()) {

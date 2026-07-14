@@ -83,7 +83,7 @@ public final class BlockEntityVoidSiphon extends BlockEntity {
             if (current.isEmpty()) {
                 siphon.output.setStackInSlot(0, new ItemStack(TCItems.VOID_SEED.get()).copyWithCount(1));
             } else {
-                siphon.output.set(0, siphon.output.getStackInSlot(0), current.getCount() + 1);
+                siphon.output.setStackInSlot(0, current.copyWithCount(current.getCount() + 1));
             }
             changed = true;
         }

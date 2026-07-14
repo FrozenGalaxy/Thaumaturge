@@ -57,7 +57,7 @@ public final class MindSpiderRenderer extends MobRenderer<EntityMindSpider, Mind
         String viewer = entity.getViewer();
         String localName = Minecraft.getInstance().player == null
                 ? ""
-                : Minecraft.getInstance().player.getGameProfile().name();
+                : Minecraft.getInstance().player.getGameProfile().getName();
         state.hiddenFromViewer = !viewer.isEmpty() && !viewer.equals(localName);
     }
 

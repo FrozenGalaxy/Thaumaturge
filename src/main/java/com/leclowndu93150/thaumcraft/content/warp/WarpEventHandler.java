@@ -46,7 +46,7 @@ public final class WarpEventHandler {
         if (!entity.isUsingItem() || !entity.getUseItem().is(Items.MILK_BUCKET)) {
             return;
         }
-        ResourceLocation id = event.getEffect().unwrapKey().map(ResourceKey::identifier).orElse(null);
+        ResourceLocation id = event.getEffect().unwrapKey().map(ResourceKey::location).orElse(null);
         if (id != null && MILK_PROOF_EFFECTS.contains(id)) {
             event.setCanceled(true);
         }
@@ -95,7 +95,7 @@ public final class WarpEventHandler {
             }
         }
         MobEffectInstance hunger = player.getEffect(TCMobEffects.UNNATURAL_HUNGER);
-        if (hunger == null || used.get(DataComponents.CONSUMABLE) == null) {
+        if (hunger == null || used.get(DataComponents.FOOD) == null) {
             return;
         }
         if (used.is(Items.ROTTEN_FLESH) || used.is(TCItems.BRAIN.get())) {

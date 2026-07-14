@@ -23,5 +23,10 @@ public interface DustTrigger extends Recipe<DustTriggerInput>, ResearchGated{
         return false;
     }
 
+    @Override
+    default boolean canCraftInDimensions(int width, int height) {
+        return true;
+    }
+
     void execute(DustTriggerInput input, Player player, @Nullable DustTriggerPlacement placement, Direction useFace);
 }

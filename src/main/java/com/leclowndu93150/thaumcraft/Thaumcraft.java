@@ -3,9 +3,9 @@ package com.leclowndu93150.thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;
 import com.leclowndu93150.thaumcraft.api.golems.GolemHelper;
+import com.leclowndu93150.thaumcraft.content.equipment.TCMaterials;
 import com.leclowndu93150.thaumcraft.content.golem.GolemBindings;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
-import com.leclowndu93150.thaumcraft.api.research.theorycraft.TheorycraftAccess;
 import com.leclowndu93150.thaumcraft.api.taint.TaintApi;
 import com.leclowndu93150.thaumcraft.compat.curio.ThaumcraftCuriosCompat;
 import com.leclowndu93150.thaumcraft.content.aura.AuraHelperBindings;
@@ -35,6 +35,7 @@ public final class Thaumcraft {
         TCFluidTypes.register(modBus);
         TCFluids.register(modBus);
         TCBlocks.register(modBus);
+        TCMaterials.register(modBus);
         TCItems.register(modBus);
         TCFeatures.register(modBus);
         TCStructures.register(modBus);
@@ -50,22 +51,20 @@ public final class Thaumcraft {
         TCAttachments.register(modBus);
         TCDamageTypes.register(modBus);
         TCMobEffects.register(modBus);
-        TCTheorycraft.register(modBus);
         TCAttributes.register(modBus);
         TCChunkGenerators.register(modBus);
         TCFocusElements.register(modBus);
         TCGolemParts.register(modBus);
+        TCWandParts.register(modBus);
         TCSeals.register(modBus);
         TCEntityDataSerializers.register(modBus);
 
-        NeoForge.EVENT_BUS.addListener(TCRecipeTypes::registerSynchronizedRecipes);
 
         container.registerConfig(ModConfig.Type.COMMON, ThaumcraftCommonConfig.SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, ThaumcraftClientConfig.SPEC);
         container.registerConfig(ModConfig.Type.SERVER, ThaumcraftServerConfig.SPEC);
 
         KnowledgeAccess.bind(player -> player.getData(TCAttachments.KNOWLEDGE));
-        TheorycraftAccess.bind(player -> player.getData(TCAttachments.RESEARCH_TABLE));
         AuraHelper.bind(new AuraHelperBindings());
         TaintApi.bind(new TaintApiBindings());
         WarpHelper.bind(new WarpManager.Bindings());

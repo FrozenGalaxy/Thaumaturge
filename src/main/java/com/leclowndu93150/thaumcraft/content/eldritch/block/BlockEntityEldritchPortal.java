@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.portal.TeleportTransition;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -74,8 +74,8 @@ public final class BlockEntityEldritchPortal extends BlockEntity {
         int chunkX = portalPos.getX() >> 4;
         int chunkZ = portalPos.getZ() >> 4;
         Vec3 target = new Vec3(chunkX * 16 + 8.5, OuterLands.MAZE_Y + 4, chunkZ * 16 + 8.5);
-        player.teleport(new TeleportTransition(outer, target, Vec3.ZERO,
-                player.getYRot(), player.getXRot(), TeleportTransition.PLAY_PORTAL_SOUND));
+        player.changeDimension(new DimensionTransition(outer, target, Vec3.ZERO,
+                player.getYRot(), player.getXRot(), DimensionTransition.PLAY_PORTAL_SOUND));
         player.setPortalCooldown(PORTAL_COOLDOWN);
     }
 
@@ -91,8 +91,8 @@ public final class BlockEntityEldritchPortal extends BlockEntity {
             int surface = overworld.getHeight(Heightmap.Types.MOTION_BLOCKING, portalPos.getX(), portalPos.getZ());
             target = new Vec3(portalPos.getX() + 0.5, surface + 1, portalPos.getZ() + 0.5);
         }
-        player.teleport(new TeleportTransition(overworld, target, Vec3.ZERO,
-                player.getYRot(), player.getXRot(), TeleportTransition.PLAY_PORTAL_SOUND));
+        player.changeDimension(new DimensionTransition(overworld, target, Vec3.ZERO,
+                player.getYRot(), player.getXRot(), DimensionTransition.PLAY_PORTAL_SOUND));
         player.setPortalCooldown(PORTAL_COOLDOWN);
     }
 
@@ -106,7 +106,7 @@ public final class BlockEntityEldritchPortal extends BlockEntity {
         int baseZ = (portalPos.getZ() >> 4) * 16;
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                for (int y = level.getMaxY(); y >= RETURN_SCAN_MIN_Y; y--) {
+                for (int y = level.getMaxBuildHeight(); y >= RETURN_SCAN_MIN_Y; y--) {
                     cursor.set(baseX + x, y, baseZ + z);
                     if (chunk.getBlockState(cursor).is(TCBlocks.ELDRITCH_PORTAL.get())) {
                         return cursor.immutable();

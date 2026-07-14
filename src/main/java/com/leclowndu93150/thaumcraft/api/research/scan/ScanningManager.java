@@ -106,8 +106,16 @@ public final class ScanningManager {
     public static void scanTheThing(Player player, @Nullable Object target) {
         boolean found = false;
         boolean suppress = false;
+        Component failure = null;
         for (IScanThing thing : THINGS) {
             if (!thing.checkThing(player, target)) {
+                continue;
+            }
+            Component fail = thing.scanFailure(player, target);
+            if (fail != null) {
+                if (failure == null) {
+                    failure = fail;
+                }
                 continue;
             }
             ResourceLocation key = thing.getResearchKey(player, target);
@@ -120,13 +128,16 @@ public final class ScanningManager {
             found = true;
             thing.onSuccess(player, target);
         }
-        if (!suppress) {
+        if (failure != null) {
+            player.displayClientMessage(failure.copy()
+                    .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC), true);
+        } else if (!suppress) {
             if (found) {
-                player.sendOverlayMessage(Component.translatable("tc.knownobject")
-                        .withStyle(ChatFormatting.GREEN, ChatFormatting.ITALIC));
+                player.displayClientMessage(Component.translatable("tc.knownobject")
+                        .withStyle(ChatFormatting.GREEN, ChatFormatting.ITALIC), true);
             } else {
-                player.sendOverlayMessage(Component.translatable("tc.unknownobject")
-                        .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
+                player.displayClientMessage(Component.translatable("tc.unknownobject")
+                        .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC), true);
             }
         }
         if (target instanceof BlockPos pos) {
@@ -141,8 +152,8 @@ public final class ScanningManager {
                         scanned++;
                     }
                     if (scanned >= MAX_CONTAINER_SCANS) {
-                        player.sendOverlayMessage(Component.translatable("tc.invtoolarge")
-                                .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
+                        player.displayClientMessage(Component.translatable("tc.invtoolarge")
+                                .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC), true);
                         break;
                     }
                 }
@@ -188,7 +199,7 @@ public final class ScanningManager {
         }
         if (target instanceof BlockPos pos) {
             BlockState state = player.level().getBlockState(pos);
-            ItemStack stack = state.getCloneItemStack(player.level(), pos, false);
+            ItemStack stack = state.getBlock().getCloneItemStack(player.level(), pos, state);
             if (stack.isEmpty()) {
                 FluidState fluid = state.getFluidState();
                 if (!fluid.isEmpty()) {

@@ -149,7 +149,7 @@ public class GenCommonPieces {
 
     private static boolean isBedrockShowing(GenContext ctx, BlockPos pos) {
         for (Direction dir : Direction.values()) {
-            if (!ctx.level.getBlockState(pos.relative(dir)).isSolidRender()) {
+            if (!ctx.level.getBlockState(pos.relative(dir)).isSolidRender(ctx.level, pos.relative(dir))) {
                 BlockState opposite = ctx.level.getBlockState(pos.relative(dir.getOpposite()));
                 if (opposite.is(Blocks.BEDROCK) || opposite.is(TCBlocks.ELDRITCH_NOTHING.get())) {
                     return true;

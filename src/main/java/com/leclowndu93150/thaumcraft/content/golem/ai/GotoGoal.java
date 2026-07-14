@@ -145,8 +145,8 @@ public abstract class GotoGoal extends Goal {
         if (seal == null || seal.getSeal() == null) {
             return true;
         }
-        if (seal.isLocked() && (golem.getOwnerReference() == null
-                || !golem.getOwnerReference().getUUID().equals(seal.getOwner()))) {
+        if (seal.isLocked() && (golem.getOwnerUUID() == null
+                || !golem.getOwnerUUID().equals(seal.getOwner()))) {
             return false;
         }
         GolemTrait[] required = seal.getSeal().getRequiredTags();

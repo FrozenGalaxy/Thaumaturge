@@ -72,7 +72,7 @@ public final class FocusEffectAir extends FocusEffect {
         if (target instanceof EntityHitResult entityHit && entityHit.getEntity() != null) {
             Entity struck = entityHit.getEntity();
             float damage = getDamageForDisplay(finalPower);
-            struck.hurtServer(level, level.damageSources().thrown(struck, getPackage().getCaster()), damage);
+            struck.hurt(level.damageSources().thrown(struck, getPackage().getCaster()), damage);
             if (struck instanceof LivingEntity living) {
                 if (trajectory != null) {
                     living.knockback(damage * KNOCKBACK_FACTOR, -trajectory.direction().x, -trajectory.direction().z);

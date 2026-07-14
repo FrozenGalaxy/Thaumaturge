@@ -117,8 +117,8 @@ public final class BlockEntityThaumatorium extends BlockEntity implements IEssen
     }
 
     private @Nullable RecipeHolder<?> findRecipe(ServerLevel server, ResourceLocation recipeId) {
-        for (RecipeHolder<?> holder : server.recipeAccess().getRecipes()) {
-            if (holder.id().identifier().equals(recipeId)) {
+        for (RecipeHolder<?> holder : server.getRecipeManager().getRecipes()) {
+            if (holder.id().equals(recipeId)) {
                 return holder;
             }
         }
@@ -128,11 +128,11 @@ public final class BlockEntityThaumatorium extends BlockEntity implements IEssen
     public List<CrucibleRecipe> candidateRecipes(ServerLevel server, Player player, List<ResourceLocation> idsOut) {
         List<CrucibleRecipe> found = new ArrayList<>();
         ItemStack stack = catalystStack();
-        for (RecipeHolder<?> holder : server.recipeAccess().getRecipes()) {
+        for (RecipeHolder<?> holder : server.getRecipeManager().getRecipes()) {
             if (!(holder.value() instanceof CrucibleRecipe recipe)) {
                 continue;
             }
-            ResourceLocation id = holder.id().identifier();
+            ResourceLocation id = holder.id();
             boolean queued = queue.contains(id);
             boolean matches = !stack.isEmpty() && recipe.catalyst().test(stack) && recipe.doesPassGate(player);
             if (queued || matches) {
@@ -229,12 +229,10 @@ public final class BlockEntityThaumatorium extends BlockEntity implements IEssen
         if (currentRecipe == null || !currentRecipe.matches(new CrucibleRecipeInput(stack, essentia), server)) {
             return;
         }
-        {
-            if (catalyst.extract(stack, 1, ctx) != 1) {
-                return;
-            }
+        if (catalyst.extractItem(0, 1, false).isEmpty()) {
+            return;
         }
-        ItemStack result = currentRecipe.assemble(new CrucibleRecipeInput(stack, essentia));
+        ItemStack result = currentRecipe.assemble(new CrucibleRecipeInput(stack, essentia), server.registryAccess());
         essentia = AspectList.EMPTY;
         InvHelper.ejectStackAt(server, getBlockPos(), facing(), result);
         server.playSound(null, getBlockPos(), SoundEvents.LAVA_EXTINGUISH, SoundSource.BLOCKS,

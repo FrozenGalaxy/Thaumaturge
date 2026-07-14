@@ -27,7 +27,7 @@ public final class EntityTaintacleSmall extends AbstractTaintacle {
         if (this.level() instanceof ServerLevel server) {
             lifetime--;
             if (lifetime <= 0) {
-                this.hurtServer(server, server.damageSources().magic(), SELF_DAMAGE);
+                this.hurt(server.damageSources().magic(), SELF_DAMAGE);
             }
         }
     }

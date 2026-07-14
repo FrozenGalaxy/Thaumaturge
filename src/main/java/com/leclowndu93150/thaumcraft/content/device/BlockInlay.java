@@ -120,14 +120,17 @@ public final class BlockInlay extends Block implements IInfusionStabiliser {
     }
 
     @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
-        for (Direction direction : Direction.Plane.HORIZONTAL) {
-            BlockPos neighbour = pos.relative(direction);
-            if (level.getBlockState(neighbour).is(this)) {
-                updateNetwork(level, neighbour);
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock())) {
+        
+            for (Direction direction : Direction.Plane.HORIZONTAL) {
+                BlockPos neighbour = pos.relative(direction);
+                if (level.getBlockState(neighbour).is(this)) {
+                    updateNetwork(level, neighbour);
+                }
             }
         }
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Override

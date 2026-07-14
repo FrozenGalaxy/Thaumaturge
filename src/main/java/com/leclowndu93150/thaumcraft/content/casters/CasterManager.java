@@ -55,7 +55,7 @@ public final class CasterManager {
     }
 
     public static boolean consumeVisFromInventory(Player player, float cost) {
-        NonNullList<ItemStack> main = player.getInventory().getNonEquipmentItems();
+        NonNullList<ItemStack> main = player.getInventory().items;
         for (int slot = main.size() - 1; slot >= 0; slot--) {
             ItemStack stack = main.get(slot);
             if (stack.getItem() instanceof ICaster caster && caster.consumeVis(stack, player, cost, true, false)) {
@@ -69,7 +69,7 @@ public final class CasterManager {
         if (!(casterStack.getItem() instanceof ICaster caster)) {
             return;
         }
-        NonNullList<ItemStack> main = player.getInventory().getNonEquipmentItems();
+        NonNullList<ItemStack> main = player.getInventory().items;
         TreeMap<String, Integer> foci = new TreeMap<>();
         Map<Integer, PouchHandle> pouches = new HashMap<>();
         int pouchCount = 0;

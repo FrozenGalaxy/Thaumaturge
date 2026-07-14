@@ -123,7 +123,8 @@ public final class EntityFocusCloud extends Entity implements TraceableEntity, I
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+    public boolean hurt(DamageSource source, float damage) {
+        ServerLevel level = (ServerLevel) level();
         return false;
     }
 
@@ -138,23 +139,23 @@ public final class EntityFocusCloud extends Entity implements TraceableEntity, I
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         output.putInt("Age", this.tickCount);
         output.putInt("Duration", this.duration);
         output.putFloat("Radius", this.getRadius());
         if (this.owner != null) {
             output.putUUID("OwnerUUID", this.owner);
         }
-        FocusPackages.save(output, this.focusPackage);
+        FocusPackages.save(output, registryAccess(), this.focusPackage);
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         this.tickCount = input.getInt("Age");
         this.duration = input.getInt("Duration");
         this.setRadius((input.contains("Radius") ? input.getFloat("Radius") : DEFAULT_RADIUS));
         this.owner = input.hasUUID("OwnerUUID") ? input.getUUID("OwnerUUID") : null;
-        this.focusPackage = FocusPackages.load(input);
+        this.focusPackage = FocusPackages.load(input, registryAccess());
     }
 
     @Override

@@ -224,7 +224,7 @@ public final class FocusMediumPlan extends FocusMedium implements IArchitect {
 
     private static boolean isBlockExposed(Level level, BlockPos pos) {
         for (Direction face : Direction.values()) {
-            if (!level.getBlockState(pos.relative(face)).isSolidRender()) {
+            if (!level.getBlockState(pos.relative(face)).isSolidRender(level, pos.relative(face))) {
                 return true;
             }
         }

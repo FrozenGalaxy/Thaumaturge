@@ -87,10 +87,10 @@ public final class WispZapGoal extends Goal {
         DamageSource source = wisp.damageSources().mobAttack(wisp);
         if (stationary) {
             if (wisp.getRandom().nextFloat() < STATIONARY_HIT_CHANCE) {
-                target.hurtServer(server, source, damage + 1.0F);
+                target.hurt(source, damage + 1.0F);
             }
         } else if (wisp.getRandom().nextFloat() < MOVING_HIT_CHANCE) {
-            target.hurtServer(server, source, damage);
+            target.hurt(source, damage);
         }
     }
 }

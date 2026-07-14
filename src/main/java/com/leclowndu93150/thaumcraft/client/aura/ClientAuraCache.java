@@ -17,12 +17,12 @@ public final class ClientAuraCache {
 
     public static void put(ChunkPos pos, short base, float vis, float flux) {
         Snapshot snapshot = new Snapshot(base, vis, flux, currentTick);
-        ENTRIES.put(ChunkPos.pack(pos.x(), pos.z()), snapshot);
+        ENTRIES.put(ChunkPos.asLong(pos.x, pos.z), snapshot);
         latest = snapshot;
     }
 
     public static @Nullable Snapshot get(ChunkPos pos) {
-        return ENTRIES.get(ChunkPos.pack(pos.x(), pos.z()));
+        return ENTRIES.get(ChunkPos.asLong(pos.x, pos.z));
     }
 
     public static @Nullable Snapshot latest() {
@@ -30,7 +30,7 @@ public final class ClientAuraCache {
     }
 
     public static boolean shouldRequest(ChunkPos pos) {
-        long key = ChunkPos.pack(pos.x(), pos.z());
+        long key = ChunkPos.asLong(pos.x, pos.z);
         Snapshot snap = ENTRIES.get(key);
         if (snap != null && currentTick - snap.tick() <= STALE_TICKS) {
             return false;

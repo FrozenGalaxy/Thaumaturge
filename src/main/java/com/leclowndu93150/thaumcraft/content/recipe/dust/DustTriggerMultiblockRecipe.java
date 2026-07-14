@@ -1,5 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.recipe.dust;
 
+import net.minecraft.core.HolderLookup;
+import com.leclowndu93150.thaumcraft.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumcraft.api.recipe.Blueprint;
 import com.leclowndu93150.thaumcraft.api.recipe.BlueprintPart;
 import com.leclowndu93150.thaumcraft.api.recipe.BlueprintTarget;
@@ -24,9 +26,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.PlacementInfo;
-import net.minecraft.client.RecipeBookCategories;
-import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -52,7 +51,7 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
             DustTriggerMultiblockRecipe::new
     );
 
-    public static final RecipeSerializer<DustTriggerMultiblockRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+    public static final RecipeSerializer<DustTriggerMultiblockRecipe> SERIALIZER = new SimpleRecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     private final ResourceLocation blueprintId;
     private final ItemStack result;
@@ -69,7 +68,7 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
     }
 
     public ItemStack result() {
-        return this.result.create();
+        return this.result.copy();
     }
 
     @Override
@@ -97,8 +96,8 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
     }
 
     @Override
-    public ItemStack assemble(DustTriggerInput input) {
-        return this.result.create();
+    public ItemStack assemble(DustTriggerInput input, HolderLookup.Provider registries) {
+        return this.result.copy();
     }
 
     @Override
@@ -200,12 +199,11 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
 
     private @Nullable Blueprint lookupBlueprint(Level level) {
         ResourceKey<Blueprint> key = ResourceKey.create(Blueprint.REGISTRY_KEY, this.blueprintId);
-        Registry<Blueprint> registry = level.registryAccess().lookup(Blueprint.REGISTRY_KEY).orElse(null);
+        HolderLookup.RegistryLookup<Blueprint> registry = level.registryAccess().lookup(Blueprint.REGISTRY_KEY).orElse(null);
         if (registry == null) {
             return null;
         }
-        Holder<Blueprint> holder = registry.get(key).orElse(null);
-        return holder == null ? null : holder.value();
+        return registry.get(key).map(Holder::value).orElse(null);
     }
 
     @Override
@@ -214,8 +212,8 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
     }
 
     @Override
-    public String group() {
-        return "";
+    public ItemStack getResultItem(HolderLookup.Provider registries) {
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -228,13 +226,4 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
         return TCRecipeTypes.DUST_TRIGGER.get();
     }
 
-    @Override
-    public PlacementInfo placementInfo() {
-        return PlacementInfo.NOT_PLACEABLE;
-    }
-
-    @Override
-    public RecipeBookCategory recipeBookCategory() {
-        return RecipeBookCategories.CRAFTING_MISC;
-    }
-}
+        }

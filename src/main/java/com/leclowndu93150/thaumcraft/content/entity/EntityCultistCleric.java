@@ -132,12 +132,13 @@ public class EntityCultistCleric extends EntityCultist implements RangedAttackMo
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
-        if (this.isInvulnerableTo(level, source)) {
+    public boolean hurt(DamageSource source, float damage) {
+        ServerLevel level = (ServerLevel) level();
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
         this.setRitualist(false);
-        return super.hurtServer(level, source, damage);
+        return super.hurt(source, damage);
     }
 
     @Override
@@ -149,13 +150,13 @@ public class EntityCultistCleric extends EntityCultist implements RangedAttackMo
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         this.setRitualist(input.getBoolean("ritualist"));
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("ritualist", this.isRitualist());
     }

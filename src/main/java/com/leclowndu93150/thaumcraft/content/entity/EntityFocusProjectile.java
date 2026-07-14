@@ -107,17 +107,17 @@ public final class EntityFocusProjectile extends ThrowableProjectile implements 
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
-        FocusPackages.save(output, this.focusPackage);
+        FocusPackages.save(output, registryAccess(), this.focusPackage);
         output.putInt("special", this.getSpecial());
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         this.setSpecial((input.contains("special") ? input.getInt("special") : SPECIAL_NONE));
-        this.focusPackage = FocusPackages.load(input);
+        this.focusPackage = FocusPackages.load(input, registryAccess());
     }
 
     @Override
@@ -174,7 +174,7 @@ public final class EntityFocusProjectile extends ThrowableProjectile implements 
                     this.getZ() - mz / speed * BOUNCE_BACKOFF);
         }
         if (!this.level().isClientSide()) {
-            this.playSound(SoundEvents.LEAD_TIED, BOUNCE_VOLUME, 1.0F);
+            this.playSound(SoundEvents.LEASH_KNOT_PLACE, BOUNCE_VOLUME, 1.0F);
             if (this.getDeltaMovement().length() < BOUNCE_MIN_SPEED) {
                 this.discard();
             }

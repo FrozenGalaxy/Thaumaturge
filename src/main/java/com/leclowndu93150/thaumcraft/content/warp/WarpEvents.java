@@ -98,7 +98,7 @@ public final class WarpEvents {
     }
 
     private static void dispatchEvent(ServerPlayer player, int eff, int warp, int normalWarp, RandomSource rand) {
-        ServerLevel level = player.level();
+        ServerLevel level = (ServerLevel) player.level();
         if (eff <= 4) {
             if (!ThaumcraftCommonConfig.NO_STRESS.get()) {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -130,7 +130,7 @@ public final class WarpEvents {
         } else if (eff <= 40) {
             applyEffect(player, TCMobEffects.SUN_SCORNED, 5000, ampFor(warp), "warp.thaumcraft.text.5");
         } else if (eff <= 44) {
-            applyEffect(player, MobEffects.MINING_FATIGUE, 1200, ampFor(warp), "warp.thaumcraft.text.9");
+            applyEffect(player, MobEffects.DIG_SLOWDOWN, 1200, ampFor(warp), "warp.thaumcraft.text.9");
         } else if (eff <= 48) {
             applyEffect(player, TCMobEffects.INFECTIOUS_VIS_EXHAUST, 6000, ampFor(warp), "warp.thaumcraft.text.1");
         } else if (eff <= 52) {
@@ -181,19 +181,19 @@ public final class WarpEvents {
     }
 
     private static void suddenlySpiders(ServerPlayer player, int warp, boolean real) {
-        ServerLevel level = player.level();
+        ServerLevel level = (ServerLevel) player.level();
         RandomSource rand = player.getRandom();
         int spawns = Math.min(MAX_SPIDERS, warp);
         for (int i = 0; i < spawns; i++) {
             for (int attempt = 0; attempt < SPAWN_ATTEMPTS; attempt++) {
-                EntityMindSpider spider = TCEntities.MIND_SPIDER.get().create(level, MobSpawnType.EVENT);
+                EntityMindSpider spider = TCEntities.MIND_SPIDER.get().create(level);
                 if (spider == null) {
                     return;
                 }
                 double x = player.getX() + rand.nextInt(15) - rand.nextInt(15);
                 double y = player.getY() + rand.nextInt(5) - rand.nextInt(5);
                 double z = player.getZ() + rand.nextInt(15) - rand.nextInt(15);
-                spider.snapTo(x, y, z, rand.nextFloat() * 360.0F, 0.0F);
+                spider.moveTo(x, y, z, rand.nextFloat() * 360.0F, 0.0F);
                 BlockPos below = spider.blockPosition().below();
                 if (!level.getBlockState(below).isCollisionShapeFullBlock(level, below)
                         || !level.noCollision(spider)
@@ -203,7 +203,7 @@ public final class WarpEvents {
                 }
                 spider.setTarget(player);
                 if (!real) {
-                    spider.setViewer(player.getGameProfile().name());
+                    spider.setViewer(player.getGameProfile().getName());
                     spider.setHarmless(true);
                 }
                 level.addFreshEntity(spider);
@@ -218,14 +218,14 @@ public final class WarpEvents {
         if (gaze == null) {
             return;
         }
-        ServerLevel level = player.level();
+        ServerLevel level = (ServerLevel) player.level();
         int range = Math.min(8 + gaze.getAmplifier() * 3, 24);
         for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class,
                 player.getBoundingBox().inflate(range))) {
             if (entity == player || !entity.isAlive() || entity.hasEffect(MobEffects.WITHER)) {
                 continue;
             }
-            if (entity instanceof ServerPlayer && !level.isPvpAllowed()) {
+            if (entity instanceof ServerPlayer && !level.getServer().isPvpAllowed()) {
                 continue;
             }
             if (!player.hasLineOfSight(entity)) {

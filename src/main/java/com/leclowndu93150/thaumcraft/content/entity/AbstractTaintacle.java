@@ -48,9 +48,10 @@ public abstract class AbstractTaintacle extends Monster implements ITaintedMob {
     }
 
     @Override
-    public boolean doHurtTarget(ServerLevel level, Entity target) {
+    public boolean doHurtTarget(Entity target) {
+        ServerLevel level = (ServerLevel) level();
         level.broadcastEntityEvent(this, EVENT_FLAIL);
-        return super.doHurtTarget(level, target);
+        return super.doHurtTarget(target);
     }
 
     @Override
@@ -75,7 +76,7 @@ public abstract class AbstractTaintacle extends Monster implements ITaintedMob {
             BlockState below = server.getBlockState(this.blockPosition().below());
             BlockState here = server.getBlockState(this.blockPosition());
             if (!(below.getBlock() instanceof AbstractTaintBlock) && !(here.getBlock() instanceof AbstractTaintBlock)) {
-                this.hurtServer(server, server.damageSources().starve(), STARVE_DAMAGE);
+                this.hurt(server.damageSources().starve(), STARVE_DAMAGE);
             }
         }
     }

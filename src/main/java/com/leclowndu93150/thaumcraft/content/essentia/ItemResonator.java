@@ -66,7 +66,7 @@ public final class ItemResonator extends Item {
                 : Component.translatable("tc.resonator3");
         player.sendSystemMessage(Component.translatable("tc.resonator2",
                 String.valueOf(transport.getSuctionAmount(side)), suctionName));
-        level.playSound(null, pos, SoundEvents.SHIELD_BLOCK.value(), SoundSource.BLOCKS,
+        level.playSound(null, pos, SoundEvents.SHIELD_BLOCK, SoundSource.BLOCKS,
                 SOUND_VOLUME, SOUND_PITCH_BASE + level.getRandom().nextFloat() * 0.1F);
         if (tile instanceof BlockEntityCondenser condenser) {
             player.sendSystemMessage(Component.translatable("tc.condenser1",

@@ -1,0 +1,23 @@
+package com.leclowndu93150.thaumcraft.content.wands;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import java.util.List;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+
+public class ItemPrimalCharm extends Item {
+    private static final int FLAVOR_LINE_COUNT = 5;
+
+    public ItemPrimalCharm(Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> builder, TooltipFlag flag) {
+        int line = Math.floorMod(System.identityHashCode(stack), FLAVOR_LINE_COUNT);
+        builder.add(Component.translatable("tooltip.thaumcraft.primal_charm." + line)
+                .withStyle(ChatFormatting.GOLD));
+    }
+}

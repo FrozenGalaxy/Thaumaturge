@@ -1,17 +1,23 @@
 package com.leclowndu93150.thaumcraft.content.casters;
 
+import com.leclowndu93150.thaumcraft.content.research.DeviceGate;
+import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
+import java.util.List;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 
@@ -36,7 +42,22 @@ public final class FocusPouchItem extends Item {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> builder, TooltipFlag flag) {
+        int count = 0;
+        for (ItemStack focus : getInventory(stack)) {
+            if (focus.getItem() instanceof ItemFocus) {
+                count++;
+            }
+        }
+        builder.add(Component.translatable("tooltip.thaumcraft.focus_pouch.count", count, SIZE)
+                .withStyle(ChatFormatting.DARK_PURPLE));
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        if (!level.isClientSide() && !DeviceGate.passes(player, TCIds.rl("focus_pouch"))) {
+            return InteractionResultHolder.consume(player.getItemInHand(hand));
+        }
         if (player instanceof ServerPlayer serverPlayer) {
             serverPlayer.openMenu(new MenuProvider() {
                 @Override
@@ -50,6 +71,6 @@ public final class FocusPouchItem extends Item {
                 }
             }, buf -> buf.writeBoolean(hand == InteractionHand.MAIN_HAND));
         }
-        return InteractionResult.SUCCESS;
+        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
 }

@@ -7,6 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -15,9 +16,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.IntProvider;
-import net.minecraft.util.valueproviders.IntProviders;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -35,8 +34,8 @@ public record InfernalBonus(HolderSet<Item> items, IntProvider count, float chan
 
     private static final Codec<InfernalBonus> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    ExtraCodecs.nonEmptyHolderSet(Ingredient.NON_AIR_HOLDER_SET_CODEC).fieldOf("items").forGetter(InfernalBonus::items),
-                    IntProviders.codec(1, 64).optionalFieldOf("count", new ConstantInt(1)).forGetter(InfernalBonus::count),
+                    ExtraCodecs.nonEmptyHolderSet(RegistryCodecs.homogeneousList(Registries.ITEM)).fieldOf("items").forGetter(InfernalBonus::items),
+                    IntProvider.codec(1, 64).optionalFieldOf("count", ConstantInt.of(1)).forGetter(InfernalBonus::count),
                     Codec.floatRange(0, 1).optionalFieldOf("chance", 1.0f).forGetter(InfernalBonus::chance)
             ).apply(instance, InfernalBonus::new));
 
@@ -66,7 +65,7 @@ public record InfernalBonus(HolderSet<Item> items, IntProvider count, float chan
     public static final class Builder {
 
         private final HolderSet<Item> items;
-        private IntProvider count = new ConstantInt(1);
+        private IntProvider count = ConstantInt.of(1);
         private float chance = 1.0F;
 
         private Builder(HolderSet<Item> items) {
@@ -79,7 +78,7 @@ public record InfernalBonus(HolderSet<Item> items, IntProvider count, float chan
         }
 
         public Builder count(int count) {
-            this.count = new ConstantInt(count);
+            this.count = ConstantInt.of(count);
             return this;
         }
 

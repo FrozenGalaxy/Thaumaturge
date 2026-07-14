@@ -117,13 +117,13 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements IEldrit
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("headless", this.isHeadless());
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         this.setHeadless(input.getBoolean("headless"));
         if (this.isHeadless()) {
@@ -186,7 +186,8 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements IEldrit
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+    public boolean hurt(DamageSource source, float damage) {
+        ServerLevel level = (ServerLevel) level();
         if (damage > this.getHealth() && !this.isHeadless()) {
             this.setHeadless(true);
             this.spawnTimer = SPAWN_INVULN_TICKS;
@@ -197,7 +198,7 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements IEldrit
             this.makeHeadless();
             return false;
         }
-        return super.hurtServer(level, source, damage);
+        return super.hurt(source, damage);
     }
 
     public int getAttackTimer() {
@@ -209,13 +210,14 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements IEldrit
     }
 
     @Override
-    public boolean doHurtTarget(ServerLevel level, Entity target) {
+    public boolean doHurtTarget(Entity target) {
+        ServerLevel level = (ServerLevel) level();
         if (this.attackTimer > 0) {
             return false;
         }
         this.attackTimer = ATTACK_COOLDOWN;
         this.level().broadcastEntityEvent(this, ATTACK_EVENT);
-        boolean hit = target.hurtServer(level, this.damageSources().mobAttack(this),
+        boolean hit = target.hurt(this.damageSources().mobAttack(this),
                 (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE) * MELEE_FACTOR);
         if (hit) {
             target.setDeltaMovement(target.getDeltaMovement().add(0.0, MELEE_KNOCKUP, 0.0));

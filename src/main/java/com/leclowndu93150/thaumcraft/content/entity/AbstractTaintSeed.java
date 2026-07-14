@@ -62,10 +62,11 @@ public abstract class AbstractTaintSeed extends Monster implements ITaintedMob {
     }
 
     @Override
-    public boolean doHurtTarget(ServerLevel level, Entity target) {
+    public boolean doHurtTarget(Entity target) {
+        ServerLevel level = (ServerLevel) level();
         level.broadcastEntityEvent(this, EVENT_ATTACK);
         this.playSound(TCSounds.TENTACLE.get(), this.getSoundVolume(), this.getVoicePitch());
-        return super.doHurtTarget(level, target);
+        return super.doHurtTarget(target);
     }
 
     @Override
@@ -99,7 +100,7 @@ public abstract class AbstractTaintSeed extends Monster implements ITaintedMob {
         BlockPos pos = this.blockPosition();
         float saturation = AuraHelper.getFluxSaturation(server, pos);
         if (saturation <= 0.0F) {
-            this.hurtServer(server, server.damageSources().starve(), STARVE_DAMAGE);
+            this.hurt(server.damageSources().starve(), STARVE_DAMAGE);
             AuraHelper.polluteAura(server, pos, STARVE_POLLUTION, false);
         } else {
             int area = getArea();

@@ -1,10 +1,12 @@
 package com.leclowndu93150.thaumcraft.content.item;
 
+import net.minecraft.world.ItemInteractionResult;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.recipe.DustTrigger;
 import com.leclowndu93150.thaumcraft.api.recipe.DustTriggerInput;
 import com.leclowndu93150.thaumcraft.api.recipe.DustTriggerPlacement;
+import com.leclowndu93150.thaumcraft.content.misc.TCActionBar;
 import com.leclowndu93150.thaumcraft.content.recipe.dust.DustTriggerFx;
 import com.leclowndu93150.thaumcraft.content.research.ResearchProgressionEvents;
 import com.leclowndu93150.thaumcraft.content.recipe.dust.DustTriggerSwapQueue;
@@ -49,7 +51,7 @@ public final class SalisMundusItem extends Item {
         if (!event.getItemStack().is(TCItems.SALIS_MUNDUS)) return;
         if (event.getPlayer() == null) return;
         if (!event.getPlayer().isCrouching()) return;
-        event.cancelWithResult(InteractionResult.PASS);
+        event.cancelWithResult(ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION);
     }
 
     @Override
@@ -71,7 +73,7 @@ public final class SalisMundusItem extends Item {
         ServerLevel serverLevel = (ServerLevel) level;
         BlockState clicked = level.getBlockState(pos);
         DustTriggerInput input = new DustTriggerInput(stack, level, pos, clicked);
-        Optional<RecipeHolder<DustTrigger>> match = serverLevel.recipeAccess()
+        Optional<RecipeHolder<DustTrigger>> match = serverLevel.getRecipeManager()
                 .getRecipeFor(TCRecipeTypes.DUST_TRIGGER.get(), input, level);
         if (match.isEmpty()) {
             return InteractionResult.PASS;
@@ -81,9 +83,10 @@ public final class SalisMundusItem extends Item {
         if (!trigger.doesPassGate(player)) {
             Thaumcraft.LOGGER.debug("Salis Mundus trigger {} blocked by research gate {}",
                     holder.id(), trigger.researchGate().orElse(null));
+            TCActionBar.sendPurple(player, "tc.dust.noresearch");
             return InteractionResult.PASS;
         }
-        ItemStack result = trigger.assemble(input);
+        ItemStack result = trigger.assemble(input, level.registryAccess());
         if (result.isEmpty()) {
             return InteractionResult.PASS;
         }

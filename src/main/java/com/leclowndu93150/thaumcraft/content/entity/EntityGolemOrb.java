@@ -95,7 +95,7 @@ public class EntityGolemOrb extends ThrowableProjectile {
             if (this.getOwner() instanceof LivingEntity owner && result instanceof EntityHitResult entityHit) {
                 float damage = (float) owner.getAttributeValue(Attributes.ATTACK_DAMAGE)
                         * (this.isRed() ? RED_DAMAGE_FACTOR : WHITE_DAMAGE_FACTOR);
-                entityHit.getEntity().hurtServer(server, this.damageSources().indirectMagic(this, owner), damage);
+                entityHit.getEntity().hurt(this.damageSources().indirectMagic(this, owner), damage);
             }
             this.playSound(TCSounds.SHOCK.get(), 1.0F,
                     1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
@@ -104,7 +104,8 @@ public class EntityGolemOrb extends ThrowableProjectile {
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+    public boolean hurt(DamageSource source, float amount) {
+        ServerLevel level = (ServerLevel) level();
         if (source.getEntity() != null) {
             Vec3 look = source.getEntity().getLookAngle();
             this.setDeltaMovement(look.scale(0.9));

@@ -47,9 +47,9 @@ public final class BlockTaintGeyser extends AbstractTaintBlock {
                 && level.getEntitiesOfClass(EntityTaintSwarm.class,
                         AABB.ofSize(pos.getCenter(), SWARM_EXCLUSION_RANGE * 2,
                                 SWARM_EXCLUSION_RANGE * 2, SWARM_EXCLUSION_RANGE * 2)).isEmpty()) {
-            EntityTaintSwarm swarm = TCEntities.TAINT_SWARM.get().create(level, MobSpawnType.NATURAL);
+            EntityTaintSwarm swarm = TCEntities.TAINT_SWARM.get().create(level);
             if (swarm != null) {
-                swarm.snapTo(x, pos.getY() + 1.25, z, random.nextInt(360), 0.0F);
+                swarm.moveTo(x, pos.getY() + 1.25, z, random.nextInt(360), 0.0F);
                 level.addFreshEntity(swarm);
             }
         } else if (AuraHelper.getFlux(level, pos) < LOW_FLUX_THRESHOLD) {

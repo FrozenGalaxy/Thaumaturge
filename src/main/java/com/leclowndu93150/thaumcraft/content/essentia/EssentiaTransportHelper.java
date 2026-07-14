@@ -23,6 +23,6 @@ public final class EssentiaTransportHelper {
     }
 
     public static @Nullable Holder<IAspect> resolve(Registry<IAspect> registry, ResourceKey<IAspect> key) {
-        return registry.get(key).orElse(null);
+        return registry.getHolder(key).orElse(null);
     }
 }

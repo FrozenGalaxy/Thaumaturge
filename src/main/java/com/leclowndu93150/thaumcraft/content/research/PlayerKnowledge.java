@@ -61,7 +61,7 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
             }
         }
         for (KnowledgeRecord record : knowledgeRecords) {
-            result.knowledge.put(new KnowledgeKey(record.type(), record.category().map(ResourceKey::identifier).orElse(null)), record.amount());
+            result.knowledge.put(new KnowledgeKey(record.type(), record.category().map(ResourceKey::location).orElse(null)), record.amount());
         }
         return result;
     }
@@ -94,8 +94,8 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
                 .sorted((a, b) -> {
                     int byType = a.type().compareTo(b.type());
                     if (byType != 0) return byType;
-                    String an = a.category().map(k -> k.identifier().toString()).orElse("");
-                    String bn = b.category().map(k -> k.identifier().toString()).orElse("");
+                    String an = a.category().map(k -> k.location().toString()).orElse("");
+                    String bn = b.category().map(k -> k.location().toString()).orElse("");
                     return an.compareTo(bn);
                 })
                 .toList();
@@ -212,7 +212,7 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
     @Override
     public boolean addKnowledge(KnowledgeType type, ResourceKey<IResearchCategory> category, int amount) {
         if (type == null || amount == 0) return false;
-        KnowledgeKey key = new KnowledgeKey(type, category == null ? null : category.identifier());
+        KnowledgeKey key = new KnowledgeKey(type, category == null ? null : category.location());
         int prev = knowledge.getOrDefault(key, 0);
         int next = Math.max(0, prev + amount);
         if (next == prev) return false;
@@ -231,7 +231,7 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
 
     @Override
     public int rawKnowledge(KnowledgeType type, ResourceKey<IResearchCategory> category) {
-        KnowledgeKey key = new KnowledgeKey(type, category == null ? null : category.identifier());
+        KnowledgeKey key = new KnowledgeKey(type, category == null ? null : category.location());
         return knowledge.getOrDefault(key, 0);
     }
 
@@ -255,7 +255,7 @@ public final class PlayerKnowledge implements IPlayerKnowledge {
         registries.lookup(IResearchEntry.REGISTRY_KEY).ifPresent(lookup ->
                 lookup.listElements().forEach(holder -> {
                     if (holder.value().hasMeta(ResearchEntryMeta.AUTOUNLOCK)) {
-                        holder.unwrapKey().ifPresent(k -> addResearch(k.identifier()));
+                        holder.unwrapKey().ifPresent(k -> addResearch(k.location()));
                     }
                 }));
     }

@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
 
 public final class EnchantMining {
     private static final int LEVEL_EVENT_BLOCK_BREAK = 2001;
@@ -32,7 +32,7 @@ public final class EnchantMining {
         }
         BlockState state = level.getBlockState(pos);
         if (!skipEvent) {
-            BreakBlockEvent event = CommonHooks.fireBlockBreak(level,
+            BlockEvent.BreakEvent event = CommonHooks.fireBlockBreak(level,
                     serverPlayer.gameMode.getGameModeForPlayer(), serverPlayer, pos, state);
             if (event.isCanceled()) {
                 return false;

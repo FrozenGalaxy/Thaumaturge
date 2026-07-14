@@ -35,7 +35,7 @@ public final class BlockEntityEldritchTrap extends BlockEntity {
         if (player == null || !(level instanceof ServerLevel serverLevel)) {
             return;
         }
-        player.hurtServer(serverLevel, serverLevel.damageSources().magic(), ZAP_DAMAGE);
+        player.hurt(serverLevel.damageSources().magic(), ZAP_DAMAGE);
         if (level.getRandom().nextBoolean() && player instanceof ServerPlayer serverPlayer) {
             WarpManager.addWarp(serverPlayer, 1 + level.getRandom().nextInt(2), WarpType.TEMPORARY);
         }

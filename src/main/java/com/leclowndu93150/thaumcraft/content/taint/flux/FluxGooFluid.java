@@ -47,13 +47,18 @@ public abstract class FluxGooFluid extends BaseFlowingFluid {
     }
 
     @Override
-    public void tick(ServerLevel level, BlockPos pos, BlockState blockState, FluidState fluidState) {
-        updateTick(level, pos, fluidState, level.getRandom());
+    public void tick(Level level, BlockPos pos, FluidState fluidState) {
+        if (level instanceof ServerLevel serverLevel) {
+            updateTick(serverLevel, pos, fluidState, serverLevel.getRandom());
+        }
+        super.tick(level, pos, fluidState);
     }
 
     @Override
-    protected void randomTick(ServerLevel level, BlockPos pos, FluidState state, RandomSource random) {
-        updateTick(level, pos, state, random);
+    protected void randomTick(Level level, BlockPos pos, FluidState state, RandomSource random) {
+        if (level instanceof ServerLevel serverLevel) {
+            updateTick(serverLevel, pos, state, random);
+        }
     }
 
     private void updateTick(ServerLevel level, BlockPos pos, FluidState state, RandomSource rand) {
@@ -153,7 +158,7 @@ public abstract class FluxGooFluid extends BaseFlowingFluid {
 
     private int tryToFlowVerticallyInto(ServerLevel level, BlockPos pos, int amtToInput) {
         BlockPos other = pos.below();
-        if (other.getY() < level.getMinY()) {
+        if (other.getY() < level.getMinBuildHeight()) {
             level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             return 0;
         }
@@ -300,7 +305,7 @@ public abstract class FluxGooFluid extends BaseFlowingFluid {
 
     private static void spawnSlime(ServerLevel level, BlockPos pos, int size) {
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-        ThaumicSlime slime = TCEntities.THAUMIC_SLIME.get().create(level, MobSpawnType.NATURAL);
+        ThaumicSlime slime = TCEntities.THAUMIC_SLIME.get().create(level);
         if (slime == null) {
             return;
         }

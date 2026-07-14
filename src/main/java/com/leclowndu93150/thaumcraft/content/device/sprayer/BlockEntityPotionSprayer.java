@@ -156,7 +156,7 @@ public final class BlockEntityPotionSprayer extends BlockEntity implements IEsse
             for (MobEffectInstance instance : effects) {
                 Holder<MobEffect> effect = instance.getEffect();
                 if (effect.value().isInstantenous()) {
-                    effect.value().applyInstantenousEffect(server, null, null, target, instance.getAmplifier(), 1.0);
+                    effect.value().applyInstantenousEffect(null, null, target, instance.getAmplifier(), 1.0);
                 } else {
                     target.addEffect(new MobEffectInstance(effect, instance.getDuration(), instance.getAmplifier()));
                 }
@@ -257,12 +257,13 @@ public final class BlockEntityPotionSprayer extends BlockEntity implements IEsse
     }
 
     @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+    public void setRemoved() {
         if (level != null && !level.isClientSide() && !potion.isEmpty()) {
+            BlockPos pos = getBlockPos();
             Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), potion);
             potion = ItemStack.EMPTY;
         }
-        super.preRemoveSideEffects(pos, state);
+        super.setRemoved();
     }
 
     @Override

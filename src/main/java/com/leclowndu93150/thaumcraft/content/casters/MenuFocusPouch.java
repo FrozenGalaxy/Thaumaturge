@@ -9,7 +9,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -36,7 +36,7 @@ public final class MenuFocusPouch extends AbstractContainerMenu {
         this.hand = hand;
         this.player = inventory.player;
         this.blockedHotbarSlot = hand == InteractionHand.MAIN_HAND
-                ? inventory.getSelectedSlot() : -1;
+                ? inventory.selected : -1;
         NonNullList<ItemStack> stored = FocusPouchItem.getInventory(pouch());
         for (int slot = 0; slot < stored.size(); slot++) {
             pouchInventory.setItem(slot, stored.get(slot));
@@ -73,14 +73,14 @@ public final class MenuFocusPouch extends AbstractContainerMenu {
     }
 
     @Override
-    public void clicked(int slotId, int button, ContainerInput containerInput, Player clickPlayer) {
+    public void clicked(int slotId, int button, ClickType containerInput, Player clickPlayer) {
         if (blockedHotbarSlot >= 0) {
             if (slotId >= 0 && slotId < slots.size()
                     && slots.get(slotId).container == clickPlayer.getInventory()
                     && slots.get(slotId).getContainerSlot() == blockedHotbarSlot) {
                 return;
             }
-            if (containerInput == ContainerInput.SWAP && button == blockedHotbarSlot) {
+            if (containerInput == ClickType.SWAP && button == blockedHotbarSlot) {
                 return;
             }
         }

@@ -76,7 +76,7 @@ public final class GolemProperties implements IGolemProperties {
 
     private static <T> StreamCodec<ByteBuf, T> registryStream(Supplier<Registry<T>> registry) {
         return ResourceLocation.STREAM_CODEC.map(
-                id -> registry.get().getValue(id),
+                id -> registry.get().get(id),
                 value -> registry.get().getKey(value));
     }
 

@@ -90,8 +90,7 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements Ranged
     private int fieldFrenzyCounter;
     private boolean lastBlast;
 
-    private final ServerBossEvent shieldEvent = new ServerBossEvent(Mth.createInsecureUUID(this.random),
-            Component.empty(), BossEvent.BossBarColor.BLUE, BossEvent.BossBarOverlay.NOTCHED_10);
+    private final ServerBossEvent shieldEvent = new ServerBossEvent(Component.empty(), BossEvent.BossBarColor.BLUE, BossEvent.BossBarOverlay.NOTCHED_10);
 
     public EntityEldritchWarden(EntityType<? extends EntityEldritchWarden> type, Level level) {
         super(type, level);
@@ -156,13 +155,13 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements Ranged
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putByte("title", this.entityData.get(DATA_TITLE));
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         setTitle(input.getByte("title"));
     }
@@ -172,9 +171,10 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements Ranged
     }
 
     @Override
-    protected void customServerAiStep(ServerLevel level) {
+    protected void customServerAiStep() {
+        ServerLevel level = (ServerLevel) level();
         if (this.fieldFrenzyCounter == 0) {
-            super.customServerAiStep(level);
+            super.customServerAiStep();
         } else {
             this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
         }
@@ -250,7 +250,7 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements Ranged
                         this.getY(),
                         Mth.floor(this.getZ()) + radius * Math.sin(radians));
                 if (server.isEmptyBlock(pos)
-                        && server.getBlockState(pos.below()).isSolidRender()) {
+                        && server.getBlockState(pos.below()).isSolidRender(server, pos.below())) {
                     server.setBlockAndUpdate(pos, TCBlocks.EFFECT_SAP.get().defaultBlockState());
                     server.scheduleTick(pos, TCBlocks.EFFECT_SAP.get(),
                             SAP_TICK_MIN + this.random.nextInt(SAP_TICK_SPREAD));
@@ -266,7 +266,7 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements Ranged
     }
 
     private void teleportHome(ServerLevel server) {
-        BlockPos home = this.hasHome() ? this.getHomePosition() : this.blockPosition();
+        BlockPos home = this.hasRestriction() ? this.getRestrictCenter() : this.blockPosition();
         double oldX = this.getX();
         double oldY = this.getY();
         double oldZ = this.getZ();
@@ -304,17 +304,18 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements Ranged
     }
 
     @Override
-    public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
-        return this.fieldFrenzyCounter > 0 || super.isInvulnerableTo(level, source);
+    public boolean isInvulnerableTo(DamageSource source) {
+        return this.fieldFrenzyCounter > 0 || super.isInvulnerableTo(source);
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+    public boolean hurt(DamageSource source, float damage) {
+        ServerLevel level = (ServerLevel) level();
         if (source.is(DamageTypes.DROWN) || source.is(DamageTypes.WITHER)
                 || source.is(DamageTypeTags.WITHER_IMMUNE_TO)) {
             return false;
         }
-        boolean hurt = super.hurtServer(level, source, damage);
+        boolean hurt = super.hurt(source, damage);
         if (hurt && !this.fieldFrenzy && this.getAbsorptionAmount() <= 0.0F) {
             this.fieldFrenzy = true;
             this.fieldFrenzyCounter = FRENZY_TICKS;

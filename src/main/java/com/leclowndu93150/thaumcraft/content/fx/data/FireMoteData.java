@@ -29,17 +29,21 @@ public record FireMoteData(
             com.mojang.serialization.Codec.BOOL.fieldOf("translucent").forGetter(FireMoteData::translucent)
     ).apply(inst, FireMoteData::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, FireMoteData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.DOUBLE, FireMoteData::vx,
-            ByteBufCodecs.DOUBLE, FireMoteData::vy,
-            ByteBufCodecs.DOUBLE, FireMoteData::vz,
-            ByteBufCodecs.FLOAT, FireMoteData::r,
-            ByteBufCodecs.FLOAT, FireMoteData::g,
-            ByteBufCodecs.FLOAT, FireMoteData::b,
-            ByteBufCodecs.FLOAT, FireMoteData::alpha,
-            ByteBufCodecs.FLOAT, FireMoteData::scale,
-            ByteBufCodecs.BOOL, FireMoteData::translucent,
-            FireMoteData::new
+    public static final StreamCodec<RegistryFriendlyByteBuf, FireMoteData> STREAM_CODEC = StreamCodec.of(
+            (buffer, data) -> {
+                buffer.writeDouble(data.vx());
+                buffer.writeDouble(data.vy());
+                buffer.writeDouble(data.vz());
+                buffer.writeFloat(data.r());
+                buffer.writeFloat(data.g());
+                buffer.writeFloat(data.b());
+                buffer.writeFloat(data.alpha());
+                buffer.writeFloat(data.scale());
+                buffer.writeBoolean(data.translucent());
+            },
+            buffer -> new FireMoteData(buffer.readDouble(), buffer.readDouble(), buffer.readDouble(),
+                    buffer.readFloat(), buffer.readFloat(), buffer.readFloat(),
+                    buffer.readFloat(), buffer.readFloat(), buffer.readBoolean())
     );
 
     @Override

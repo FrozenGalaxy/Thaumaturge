@@ -4,19 +4,17 @@ import net.minecraft.resources.ResourceLocation;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
-import com.leclowndu93150.thaumcraft.content.casters.ItemCaster;
+import com.leclowndu93150.thaumcraft.api.casters.ICaster;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
+import com.leclowndu93150.thaumcraft.content.misc.TCActionBar;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -63,17 +61,17 @@ public final class BlockEldritchAltar extends BlockEldritchStructure implements 
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                           Player player, InteractionHand hand, BlockHitResult hit) {
         if (player.isShiftKeyDown() || !(level.getBlockEntity(pos) instanceof BlockEntityEldritchAltar altar)) {
-            return InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (stack.is(TCItems.ELDRITCH_EYE.get())) {
             if (altar.getEyes() >= MAX_EYES) {
-                return InteractionResult.PASS;
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
             if (level.isClientSide()) {
-                return InteractionResult.SUCCESS;
+                return ItemInteractionResult.SUCCESS;
             }
             if (altar.getEyes() >= 2) {
                 altar.setSpawner(true);
@@ -85,36 +83,30 @@ public final class BlockEldritchAltar extends BlockEldritchStructure implements 
             altar.setChanged();
             level.sendBlockUpdated(pos, state, state, 3);
             level.playSound(null, pos, TCSounds.CRYSTAL.get(), SoundSource.BLOCKS, 0.2F, 1.0F);
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
-        if (stack.getItem() instanceof ItemCaster) {
+        if (stack.getItem() instanceof ICaster) {
             if (altar.getEyes() < MAX_EYES || altar.isOpen()) {
-                return InteractionResult.PASS;
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
             if (level.isClientSide()) {
-                return InteractionResult.SUCCESS;
+                return ItemInteractionResult.SUCCESS;
             }
             if (!altar.checkForMaze()) {
-                return InteractionResult.SUCCESS;
+                return ItemInteractionResult.SUCCESS;
             }
             if (!KnowledgeAccess.of(player).isResearchComplete(OCULUS_RESEARCH)) {
-                if (player instanceof ServerPlayer serverPlayer) {
-                    serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(
-                            Component.translatable("gui.thaumcraft.altar.ritual_unknown")
-                                    .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC)));
-                }
-                return InteractionResult.SUCCESS;
+                TCActionBar.sendPurple(player, "gui.thaumcraft.altar.ritual_unknown");
+                return ItemInteractionResult.SUCCESS;
             }
             if (AuraHelper.drainVis(level, pos, RITUAL_CHARGE, true) >= RITUAL_CHARGE) {
                 AuraHelper.drainVis(level, pos, RITUAL_CHARGE, false);
                 altar.openPortal();
-            } else if (player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(
-                        Component.translatable("gui.thaumcraft.altar.not_enough_vis")
-                                .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC)));
+            } else {
+                TCActionBar.sendPurple(player, "gui.thaumcraft.altar.not_enough_vis");
             }
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 }

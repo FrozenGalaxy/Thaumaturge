@@ -42,8 +42,7 @@ public class EntityTaintacleGiant extends AbstractTaintacle implements IEldritch
     private static final int ENRAGE_TICKS = 200;
     private static final double LONELY_RANGE = 48.0;
 
-    private final ServerBossEvent bossEvent = new ServerBossEvent(Mth.createInsecureUUID(this.random),
-            getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
+    private final ServerBossEvent bossEvent = new ServerBossEvent(getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
 
     public EntityTaintacleGiant(EntityType<? extends EntityTaintacleGiant> type, Level level) {
         super(type, level);
@@ -99,8 +98,9 @@ public class EntityTaintacleGiant extends AbstractTaintacle implements IEldritch
     }
 
     @Override
-    protected void customServerAiStep(ServerLevel level) {
-        super.customServerAiStep(level);
+    protected void customServerAiStep() {
+        ServerLevel level = (ServerLevel) level();
+        super.customServerAiStep();
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
     }
 
@@ -117,14 +117,15 @@ public class EntityTaintacleGiant extends AbstractTaintacle implements IEldritch
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+    public boolean hurt(DamageSource source, float damage) {
+        ServerLevel level = (ServerLevel) level();
         if (damage > ENRAGE_THRESHOLD) {
             if (this.getAnger() == 0) {
                 this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, ENRAGE_TICKS,
                         (int) (damage / 15.0F)));
-                this.addEffect(new MobEffectInstance(MobEffects.STRENGTH, ENRAGE_TICKS,
+                this.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, ENRAGE_TICKS,
                         (int) (damage / 10.0F)));
-                this.addEffect(new MobEffectInstance(MobEffects.HASTE, ENRAGE_TICKS,
+                this.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, ENRAGE_TICKS,
                         (int) (damage / 40.0F)));
                 this.setAnger(ENRAGE_TICKS);
                 if (source.getEntity() instanceof ServerPlayer player) {
@@ -136,7 +137,7 @@ public class EntityTaintacleGiant extends AbstractTaintacle implements IEldritch
             }
             damage = ENRAGE_THRESHOLD;
         }
-        return super.hurtServer(level, source, damage);
+        return super.hurt(source, damage);
     }
 
     @Override

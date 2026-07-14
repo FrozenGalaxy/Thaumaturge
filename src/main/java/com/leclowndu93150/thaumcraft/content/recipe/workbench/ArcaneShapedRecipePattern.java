@@ -16,7 +16,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
-import net.minecraft.Util;
+import java.util.Objects;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -32,7 +32,7 @@ public final class ArcaneShapedRecipePattern {
     public static final StreamCodec<RegistryFriendlyByteBuf, ArcaneShapedRecipePattern> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, (e) -> e.width,
             ByteBufCodecs.VAR_INT, (e) -> e.height,
-            Ingredient.OPTIONAL_CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), (e) -> e.ingredients,
+            ByteBufCodecs.optional(Ingredient.CONTENTS_STREAM_CODEC).apply(ByteBufCodecs.list()), (e) -> e.ingredients,
             ArcaneShapedRecipePattern::createFromNetwork);
 
     private final int width;
@@ -67,7 +67,18 @@ public final class ArcaneShapedRecipePattern {
         this.ingredients = ingredients;
         this.data = data;
         this.ingredientCount = (int)ingredients.stream().flatMap(Optional::stream).count();
-        this.symmetrical = Util.isSymmetrical(width, height, ingredients);
+        this.symmetrical = computeSymmetrical(width, height, ingredients);
+    }
+
+    private static boolean computeSymmetrical(int width, int height, List<Optional<Ingredient>> ingredients) {
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width / 2; ++x) {
+                if (!Objects.equals(ingredients.get(y * width + x), ingredients.get(y * width + width - 1 - x))) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private static ArcaneShapedRecipePattern createFromNetwork(Integer width, Integer height, List<Optional<Ingredient>> ingredients) {
@@ -191,7 +202,7 @@ public final class ArcaneShapedRecipePattern {
                 }
 
                 ItemStack actual = input.getItem(x, y);
-                if (!Ingredient.testOptionalIngredient(expected, actual)) {
+                if (!(expected.isPresent() ? expected.get().test(actual) : actual.isEmpty())) {
                     return false;
                 }
             }

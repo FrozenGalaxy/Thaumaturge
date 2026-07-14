@@ -39,7 +39,8 @@ public final class EntityBottleTaint extends ThrowableItemProjectile implements 
     }
 
     public EntityBottleTaint(Level level, LivingEntity owner, ItemStack stack) {
-        super(TCEntities.BOTTLE_TAINT.get(), owner, level, stack);
+        super(TCEntities.BOTTLE_TAINT.get(), owner, level);
+        this.setItem(stack);
     }
 
     @Override
@@ -86,7 +87,7 @@ public final class EntityBottleTaint extends ThrowableItemProjectile implements 
     private void applyAreaEffect(ServerLevel server) {
         AABB box = new AABB(this.position(), this.position()).inflate(SPLASH_RADIUS);
         for (LivingEntity target : server.getEntitiesOfClass(LivingEntity.class, box,
-                e -> !(e instanceof ITaintedMob) && !e.is(EntityTypeTags.UNDEAD))) {
+                e -> !(e instanceof ITaintedMob) && !e.getType().is(EntityTypeTags.UNDEAD))) {
             target.addEffect(new MobEffectInstance(TCMobEffects.FLUX_TAINT, FLUX_TAINT_TICKS, 0, false, true));
         }
     }

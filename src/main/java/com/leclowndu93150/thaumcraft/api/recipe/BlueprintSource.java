@@ -179,19 +179,19 @@ public sealed interface BlueprintSource {
 
         @Override
         public BlockState getState() {
-            Optional<HolderSet.Named<Block>> tagSet = BuiltInRegistries.BLOCK.get(this.tag);
+            Optional<HolderSet.Named<Block>> tagSet = BuiltInRegistries.BLOCK.getTag(this.tag);
             if (tagSet.isEmpty()) return Blocks.AIR.defaultBlockState();
             HolderSet.Named<Block> namedTag = tagSet.get();
-            if (!namedTag.isBound()) return Blocks.AIR.defaultBlockState();
+            if (namedTag.size() == 0) return Blocks.AIR.defaultBlockState();
             return namedTag.get(0).value().defaultBlockState();
         }
 
         @Override
         public List<ItemStack> getRepresentations() {
-            Optional<HolderSet.Named<Block>> tagSet = BuiltInRegistries.BLOCK.get(this.tag);
+            Optional<HolderSet.Named<Block>> tagSet = BuiltInRegistries.BLOCK.getTag(this.tag);
             if (tagSet.isEmpty()) return List.of();
             HolderSet.Named<Block> namedTag = tagSet.get();
-            if (!namedTag.isBound()) return List.of();
+            if (namedTag.size() == 0) return List.of();
             List<ItemStack> stacks = new ArrayList<>();
             for (Holder<Block> blockHolder : namedTag) {
                 ItemStack stack = new ItemStack(blockHolder.value());

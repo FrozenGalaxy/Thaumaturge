@@ -1,5 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.essentia.smeltery;
 
+import com.leclowndu93150.thaumcraft.content.research.DeviceGate;
+import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.workbench.BlockEntityArcaneWorkbench;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
@@ -66,8 +68,11 @@ public class BlockSmelter extends BaseEntityBlock {
         return new BlockEntitySmelter(blockPos,blockState);
     }
 
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-        Containers.updateNeighboursAfterDestroy(state, level, pos);
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock())) {
+            level.updateNeighbourForOutputSignal(pos, state.getBlock());
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     protected boolean hasAnalogOutputSignal(BlockState state) {
@@ -112,6 +117,9 @@ public class BlockSmelter extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!level.isClientSide() && !DeviceGate.passes(player, TCIds.rl("essentia_smelter"))) {
+            return InteractionResult.CONSUME;
+        }
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }

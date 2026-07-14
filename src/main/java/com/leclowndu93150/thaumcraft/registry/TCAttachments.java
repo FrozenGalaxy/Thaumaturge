@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.registry;
 
+import com.leclowndu93150.thaumcraft.content.research.pool.AspectPoolData;
 import com.leclowndu93150.thaumcraft.TCIds;
 import net.minecraft.core.BlockPos;
 import com.leclowndu93150.thaumcraft.content.aura.AuraData;
@@ -10,7 +11,6 @@ import com.leclowndu93150.thaumcraft.content.golem.tasks.GolemTasks;
 import com.leclowndu93150.thaumcraft.content.entity.FocusCloudCooldowns;
 import com.leclowndu93150.thaumcraft.content.recipe.dust.DustTriggerSwapQueue;
 import com.leclowndu93150.thaumcraft.content.research.PlayerKnowledge;
-import com.leclowndu93150.thaumcraft.content.research.theorycraft.ResearchTableData;
 import com.leclowndu93150.thaumcraft.content.warp.WarpData;
 import java.util.function.Supplier;
 import net.neoforged.bus.api.IEventBus;
@@ -28,32 +28,33 @@ public final class TCAttachments {
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<PlayerKnowledge>> KNOWLEDGE =
             register("knowledge", () -> AttachmentType.builder(PlayerKnowledge::new)
-                    .serialize(PlayerKnowledge.CODEC)
+                    .serialize(PlayerKnowledge.CODEC.codec())
                     .sync(PlayerKnowledge.STREAM_CODEC)
                     .copyOnDeath()
                     .build());
 
-    public static final DeferredHolder<AttachmentType<?>, AttachmentType<ResearchTableData>> RESEARCH_TABLE =
-            register("research_table", () -> AttachmentType.builder(ResearchTableData::new)
-                    .serialize(ResearchTableData.CODEC)
-                    .sync(ResearchTableData.STREAM_CODEC)
-                    .build());
-
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<AuraData>> AURA =
             register("aura", () -> AttachmentType.builder(AuraData::new)
-                    .serialize(AuraData.CODEC)
+                    .serialize(AuraData.CODEC.codec())
+                    .build());
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<AspectPoolData>> ASPECT_POOL =
+            register("aspect_pool", () -> AttachmentType.builder(AspectPoolData::new)
+                    .serialize(AspectPoolData.CODEC.codec())
+                    .sync(AspectPoolData.STREAM_CODEC)
+                    .copyOnDeath()
                     .build());
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<WarpData>> WARP =
             register("warp", () -> AttachmentType.builder(WarpData::new)
-                    .serialize(WarpData.CODEC)
+                    .serialize(WarpData.CODEC.codec())
                     .sync((holder, to) -> holder == to, WarpData.STREAM_CODEC)
                     .copyOnDeath()
                     .build());
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<DustTriggerSwapQueue>> DUST_TRIGGER_QUEUE =
             register("dust_trigger_queue", () -> AttachmentType.builder(DustTriggerSwapQueue::new)
-                    .serialize(DustTriggerSwapQueue.CODEC)
+                    .serialize(DustTriggerSwapQueue.CODEC.codec())
                     .build());
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<Integer>> GRAPPLE_ID =
@@ -70,7 +71,7 @@ public final class TCAttachments {
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<SealsChunkData>> SEALS =
             register("seals", () -> AttachmentType.builder(SealsChunkData::new)
-                    .serialize(SealsChunkData.CODEC)
+                    .serialize(SealsChunkData.CODEC.codec())
                     .build());
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<SealWorldIndex>> SEAL_INDEX =

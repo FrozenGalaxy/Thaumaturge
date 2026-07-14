@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.device.sprayer;
 
+import java.util.Arrays;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
@@ -44,7 +45,7 @@ final class PotionAspects {
                 for (AspectInstance entry : reagentAspects.entries()) {
                     result = result.add(entry.aspect(), entry.amount());
                 }
-                result = result.add(resolve(level, TCAspects.ALKIMIA.identifier()), ALKIMIA_PER_REAGENT);
+                result = result.add(resolve(level, TCAspects.ALKIMIA.location()), ALKIMIA_PER_REAGENT);
                 anyReagent = true;
             }
             AspectList reduced = AspectList.EMPTY;
@@ -57,8 +58,8 @@ final class PotionAspects {
             result = reduced;
         }
         if (!anyReagent) {
-            result = result.add(resolve(level, TCAspects.PRAECANTATIO.identifier()), FALLBACK_AMOUNT)
-                    .add(resolve(level, TCAspects.ALKIMIA.identifier()), FALLBACK_AMOUNT);
+            result = result.add(resolve(level, TCAspects.PRAECANTATIO.location()), FALLBACK_AMOUNT)
+                    .add(resolve(level, TCAspects.ALKIMIA.location()), FALLBACK_AMOUNT);
         }
         return cull(result, ASPECT_CAP);
     }
@@ -78,14 +79,14 @@ final class PotionAspects {
     private static void collectReagents(List<?> mixes, Holder<Potion> target, List<ItemStack> reagents,
                                         Set<ResourceLocation> visited, int depth) {
         if (depth > MAX_REAGENT_DEPTH) return;
-        ResourceLocation targetId = target.unwrapKey().map(k -> k.identifier()).orElse(null);
+        ResourceLocation targetId = target.unwrapKey().map(k -> k.location()).orElse(null);
         if (targetId == null || !visited.add(targetId)) return;
         for (Object raw : mixes) {
             PotionBrewingMixAccessor mix = (PotionBrewingMixAccessor) raw;
             if (!mix.thaumcraft$getTo().equals(target)) continue;
             Ingredient ingredient = mix.thaumcraft$getIngredient();
-            ingredient.items().findFirst().ifPresent(holder -> {
-                ItemStack reagent = new ItemStack(holder);
+            Arrays.stream(ingredient.getItems()).findFirst().ifPresent(found -> {
+                ItemStack reagent = found.copyWithCount(1);
                 for (ItemStack existing : reagents) {
                     if (ItemStack.isSameItemSameComponents(existing, reagent)) {
                         return;

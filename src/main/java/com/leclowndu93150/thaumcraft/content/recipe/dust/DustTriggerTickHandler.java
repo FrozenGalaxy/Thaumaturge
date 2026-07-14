@@ -56,10 +56,10 @@ public final class DustTriggerTickHandler {
             return;
         }
         for (ChunkPos cp : active) {
-            if (!level.hasChunk(cp.x(), cp.z())) {
+            if (!level.hasChunk(cp.x, cp.z)) {
                 continue;
             }
-            LevelChunk chunk = level.getChunk(cp.x(), cp.z());
+            LevelChunk chunk = level.getChunk(cp.x, cp.z);
             DustTriggerSwapQueue queue = chunk.getData(TCAttachments.DUST_TRIGGER_QUEUE.get());
             if (queue.isEmpty()) {
                 DustTriggerSwapQueue.markChunkClear(level, cp);
@@ -82,7 +82,7 @@ public final class DustTriggerTickHandler {
         }
         entries.clear();
         entries.addAll(next);
-        chunk.markUnsaved();
+        chunk.setUnsaved(true);
         if (queue.isEmpty()) {
             DustTriggerSwapQueue.markChunkClear(level, chunk.getPos());
         }

@@ -72,11 +72,11 @@ public final class ItemGolemPlacer extends Item implements ISealDisplayer {
             return InteractionResult.FAIL;
         }
         ServerLevel serverLevel = (ServerLevel) level;
-        EntityThaumcraftGolem golem = TCEntities.THAUMCRAFT_GOLEM.get().create(serverLevel, MobSpawnType.MOB_SUMMONED);
+        EntityThaumcraftGolem golem = TCEntities.THAUMCRAFT_GOLEM.get().create(serverLevel);
         if (golem == null) {
             return InteractionResult.FAIL;
         }
-        golem.snapTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0.0F, 0.0F);
+        golem.moveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0.0F, 0.0F);
         if (!serverLevel.addFreshEntity(golem)) {
             return InteractionResult.FAIL;
         }
@@ -92,6 +92,6 @@ public final class ItemGolemPlacer extends Item implements ISealDisplayer {
         if (!player.hasInfiniteMaterials()) {
             held.shrink(1);
         }
-        return InteractionResult.SUCCESS_SERVER;
+        return InteractionResult.CONSUME;
     }
 }

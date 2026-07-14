@@ -76,7 +76,7 @@ public final class FocusEffectFire extends FocusEffect {
             float fire = 1 + getSettingValue("duration") * getSettingValue("duration");
             float damage = getDamageForDisplay(finalPower);
             fire *= finalPower;
-            struck.hurtServer(level, TCDamageSources.focusFire(level, struck, getPackage().getCaster()), damage);
+            struck.hurt(TCDamageSources.focusFire(level, struck, getPackage().getCaster()), damage);
             if (fire > 0.0F) {
                 struck.igniteForSeconds(Math.round(fire));
             }

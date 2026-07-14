@@ -1,6 +1,12 @@
 package com.leclowndu93150.thaumcraft.registry;
 
+import com.leclowndu93150.thaumcraft.content.aura.node.NodeData;
+import com.leclowndu93150.thaumcraft.content.research.PlayerKnowledge;
+import com.leclowndu93150.thaumcraft.content.research.note.ResearchNoteData;
+import com.leclowndu93150.thaumcraft.content.wands.WandParts;
+import com.leclowndu93150.thaumcraft.content.wands.WandVis;
 import com.leclowndu93150.thaumcraft.TCIds;
+import com.leclowndu93150.thaumcraft.content.research.pool.AspectPoolData;
 import com.mojang.serialization.Codec;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
@@ -145,6 +151,41 @@ public final class TCDataComponents {
             DATA_COMPONENTS.registerComponentType("mirror_link", builder -> builder
                     .persistent(GlobalPos.CODEC)
                     .networkSynchronized(GlobalPos.STREAM_CODEC));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> NOTE_COMPLETE =
+            DATA_COMPONENTS.registerComponentType("note_complete", builder -> builder
+                    .persistent(Codec.BOOL)
+                    .networkSynchronized(ByteBufCodecs.BOOL));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ResearchNoteData>> RESEARCH_NOTE =
+            DATA_COMPONENTS.registerComponentType("research_note", builder -> builder
+                    .persistent(ResearchNoteData.CODEC)
+                    .networkSynchronized(ResearchNoteData.STREAM_CODEC));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<NodeData>> NODE_DATA =
+            DATA_COMPONENTS.registerComponentType("node_data", builder -> builder
+                    .persistent(NodeData.CODEC)
+                    .networkSynchronized(NodeData.STREAM_CODEC));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<WandParts>> WAND_PARTS =
+            DATA_COMPONENTS.registerComponentType("wand_parts", builder -> builder
+                    .persistent(WandParts.CODEC)
+                    .networkSynchronized(WandParts.STREAM_CODEC));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<WandVis>> WAND_VIS =
+            DATA_COMPONENTS.registerComponentType("wand_vis", builder -> builder
+                    .persistent(WandVis.CODEC)
+                    .networkSynchronized(WandVis.STREAM_CODEC));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<AspectPoolData>> DISCOVERED_ASPECTS =
+            DATA_COMPONENTS.registerComponentType("discovered_aspects", builder -> builder
+                    .persistent(AspectPoolData.CODEC.codec())
+                    .networkSynchronized(AspectPoolData.STREAM_CODEC));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<PlayerKnowledge>> KNOWLEDGE =
+            DATA_COMPONENTS.registerComponentType("knowledge", builder -> builder
+                    .persistent(PlayerKnowledge.CODEC.codec())
+                    .networkSynchronized(PlayerKnowledge.STREAM_CODEC));
 
     private TCDataComponents() {}
 

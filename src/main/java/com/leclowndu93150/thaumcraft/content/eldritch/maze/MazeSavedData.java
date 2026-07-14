@@ -4,15 +4,18 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.eldritch.OuterLands;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.mojang.serialization.DataResult;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.level.saveddata.SavedDataType;
 import org.jspecify.annotations.Nullable;
 
 public final class MazeSavedData extends SavedData {
@@ -24,10 +27,9 @@ public final class MazeSavedData extends SavedData {
             Codec.INT.fieldOf("boss_count").forGetter(data -> data.bossCount)
     ).apply(builder, MazeSavedData::new));
 
-    public static final SavedDataType<MazeSavedData> TYPE = new SavedDataType<>(
-            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "labyrinth"),
+    public static final SavedData.Factory<MazeSavedData> FACTORY = new SavedData.Factory<>(
             MazeSavedData::new,
-            CODEC,
+            MazeSavedData::load,
             DataFixTypes.LEVEL);
 
     private final Map<Long, Short> cells;
@@ -50,31 +52,42 @@ public final class MazeSavedData extends SavedData {
         MinecraftServer server = anyLevel.getServer();
         ServerLevel outer = server.getLevel(OuterLands.DIMENSION);
         ServerLevel target = outer != null ? outer : server.overworld();
-        return target.getDataStorage().computeIfAbsent(TYPE);
+        return target.getDataStorage().computeIfAbsent(FACTORY, "thaumcraft_labyrinth");
+    }
+
+    private static MazeSavedData load(CompoundTag tag, HolderLookup.Provider registries) {
+        return CODEC.parse(NbtOps.INSTANCE, tag.get("data")).result().orElseGet(MazeSavedData::new);
+    }
+
+    @Override
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+        DataResult<Tag> encoded = CODEC.encodeStart(NbtOps.INSTANCE, this);
+        tag.put("data", encoded.getOrThrow());
+        return tag;
     }
 
     public @Nullable MazeCell getCell(int chunkX, int chunkZ) {
-        Short packed = cells.get(ChunkPos.pack(chunkX, chunkZ));
+        Short packed = cells.get(ChunkPos.asLong(chunkX, chunkZ));
         return packed == null ? null : new MazeCell(packed);
     }
 
     public short getCellRaw(int chunkX, int chunkZ) {
-        Short packed = cells.get(ChunkPos.pack(chunkX, chunkZ));
+        Short packed = cells.get(ChunkPos.asLong(chunkX, chunkZ));
         return packed == null ? 0 : packed;
     }
 
     public void putCellRaw(int chunkX, int chunkZ, short packed) {
-        cells.put(ChunkPos.pack(chunkX, chunkZ), packed);
+        cells.put(ChunkPos.asLong(chunkX, chunkZ), packed);
         setDirty();
     }
 
     public void removeCell(int chunkX, int chunkZ) {
-        cells.remove(ChunkPos.pack(chunkX, chunkZ));
+        cells.remove(ChunkPos.asLong(chunkX, chunkZ));
         setDirty();
     }
 
     public boolean hasCell(int chunkX, int chunkZ) {
-        return cells.containsKey(ChunkPos.pack(chunkX, chunkZ));
+        return cells.containsKey(ChunkPos.asLong(chunkX, chunkZ));
     }
 
     public boolean mazesInRange(int chunkX, int chunkZ, int w, int h) {

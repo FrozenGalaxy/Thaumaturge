@@ -20,7 +20,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
@@ -46,8 +45,7 @@ public final class ScanSky implements IScanThing {
         SkyAngles angles = SkyAngles.of(player);
         int worldDay = (int) (player.level().getGameTime() / TICKS_PER_DAY);
         if (angles.onBody()) {
-            int moonPhase = player.level().environmentAttributes()
-                    .getValue(EnvironmentAttributes.MOON_PHASE, player.position()).index();
+            int moonPhase = player.level().getMoonPhase();
             String body = angles.night() ? "moon" + moonPhase : "sun";
             CelestialBody note = angles.night() ? CelestialBody.moon(moonPhase) : CelestialBody.SUN;
             observe(serverPlayer, worldDay, body, note);
@@ -66,7 +64,7 @@ public final class ScanSky implements IScanThing {
     private static void observe(ServerPlayer player, int worldDay, String body, CelestialBody note) {
         ResourceLocation key = ScanKeys.celestial(worldDay, body);
         if (KnowledgeAccess.of(player).isResearchKnown(key)) {
-            player.sendOverlayMessage(Component.translatable("tc.celestial.fail.1"));
+            player.displayClientMessage(Component.translatable("tc.celestial.fail.1"), true);
             return;
         }
         if (isCarrying(player, TCItems.SCRIBING_TOOLS.get()) && consume(player, Items.PAPER)) {
@@ -76,7 +74,7 @@ public final class ScanSky implements IScanThing {
             }
             ScanningManager.progressResearch(player, key);
         } else {
-            player.sendOverlayMessage(Component.translatable("tc.celestial.fail.2"));
+            player.displayClientMessage(Component.translatable("tc.celestial.fail.2"), true);
         }
         cleanResearch(player, worldDay);
     }
@@ -129,8 +127,7 @@ public final class ScanSky implements IScanThing {
         static SkyAngles of(Player player) {
             int yaw = (int) (player.getYRot() + 90.0F) % 360;
             int pitch = (int) Math.abs(player.getXRot());
-            float sunAngle = player.level().environmentAttributes()
-                    .getValue(EnvironmentAttributes.SUN_ANGLE, player.position());
+            float sunAngle = player.level().getTimeOfDay(1.0F) * 360.0F;
             int celestialAngle = (int) (sunAngle + 90.0F) % 360;
             boolean night = celestialAngle > 180;
             if (night) {

@@ -89,7 +89,7 @@ public final class ConstructFollowOwnerGoal extends Goal {
                         && isSolidGround(new BlockPos(baseX + dx, baseY - 1, baseZ + dz))
                         && isPassable(new BlockPos(baseX + dx, baseY, baseZ + dz))
                         && isPassable(new BlockPos(baseX + dx, baseY + 1, baseZ + dz))) {
-                    construct.snapTo(baseX + dx + 0.5, baseY, baseZ + dz + 0.5,
+                    construct.moveTo(baseX + dx + 0.5, baseY, baseZ + dz + 0.5,
                             construct.getYRot(), construct.getXRot());
                     navigation.stop();
                     return;

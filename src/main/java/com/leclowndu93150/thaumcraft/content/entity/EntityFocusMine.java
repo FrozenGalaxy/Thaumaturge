@@ -89,22 +89,22 @@ public final class EntityFocusMine extends ThrowableProjectile implements IEntit
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag output) {
+    public void addAdditionalSaveData(CompoundTag output) {
         super.addAdditionalSaveData(output);
         output.putBoolean("armed", this.isArmed());
         output.putBoolean("friendly", this.friendly);
-        FocusPackages.save(output, this.focusPackage);
+        FocusPackages.save(output, registryAccess(), this.focusPackage);
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag input) {
+    public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         this.friendly = input.getBoolean("friendly");
         this.setArmed(input.getBoolean("armed"));
         if (this.isArmed()) {
             this.counter = 0;
         }
-        this.focusPackage = FocusPackages.load(input);
+        this.focusPackage = FocusPackages.load(input, registryAccess());
     }
 
     @Override

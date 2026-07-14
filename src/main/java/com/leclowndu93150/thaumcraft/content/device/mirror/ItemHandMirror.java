@@ -1,5 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.device.mirror;
 
+import com.leclowndu93150.thaumcraft.content.research.DeviceGate;
+import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import net.minecraft.ChatFormatting;
@@ -11,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -52,11 +55,14 @@ public final class ItemHandMirror extends Item {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        if (!level.isClientSide() && !DeviceGate.passes(player, TCIds.rl("mirror_hand"))) {
+            return InteractionResultHolder.consume(player.getItemInHand(hand));
+        }
         ItemStack stack = player.getItemInHand(hand);
         GlobalPos link = stack.get(TCDataComponents.MIRROR_LINK.get());
         if (link == null || !(player instanceof ServerPlayer serverPlayer)) {
-            return InteractionResult.PASS;
+            return InteractionResultHolder.pass(stack);
         }
         ServerLevel targetLevel = serverPlayer.level().getServer().getLevel(link.dimension());
         BlockEntity target = targetLevel == null ? null : targetLevel.getBlockEntity(link.pos());
@@ -65,7 +71,7 @@ public final class ItemHandMirror extends Item {
             serverPlayer.level().playSound(null, serverPlayer.getX(), serverPlayer.getY(), serverPlayer.getZ(),
                     TCSounds.ZAP.get(), SoundSource.PLAYERS, 1.0F, 0.8F);
             serverPlayer.sendSystemMessage(Component.translatable("tc.handmirrorerror"));
-            return InteractionResult.SUCCESS;
+            return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
         }
         serverPlayer.openMenu(new MenuProvider() {
             @Override
@@ -78,7 +84,7 @@ public final class ItemHandMirror extends Item {
                 return new MenuHandMirror(containerId, inventory);
             }
         });
-        return InteractionResult.SUCCESS;
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
     public static boolean transport(ItemStack mirror, ItemStack items, ServerPlayer player) {
@@ -114,7 +120,7 @@ public final class ItemHandMirror extends Item {
         if (link != null) {
             tooltip.add(Component.translatable("tc.handmirrorlinkedto.full",
                     link.pos().getX(), link.pos().getY(), link.pos().getZ(),
-                    link.dimension().identifier().toString()));
+                    link.dimension().location().toString()));
         }
     }
 }

@@ -42,6 +42,6 @@ public final class CropUtils {
     }
 
     public static ItemStack getSeed(Level level, BlockPos pos, BlockState state) {
-        return state.getCloneItemStack(level, pos, false);
+        return state.getBlock().getCloneItemStack(level, pos, state);
     }
 }

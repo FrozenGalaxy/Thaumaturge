@@ -101,7 +101,7 @@ public final class BlockEntityPatternCrafter extends BlockEntity {
         if (above == null || below == null) {
             return;
         }
-        for (int slot = 0; slot < above.size(); slot++) {
+        for (int slot = 0; slot < above.getSlots(); slot++) {
             ItemStack resource = above.getStackInSlot(slot);
             if (resource.isEmpty()) continue;
             ItemStack testStack = resource.copyWithCount(inputCount);
@@ -141,13 +141,13 @@ public final class BlockEntityPatternCrafter extends BlockEntity {
             grid.set(slot, input.copyWithCount(1));
         }
         CraftingInput craftingInput = CraftingInput.of(3, 3, grid);
-        Optional<RecipeHolder<CraftingRecipe>> match = server.recipeAccess()
+        Optional<RecipeHolder<CraftingRecipe>> match = server.getRecipeManager()
                 .getRecipeFor(RecipeType.CRAFTING, craftingInput, server);
         if (match.isEmpty()) {
             return null;
         }
         CraftingRecipe recipe = match.get().value();
-        ItemStack output = recipe.assemble(craftingInput);
+        ItemStack output = recipe.assemble(craftingInput, server.registryAccess());
         if (output.isEmpty()) {
             return null;
         }

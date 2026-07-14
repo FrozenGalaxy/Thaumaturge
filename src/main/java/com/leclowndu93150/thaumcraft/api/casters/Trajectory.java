@@ -3,6 +3,7 @@ package com.leclowndu93150.thaumcraft.api.casters;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
 
@@ -20,11 +21,19 @@ public record Trajectory(Vec3 source, Vec3 direction) {
             Vec3.CODEC.fieldOf("direction").forGetter(Trajectory::direction)
     ).apply(i, Trajectory::new));
 
+    /** Network encoding of a single vector as double triples. */
+    private static final StreamCodec<ByteBuf, Vec3> VEC3_STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.DOUBLE, Vec3::x,
+            ByteBufCodecs.DOUBLE, Vec3::y,
+            ByteBufCodecs.DOUBLE, Vec3::z,
+            Vec3::new
+    );
+
     /** Network encoding mirroring {@link #CODEC}. */
     public static final StreamCodec<ByteBuf, Trajectory> STREAM_CODEC = StreamCodec.composite(
-            Vec3.STREAM_CODEC,
+            VEC3_STREAM_CODEC,
             Trajectory::source,
-            Vec3.STREAM_CODEC,
+            VEC3_STREAM_CODEC,
             Trajectory::direction,
             Trajectory::new
     );

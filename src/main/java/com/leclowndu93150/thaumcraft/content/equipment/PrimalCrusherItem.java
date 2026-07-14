@@ -1,16 +1,17 @@
 package com.leclowndu93150.thaumcraft.content.equipment;
 
+import com.leclowndu93150.thaumcraft.api.items.IWarpingGear;
 import java.util.List;
-import net.minecraft.core.HolderGetter;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.Tool;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.Level;
 
-public final class PrimalCrusherItem extends VoidGearItem {
+public final class PrimalCrusherItem extends Item implements IWarpingGear {
     private static final int CRUSHER_WARP = 2;
 
     public PrimalCrusherItem(Properties properties) {
@@ -18,13 +19,31 @@ public final class PrimalCrusherItem extends VoidGearItem {
     }
 
     private static Tool crusherTool() {
-        HolderGetter<Block> blocks = BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK);
         return new Tool(List.of(
-                Tool.Rule.minesAndDrops(blocks.getOrThrow(BlockTags.MINEABLE_WITH_PICKAXE),
-                        TCMaterials.TOOL_PRIMAL_VOID.speed()),
-                Tool.Rule.minesAndDrops(blocks.getOrThrow(BlockTags.MINEABLE_WITH_SHOVEL),
-                        TCMaterials.TOOL_PRIMAL_VOID.speed())),
-                1.0F, 1, true);
+                Tool.Rule.deniesDrops(TCMaterials.TOOL_PRIMAL_VOID.getIncorrectBlocksForDrops()),
+                Tool.Rule.minesAndDrops(BlockTags.MINEABLE_WITH_PICKAXE,
+                        TCMaterials.TOOL_PRIMAL_VOID.getSpeed()),
+                Tool.Rule.minesAndDrops(BlockTags.MINEABLE_WITH_SHOVEL,
+                        TCMaterials.TOOL_PRIMAL_VOID.getSpeed())),
+                1.0F, 1);
+    }
+
+    @Override
+    public int getEnchantmentValue() {
+        return TCMaterials.TOOL_PRIMAL_VOID.getEnchantmentValue();
+    }
+
+    @Override
+    public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
+        return TCMaterials.TOOL_PRIMAL_VOID.getRepairIngredient().test(repairCandidate);
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        super.inventoryTick(stack, level, entity, slotId, isSelected);
+        if (!level.isClientSide()) {
+            VoidGearItem.selfRepairTick(stack, entity);
+        }
     }
 
     @Override

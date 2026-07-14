@@ -12,11 +12,12 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 
 public class ItemSanitySoap extends Item {
@@ -36,14 +37,14 @@ public class ItemSanitySoap extends Item {
     }
 
     @Override
-    public ItemUseAnimation getUseAnimation(ItemStack stack) {
-        return ItemUseAnimation.BLOCK;
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.BLOCK;
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         player.startUsingItem(hand);
-        return InteractionResult.SUCCESS;
+        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
 
     @Override
@@ -62,10 +63,10 @@ public class ItemSanitySoap extends Item {
     }
 
     @Override
-    public boolean releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
+    public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
         int used = getUseDuration(stack, entity) - timeLeft;
         if (used <= FINISH_THRESHOLD_TICKS || !(entity instanceof Player)) {
-            return false;
+            return;
         }
         stack.shrink(1);
         if (!level.isClientSide() && entity instanceof ServerPlayer player) {
@@ -88,7 +89,7 @@ public class ItemSanitySoap extends Item {
                     TCSounds.CRAFTSTART.get(), SoundSource.PLAYERS, 0.25F, 1.0F, false);
             spawnBubbles(level, entity, FINISH_BUBBLES, 1.5F);
         }
-        return true;
+        return;
     }
 
     private static void spawnBubbles(Level level, LivingEntity entity, int count, float spread) {

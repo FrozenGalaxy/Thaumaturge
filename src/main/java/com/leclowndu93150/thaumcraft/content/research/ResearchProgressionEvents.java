@@ -65,7 +65,7 @@ public final class ResearchProgressionEvents {
     public static void recordCrafted(ServerPlayer player, ItemStack crafted) {
         if (crafted.isEmpty()) return;
         ResourceLocation itemId = crafted.getItem().builtInRegistryHolder().unwrapKey()
-                .map(ResourceKey::identifier).orElse(null);
+                .map(ResourceKey::location).orElse(null);
         if (itemId == null) return;
         PlayerKnowledge knowledge = (PlayerKnowledge) KnowledgeAccess.of(player);
         ResourceLocation craftedKey = ResearchManager.craftedKey(itemId);
@@ -169,9 +169,9 @@ public final class ResearchProgressionEvents {
                 && !knowledge.isResearchComplete(UNLOCK_AUROMANCY);
         if (auromancyInProgress) {
             milestone(player, knowledge, TCIds.rl("m_deepdown"), "got.deepdown",
-                    player.getY() < player.level().getMinY() + DEEP_DOWN_DEPTH);
+                    player.getY() < player.level().getMinBuildHeight() + DEEP_DOWN_DEPTH);
             milestone(player, knowledge, TCIds.rl("m_uphigh"), "got.uphigh",
-                    player.getY() > player.level().getMaxY() * UP_HIGH_FRACTION);
+                    player.getY() > player.level().getMaxBuildHeight() * UP_HIGH_FRACTION);
         }
         milestone(player, knowledge, TCIds.rl("m_walker"), null,
                 player.getStats().getValue(Stats.CUSTOM.get(Stats.WALK_ONE_CM)) > WALK_MILESTONE_CM);

@@ -64,7 +64,7 @@ public class EntityInhabitedZombie extends Zombie implements IEldritchMob {
     }
 
     @Override
-    public boolean killedEntity(ServerLevel level, LivingEntity killed, DamageSource source) {
+    public boolean killedEntity(ServerLevel level, LivingEntity killed) {
         return false;
     }
 
@@ -85,16 +85,16 @@ public class EntityInhabitedZombie extends Zombie implements IEldritchMob {
     @Override
     protected void tickDeath() {
         if (this.level() instanceof ServerLevel server) {
-            EntityEldritchCrab crab = TCEntities.ELDRITCH_CRAB.get().create(server, MobSpawnType.CONVERSION);
+            EntityEldritchCrab crab = TCEntities.ELDRITCH_CRAB.get().create(server);
             if (crab != null) {
-                crab.snapTo(this.getX(), this.getY() + this.getEyeHeight(), this.getZ(),
+                crab.moveTo(this.getX(), this.getY() + this.getEyeHeight(), this.getZ(),
                         this.getYRot(), this.getXRot());
                 crab.setHelm(true);
                 server.addFreshEntity(crab);
             }
             if (server.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT) && this.shouldDropExperience()) {
                 ExperienceOrb.award(server, this.position(),
-                        this.getExperienceReward(server, this.getLastHurtByPlayer()));
+                        this.getExperienceReward(server, this.lastHurtByPlayer));
             }
             server.sendParticles(ParticleTypes.POOF,
                     this.getX(), this.getY() + this.getBbHeight() / 2.0, this.getZ(),

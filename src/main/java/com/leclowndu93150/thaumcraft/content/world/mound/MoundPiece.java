@@ -52,7 +52,7 @@ public class MoundPiece extends ScatteredFeaturePiece {
 
     public MoundPiece(CompoundTag tag) {
         super(TCStructures.MOUND_PIECE.get(), tag);
-        this.spawnedPortal = tag.getBooleanOr("Portal", false);
+        this.spawnedPortal = tag.getBoolean("Portal");
     }
 
     @Override
@@ -120,10 +120,10 @@ public class MoundPiece extends ScatteredFeaturePiece {
         }
         this.spawnedPortal = true;
         EntityCultistPortalLesser portal =
-                TCEntities.CULTIST_PORTAL_LESSER.get().create(level.getLevel(), MobSpawnType.STRUCTURE);
+                TCEntities.CULTIST_PORTAL_LESSER.get().create(level.getLevel());
         if (portal != null) {
             portal.setPersistenceRequired();
-            portal.snapTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0.0F, 0.0F);
+            portal.moveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0.0F, 0.0F);
             portal.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.STRUCTURE, null);
             level.addFreshEntityWithPassengers(portal);
         }

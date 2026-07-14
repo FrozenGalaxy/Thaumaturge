@@ -34,7 +34,7 @@ public final class PechItemGoal extends Goal {
         this.targetItem = null;
         for (ItemEntity item : this.pech.level().getEntitiesOfClass(ItemEntity.class,
                 this.pech.getBoundingBox().inflate(MAX_TARGET_DISTANCE))) {
-            if (!this.pech.canPickup(item.getItem()) || item.entityTags().contains(PECH_DROP_TAG)) {
+            if (!this.pech.canPickup(item.getItem()) || item.getTags().contains(PECH_DROP_TAG)) {
                 continue;
             }
             double distance = item.distanceToSqr(this.pech);

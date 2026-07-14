@@ -76,8 +76,9 @@ public final class EntityGiantBrainyZombie extends EntityBrainyZombie {
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+    public boolean hurt(DamageSource source, float damage) {
+        ServerLevel level = (ServerLevel) level();
         setAnger(Math.min(MAX_ANGER, getAnger() + ANGER_PER_HIT));
-        return super.hurtServer(level, source, damage);
+        return super.hurt(source, damage);
     }
 }

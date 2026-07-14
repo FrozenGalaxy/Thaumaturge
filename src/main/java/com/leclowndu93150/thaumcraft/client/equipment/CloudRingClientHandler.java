@@ -68,8 +68,8 @@ public final class CloudRingClientHandler {
                 SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, SOUND_VOLUME,
                 1.0F + (float) player.getRandom().nextGaussian() * 0.05F, false);
         double velocityY = JUMP_VELOCITY;
-        if (player.hasEffect(MobEffects.JUMP_BOOST)) {
-            velocityY += (player.getEffect(MobEffects.JUMP_BOOST).getAmplifier() + 1) * JUMP_BOOST_BONUS;
+        if (player.hasEffect(MobEffects.JUMP)) {
+            velocityY += (player.getEffect(MobEffects.JUMP).getAmplifier() + 1) * JUMP_BOOST_BONUS;
         }
         Vec3 movement = player.getDeltaMovement();
         double velocityX = movement.x;

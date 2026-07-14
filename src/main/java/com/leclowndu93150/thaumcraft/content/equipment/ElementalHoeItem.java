@@ -8,8 +8,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -20,9 +20,8 @@ public final class ElementalHoeItem extends HoeItem {
     private static final int LEVEL_EVENT_BONEMEAL = 1505;
     private static final int BONEMEAL_EVENT_DATA = 15;
 
-    public ElementalHoeItem(ToolMaterial material, float attackDamageBaseline, float attackSpeedBaseline,
-                            Properties properties) {
-        super(material, attackDamageBaseline, attackSpeedBaseline, properties);
+    public ElementalHoeItem(Properties properties) {
+        super(TCMaterials.TOOL_ELEMENTAL, properties);
     }
 
     @Override
@@ -53,7 +52,7 @@ public final class ElementalHoeItem extends HoeItem {
             }
         }
         if (!did && BoneMealItem.growCrop(new ItemStack(Items.BONE_MEAL), level, pos)) {
-            context.getItemInHand().hurtAndBreak(BONEMEAL_DAMAGE, player, context.getHand().asEquipmentSlot());
+            context.getItemInHand().hurtAndBreak(BONEMEAL_DAMAGE, player, LivingEntity.getSlotForHand(context.getHand()));
             if (!level.isClientSide()) {
                 level.levelEvent(LEVEL_EVENT_BONEMEAL, pos, BONEMEAL_EVENT_DATA);
             }

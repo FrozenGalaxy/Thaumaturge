@@ -202,20 +202,20 @@ public final class BlockEntityInfusionMatrix extends BlockEntity implements IGog
         }
         InfusionInput input = new InfusionInput(catalyst, components);
         float costMult = Math.max(MIN_COST_MULT, env.costMult());
-        Optional<RecipeHolder<InfusionRecipe>> match = level.recipeAccess()
+        Optional<RecipeHolder<InfusionRecipe>> match = level.getRecipeManager()
                 .getRecipeFor(TCRecipeTypes.INFUSION.get(), input, level)
                 .filter(holder -> ResearchManager.doesPassGate(player, holder.value().researchGate().orElse(null)));
         if (match.isPresent()) {
             InfusionRecipe recipe = match.get().value();
             job = new InfusionCraftJob(recipe.matchComponents(components),
-                    scaleByEnvironment(recipe.aspects(), costMult), recipe.assemble(input),
+                    scaleByEnvironment(recipe.aspects(), costMult), recipe.assemble(input, level.registryAccess()),
                     catalyst.copyWithCount(1), recipe.instability(), Optional.of(player.getUUID()));
             level.playSound(null, worldPosition, TCSounds.CRAFTSTART.get(), SoundSource.BLOCKS, 0.5F, 1.0F);
             setChanged();
             syncToClient();
             return;
         }
-        Optional<RecipeHolder<InfusionEnchantmentRecipe>> enchantMatch = level.recipeAccess()
+        Optional<RecipeHolder<InfusionEnchantmentRecipe>> enchantMatch = level.getRecipeManager()
                 .getRecipeFor(TCRecipeTypes.INFUSION_ENCHANTMENT.get(), input, level)
                 .filter(holder -> ResearchManager.doesPassGate(player, holder.value().researchGate().orElse(null)));
         if (enchantMatch.isEmpty()) {
@@ -362,8 +362,9 @@ public final class BlockEntityInfusionMatrix extends BlockEntity implements IGog
                     itemPullCountdown = ITEM_PULL_TICKS;
                     InfusionFx.itemStream(level, worldPosition, pedestalPos);
                 } else if (--itemPullCountdown < 1) {
-                    ItemStack remainder = stack.getItem().getCraftingRemainder(stack);
-                    pedestal.setItem(remainder == null ? ItemStack.EMPTY : remainder.create());
+                    ItemStack remainder = stack.getItem().hasCraftingRemainingItem(stack)
+                            ? stack.getItem().getCraftingRemainingItem(stack) : ItemStack.EMPTY;
+                    pedestal.setItem(remainder == null ? ItemStack.EMPTY : remainder.copy());
                     ingredients.remove(a);
                     setChanged();
                 }
