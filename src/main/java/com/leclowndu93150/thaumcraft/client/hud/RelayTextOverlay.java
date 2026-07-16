@@ -1,13 +1,13 @@
 package com.leclowndu93150.thaumcraft.client.hud;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import net.minecraft.util.LightCoordsUtil;
 import com.leclowndu93150.thaumcraft.content.device.BlockEntityRedstoneRelay;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -31,7 +31,10 @@ public final class RelayTextOverlay {
     private RelayTextOverlay() {}
 
     @SubscribeEvent
-    public static void onRender(RenderLevelStageEvent.AfterWeather event) {
+    public static void onRender(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) {
+            return;
+        }
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.options.hideGui) {
             return;
@@ -61,7 +64,7 @@ public final class RelayTextOverlay {
     private static void drawTextInAir(PoseStack poseStack, Minecraft mc, MultiBufferSource buffers,
                                       double x, double y, double z, Component text) {
         Camera camera = mc.gameRenderer.getMainCamera();
-        Vec3 cam = camera.position();
+        Vec3 cam = camera.getPosition();
         float yaw = (float) Math.toDegrees(Math.atan2(cam.x - x, cam.z - z));
         poseStack.pushPose();
         poseStack.translate(x - cam.x, y - cam.y, z - cam.z);
@@ -69,7 +72,7 @@ public final class RelayTextOverlay {
         poseStack.scale(-TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
         int width = mc.font.width(text);
         mc.font.drawInBatch(text, 1 - width / 2, 1.0F, TEXT_COLOR, true,
-                poseStack.last().pose(), buffers, Font.DisplayMode.SEE_THROUGH, 0, LightCoordsUtil.FULL_BRIGHT);
+                poseStack.last().pose(), buffers, Font.DisplayMode.SEE_THROUGH, 0, LightTexture.FULL_BRIGHT);
         poseStack.popPose();
     }
 }

@@ -1,6 +1,6 @@
 package com.leclowndu93150.thaumcraft.client.screen.widget;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 public class TCHoverButton extends TCButton {
@@ -23,7 +23,7 @@ public class TCHoverButton extends TCButton {
     }
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         int tint = activeTintColor(tintColor(), isHovered(), active);
         int drawX = getX() + (getWidth() - iconSize) / 2;
         int drawY = getY() + (getHeight() - iconSize) / 2;

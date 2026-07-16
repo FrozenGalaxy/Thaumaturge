@@ -14,7 +14,7 @@ import org.lwjgl.glfw.GLFW;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
 public final class TCKeybinds {
-    public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(TCIds.rl("main"));
+    public static final String CATEGORY = "key.categories.thaumcraft";
     public static final KeyMapping OPEN_THAUMONOMICON = new KeyMapping(
             "key.thaumcraft.thaumonomicon",
             InputConstants.Type.KEYSYM,
@@ -30,7 +30,6 @@ public final class TCKeybinds {
 
     @SubscribeEvent
     public static void onRegisterMappings(RegisterKeyMappingsEvent event) {
-        event.registerCategory(CATEGORY);
         event.register(OPEN_THAUMONOMICON);
         event.register(CHANGE_FOCUS);
         event.register(MISC_TOGGLE);

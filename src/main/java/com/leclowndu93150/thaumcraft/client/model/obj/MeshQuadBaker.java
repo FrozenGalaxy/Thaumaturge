@@ -1,11 +1,10 @@
 package com.leclowndu93150.thaumcraft.client.model.obj;
 
 import java.util.List;
-import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
+import net.neoforged.neoforge.client.model.pipeline.QuadBakingVertexConsumer;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -14,27 +13,32 @@ import org.joml.Vector3fc;
 public final class MeshQuadBaker {
     private static final float CONTRACT_EPS = 1.0F / 256.0F;
     private static final float CONTRACT_DIVISOR = 256.0F;
+    private static final float NORMAL_EPS = 1.0E-6F;
 
     private MeshQuadBaker() {}
 
-    public static void bakePart(MeshModel mesh, MeshPart part, Material.Baked baked, int tintIndex,
-                                Matrix4f transform, BakedQuad.MaterialInfo info, List<BakedQuad> output) {
-        bakePart(mesh, part, baked, tintIndex, transform, info, false, output);
+    public static void bakePart(MeshModel mesh, MeshPart part, TextureAtlasSprite sprite, int tintIndex,
+                                Matrix4f transform, List<BakedQuad> output) {
+        bakePart(mesh, part, sprite, tintIndex, transform, false, 0, 0, output);
     }
 
-    public static void bakePart(MeshModel mesh, MeshPart part, Material.Baked baked, int tintIndex,
-                                Matrix4f transform, BakedQuad.MaterialInfo info, boolean flipV, List<BakedQuad> output) {
+    public static void bakePart(MeshModel mesh, MeshPart part, TextureAtlasSprite sprite, int tintIndex,
+                                Matrix4f transform, boolean flipV, List<BakedQuad> output) {
+        bakePart(mesh, part, sprite, tintIndex, transform, flipV, 0, 0, output);
+    }
+
+    public static void bakePart(MeshModel mesh, MeshPart part, TextureAtlasSprite sprite, int tintIndex,
+                                Matrix4f transform, boolean flipV, int blockLight, int skyLight, List<BakedQuad> output) {
+        QuadBakingVertexConsumer consumer = new QuadBakingVertexConsumer();
         for (int i = 0; i + 3 < part.indices().size(); i += 4) {
-            BakedQuad quad = bakeQuad(mesh, part, i, baked, transform, info, flipV);
-            if (quad != null) {
-                output.add(quad);
-            }
+            output.add(bakeQuad(mesh, part, i, sprite, transform, tintIndex, flipV, blockLight, skyLight, consumer));
         }
     }
 
-    private static BakedQuad bakeQuad(MeshModel mesh, MeshPart part, int start, Material.Baked baked,
-                                      Matrix4f transform, BakedQuad.MaterialInfo info, boolean flipV) {
-        Vector3fc[] positions = new Vector3fc[4];
+    private static BakedQuad bakeQuad(MeshModel mesh, MeshPart part, int start, TextureAtlasSprite sprite,
+                                      Matrix4f transform, int tintIndex, boolean flipV, int blockLight, int skyLight,
+                                      QuadBakingVertexConsumer consumer) {
+        Vector3f[] positions = new Vector3f[4];
         float[] us = new float[4];
         float[] vs = new float[4];
         for (int i = 0; i < 4; i++) {
@@ -51,20 +55,34 @@ public final class MeshQuadBaker {
             }
             pos.mulPosition(transform);
             positions[i] = pos;
-            us[i] = baked.sprite().getU(tex.x);
-            vs[i] = baked.sprite().getV(flipV ? 1.0F - tex.y : tex.y);
+            us[i] = sprite.getU(tex.x);
+            vs[i] = sprite.getV(flipV ? 1.0F - tex.y : tex.y);
         }
-        contractUvs(us, vs, baked.sprite());
-        long[] packedUvs = new long[4];
+        contractUvs(us, vs, sprite);
+
+        Vector3f normal = faceNormal(positions);
+        Direction facing;
+        if (normal.lengthSquared() < NORMAL_EPS) {
+            facing = Direction.UP;
+            normal.set(0.0F, 1.0F, 0.0F);
+        } else {
+            normal.normalize();
+            facing = Direction.getNearest(normal.x, normal.y, normal.z);
+        }
+
+        consumer.setSprite(sprite);
+        consumer.setDirection(facing);
+        consumer.setTintIndex(tintIndex);
+        consumer.setShade(false);
+        consumer.setHasAmbientOcclusion(false);
         for (int i = 0; i < 4; i++) {
-            packedUvs[i] = UVPair.pack(us[i], vs[i]);
+            consumer.addVertex(positions[i].x, positions[i].y, positions[i].z)
+                    .setColor(255, 255, 255, 255)
+                    .setUv(us[i], vs[i])
+                    .setUv2(blockLight, skyLight)
+                    .setNormal(normal.x, normal.y, normal.z);
         }
-        Direction facing = computeFaceDirection(positions);
-        return new BakedQuad(
-                positions[0], positions[1], positions[2], positions[3],
-                packedUvs[0], packedUvs[1], packedUvs[2], packedUvs[3],
-                facing,
-                info);
+        return consumer.bakeQuad();
     }
 
     private static void contractUvs(float[] us, float[] vs, TextureAtlasSprite sprite) {
@@ -92,12 +110,17 @@ public final class MeshQuadBaker {
         return value + (toCenter < 0.0F ? -minShift : minShift);
     }
 
-    public static Direction computeFaceDirection(Vector3fc[] positions) {
+    public static Vector3f faceNormal(Vector3fc[] positions) {
         Vector3f edge1 = new Vector3f(positions[1]).sub(positions[0]);
         Vector3f edge2 = new Vector3f(positions[2]).sub(positions[0]);
         Vector3f normal = new Vector3f();
         edge1.cross(edge2, normal);
-        if (normal.lengthSquared() < 1.0E-6F) {
+        return normal;
+    }
+
+    public static Direction computeFaceDirection(Vector3fc[] positions) {
+        Vector3f normal = faceNormal(positions);
+        if (normal.lengthSquared() < NORMAL_EPS) {
             return Direction.UP;
         }
         normal.normalize();

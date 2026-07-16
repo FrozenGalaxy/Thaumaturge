@@ -1,15 +1,18 @@
-#version 330
+#version 150
 
-#moj_import <minecraft:fog.glsl>
-#moj_import <minecraft:projection.glsl>
-#moj_import <minecraft:globals.glsl>
+#moj_import <fog.glsl>
 
 uniform sampler2D Sampler0;
 uniform sampler2D Sampler1;
 
+uniform mat4 ProjMat;
+uniform float GameTime;
+uniform float FogStart;
+uniform float FogEnd;
+uniform vec4 FogColor;
+
 in vec4 texProj0;
-in float sphericalVertexDistance;
-in float cylindricalVertexDistance;
+in float vertexDistance;
 
 const vec3[] COLORS = vec3[](
     vec3(0.100000, 0.100000, 0.100000),
@@ -52,5 +55,5 @@ void main() {
         vec4 tex = texture(Sampler1, layer_uv(base, i));
         color += tex.rgb * tex.a * COLORS[i];
     }
-    fragColor = apply_fog(vec4(color, 1.0), sphericalVertexDistance, cylindricalVertexDistance, FogEnvironmentalStart, FogEnvironmentalEnd, FogRenderDistanceStart, FogRenderDistanceEnd, FogColor);
+    fragColor = linear_fog(vec4(color, 1.0), vertexDistance, FogStart, FogEnd, FogColor);
 }

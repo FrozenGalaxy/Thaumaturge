@@ -1,0 +1,44 @@
+package com.leclowndu93150.thaumcraft.client.render;
+
+import com.leclowndu93150.thaumcraft.TCIds;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import java.io.IOException;
+import net.minecraft.client.renderer.ShaderInstance;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RegisterShadersEvent;
+
+@EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
+public final class TCShaders {
+    private static ShaderInstance ender;
+    private static ShaderInstance portal;
+    private static ShaderInstance voidStream;
+
+    private TCShaders() {}
+
+    public static ShaderInstance ender() {
+        return ender;
+    }
+
+    public static ShaderInstance portal() {
+        return portal;
+    }
+
+    public static ShaderInstance voidStream() {
+        return voidStream;
+    }
+
+    @SubscribeEvent
+    public static void register(RegisterShadersEvent event) throws IOException {
+        event.registerShader(
+                new ShaderInstance(event.getResourceProvider(), TCIds.rl("tc_ender"), DefaultVertexFormat.POSITION),
+                shader -> ender = shader);
+        event.registerShader(
+                new ShaderInstance(event.getResourceProvider(), TCIds.rl("tc_portal"), DefaultVertexFormat.POSITION),
+                shader -> portal = shader);
+        event.registerShader(
+                new ShaderInstance(event.getResourceProvider(), TCIds.rl("void_stream"), DefaultVertexFormat.POSITION_TEX_COLOR),
+                shader -> voidStream = shader);
+    }
+}

@@ -57,9 +57,9 @@ public final class EssentiaStreamManager extends AbstractFXManager<EssentiaStrea
         if (ACTIVE.isEmpty()) return;
         MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(new ByteBufferBuilder(2048));
         VertexConsumer consumer = bufferSource.getBuffer(EssentiaStreamRenderType.RENDER_TYPE);
-        double cx = camera.position().x;
-        double cy = camera.position().y;
-        double cz = camera.position().z;
+        double cx = camera.getPosition().x;
+        double cy = camera.getPosition().y;
+        double cz = camera.getPosition().z;
         for (EssentiaStreamInstance inst : ACTIVE.values()) {
             EssentiaStreamInstance.Snapshot snap = inst.snapshot(partialTick);
             if (snap == null) continue;

@@ -3,7 +3,6 @@ package com.leclowndu93150.thaumcraft.client.screen.widget;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -57,7 +56,7 @@ public abstract class TCButton extends AbstractButton {
     }
 
     @Override
-    public void onPress(InputWithModifiers input) {
+    public void onPress() {
         if (onPress != null) {
             onPress.run();
         }

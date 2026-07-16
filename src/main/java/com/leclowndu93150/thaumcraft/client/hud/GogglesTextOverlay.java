@@ -8,10 +8,10 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -29,7 +29,10 @@ public final class GogglesTextOverlay {
     private GogglesTextOverlay() {}
 
     @SubscribeEvent
-    public static void onRender(RenderLevelStageEvent.AfterWeather event) {
+    public static void onRender(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) {
+            return;
+        }
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.options.hideGui) {
             return;
@@ -69,7 +72,7 @@ public final class GogglesTextOverlay {
     private static void drawTextInAir(PoseStack poseStack, Minecraft mc, MultiBufferSource buffers,
                                       double x, double y, double z, Component text) {
         Camera camera = mc.gameRenderer.getMainCamera();
-        Vec3 cam = camera.position();
+        Vec3 cam = camera.getPosition();
         float yaw = (float) Math.toDegrees(Math.atan2(cam.x - (x + 0.5), cam.z - (z + 0.5)));
         poseStack.pushPose();
         poseStack.translate(x + 0.5 - cam.x, y + 0.5 - cam.y, z + 0.5 - cam.z);
@@ -77,7 +80,7 @@ public final class GogglesTextOverlay {
         poseStack.scale(-TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
         int width = mc.font.width(text);
         mc.font.drawInBatch(text, 1 - width / 2, 1.0F, TEXT_COLOR, true,
-                poseStack.last().pose(), buffers, Font.DisplayMode.SEE_THROUGH, 0, LightCoordsUtil.FULL_BRIGHT);
+                poseStack.last().pose(), buffers, Font.DisplayMode.SEE_THROUGH, 0, LightTexture.FULL_BRIGHT);
         poseStack.popPose();
     }
 }

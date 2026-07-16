@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.render.research;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 public final class StageNavigatorWidget {
@@ -14,7 +14,7 @@ public final class StageNavigatorWidget {
     }
 
     public static void render(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             Font font,
             int x,
             int y,
@@ -24,7 +24,7 @@ public final class StageNavigatorWidget {
     ) {
         String label = (currentStage + 1) + " / " + totalStages;
         int labelWidth = font.width(label);
-        graphics.text(font, Component.literal(label),
+        graphics.drawString(font, Component.literal(label),
                 x + width / 2 - labelWidth / 2,
                 y + 2,
                 TEXT_COLOR,

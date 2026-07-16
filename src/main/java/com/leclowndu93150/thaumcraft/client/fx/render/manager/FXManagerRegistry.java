@@ -29,12 +29,13 @@ public final class FXManagerRegistry {
     }
 
     @SubscribeEvent
-    public static void onRender(RenderLevelStageEvent.AfterWeather event) {
+    public static void onRender(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
         Camera camera = mc.gameRenderer.getMainCamera();
         PoseStack poseStack = event.getPoseStack();
-        float partialTick = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float partialTick = mc.getTimer().getGameTimeDeltaPartialTick(false);
         for (AbstractFXManager<?> m : MANAGERS) m.renderAll(poseStack, camera, partialTick);
     }
 }

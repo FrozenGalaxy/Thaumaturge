@@ -1,11 +1,11 @@
 package com.leclowndu93150.thaumcraft.client.render.research;
 
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.leclowndu93150.thaumcraft.client.screen.TCScreenTextures;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
 
 public final class ConnectorRenderer {
     public static final int CELL_SIZE = 24;
@@ -50,7 +50,7 @@ public final class ConnectorRenderer {
     private record PendingBlit(int x, int y, int u, int v, int w, int h, int color, float zMod, int order) {}
 
     public static void draw(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int sourceCol,
             int sourceRow,
             int parentCol,
@@ -157,17 +157,16 @@ public final class ConnectorRenderer {
         }
     }
 
-    public static void flush(GuiGraphicsExtractor graphics) {
+    public static void flush(GuiGraphics graphics) {
         List<PendingBlit> queue = PENDING.get();
         if (queue.isEmpty()) return;
         queue.sort(Comparator.<PendingBlit>comparingDouble(b -> b.zMod).thenComparingInt(b -> b.order));
         for (PendingBlit b : queue) {
-            graphics.blit(
-                    RenderPipelines.GUI_TEXTURED,
+            GuiBlend.blitTinted(
+                    graphics,
                     TCScreenTextures.RESEARCH_BROWSER,
                     b.x, b.y,
                     (float) b.u, (float) b.v,
-                    b.w, b.h,
                     b.w, b.h,
                     TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
                     b.color

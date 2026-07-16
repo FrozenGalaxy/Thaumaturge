@@ -1,14 +1,12 @@
 package com.leclowndu93150.thaumcraft.client.render.aspect;
 
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.config.ThaumcraftClientConfig;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import java.text.DecimalFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 
@@ -34,20 +32,20 @@ public final class AspectTagRenderer {
 
     private AspectTagRenderer() {}
 
-    public static void render(GuiGraphicsExtractor graphics, int x, int y, Holder<IAspect> aspect) {
+    public static void render(GuiGraphics graphics, int x, int y, Holder<IAspect> aspect) {
         render(graphics, Minecraft.getInstance().font, (double) x, (double) y, aspect, 0.0F, 0, 0.0, BlendMode.ALPHA, 1.0F, false);
     }
 
-    public static void renderUnknown(GuiGraphicsExtractor graphics, int x, int y, Holder<IAspect> aspect) {
+    public static void renderUnknown(GuiGraphics graphics, int x, int y, Holder<IAspect> aspect) {
         render(graphics, Minecraft.getInstance().font, (double) x, (double) y, aspect, 0.0F, 0, 0.0, BlendMode.ALPHA, 1.0F, true);
     }
 
-    public static void render(GuiGraphicsExtractor graphics, Font font, int x, int y, Holder<IAspect> aspect, float amount) {
+    public static void render(GuiGraphics graphics, Font font, int x, int y, Holder<IAspect> aspect, float amount) {
         render(graphics, font, (double) x, (double) y, aspect, amount, 0, 0.0, BlendMode.ALPHA, 1.0F, false);
     }
 
     public static void render(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             Font font,
             int x,
             int y,
@@ -61,7 +59,7 @@ public final class AspectTagRenderer {
     }
 
     public static void render(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int x,
             int y,
             Holder<IAspect> aspect,
@@ -74,7 +72,7 @@ public final class AspectTagRenderer {
     }
 
     public static void render(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int x,
             int y,
             Holder<IAspect> aspect,
@@ -86,7 +84,7 @@ public final class AspectTagRenderer {
     }
 
     public static void render(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int x,
             int y,
             Holder<IAspect> aspect,
@@ -100,7 +98,7 @@ public final class AspectTagRenderer {
     }
 
     public static void render(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             Font font,
             double x,
             double y,
@@ -123,7 +121,7 @@ public final class AspectTagRenderer {
     }
 
     private static void drawIcon(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             double x,
             double y,
             double z,
@@ -134,25 +132,16 @@ public final class AspectTagRenderer {
     ) {
         IAspect value = aspect.value();
         int color = colorOf(value, alpha, bw);
-        RenderPipeline pipeline = blend == BlendMode.ADDITIVE
-                ? TCRenderPipelines.GUI_TEXTURED_ADDITIVE
-                : RenderPipelines.GUI_TEXTURED;
-        graphics.pose().pushMatrix();
-        graphics.pose().translate((float) x, (float) y);
-        graphics.blit(
-                pipeline,
-                value.texture(),
-                0, 0,
-                0.0F, 0.0F,
-                TAG_SIZE, TAG_SIZE,
-                TEXTURE_SIZE, TEXTURE_SIZE,
-                TEXTURE_SIZE, TEXTURE_SIZE,
-                color
-        );
-        graphics.pose().popMatrix();
+        if (blend == BlendMode.ADDITIVE) {
+            GuiBlend.blitAdditive(graphics, value.texture(), (int) x, (int) y, 0.0F, 0.0F,
+                    TAG_SIZE, TAG_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, color);
+        } else {
+            GuiBlend.blitTinted(graphics, value.texture(), (int) x, (int) y, 0.0F, 0.0F,
+                    TAG_SIZE, TAG_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, color);
+        }
     }
 
-    private static void drawAmount(GuiGraphicsExtractor graphics, Font font, double x, double y, float amount) {
+    private static void drawAmount(GuiGraphics graphics, Font font, double x, double y, float amount) {
         String text = AMOUNT_FORMAT.format(amount);
         int width = font.width(text);
         int fontHeight = font.lineHeight;
@@ -161,31 +150,27 @@ public final class AspectTagRenderer {
         float q = large ? 0.5F : 1.0F;
         float textX = (32.0F - (float) width + (float) ((int) x) * 2.0F) * q;
         float textY = (32.0F - (float) fontHeight + (float) ((int) y) * 2.0F) * q;
-        graphics.pose().pushMatrix();
-        graphics.pose().scale(textScale, textScale);
-        graphics.text(font, Component.literal(text), (int) (textX - 1.0F), (int) textY, AMOUNT_OUTLINE_COLOR, false);
-        graphics.text(font, Component.literal(text), (int) (textX + 1.0F), (int) textY, AMOUNT_OUTLINE_COLOR, false);
-        graphics.text(font, Component.literal(text), (int) textX, (int) (textY - 1.0F), AMOUNT_OUTLINE_COLOR, false);
-        graphics.text(font, Component.literal(text), (int) textX, (int) (textY + 1.0F), AMOUNT_OUTLINE_COLOR, false);
-        graphics.text(font, Component.literal(text), (int) textX, (int) textY, AMOUNT_COLOR, false);
-        graphics.pose().popMatrix();
+        graphics.pose().pushPose();
+        graphics.pose().scale(textScale, textScale, 1.0F);
+        graphics.drawString(font, Component.literal(text), (int) (textX - 1.0F), (int) textY, AMOUNT_OUTLINE_COLOR, false);
+        graphics.drawString(font, Component.literal(text), (int) (textX + 1.0F), (int) textY, AMOUNT_OUTLINE_COLOR, false);
+        graphics.drawString(font, Component.literal(text), (int) textX, (int) (textY - 1.0F), AMOUNT_OUTLINE_COLOR, false);
+        graphics.drawString(font, Component.literal(text), (int) textX, (int) (textY + 1.0F), AMOUNT_OUTLINE_COLOR, false);
+        graphics.drawString(font, Component.literal(text), (int) textX, (int) textY, AMOUNT_COLOR, false);
+        graphics.pose().popPose();
     }
 
-    private static void drawBonus(GuiGraphicsExtractor graphics, Font font, double x, double y, double z, int bonus) {
+    private static void drawBonus(GuiGraphics graphics, Font font, double x, double y, double z, int bonus) {
         Minecraft mc = Minecraft.getInstance();
         int ticks = mc.player != null ? mc.player.tickCount : mc.gui.getGuiTicks();
         int frame = ticks % BONUS_BADGE_CYCLE;
         int u = frame * BONUS_BADGE_STRIDE;
-        graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
-                ParticleTextures.PARTICLES,
+        GuiBlend.blitTinted(graphics, ParticleTextures.PARTICLES,
                 (int) x + BONUS_OFFSET, (int) y + BONUS_OFFSET,
                 (float) u, (float) BONUS_BADGE_V,
                 BONUS_BADGE_SIZE, BONUS_BADGE_SIZE,
-                BONUS_BADGE_SIZE, BONUS_BADGE_SIZE,
                 BONUS_BADGE_TEXTURE_SIZE, BONUS_BADGE_TEXTURE_SIZE,
-                0xFFFFFFFF
-        );
+                0xFFFFFFFF);
         if (bonus > 1) {
             String text = Integer.toString(bonus);
             int half = font.width(text) / 2;
@@ -195,10 +180,10 @@ public final class AspectTagRenderer {
             float q = large ? 0.5F : 1.0F;
             float textX = (8.0F - (float) half + (float) ((int) x) * 2.0F) * q;
             float textY = (15.0F - (float) fontHeight + (float) ((int) y) * 2.0F) * q;
-            graphics.pose().pushMatrix();
-            graphics.pose().scale(textScale, textScale);
-            graphics.text(font, Component.literal(text), (int) textX, (int) textY, AMOUNT_COLOR, true);
-            graphics.pose().popMatrix();
+            graphics.pose().pushPose();
+            graphics.pose().scale(textScale, textScale, 1.0F);
+            graphics.drawString(font, Component.literal(text), (int) textX, (int) textY, AMOUNT_COLOR, true);
+            graphics.pose().popPose();
         }
     }
 

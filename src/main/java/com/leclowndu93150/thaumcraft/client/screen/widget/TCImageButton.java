@@ -1,7 +1,6 @@
 package com.leclowndu93150.thaumcraft.client.screen.widget;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -64,24 +63,11 @@ public class TCImageButton extends TCButton {
     }
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         int color = activeTintColor(tintColor(), isHovered(), active);
         int drawX = getX() + (getWidth() - spriteWidth) / 2;
         int drawY = getY() + (getHeight() - spriteHeight) / 2;
-        graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
-                texture,
-                drawX,
-                drawY,
-                (float) u,
-                (float) v,
-                spriteWidth,
-                spriteHeight,
-                spriteWidth,
-                spriteHeight,
-                textureWidth,
-                textureHeight,
-                color
-        );
+        WidgetRender.blitTinted(graphics, texture, drawX, drawY, (float) u, (float) v,
+                spriteWidth, spriteHeight, textureWidth, textureHeight, color);
     }
 }

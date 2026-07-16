@@ -3,25 +3,18 @@ package com.leclowndu93150.thaumcraft.client.render.crystal;
 import com.leclowndu93150.thaumcraft.client.model.obj.MeshModel;
 import com.leclowndu93150.thaumcraft.client.model.obj.MeshPart;
 import com.leclowndu93150.thaumcraft.client.model.obj.MeshQuadBaker;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import java.util.List;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.resources.model.sprite.Material.Baked;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.joml.Matrix4f;
 
 public final class CrystalQuadBaker {
-    private static final int CRYSTAL_LIGHT_EMISSION = 15;
+    private static final int FULLBRIGHT = 240;
 
     private CrystalQuadBaker() {}
 
-    public static void bakePart(MeshModel mesh, MeshPart part, Baked baked, int tintIndex, Matrix4f transform, java.util.List<BakedQuad> output) {
-        BakedQuad.MaterialInfo info = new BakedQuad.MaterialInfo(
-                baked.sprite(),
-                ChunkSectionLayer.CUTOUT,
-                Sheets.cutoutBlockItemSheet(),
-                tintIndex,
-                false,
-                CRYSTAL_LIGHT_EMISSION);
-        MeshQuadBaker.bakePart(mesh, part, baked, tintIndex, transform, info, output);
+    public static void bakePart(MeshModel mesh, MeshPart part, TextureAtlasSprite sprite, int tintIndex,
+                                Matrix4f transform, List<BakedQuad> output) {
+        MeshQuadBaker.bakePart(mesh, part, sprite, tintIndex, transform, false, FULLBRIGHT, FULLBRIGHT, output);
     }
 }

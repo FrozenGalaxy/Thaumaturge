@@ -1,8 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.screen;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.Nullable;
@@ -28,23 +27,10 @@ public abstract class AbstractTCScreen extends Screen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractBackground(graphics, mouseX, mouseY, partialTick);
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(graphics, mouseX, mouseY, partialTick);
         if (background != null) {
-            graphics.blit(
-                    RenderPipelines.GUI_TEXTURED,
-                    background,
-                    0,
-                    0,
-                    0.0F,
-                    0.0F,
-                    width,
-                    height,
-                    width,
-                    height,
-                    backgroundTextureWidth,
-                    backgroundTextureHeight
-            );
+            graphics.blit(background, 0, 0, 0.0F, 0.0F, width, height, backgroundTextureWidth, backgroundTextureHeight);
         }
     }
 

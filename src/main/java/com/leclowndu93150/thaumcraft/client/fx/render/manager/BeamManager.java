@@ -62,7 +62,7 @@ public final class BeamManager extends AbstractFXManager<IFXInstance> {
     @Override
     public void renderAll(PoseStack poseStack, Camera camera, float partialTick) {
         if (ARCS.isEmpty() && BOLTS.isEmpty() && BEAMS.isEmpty()) return;
-        Vec3 camPos = camera.position();
+        Vec3 camPos = camera.getPosition();
 
         if (!ARCS.isEmpty()) {
             MultiBufferSource.BufferSource bufSource = MultiBufferSource.immediate(new ByteBufferBuilder(2048));

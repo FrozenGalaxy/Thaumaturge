@@ -43,7 +43,10 @@ public final class ThaumometerAspectOverlay {
     private ThaumometerAspectOverlay() {}
 
     @SubscribeEvent
-    public static void onRender(RenderLevelStageEvent.AfterWeather event) {
+    public static void onRender(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) {
+            return;
+        }
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.options.hideGui) {
             return;

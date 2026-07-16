@@ -1,8 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.screen;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -45,15 +44,13 @@ public abstract class AbstractTCContainerScreen<T extends AbstractContainerMenu>
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractBackground(graphics, mouseX, mouseY, partialTick);
-        extractBackgroundTexture(graphics);
-        extractBackgroundOverlay(graphics, mouseX, mouseY, partialTick);
+    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+        renderBackgroundTexture(graphics);
+        renderBackgroundOverlay(graphics, mouseX, mouseY, partialTick);
     }
 
-    protected void extractBackgroundTexture(GuiGraphicsExtractor graphics) {
+    protected void renderBackgroundTexture(GuiGraphics graphics) {
         graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
                 background,
                 leftPos,
                 topPos,
@@ -66,7 +63,7 @@ public abstract class AbstractTCContainerScreen<T extends AbstractContainerMenu>
         );
     }
 
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
     }
 
     protected final ResourceLocation background() {

@@ -1,70 +1,42 @@
 package com.leclowndu93150.thaumcraft.client.fx.render.rendertype;
 
-import com.leclowndu93150.thaumcraft.TCIds;
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.CompareOp;
-import com.mojang.blaze3d.platform.DestFactor;
-import com.mojang.blaze3d.platform.SourceFactor;
-import com.mojang.blaze3d.shaders.UniformType;
+import com.leclowndu93150.thaumcraft.client.render.TCShaders;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 
-@EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
 public final class VoidStreamRenderType {
     public static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace("textures/entity/end_portal.png");
-    private static final ResourceLocation SHADER = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "core/void_stream");
 
-    private static final RenderPipeline.Snippet BASE = RenderPipeline.builder()
-            .withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
-            .withUniform("Projection", UniformType.UNIFORM_BUFFER)
-            .withUniform("Globals", UniformType.UNIFORM_BUFFER)
-            .withVertexShader(SHADER)
-            .withFragmentShader(SHADER)
-            .withSampler("Sampler0")
-            .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS)
-            .buildSnippet();
+    private static final int BUFFER = 1536;
+    private static final RenderStateShard.ShaderStateShard SHADER =
+            new RenderStateShard.ShaderStateShard(TCShaders::voidStream);
+    private static final RenderStateShard.TextureStateShard TEXTURE_STATE =
+            new RenderStateShard.TextureStateShard(TEXTURE, false, false);
 
-    public static final RenderPipeline ADDITIVE_PIPELINE = RenderPipeline.builder(BASE)
-            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/void_stream_add"))
-            .withColorTargetState(new ColorTargetState(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE)))
-            .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
-            .withCull(false)
-            .build();
+    public static final RenderType ADDITIVE = RenderType.create("thaumcraft_void_stream_add",
+            DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, BUFFER, false, false,
+            RenderType.CompositeState.builder()
+                    .setShaderState(SHADER)
+                    .setTextureState(TEXTURE_STATE)
+                    .setTransparencyState(RenderStateShard.ADDITIVE_TRANSPARENCY)
+                    .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
+                    .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                    .setCullState(RenderStateShard.NO_CULL)
+                    .createCompositeState(false));
 
-    public static final RenderPipeline TRANSLUCENT_PIPELINE = RenderPipeline.builder(BASE)
-            .withLocation(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "pipeline/void_stream_tr"))
-            .withColorTargetState(new ColorTargetState(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA)))
-            .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true))
-            .withCull(false)
-            .build();
-
-    public static final RenderType ADDITIVE = RenderType.create(
-            "thaumcraft_void_stream_add",
-            RenderSetup.builder(ADDITIVE_PIPELINE)
-                    .withTexture("Sampler0", TEXTURE)
-                    .createRenderSetup());
-
-    public static final RenderType TRANSLUCENT = RenderType.create(
-            "thaumcraft_void_stream_tr",
-            RenderSetup.builder(TRANSLUCENT_PIPELINE)
-                    .withTexture("Sampler0", TEXTURE)
-                    .createRenderSetup());
-
-    @SubscribeEvent
-    static void register(RegisterRenderPipelinesEvent event) {
-        event.registerPipeline(ADDITIVE_PIPELINE);
-        event.registerPipeline(TRANSLUCENT_PIPELINE);
-    }
+    public static final RenderType TRANSLUCENT = RenderType.create("thaumcraft_void_stream_tr",
+            DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, BUFFER, false, true,
+            RenderType.CompositeState.builder()
+                    .setShaderState(SHADER)
+                    .setTextureState(TEXTURE_STATE)
+                    .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+                    .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
+                    .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
+                    .setCullState(RenderStateShard.NO_CULL)
+                    .createCompositeState(false));
 
     private VoidStreamRenderType() {}
 }

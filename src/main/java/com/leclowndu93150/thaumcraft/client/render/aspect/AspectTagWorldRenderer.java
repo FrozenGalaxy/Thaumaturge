@@ -14,13 +14,12 @@ import java.util.List;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
@@ -49,7 +48,7 @@ public final class AspectTagWorldRenderer {
                                       @Nullable Direction dir, float tagScale, float alpha,
                                       Predicate<Holder<IAspect>> discovered) {
         Camera camera = mc.gameRenderer.getMainCamera();
-        Vec3 cam = camera.position();
+        Vec3 cam = camera.getPosition();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         Font font = mc.font;
         int stepX = 0;
@@ -96,7 +95,7 @@ public final class AspectTagWorldRenderer {
             renderQuad(poseStack,
                     buffers.getBuffer(TCFlatRenderTypes.entityTranslucentFlat(
                             known ? entry.aspect().value().texture() : UNKNOWN_TEXTURE)),
-                    entry.aspect(), known ? alpha : UNKNOWN_ALPHA, false, LightCoordsUtil.FULL_BRIGHT);
+                    entry.aspect(), known ? alpha : UNKNOWN_ALPHA, false, LightTexture.FULL_BRIGHT);
             poseStack.popPose();
 
             String amount = Integer.toString(entry.amount());
@@ -105,10 +104,10 @@ public final class AspectTagWorldRenderer {
             poseStack.scale(tagScale * TEXT_SCALE, -tagScale * TEXT_SCALE, tagScale * TEXT_SCALE);
             poseStack.translate(0.0, 6.0, -0.1);
             font.drawInBatch(amount, 14 - width, 1, TEXT_SHADOW_COLOR, false,
-                    poseStack.last().pose(), buffers, Font.DisplayMode.NORMAL, 0, LightCoordsUtil.FULL_BRIGHT);
+                    poseStack.last().pose(), buffers, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
             poseStack.translate(0.0, 0.0, -0.1);
             font.drawInBatch(amount, 13 - width, 0, TEXT_COLOR, false,
-                    poseStack.last().pose(), buffers, Font.DisplayMode.NORMAL, 0, LightCoordsUtil.FULL_BRIGHT);
+                    poseStack.last().pose(), buffers, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
             poseStack.popPose();
 
             poseStack.popPose();

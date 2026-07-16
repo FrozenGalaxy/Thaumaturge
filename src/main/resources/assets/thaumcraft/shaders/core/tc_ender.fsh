@@ -1,12 +1,11 @@
-#version 330
-
-#moj_import <minecraft:dynamictransforms.glsl>
-#moj_import <minecraft:globals.glsl>
+#version 150
 
 #define M_PI 3.1415926535897932384626433832795
 
 uniform sampler2D Sampler0;
-uniform sampler2D Sampler1;
+
+uniform mat4 ModelViewMat;
+uniform float GameTime;
 
 in vec3 eyePos;
 

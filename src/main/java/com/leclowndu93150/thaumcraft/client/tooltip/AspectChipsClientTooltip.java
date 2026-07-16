@@ -8,11 +8,10 @@ import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.content.research.pool.AspectPools;
 import net.minecraft.client.Minecraft;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.player.Player;
@@ -34,7 +33,7 @@ public final class AspectChipsClientTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public int getHeight(Font font) {
+    public int getHeight() {
         return aspects.isEmpty() ? 0 : ROW_HEIGHT;
     }
 
@@ -47,7 +46,7 @@ public final class AspectChipsClientTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public void extractImage(Font font, int x, int y, int w, int h, GuiGraphicsExtractor graphics) {
+    public void renderImage(Font font, int x, int y, GuiGraphics graphics) {
         Player player = Minecraft.getInstance().player;
         int chipX = x;
         for (AspectInstance entry : aspects.sortedByAmount()) {
@@ -58,9 +57,8 @@ public final class AspectChipsClientTooltip implements ClientTooltipComponent {
                 int color = entry.aspect().value() != null
                         ? (tint & 0xFF000000) | (entry.aspect().value().color() & 0x00FFFFFF)
                         : tint;
-                graphics.blit(RenderPipelines.GUI_TEXTURED, UNKNOWN_TEXTURE, chipX, y,
-                        0.0F, 0.0F, CHIP_SIZE, CHIP_SIZE,
-                        TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, color);
+                GuiBlend.blitTinted(graphics, UNKNOWN_TEXTURE, chipX, y, 0.0F, 0.0F,
+                        CHIP_SIZE, CHIP_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, color);
             }
             chipX += CHIP_STRIDE;
         }

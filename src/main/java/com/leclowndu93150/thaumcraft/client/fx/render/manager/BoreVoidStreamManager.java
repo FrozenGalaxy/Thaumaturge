@@ -51,9 +51,9 @@ public final class BoreVoidStreamManager extends AbstractFXManager<IFXInstance> 
     @Override
     public void renderAll(PoseStack poseStack, Camera camera, float partialTick) {
         if (BORES.isEmpty() && VOIDS.isEmpty()) return;
-        double cx = camera.position().x;
-        double cy = camera.position().y;
-        double cz = camera.position().z;
+        double cx = camera.getPosition().x;
+        double cy = camera.getPosition().y;
+        double cz = camera.getPosition().z;
 
         if (!BORES.isEmpty()) {
             MultiBufferSource.BufferSource buf = MultiBufferSource.immediate(new ByteBufferBuilder(2048));
@@ -70,8 +70,8 @@ public final class BoreVoidStreamManager extends AbstractFXManager<IFXInstance> 
         }
 
         if (!VOIDS.isEmpty()) {
-            float yawRad = (float)Math.toRadians(camera.yRot());
-            float pitchRad = (float)Math.toRadians(camera.xRot());
+            float yawRad = (float)Math.toRadians(camera.getYRot());
+            float pitchRad = (float)Math.toRadians(camera.getXRot());
             float yawNorm = ((yawRad % (float)(2.0 * Math.PI)) + (float)(2.0 * Math.PI)) % (float)(2.0 * Math.PI) / (float)(2.0 * Math.PI);
             float pitchNorm = (pitchRad + (float)(Math.PI * 0.5)) / (float)Math.PI;
 

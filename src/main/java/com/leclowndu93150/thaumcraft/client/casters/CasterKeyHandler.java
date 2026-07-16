@@ -74,9 +74,9 @@ public final class CasterKeyHandler {
         if (TCKeybinds.MISC_TOGGLE.isDown()) {
             if (mc.screen == null && mc.mouseHandler.isMouseGrabbed()) {
                 if (!keyPressedG) {
-                    int mod = InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL)
+                    int mod = InputConstants.isKeyDown(mc.getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL)
                             ? MOD_CYCLE_DIM
-                            : InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT) ? MOD_SHIFT : MOD_GROW;
+                            : InputConstants.isKeyDown(mc.getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT) ? MOD_SHIFT : MOD_GROW;
                     PacketDistributor.sendToServer(new ServerboundCasterKeyPayload(mod));
                 }
                 keyPressedG = true;

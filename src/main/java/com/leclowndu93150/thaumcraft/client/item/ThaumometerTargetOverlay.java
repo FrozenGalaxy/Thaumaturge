@@ -33,7 +33,10 @@ public final class ThaumometerTargetOverlay {
     }
 
     @SubscribeEvent
-    public static void onRender(RenderLevelStageEvent.AfterWeather event) {
+    public static void onRender(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) {
+            return;
+        }
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.options.hideGui || target == null || target.isRemoved()) {
             return;
@@ -45,7 +48,7 @@ public final class ThaumometerTargetOverlay {
         if (tagScale < TAG_SCALE_CAP) {
             tagScale = tagScale + (TAG_SCALE_GROWTH - tagScale / TAG_SCALE_DECAY_DIVISOR);
         }
-        float partialTicks = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float partialTicks = mc.getTimer().getGameTimeDeltaPartialTick(false);
         double x = Mth.lerp(partialTicks, target.xOld, target.getX());
         double y = Mth.lerp(partialTicks, target.yOld, target.getY());
         double z = Mth.lerp(partialTicks, target.zOld, target.getZ());

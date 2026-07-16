@@ -2,8 +2,7 @@ package com.leclowndu93150.thaumcraft.client.color;
 
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.TCIds;
-import java.util.List;
-import net.minecraft.client.color.block.BlockTintSource;
+import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
@@ -24,7 +23,7 @@ public final class CrystalBlockColors {
     private CrystalBlockColors() {}
 
     @SubscribeEvent
-    public static void onRegisterBlockColors(RegisterColorHandlersEvent.BlockTintSources event) {
+    public static void onRegisterBlockColors(RegisterColorHandlersEvent.Block event) {
         register(event, TCBlocks.CRYSTAL_AER.get(), AER);
         register(event, TCBlocks.CRYSTAL_IGNIS.get(), IGNIS);
         register(event, TCBlocks.CRYSTAL_AQUA.get(), AQUA);
@@ -34,9 +33,9 @@ public final class CrystalBlockColors {
         register(event, TCBlocks.CRYSTAL_VITIUM.get(), VITIUM);
     }
 
-    private static void register(RegisterColorHandlersEvent.BlockTintSources event, Block block, int rgb) {
+    private static void register(RegisterColorHandlersEvent.Block event, Block block, int rgb) {
         int argb = ARGB32.opaque(rgb);
-        BlockTintSource source = state -> argb;
-        event.register(List.of(source), block);
+        BlockColor color = (state, level, pos, tintIndex) -> argb;
+        event.register(color, block);
     }
 }

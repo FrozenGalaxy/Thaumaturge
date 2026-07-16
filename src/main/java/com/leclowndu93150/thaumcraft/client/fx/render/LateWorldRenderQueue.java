@@ -29,13 +29,13 @@ public final class LateWorldRenderQueue {
     }
 
     @SubscribeEvent
-    public static void onRender(RenderLevelStageEvent.AfterWeather event) {
-        if (QUEUE.isEmpty()) {
+    public static void onRender(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER || QUEUE.isEmpty()) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
-        Vec3 cam = mc.gameRenderer.getMainCamera().position();
+        Vec3 cam = mc.gameRenderer.getMainCamera().getPosition();
         PoseStack poseStack = event.getPoseStack();
         for (Entry entry : QUEUE) {
             poseStack.pushPose();

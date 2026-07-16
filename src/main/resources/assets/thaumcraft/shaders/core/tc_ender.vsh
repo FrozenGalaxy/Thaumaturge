@@ -1,9 +1,9 @@
-#version 330
-
-#moj_import <minecraft:projection.glsl>
-#moj_import <minecraft:dynamictransforms.glsl>
+#version 150
 
 in vec3 Position;
+
+uniform mat4 ModelViewMat;
+uniform mat4 ProjMat;
 
 out vec3 eyePos;
 
