@@ -1,85 +1,42 @@
 package com.leclowndu93150.thaumcraft.client.render.blockentity;
 
-import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
-import com.leclowndu93150.thaumcraft.api.essentia.EssentiaCapabilities;
-import com.leclowndu93150.thaumcraft.api.essentia.IEssentiaTransport;
 import com.leclowndu93150.thaumcraft.content.essentia.EssentiaTransportHelper;
 import com.leclowndu93150.thaumcraft.content.essentia.smeltery.BlockEntityAlembic;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
-import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class AlembicRenderer implements BlockEntityRenderer<BlockEntityAlembic,AlembicRenderState> {
+public class AlembicRenderer implements BlockEntityRenderer<BlockEntityAlembic> {
 
     private static final ResourceLocation LABEL_TEXTURE = ResourceLocation.fromNamespaceAndPath("thaumcraft", "textures/entity/label.png");
-
 
     public AlembicRenderer(BlockEntityRendererProvider.Context context) {
     }
 
-
     @Override
-    public AlembicRenderState createRenderState() {
-        return new AlembicRenderState();
-    }
-
-    @Override
-    public void submit(AlembicRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
-        if (state.hasFilter)
-            submitFilterLabel(state, poseStack, submitNodeCollector);
-    }
-
-    @Override
-    public void extractRenderState(BlockEntityAlembic blockEntity, AlembicRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
-        state.filterTexture = null;
-        state.filterColor = -1;
-        state.filterAspect = null;
-        Level level = blockEntity.getLevel();
-        if (level == null) return;
-        var registry = level.registryAccess();
-        state.hasFilter = blockEntity.aspectFilterKey() != null;
-        if (blockEntity.aspectFilterKey() != null) {
-            Holder<IAspect> filter = EssentiaTransportHelper.resolve(registry, blockEntity.aspectFilterKey());
-            if (filter != null) {
-                state.filterAspect = filter;
-                state.filterTexture = filter.value().texture();
-                state.filterColor = 0xFF000000 | (filter.value().color() & 0x00FFFFFF);
-                state.facing = blockEntity.facing();
-            }
+    public void render(BlockEntityAlembic alembic, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light, int overlay) {
+        Level level = alembic.getLevel();
+        if (level == null || alembic.aspectFilterKey() == null) {
+            return;
         }
-        List<Direction> dirs = new ArrayList<>();
-        for (Direction dir : Direction.Plane.HORIZONTAL) {
-            IEssentiaTransport connected = level.getCapability(EssentiaCapabilities.TRANSPORT,blockEntity.getBlockPos().relative(dir),dir.getOpposite());
-            if (connected != null && connected.isConnectable(dir.getOpposite())){
-                dirs.add(dir);
-            }
+        Holder<IAspect> filter = EssentiaTransportHelper.resolve(level.registryAccess(), alembic.aspectFilterKey());
+        if (filter == null) {
+            return;
         }
-        state.connectedDirections = dirs.toArray(new Direction[0]);
+        ResourceLocation filterTexture = filter.value().texture();
+        int filterColor = 0xFF000000 | (filter.value().color() & 0x00FFFFFF);
+        submitFilterLabel(alembic.facing(), filterTexture, filterColor, poseStack, buffers, light);
     }
 
     public static void addVertex(
@@ -101,29 +58,22 @@ public class AlembicRenderer implements BlockEntityRenderer<BlockEntityAlembic,A
                 .setOverlay(OverlayTexture.NO_OVERLAY)
                 .setLight(light)
                 .setNormal(pose, nx, ny, nz)
-                // Let the .setColor at the end otherwise the vertex consumer is not the good one
                 .setColor(color);
     }
 
-    private void submitFilterLabel(AlembicRenderState state, PoseStack poseStack, SubmitNodeCollector collector) {
-        Direction facing = state.facing;
+    private void submitFilterLabel(Direction facing, ResourceLocation filterTexture, int filterColor,
+                                   PoseStack poseStack, MultiBufferSource buffers, int light) {
         poseStack.pushPose();
         poseStack.translate(0.5, 0.5, 0.5);
         if (facing.getAxis() == Direction.Axis.Z) poseStack.mulPose(Axis.YP.rotationDegrees(180));
         poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
         poseStack.translate(0.0, 0.0, -0.376f);
-        int light = state.lightCoords;
-        ResourceLocation labelTex = LABEL_TEXTURE;
-        RenderType labelType = RenderTypes.entityCutout(labelTex);
-        collector.submitCustomGeometry(poseStack, labelType, (pose, buffer) -> labelQuad(buffer, pose, light));
-        if (state.filterTexture != null) {
+        labelQuad(buffers.getBuffer(RenderType.entityCutout(LABEL_TEXTURE)), poseStack.last(), light);
+        if (filterTexture != null) {
             poseStack.pushPose();
             poseStack.mulPose(Axis.YP.rotationDegrees(180));
             poseStack.translate(0.0, 0.0, 0.001);
-            int filterColor = state.filterColor;
-            ResourceLocation aspectTex = state.filterTexture;
-            RenderType aspectType = RenderTypes.entityTranslucent(aspectTex);
-            collector.submitCustomGeometry(poseStack, aspectType, (pose, buffer) -> aspectIconQuad(buffer, pose, filterColor, light));
+            aspectIconQuad(buffers.getBuffer(RenderType.entityTranslucent(filterTexture)), poseStack.last(), filterColor, light);
             poseStack.popPose();
         }
         poseStack.popPose();

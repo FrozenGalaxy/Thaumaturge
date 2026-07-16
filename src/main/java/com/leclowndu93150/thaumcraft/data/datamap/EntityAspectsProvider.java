@@ -118,13 +118,6 @@ public final class EntityAspectsProvider extends DataMapProvider {
         add(b, EntityType.ARMADILLO, list(TCAspects.BESTIA, 8, TCAspects.PRAEMUNIO, 5, TCAspects.TERRA, 3));
         add(b, EntityType.BOGGED, list(TCAspects.EXANIMIS, 20, TCAspects.HUMANUS, 5, TCAspects.HERBA, 5));
         add(b, EntityType.BREEZE, list(TCAspects.AER, 15, TCAspects.MOTUS, 10, TCAspects.POTENTIA, 5, TCAspects.PRAECANTATIO, 3));
-        add(b, EntityType.CREAKING, list(TCAspects.HERBA, 15, TCAspects.SPIRITUS, 10, TCAspects.TENEBRAE, 10, TCAspects.AVERSIO, 5));
-        add(b, EntityType.HAPPY_GHAST, list(TCAspects.BESTIA, 10, TCAspects.VOLATUS, 10, TCAspects.AER, 5, TCAspects.VICTUS, 3));
-        add(b, EntityType.COPPER_GOLEM, list(TCAspects.METALLUM, 10, TCAspects.MACHINA, 10, TCAspects.MOTUS, 5, TCAspects.HUMANUS, 3));
-        add(b, EntityType.CAMEL_HUSK, list(TCAspects.EXANIMIS, 15, TCAspects.BESTIA, 8, TCAspects.IGNIS, 3));
-        add(b, EntityType.PARCHED, list(TCAspects.EXANIMIS, 15, TCAspects.HUMANUS, 8, TCAspects.TERRA, 3));
-        add(b, EntityType.NAUTILUS, list(TCAspects.BESTIA, 8, TCAspects.AQUA, 8, TCAspects.PRAEMUNIO, 3));
-        add(b, EntityType.ZOMBIE_NAUTILUS, list(TCAspects.EXANIMIS, 12, TCAspects.BESTIA, 5, TCAspects.AQUA, 5));
 
         add(b, TCEntities.THAUMIC_SLIME.get(), list(TCAspects.VICTUS, 5, TCAspects.AQUA, 5, TCAspects.VITIUM, 5, TCAspects.ALKIMIA, 5));
         add(b, TCEntities.TAINTACLE.get(), list(TCAspects.VITIUM, 15, TCAspects.BESTIA, 10));

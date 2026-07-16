@@ -6,20 +6,15 @@ import com.leclowndu93150.thaumcraft.content.device.patterncrafter.BlockPatternC
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
 
-public final class PatternCrafterRenderer implements BlockEntityRenderer<BlockEntityPatternCrafter, PatternCrafterRenderState> {
+public final class PatternCrafterRenderer implements BlockEntityRenderer<BlockEntityPatternCrafter> {
     private static final ResourceLocation MODES_TEXTURE = TCIds.rl("textures/block/pattern_crafter_modes.png");
     private static final ResourceLocation GEAR_TEXTURE = TCIds.rl("textures/misc/gear_brass.png");
 
@@ -35,24 +30,15 @@ public final class PatternCrafterRenderer implements BlockEntityRenderer<BlockEn
     public PatternCrafterRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public PatternCrafterRenderState createRenderState() {
-        return new PatternCrafterRenderState();
-    }
+    public void render(BlockEntityPatternCrafter crafter, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light, int overlay) {
+        Direction facing = crafter.getBlockState().getValue(BlockPatternCrafter.FACING);
+        int frame = crafter.patternType();
+        float rotation = (crafter.rot + crafter.rotSpeed * partialTick) % 360.0F;
 
-    @Override
-    public void extractRenderState(BlockEntityPatternCrafter crafter, PatternCrafterRenderState state, float partialTicks,
-                                   Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(crafter, state, partialTicks, cameraPosition, breakProgress);
-        state.facing = crafter.getBlockState().getValue(BlockPatternCrafter.FACING);
-        state.patternType = crafter.patternType();
-        state.rotation = crafter.rot + crafter.rotSpeed * partialTicks;
-    }
-
-    @Override
-    public void submit(PatternCrafterRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.0F, 0.5F);
-        float yRot = switch (state.facing) {
+        float yRot = switch (facing) {
             case SOUTH -> 180.0F;
             case WEST -> 90.0F;
             case EAST -> 270.0F;
@@ -60,10 +46,9 @@ public final class PatternCrafterRenderer implements BlockEntityRenderer<BlockEn
         };
         poseStack.mulPose(Axis.YP.rotationDegrees(yRot));
 
-        RenderType modeType = RenderTypes.entityCutout(MODES_TEXTURE);
-        int light = state.lightCoords;
-        int frame = state.patternType;
-        collector.submitCustomGeometry(poseStack, modeType, (pose, buffer) -> {
+        {
+            VertexConsumer buffer = buffers.getBuffer(RenderType.entityCutout(MODES_TEXTURE));
+            PoseStack.Pose pose = poseStack.last();
             float u0 = frame / (float) MODE_FRAMES;
             float u1 = (frame + 1) / (float) MODE_FRAMES;
             float half = MODE_SIZE / 2.0F;
@@ -71,23 +56,21 @@ public final class PatternCrafterRenderer implements BlockEntityRenderer<BlockEn
                     -half, MODE_HEIGHT - half, -MODE_FORWARD,
                     half, MODE_HEIGHT + half, -MODE_FORWARD,
                     u0, u1, light);
-        });
+        }
 
-        RenderType gearType = RenderTypes.entityCutout(GEAR_TEXTURE);
-        float rotation = state.rotation % 360.0F;
         for (int side = 0; side < 2; side++) {
             float offsetX = side == 0 ? -GEAR_OFFSET_X : GEAR_OFFSET_X;
             float spin = side == 0 ? -rotation : rotation;
             poseStack.pushPose();
             poseStack.translate(offsetX, GEAR_Y, -GEAR_FORWARD);
             poseStack.mulPose(Axis.ZP.rotationDegrees(spin));
-            collector.submitCustomGeometry(poseStack, gearType, (pose, buffer) -> {
-                float half = GEAR_SIZE / 2.0F;
-                quad(pose, buffer,
-                        -half, -half, 0.0F,
-                        half, half, 0.0F,
-                        0.0F, 1.0F, light);
-            });
+            VertexConsumer buffer = buffers.getBuffer(RenderType.entityCutout(GEAR_TEXTURE));
+            PoseStack.Pose pose = poseStack.last();
+            float half = GEAR_SIZE / 2.0F;
+            quad(pose, buffer,
+                    -half, -half, 0.0F,
+                    half, half, 0.0F,
+                    0.0F, 1.0F, light);
             poseStack.popPose();
         }
         poseStack.popPose();

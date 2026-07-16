@@ -2,17 +2,15 @@ package com.leclowndu93150.thaumcraft.client.fx.render.particle;
 
 import com.leclowndu93150.thaumcraft.client.fx.render.texture.TCParticleLayer;
 import com.leclowndu93150.thaumcraft.content.fx.data.SmokeSpiralData;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 
@@ -27,8 +25,8 @@ public final class SmokeSpiralParticle extends SingleQuadParticle {
     private int currentCell;
     private float currentAlpha = 1.0F;
 
-    private SmokeSpiralParticle(ClientLevel level, double x, double y, double z, SmokeSpiralData data, TextureAtlasSprite sprite) {
-        super(level, x, y, z, 0.0, 0.0, 0.0, sprite);
+    private SmokeSpiralParticle(ClientLevel level, double x, double y, double z, SmokeSpiralData data) {
+        super(level, x, y, z, 0.0, 0.0, 0.0);
         this.setSize(0.01F, 0.01F);
         this.xo = x;
         this.yo = y;
@@ -55,6 +53,7 @@ public final class SmokeSpiralParticle extends SingleQuadParticle {
         this.yo = this.y;
         this.zo = this.z;
         this.currentAlpha = (float)(this.lifetime - this.age) / this.lifetime;
+        this.alpha = ALPHA * this.currentAlpha;
         if (this.age++ >= this.lifetime) {
             this.remove();
             return;
@@ -63,8 +62,8 @@ public final class SmokeSpiralParticle extends SingleQuadParticle {
     }
 
     @Override
-    public void extract(QuadParticleRenderState renderState, Camera camera, float partialTickTime) {
-        float ageFrac = (this.age + partialTickTime) / this.lifetime;
+    public void render(VertexConsumer buffer, Camera camera, float partialTick) {
+        float ageFrac = (this.age + partialTick) / this.lifetime;
         float r1 = this.startDeg + 720.0F * ageFrac;
         float r2 = 90.0F - 180.0F * ageFrac;
         float r1r = (float)Math.toRadians(r1);
@@ -72,24 +71,13 @@ public final class SmokeSpiralParticle extends SingleQuadParticle {
         float mX = -Mth.sin(r1r) * Mth.cos(r2r) * this.radius;
         float mY = -Mth.sin(r2r) * this.radius;
         float mZ = Mth.cos(r1r) * Mth.cos(r2r) * this.radius;
-        Vec3 pos = camera.position();
-        float baseX = (float)(Mth.lerp((double)partialTickTime, this.xo, this.x) - pos.x());
-        float baseY = (float)(Math.max(Mth.lerp((double)partialTickTime, this.yo, this.y) + mY, this.minY + 0.1) - pos.y());
-        float baseZ = (float)(Mth.lerp((double)partialTickTime, this.zo, this.z) - pos.z());
-        float wx = baseX + mX;
-        float wy = baseY;
-        float wz = baseZ + mZ;
+        Vec3 pos = camera.getPosition();
+        float baseX = (float)(Mth.lerp((double)partialTick, this.xo, this.x) - pos.x());
+        float baseY = (float)(Math.max(Mth.lerp((double)partialTick, this.yo, this.y) + mY, this.minY + 0.1) - pos.y());
+        float baseZ = (float)(Mth.lerp((double)partialTick, this.zo, this.z) - pos.z());
         Quaternionf rotation = new Quaternionf();
-        this.getFacingCameraMode().setRotation(rotation, camera, partialTickTime);
-        int color = ARGB32.colorFromFloat(ALPHA * this.currentAlpha, this.rCol, this.gCol, this.bCol);
-        int light = this.getLightCoords(partialTickTime);
-        renderState.add(
-                this.getLayer(),
-                wx, wy, wz,
-                rotation.x, rotation.y, rotation.z, rotation.w,
-                QUAD_RADIUS,
-                this.getU0(), this.getU1(), this.getV0(), this.getV1(),
-                color, light);
+        this.getFacingCameraMode().setRotation(rotation, camera, partialTick);
+        renderRotatedQuad(buffer, rotation, baseX + mX, baseY, baseZ + mZ, partialTick);
     }
 
     @Override
@@ -113,7 +101,7 @@ public final class SmokeSpiralParticle extends SingleQuadParticle {
     }
 
     @Override
-    public SingleQuadParticle.Layer getLayer() {
+    public ParticleRenderType getRenderType() {
         return TCParticleLayer.TRANSLUCENT;
     }
 
@@ -130,8 +118,8 @@ public final class SmokeSpiralParticle extends SingleQuadParticle {
         }
 
         @Override
-        public Particle createParticle(SmokeSpiralData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux, RandomSource random) {
-            return new SmokeSpiralParticle(level, x, y, z, options, this.sprites.first());
+        public Particle createParticle(SmokeSpiralData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux) {
+            return new SmokeSpiralParticle(level, x, y, z, options);
         }
     }
 }

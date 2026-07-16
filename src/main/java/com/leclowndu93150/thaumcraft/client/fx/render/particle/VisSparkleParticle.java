@@ -5,11 +5,11 @@ import com.leclowndu93150.thaumcraft.content.fx.data.VisSparkleData;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 
 public final class VisSparkleParticle extends SingleQuadParticle {
     private static final int GRID_SIZE = 64;
@@ -27,7 +27,7 @@ public final class VisSparkleParticle extends SingleQuadParticle {
     private float scale;
 
     private VisSparkleParticle(ClientLevel level, double x, double y, double z, VisSparkleData data, SpriteSet sprites) {
-        super(level, x, y, z, 0.0, 0.0, 0.0, sprites.first());
+        super(level, x, y, z, 0.0, 0.0, 0.0);
         if (data.color() >= 0) {
             this.rCol = ((data.color() >> 16) & 0xFF) / 255.0F;
             this.gCol = ((data.color() >> 8) & 0xFF) / 255.0F;
@@ -95,8 +95,8 @@ public final class VisSparkleParticle extends SingleQuadParticle {
     }
 
     @Override
-    protected int getLightCoords(float partialTick) {
-        return LightCoordsUtil.FULL_BRIGHT;
+    protected int getLightColor(float partialTick) {
+        return LightTexture.FULL_BRIGHT;
     }
 
     private int currentCell() {
@@ -124,7 +124,7 @@ public final class VisSparkleParticle extends SingleQuadParticle {
     }
 
     @Override
-    public SingleQuadParticle.Layer getLayer() {
+    public ParticleRenderType getRenderType() {
         return TCParticleLayer.byLayer(0);
     }
 
@@ -137,7 +137,7 @@ public final class VisSparkleParticle extends SingleQuadParticle {
 
         @Override
         public Particle createParticle(VisSparkleData options, ClientLevel level, double x, double y, double z,
-                                       double xa, double ya, double za, RandomSource random) {
+                                       double xa, double ya, double za) {
             return new VisSparkleParticle(level, x, y, z, options, this.sprites);
         }
     }

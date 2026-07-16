@@ -4,18 +4,17 @@ import com.leclowndu93150.thaumcraft.content.fx.data.BoreSparkleData;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import org.jspecify.annotations.Nullable;
 
 public final class BoreSparkleParticle extends HomingParticleBase {
     private final TextureAtlasSprite sprite;
 
     private BoreSparkleParticle(ClientLevel level, double x, double y, double z, BoreSparkleData data, TextureAtlasSprite sprite) {
-        super(level, x, y, z, data.tx(), data.ty(), data.tz(), 0.01F, sprite);
+        super(level, x, y, z, data.tx(), data.ty(), data.tz(), 0.01F);
         this.sprite = sprite;
         this.rCol = data.r();
         this.gCol = data.g();
@@ -53,8 +52,8 @@ public final class BoreSparkleParticle extends HomingParticleBase {
     }
 
     @Override
-    public SingleQuadParticle.Layer getLayer() {
-        return SingleQuadParticle.Layer.bySprite(this.sprite);
+    public ParticleRenderType getRenderType() {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
     public static final class Provider implements ParticleProvider<BoreSparkleData> {
@@ -65,8 +64,8 @@ public final class BoreSparkleParticle extends HomingParticleBase {
         }
 
         @Override
-        public @Nullable Particle createParticle(BoreSparkleData options, ClientLevel level, double x, double y, double z, double xa, double ya, double za, RandomSource random) {
-            return new BoreSparkleParticle(level, x, y, z, options, this.sprites.first());
+        public @Nullable Particle createParticle(BoreSparkleData options, ClientLevel level, double x, double y, double z, double xa, double ya, double za) {
+            return new BoreSparkleParticle(level, x, y, z, options, this.sprites.get(0, 1));
         }
     }
 }

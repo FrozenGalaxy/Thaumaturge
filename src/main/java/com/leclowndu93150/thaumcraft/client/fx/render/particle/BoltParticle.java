@@ -2,18 +2,20 @@ package com.leclowndu93150.thaumcraft.client.fx.render.particle;
 
 import com.leclowndu93150.thaumcraft.client.fx.render.texture.TCParticleLayer;
 import com.leclowndu93150.thaumcraft.content.fx.data.BoltData;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 public final class BoltParticle extends SingleQuadParticle {
     private static final int GRID = 64;
@@ -37,8 +39,8 @@ public final class BoltParticle extends SingleQuadParticle {
     private final float phase;
     private final long seed;
 
-    private BoltParticle(ClientLevel level, double x, double y, double z, BoltData data, TextureAtlasSprite sprite) {
-        super(level, x, y, z, 0.0, 0.0, 0.0, sprite);
+    private BoltParticle(ClientLevel level, double x, double y, double z, BoltData data) {
+        super(level, x, y, z, 0.0, 0.0, 0.0);
         this.setSize(0.02F, 0.02F);
         this.hasPhysics = false;
         this.xd = 0.0;
@@ -69,20 +71,21 @@ public final class BoltParticle extends SingleQuadParticle {
     }
 
     @Override
-    public void extract(QuadParticleRenderState renderState, Camera camera, float partialTickTime) {
-        Vec3 cam = camera.position();
+    public void render(VertexConsumer buffer, Camera camera, float partialTick) {
+        Vec3 cam = camera.getPosition();
         float baseX = (float) (this.x - cam.x());
         float baseY = (float) (this.y - cam.y());
         float baseZ = (float) (this.z - cam.z());
-        float alpha = Mth.clamp(1.0F - (this.age + partialTickTime) / this.lifetime, MIN_ALPHA, 1.0F);
+        float alpha = Mth.clamp(1.0F - (this.age + partialTick) / this.lifetime, MIN_ALPHA, 1.0F);
         int color = ARGB32.colorFromFloat(alpha, this.rCol, this.gCol, this.bCol);
-        float ampl = (this.age + partialTickTime) / WAVE_AMPLITUDE_RATE;
+        float ampl = (this.age + partialTick) / WAVE_AMPLITUDE_RATE;
         RandomSource jitterSource = RandomSource.create(this.seed);
         float beadSize = this.width * BEAD_SIZE_FACTOR;
         int frame = FRAME_START + (this.age + (int) this.seed) % FRAME_COUNT;
         float texFrame = 1.0F / GRID;
         float u0 = (frame % GRID) * texFrame;
         float v0 = (frame / GRID) * texFrame;
+        Quaternionf rotation = camera.rotation();
 
         float prevX = 0.0F;
         float prevY = 0.0F;
@@ -109,14 +112,27 @@ public final class BoltParticle extends SingleQuadParticle {
                 float bx = baseX + Mth.lerp(t, prevX, px);
                 float by = baseY + Mth.lerp(t, prevY, py);
                 float bz = baseZ + Mth.lerp(t, prevZ, pz);
-                renderState.add(getLayer(), bx, by, bz,
-                        camera.rotation().x, camera.rotation().y, camera.rotation().z, camera.rotation().w,
-                        beadSize, u0, u0 + texFrame, v0, v0 + texFrame, color, EMISSIVE_LIGHT);
+                emitQuad(buffer, rotation, bx, by, bz, beadSize,
+                        u0, u0 + texFrame, v0, v0 + texFrame, color, EMISSIVE_LIGHT);
             }
             prevX = px;
             prevY = py;
             prevZ = pz;
         }
+    }
+
+    private static void emitQuad(VertexConsumer buffer, Quaternionf rotation, float x, float y, float z,
+                                 float size, float u0, float u1, float v0, float v1, int color, int light) {
+        emitVertex(buffer, rotation, x, y, z, 1.0F, -1.0F, size, u1, v1, color, light);
+        emitVertex(buffer, rotation, x, y, z, 1.0F, 1.0F, size, u1, v0, color, light);
+        emitVertex(buffer, rotation, x, y, z, -1.0F, 1.0F, size, u0, v0, color, light);
+        emitVertex(buffer, rotation, x, y, z, -1.0F, -1.0F, size, u0, v1, color, light);
+    }
+
+    private static void emitVertex(VertexConsumer buffer, Quaternionf rotation, float x, float y, float z,
+                                   float cornerX, float cornerY, float size, float u, float v, int color, int light) {
+        Vector3f pos = new Vector3f(cornerX, cornerY, 0.0F).rotate(rotation).mul(size).add(x, y, z);
+        buffer.addVertex(pos.x(), pos.y(), pos.z()).setUv(u, v).setColor(color).setLight(light);
     }
 
     @Override
@@ -140,7 +156,7 @@ public final class BoltParticle extends SingleQuadParticle {
     }
 
     @Override
-    public SingleQuadParticle.Layer getLayer() {
+    public ParticleRenderType getRenderType() {
         return TCParticleLayer.ADDITIVE;
     }
 
@@ -158,8 +174,8 @@ public final class BoltParticle extends SingleQuadParticle {
 
         @Override
         public Particle createParticle(BoltData options, ClientLevel level, double x, double y, double z,
-                                       double xAux, double yAux, double zAux, RandomSource random) {
-            return new BoltParticle(level, x, y, z, options, this.sprites.first());
+                                       double xAux, double yAux, double zAux) {
+            return new BoltParticle(level, x, y, z, options);
         }
     }
 }

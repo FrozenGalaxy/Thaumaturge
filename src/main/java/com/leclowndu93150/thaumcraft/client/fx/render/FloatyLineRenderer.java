@@ -1,12 +1,10 @@
 package com.leclowndu93150.thaumcraft.client.fx.render;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
+import com.leclowndu93150.thaumcraft.client.render.TCFlatRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
@@ -17,11 +15,7 @@ import net.minecraft.world.phys.Vec3;
 public final class FloatyLineRenderer {
     private static final ResourceLocation WISPY_TEXTURE = TCIds.rl("textures/misc/wispy.png");
 
-    private static final RenderType WISPY_LINE = RenderType.create("tc_wispy_line",
-            RenderSetup.builder(TCRenderPipelines.FX_ADDITIVE)
-                    .withTexture("Sampler0", WISPY_TEXTURE)
-                    .useLightmap()
-                    .createRenderSetup());
+    private static final RenderType WISPY_LINE = TCFlatRenderTypes.entityAdditiveFlat(WISPY_TEXTURE);
 
     private static final float SEGMENTS_PER_BLOCK = 2.0F;
     private static final float TIME_UNITS_PER_TICK = 50.0F / 30.0F;
@@ -30,13 +24,6 @@ public final class FloatyLineRenderer {
     private static final float END_ATTACH_ALPHA = 0.8F;
 
     private FloatyLineRenderer() {}
-
-    public static void submit(PoseStack poseStack, SubmitNodeCollector collector, Vec3 fromRelative,
-                              float time, int color, float speed, float distanceFraction, float width) {
-        PoseStack.Pose pose = poseStack.last().copy();
-        collector.submitCustomGeometry(poseStack, WISPY_LINE,
-                (p, buffer) -> write(pose, buffer, fromRelative, time, color, speed, distanceFraction, width));
-    }
 
     public static void draw(PoseStack poseStack, MultiBufferSource buffers, Vec3 fromRelative,
                             float time, int color, float speed, float distanceFraction, float width) {

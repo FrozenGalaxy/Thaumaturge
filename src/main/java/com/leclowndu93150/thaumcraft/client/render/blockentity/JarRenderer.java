@@ -8,33 +8,27 @@ import com.leclowndu93150.thaumcraft.content.essentia.jar.BlockJar;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.sprite.SpriteId;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
 
-public final class JarRenderer implements BlockEntityRenderer<BlockEntityJar, JarRenderState> {
+public final class JarRenderer implements BlockEntityRenderer<BlockEntityJar> {
     private static final ResourceLocation BRINE_TEXTURE = ResourceLocation.fromNamespaceAndPath("thaumcraft", "textures/entity/jarbrine.png");
     private static final ResourceLocation LABEL_TEXTURE = ResourceLocation.fromNamespaceAndPath("thaumcraft", "textures/entity/label.png");
     public static final ResourceLocation ANIMATED_GLOW_LOCATION = ResourceLocation.fromNamespaceAndPath("thaumcraft", "block/animatedglow");
-    public static final SpriteId ANIMATED_GLOW_SPRITE = new SpriteId(TextureAtlas.LOCATION_BLOCKS, ANIMATED_GLOW_LOCATION);
+    public static final Material ANIMATED_GLOW_MATERIAL = new Material(TextureAtlas.LOCATION_BLOCKS, ANIMATED_GLOW_LOCATION);
 
     public static final float FLUID_MIN = 4.0F / 16.0F;
     public static final float FLUID_MAX = 12.0F / 16.0F;
@@ -55,78 +49,61 @@ public final class JarRenderer implements BlockEntityRenderer<BlockEntityJar, Ja
     public JarRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public JarRenderState createRenderState() {
-        return new JarRenderState();
-    }
-
-    @Override
-    public void extractRenderState(
-            BlockEntityJar blockEntity,
-            JarRenderState state,
-            float partialTicks,
-            Vec3 cameraPosition,
-            ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress
-    ) {
-        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
-        state.amount = blockEntity.amount();
-        state.braced = blockEntity.isBlocked();
-        state.hasFilter = blockEntity.aspectFilterKey() != null;
-        state.facing = blockEntity.facing();
-        Level level = blockEntity.getLevel();
-        state.aspectColor = -1;
-        state.filterTexture = null;
-        state.filterColor = -1;
-        state.filterAspect = null;
-        state.connectedAbove = false;
-        if (level == null) return;
-        var registry = level.registryAccess();
-        if (blockEntity.aspectKey() != null) {
-            Holder<IAspect> aspect = EssentiaTransportHelper.resolve(registry, blockEntity.aspectKey());
-            if (aspect != null) {
-                state.aspectColor = 0xFF000000 | (aspect.value().color() & 0x00FFFFFF);
+    public void render(BlockEntityJar jar, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light, int overlay) {
+        int amount = jar.amount();
+        boolean braced = jar.isBlocked();
+        boolean hasFilter = jar.aspectFilterKey() != null;
+        Direction facing = jar.facing();
+        Level level = jar.getLevel();
+        int aspectColor = -1;
+        ResourceLocation filterTexture = null;
+        int filterColor = -1;
+        boolean connectedAbove = false;
+        if (level != null) {
+            var registry = level.registryAccess();
+            if (jar.aspectKey() != null) {
+                Holder<IAspect> aspect = EssentiaTransportHelper.resolve(registry, jar.aspectKey());
+                if (aspect != null) {
+                    aspectColor = 0xFF000000 | (aspect.value().color() & 0x00FFFFFF);
+                }
             }
-        }
-        if (blockEntity.aspectFilterKey() != null) {
-            Holder<IAspect> filter = EssentiaTransportHelper.resolve(registry, blockEntity.aspectFilterKey());
-            if (filter != null) {
-                state.filterAspect = filter;
-                state.filterTexture = filter.value().texture();
-                state.filterColor = 0xFF000000 | (filter.value().color() & 0x00FFFFFF);
+            if (jar.aspectFilterKey() != null) {
+                Holder<IAspect> filter = EssentiaTransportHelper.resolve(registry, jar.aspectFilterKey());
+                if (filter != null) {
+                    filterTexture = filter.value().texture();
+                    filterColor = 0xFF000000 | (filter.value().color() & 0x00FFFFFF);
+                }
             }
+            BlockPos above = jar.getBlockPos().above();
+            connectedAbove = EssentiaFlowHandler.transport(level, above, Direction.DOWN) != null;
         }
-        BlockPos above = blockEntity.getBlockPos().above();
-        state.connectedAbove = EssentiaFlowHandler.transport(level, above, Direction.DOWN) != null;
-    }
 
-    @Override
-    public void submit(JarRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
-        if (state.amount > 0 && state.aspectColor != -1) {
-            submitFluid(state.amount, state.aspectColor, state.lightCoords,Minecraft.getInstance().getAtlasManager().get(ANIMATED_GLOW_SPRITE), poseStack, submitNodeCollector);
+        if (amount > 0 && aspectColor != -1) {
+            submitFluid(amount, aspectColor, light, ANIMATED_GLOW_MATERIAL.sprite(), poseStack, buffers);
         }
-        if (state.hasFilter && state.filterTexture != null) {
-            submitFilterLabel(state, poseStack, submitNodeCollector);
+        if (hasFilter && filterTexture != null) {
+            submitFilterLabel(facing, filterTexture, filterColor, jar.getBlockPos(), poseStack, buffers, light);
         }
-        if (state.braced) {
-            submitBrace(state, poseStack, submitNodeCollector);
+        if (braced) {
+            submitBrace(poseStack, buffers, light);
         }
-        if (state.connectedAbove) {
-            submitLidExtension(state, poseStack, submitNodeCollector);
+        if (connectedAbove) {
+            submitLidExtension(poseStack, buffers, light);
         }
     }
 
-    public static void submitFluid(float amount, int aspectColor, int lightCoords, TextureAtlasSprite sprite, PoseStack poseStack, SubmitNodeCollector collector) {
+    public static void submitFluid(float amount, int aspectColor, int lightCoords, TextureAtlasSprite sprite, PoseStack poseStack, MultiBufferSource buffers) {
         float ratio = Math.min(1.0F, amount / (float) BlockEntityJar.CAPACITY);
         float height = FLUID_BASE_Y + ratio * FLUID_MAX_HEIGHT;
-        RenderType type = Sheets.translucentBlockItemSheet();
-        collector.submitCustomGeometry(poseStack, type, (pose, buffer) -> {
-            VertexConsumer wrapped = sprite.wrap(buffer);
-            fluidQuadTop(wrapped, pose, height, aspectColor, lightCoords);
-            fluidQuadBottom(wrapped, pose, aspectColor, lightCoords);
-            fluidQuadSide(wrapped, pose, FLUID_MIN, FLUID_MIN, FLUID_MIN, FLUID_MAX, height, aspectColor, lightCoords, -1.0F, 0.0F, 0.0F);
-            fluidQuadSide(wrapped, pose, FLUID_MAX, FLUID_MAX, FLUID_MAX, FLUID_MIN, height, aspectColor, lightCoords, 1.0F, 0.0F, 0.0F);
-            fluidQuadSide(wrapped, pose, FLUID_MAX, FLUID_MIN, FLUID_MIN, FLUID_MIN, height, aspectColor, lightCoords, 0.0F, 0.0F, -1.0F);
-            fluidQuadSide(wrapped, pose, FLUID_MIN, FLUID_MAX, FLUID_MAX, FLUID_MAX, height, aspectColor, lightCoords, 0.0F, 0.0F, 1.0F);
-        });
+        VertexConsumer wrapped = sprite.wrap(buffers.getBuffer(Sheets.translucentCullBlockSheet()));
+        PoseStack.Pose pose = poseStack.last();
+        fluidQuadTop(wrapped, pose, height, aspectColor, lightCoords);
+        fluidQuadBottom(wrapped, pose, aspectColor, lightCoords);
+        fluidQuadSide(wrapped, pose, FLUID_MIN, FLUID_MIN, FLUID_MIN, FLUID_MAX, height, aspectColor, lightCoords, -1.0F, 0.0F, 0.0F);
+        fluidQuadSide(wrapped, pose, FLUID_MAX, FLUID_MAX, FLUID_MAX, FLUID_MIN, height, aspectColor, lightCoords, 1.0F, 0.0F, 0.0F);
+        fluidQuadSide(wrapped, pose, FLUID_MAX, FLUID_MIN, FLUID_MIN, FLUID_MIN, height, aspectColor, lightCoords, 0.0F, 0.0F, -1.0F);
+        fluidQuadSide(wrapped, pose, FLUID_MIN, FLUID_MAX, FLUID_MAX, FLUID_MAX, height, aspectColor, lightCoords, 0.0F, 0.0F, 1.0F);
     }
 
     public static void fluidQuadTop(VertexConsumer buffer, PoseStack.Pose pose, float y, int color, int light) {
@@ -188,27 +165,21 @@ public final class JarRenderer implements BlockEntityRenderer<BlockEntityJar, Ja
                 .setColor(color);
     }
 
-    private void submitFilterLabel(JarRenderState state, PoseStack poseStack, SubmitNodeCollector collector) {
-        Direction facing = state.facing;
+    private void submitFilterLabel(Direction facing, ResourceLocation filterTexture, int filterColor,
+                                   BlockPos blockPos, PoseStack poseStack, MultiBufferSource buffers, int light) {
         poseStack.pushPose();
         poseStack.translate(0.5, 0.5, 0.5);
         if (facing.getAxis() == Direction.Axis.Z) poseStack.mulPose(Axis.YP.rotationDegrees(180));
         poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
         poseStack.translate(0.0, -0.1, -0.315 - 0.001);
-        float rot = (state.blockPos.getX() + state.facing.ordinal()) % 4 - 2;
+        float rot = (blockPos.getX() + facing.ordinal()) % 4 - 2;
         poseStack.mulPose(Axis.ZN.rotationDegrees(rot));
-        int light = state.lightCoords;
-        ResourceLocation labelTex = LABEL_TEXTURE;
-        RenderType labelType = RenderTypes.entityCutout(labelTex);
         poseStack.mulPose(Axis.YP.rotationDegrees(180));
-        collector.submitCustomGeometry(poseStack, labelType, (pose, buffer) -> labelQuad(buffer, pose, light));
-        if (state.filterTexture != null) {
+        labelQuad(buffers.getBuffer(RenderType.entityCutout(LABEL_TEXTURE)), poseStack.last(), light);
+        if (filterTexture != null) {
             poseStack.pushPose();
             poseStack.translate(0.0, 0.0, 0.001);
-            int filterColor = state.filterColor;
-            ResourceLocation aspectTex = state.filterTexture;
-            RenderType aspectType = RenderTypes.entityTranslucent(aspectTex);
-            collector.submitCustomGeometry(poseStack, aspectType, (pose, buffer) -> aspectIconQuad(buffer, pose, filterColor, light));
+            aspectIconQuad(buffers.getBuffer(RenderType.entityTranslucent(filterTexture)), poseStack.last(), filterColor, light);
             poseStack.popPose();
         }
         poseStack.popPose();
@@ -231,31 +202,25 @@ public final class JarRenderer implements BlockEntityRenderer<BlockEntityJar, Ja
         addVertex(buffer, pose, -s, s, 0.0F, 0.0F, 0.0F, color, light, 0.0F, 0.0F, -1.0F);
     }
 
-    private void submitBrace(JarRenderState state, PoseStack poseStack, SubmitNodeCollector collector) {
-        int light = state.lightCoords;
+    private void submitBrace(PoseStack poseStack, MultiBufferSource buffers, int light) {
         int color = 0xFFFFFFFF;
-        RenderType type = RenderTypes.entityCutout(BRINE_TEXTURE);
-        collector.submitCustomGeometry(poseStack, type, (pose, buffer) -> {
-            float minX = 0.5F - (BRACE_MAX_XZ - BRACE_MIN_XZ) * 0.5F * BRACE_STRETCH;
-            float maxX = 0.5F + (BRACE_MAX_XZ - BRACE_MIN_XZ) * 0.5F * BRACE_STRETCH;
-            float minZ = minX;
-            float maxZ = maxX;
-            float bottom = BRACE_BOTTOM_Y;
-            float top = BRACE_TOP_Y;
-            braceCuboid(buffer, pose, minX, bottom, minZ, maxX, top, maxZ, color, light);
-        });
+        VertexConsumer buffer = buffers.getBuffer(RenderType.entityCutout(BRINE_TEXTURE));
+        PoseStack.Pose pose = poseStack.last();
+        float minX = 0.5F - (BRACE_MAX_XZ - BRACE_MIN_XZ) * 0.5F * BRACE_STRETCH;
+        float maxX = 0.5F + (BRACE_MAX_XZ - BRACE_MIN_XZ) * 0.5F * BRACE_STRETCH;
+        float minZ = minX;
+        float maxZ = maxX;
+        braceCuboid(buffer, pose, minX, BRACE_BOTTOM_Y, minZ, maxX, BRACE_TOP_Y, maxZ, color, light);
     }
 
-    private void submitLidExtension(JarRenderState state, PoseStack poseStack, SubmitNodeCollector collector) {
-        int light = state.lightCoords;
+    private void submitLidExtension(PoseStack poseStack, MultiBufferSource buffers, int light) {
         int color = 0xFFFFFFFF;
-        RenderType type = RenderTypes.entityCutout(BRINE_TEXTURE);
-        collector.submitCustomGeometry(poseStack, type, (pose, buffer) -> {
-            cuboid(buffer, pose,
-                    LID_EXT_MIN_XZ, LID_EXT_BOTTOM_Y, LID_EXT_MIN_XZ,
-                    LID_EXT_MAX_XZ, LID_EXT_TOP_Y, LID_EXT_MAX_XZ,
-                    color, light);
-        });
+        VertexConsumer buffer = buffers.getBuffer(RenderType.entityCutout(BRINE_TEXTURE));
+        PoseStack.Pose pose = poseStack.last();
+        cuboid(buffer, pose,
+                LID_EXT_MIN_XZ, LID_EXT_BOTTOM_Y, LID_EXT_MIN_XZ,
+                LID_EXT_MAX_XZ, LID_EXT_TOP_Y, LID_EXT_MAX_XZ,
+                color, light);
     }
 
     private static void braceCuboid(

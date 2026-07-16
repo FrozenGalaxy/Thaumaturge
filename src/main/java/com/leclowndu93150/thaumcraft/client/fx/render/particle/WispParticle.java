@@ -1,19 +1,19 @@
 package com.leclowndu93150.thaumcraft.client.fx.render.particle;
 
 import com.leclowndu93150.thaumcraft.content.fx.data.WispData;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
-public final class WispParticle extends SingleQuadParticle {
+public final class WispParticle extends TextureSheetParticle {
     private static final float BASE_ALPHA = 0.2F;
     private static final float MAX_DIST_SQ = 1024.0F;
     private static final float SCALE_MULTIPLIER = 0.4F;
@@ -25,7 +25,8 @@ public final class WispParticle extends SingleQuadParticle {
     private Entity target;
 
     private WispParticle(ClientLevel level, double x, double y, double z, WispData data, SpriteSet sprites) {
-        super(level, x, y, z, 0.0, 0.0, 0.0, sprites.get(0, FRAME_COUNT));
+        super(level, x, y, z, 0.0, 0.0, 0.0);
+        this.setSprite(sprites.get(0, FRAME_COUNT));
         this.sprites = sprites;
         this.targetEntityId = data.entityId();
         this.xd = level.getRandom().nextGaussian() * 0.03;
@@ -48,7 +49,7 @@ public final class WispParticle extends SingleQuadParticle {
     @Override
     public void tick() {
         super.tick();
-        this.sprite = this.sprites.get(this.age % FRAME_COUNT, FRAME_COUNT);
+        this.setSprite(this.sprites.get(this.age % FRAME_COUNT, FRAME_COUNT));
         if (this.target == null && this.targetEntityId != WispData.NO_ENTITY) {
             this.target = this.level.getEntity(this.targetEntityId);
         }
@@ -60,9 +61,9 @@ public final class WispParticle extends SingleQuadParticle {
     }
 
     @Override
-    public void extract(QuadParticleRenderState particleTypeRenderState, Camera camera, float partialTickTime) {
+    public void render(VertexConsumer buffer, Camera camera, float partialTick) {
         float ageScale = 1.0F - (float)this.age / this.lifetime;
-        Vec3 camPos = camera.position();
+        Vec3 camPos = camera.getPosition();
         double dx = camPos.x() - this.x;
         double dy = camPos.y() - this.y;
         double dz = camPos.z() - this.z;
@@ -70,13 +71,13 @@ public final class WispParticle extends SingleQuadParticle {
         float base = (float)(1.0 - Math.min((double)MAX_DIST_SQ, distSq) / MAX_DIST_SQ);
         float prev = this.alpha;
         this.alpha = Mth.clamp(BASE_ALPHA * ageScale * base, 0.0F, 1.0F);
-        super.extract(particleTypeRenderState, camera, partialTickTime);
+        super.render(buffer, camera, partialTick);
         this.alpha = prev;
     }
 
     @Override
-    public SingleQuadParticle.Layer getLayer() {
-        return SingleQuadParticle.Layer.TRANSLUCENT;
+    public ParticleRenderType getRenderType() {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
     public static final class Provider implements ParticleProvider<WispData> {
@@ -87,7 +88,7 @@ public final class WispParticle extends SingleQuadParticle {
         }
 
         @Override
-        public Particle createParticle(WispData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux, RandomSource random) {
+        public Particle createParticle(WispData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux) {
             return new WispParticle(level, x, y, z, options, sprites);
         }
     }

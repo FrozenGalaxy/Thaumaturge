@@ -2,7 +2,6 @@ package com.leclowndu93150.thaumcraft.client.fx.render.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.SingleQuadParticle;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Mth;
 
 public abstract class HomingParticleBase extends SingleQuadParticle {
@@ -12,8 +11,8 @@ public abstract class HomingParticleBase extends SingleQuadParticle {
     protected final float driftScale;
 
     protected HomingParticleBase(ClientLevel level, double x, double y, double z,
-                                 double tx, double ty, double tz, float driftScale, TextureAtlasSprite sprite) {
-        super(level, x, y, z, 0.0, 0.0, 0.0, sprite);
+                                 double tx, double ty, double tz, float driftScale) {
+        super(level, x, y, z, 0.0, 0.0, 0.0);
         this.targetX = tx;
         this.targetY = ty;
         this.targetZ = tz;

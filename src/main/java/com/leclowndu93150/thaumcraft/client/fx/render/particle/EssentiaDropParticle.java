@@ -4,13 +4,13 @@ import com.leclowndu93150.thaumcraft.content.fx.data.EssentiaDropParticleData;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.util.FastColor.ARGB32;
-import net.minecraft.util.RandomSource;
 import org.joml.Vector3f;
 
-public final class EssentiaDropParticle extends SingleQuadParticle {
+public final class EssentiaDropParticle extends TextureSheetParticle {
     private final float baseAlpha;
     private final float baseScale;
 
@@ -18,8 +18,8 @@ public final class EssentiaDropParticle extends SingleQuadParticle {
         super(level, x, y, z,
                 level.getRandom().nextGaussian() * 0.005,
                 level.getRandom().nextGaussian() * 0.005,
-                level.getRandom().nextGaussian() * 0.005,
-                sprites.get(level.getRandom()));
+                level.getRandom().nextGaussian() * 0.005);
+        this.setSprite(sprites.get(level.getRandom()));
         Vector3f rgb = new Vector3f(ARGB32.red(data.color()) / 255.0F, ARGB32.green(data.color()) / 255.0F, ARGB32.blue(data.color()) / 255.0F);
         this.rCol = rgb.x();
         this.gCol = rgb.y();
@@ -54,8 +54,8 @@ public final class EssentiaDropParticle extends SingleQuadParticle {
     }
 
     @Override
-    public SingleQuadParticle.Layer getLayer() {
-        return SingleQuadParticle.Layer.TRANSLUCENT;
+    public ParticleRenderType getRenderType() {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
     public static final class Provider implements ParticleProvider<EssentiaDropParticleData> {
@@ -66,7 +66,7 @@ public final class EssentiaDropParticle extends SingleQuadParticle {
         }
 
         @Override
-        public Particle createParticle(EssentiaDropParticleData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux, RandomSource random) {
+        public Particle createParticle(EssentiaDropParticleData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux) {
             return new EssentiaDropParticle(level, x, y, z, options, sprites);
         }
     }

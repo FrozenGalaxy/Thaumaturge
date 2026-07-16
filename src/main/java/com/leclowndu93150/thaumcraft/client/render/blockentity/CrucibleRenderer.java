@@ -4,73 +4,51 @@ import com.leclowndu93150.thaumcraft.content.crucible.BlockEntityCrucible;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.fluids.FluidStack;
 
-public final class CrucibleRenderer implements BlockEntityRenderer<BlockEntityCrucible, CrucibleRenderState> {
+public final class CrucibleRenderer implements BlockEntityRenderer<BlockEntityCrucible> {
 
     public CrucibleRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public CrucibleRenderState createRenderState() {
-        return new CrucibleRenderState();
-    }
+    public void render(BlockEntityCrucible crucible, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light, int overlay) {
+        FluidStack fluid = crucible.getTank().getFluid();
+        if (fluid.isEmpty()) return;
+        float height = crucible.getFluidHeight();
 
-    @Override
-    public void extractRenderState(
-            BlockEntityCrucible blockEntity,
-            CrucibleRenderState state,
-            float partialTicks,
-            Vec3 cameraPosition,
-            ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress
-    ) {
-        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
-        state.fluid = blockEntity.getTank().getFluid().copy();
-        state.fluidHeight = blockEntity.getFluidHeight();
-        var fluidModel = Minecraft.getInstance().getModelManager().getFluidStateModelSet()
-                .get(state.fluid.getFluid().defaultFluidState());
-        state.sprite = fluidModel.stillMaterial().sprite();
-        var tintSource = fluidModel.fluidTintSource();
-        if (tintSource != null) {
-            state.color = tintSource.colorAsStack(state.fluid);
-        } else {
-            state.color = -1;
-        }
+        IClientFluidTypeExtensions ext = IClientFluidTypeExtensions.of(fluid.getFluid());
+        TextureAtlasSprite sprite = Minecraft.getInstance()
+                .getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(ext.getStillTexture(fluid));
+        int color = ext.getTintColor(fluid);
 
-        float recolor = (float) blockEntity.getAspects().totalAmount() / BlockEntityCrucible.MAX_ASPECT;
-        if (recolor > 0.0F){
+        float recolor = (float) crucible.getAspects().totalAmount() / BlockEntityCrucible.MAX_ASPECT;
+        if (recolor > 0.0F) {
             recolor = 0.5F + recolor / 2F;
         }
-
         if (recolor > 1F) recolor = 1F;
+        float r = Mth.lerp(recolor, ARGB32.red(color) / 255.0F, 0.25F);
+        float g = Mth.lerp(recolor, ARGB32.green(color) / 255.0F, 0.0F);
+        float b = Mth.lerp(recolor, ARGB32.blue(color) / 255.0F, 0.75F);
+        color = ARGB32.colorFromFloat(1F, r, g, b);
 
-        float r = Mth.lerp(recolor,ARGB32.red(state.color) / 255.0F,0.25F);
-        float g = Mth.lerp(recolor,ARGB32.green(state.color) / 255.0F,0.0F);
-        float b = Mth.lerp(recolor,ARGB32.blue(state.color) / 255.0F,0.75F);
-        state.color = ARGB32.colorFromFloat(1F,r,g,b);
+        float min = 0 / 16F;
+        float max = 16 / 16F;
+        VertexConsumer wrapped = sprite.wrap(buffers.getBuffer(Sheets.translucentCullBlockSheet()));
+        PoseStack.Pose pose = poseStack.last();
+        JarRenderer.addVertex(wrapped, pose, min, height, min, min, min, color, light, 0, 1, 0);
+        JarRenderer.addVertex(wrapped, pose, min, height, max, min, max, color, light, 0, 1, 0);
+        JarRenderer.addVertex(wrapped, pose, max, height, max, max, max, color, light, 0, 1, 0);
+        JarRenderer.addVertex(wrapped, pose, max, height, min, max, min, color, light, 0, 1, 0);
     }
-
-    @Override
-    public void submit(CrucibleRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
-        if (state.fluid.isEmpty()) return;
-        float height = state.fluidHeight;
-        float min = 0 / 16F, max = 16 / 16F;
-        submitNodeCollector.submitCustomGeometry(poseStack, Sheets.translucentBlockItemSheet(), (pose, buffer) -> {
-            VertexConsumer wrapped = state.sprite.wrap(buffer);
-            JarRenderer.addVertex(wrapped, pose, min, height, min, min, min, state.color, state.lightCoords, 0, 1, 0);
-            JarRenderer.addVertex(wrapped, pose, min, height, max, min, max, state.color, state.lightCoords, 0, 1, 0);
-            JarRenderer.addVertex(wrapped, pose, max, height, max, max, max, state.color, state.lightCoords, 0, 1, 0);
-            JarRenderer.addVertex(wrapped, pose, max, height, min, max, min, state.color, state.lightCoords, 0, 1, 0);
-        });
-    }
-
 }

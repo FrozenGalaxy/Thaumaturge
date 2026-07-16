@@ -11,21 +11,17 @@ import com.leclowndu93150.thaumcraft.content.research.table.BlockResearchTable;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
 
-public final class ResearchTableRenderer implements BlockEntityRenderer<BlockEntityResearchTable, ResearchTableRenderState> {
+public final class ResearchTableRenderer implements BlockEntityRenderer<BlockEntityResearchTable> {
     private static final ResourceLocation TABLE_TEXTURE = TCIds.rl("textures/entity/restable.png");
     private static final ResourceLocation SCROLL_TEXTURE = TCIds.rl("textures/entity/restable2.png");
     private static final ResourceLocation QUILL_TEXTURE = TCIds.rl("textures/entity/tablequill.png");
@@ -44,37 +40,26 @@ public final class ResearchTableRenderer implements BlockEntityRenderer<BlockEnt
     }
 
     @Override
-    public ResearchTableRenderState createRenderState() {
-        return new ResearchTableRenderState();
-    }
-
-    @Override
     public AABB getRenderBoundingBox(BlockEntityResearchTable table) {
         return new AABB(table.getBlockPos()).inflate(1.0);
     }
 
     @Override
-    public void extractRenderState(BlockEntityResearchTable table, ResearchTableRenderState state, float partialTicks,
-                                   Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(table, state, partialTicks, cameraPosition, breakProgress);
-        state.facing = table.getBlockState().hasProperty(BlockResearchTable.FACING)
+    public void render(BlockEntityResearchTable table, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light, int overlay) {
+        Direction facing = table.getBlockState().hasProperty(BlockResearchTable.FACING)
                 ? table.getBlockState().getValue(BlockResearchTable.FACING)
                 : Direction.NORTH;
-        ItemStack tools = table.items().getResource(BlockEntityResearchTable.SLOT_SCRIBE_TOOLS).toStack(1);
-        state.hasTools = tools.getItem() instanceof IScribeTools;
-        ItemStack note = table.items().getResource(BlockEntityResearchTable.SLOT_NOTE).toStack(1);
+        boolean hasTools = table.items().getStackInSlot(BlockEntityResearchTable.SLOT_SCRIBE_TOOLS).getItem() instanceof IScribeTools;
+        ItemStack note = table.items().getStackInSlot(BlockEntityResearchTable.SLOT_NOTE);
         ResearchNoteData data = ResearchNotes.dataOf(note);
-        state.hasNote = !note.isEmpty() && data != null;
-        state.noteColor = data != null ? data.color() : DEFAULT_SCROLL_COLOR;
-    }
+        boolean hasNote = !note.isEmpty() && data != null;
+        int noteColor = data != null ? data.color() : DEFAULT_SCROLL_COLOR;
 
-    @Override
-    public void submit(ResearchTableRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        int light = state.lightCoords;
         poseStack.pushPose();
         poseStack.translate(0.5F, 1.0F, 0.5F);
         poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
-        float yaw = switch (state.facing) {
+        float yaw = switch (facing) {
             case NORTH -> 270.0F;
             case SOUTH -> 90.0F;
             case WEST -> 180.0F;
@@ -82,20 +67,17 @@ public final class ResearchTableRenderer implements BlockEntityRenderer<BlockEnt
         };
         poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
 
-        collector.submitModelPart(model.table, poseStack, RenderTypes.entityCutout(TABLE_TEXTURE),
-                light, OverlayTexture.NO_OVERLAY, null, -1, null);
+        model.table.render(poseStack, buffers.getBuffer(RenderType.entityCutout(TABLE_TEXTURE)), light, OverlayTexture.NO_OVERLAY);
 
-        if (state.hasTools) {
-            collector.submitModelPart(model.inkwell, poseStack, RenderTypes.entityCutout(TABLE_TEXTURE),
-                    light, OverlayTexture.NO_OVERLAY, null, -1, null);
+        if (hasTools) {
+            model.inkwell.render(poseStack, buffers.getBuffer(RenderType.entityCutout(TABLE_TEXTURE)), light, OverlayTexture.NO_OVERLAY);
             poseStack.pushPose();
             poseStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
             poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
             poseStack.translate(-0.17F, 0.1F, -0.15F);
             poseStack.mulPose(Axis.YP.rotationDegrees(15.0F));
             poseStack.scale(0.5F, 0.5F, 0.5F);
-            collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(QUILL_TEXTURE),
-                    (pose, buffer) -> itemIn2D(pose, buffer, light));
+            itemIn2D(poseStack.last(), buffers.getBuffer(RenderType.entityCutout(QUILL_TEXTURE)), light);
             poseStack.popPose();
         }
 
@@ -105,18 +87,16 @@ public final class ResearchTableRenderer implements BlockEntityRenderer<BlockEnt
             poseStack.mulPose(Axis.XN.rotationDegrees(90.0F));
             poseStack.mulPose(Axis.ZP.rotationDegrees(15 + a % 3 * 2));
             poseStack.scale(0.5F, 0.6F, 0.6F);
-            collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(PARCHMENT_TEXTURE),
-                    (pose, buffer) -> parchmentQuad(pose, buffer, light));
+            parchmentQuad(poseStack.last(), buffers.getBuffer(RenderType.entityTranslucent(PARCHMENT_TEXTURE)), light);
             poseStack.popPose();
         }
 
-        if (state.hasNote) {
-            collector.submitModelPart(model.scrollTube, poseStack, RenderTypes.entityCutout(SCROLL_TEXTURE),
-                    light, OverlayTexture.NO_OVERLAY, null, -1, null);
+        if (hasNote) {
+            model.scrollTube.render(poseStack, buffers.getBuffer(RenderType.entityCutout(SCROLL_TEXTURE)), light, OverlayTexture.NO_OVERLAY);
             poseStack.pushPose();
             poseStack.scale(RIBBON_SCALE, RIBBON_SCALE, RIBBON_SCALE);
-            collector.submitModelPart(model.scrollRibbon, poseStack, RenderTypes.entityCutout(SCROLL_TEXTURE),
-                    light, OverlayTexture.NO_OVERLAY, null, 0xFF000000 | state.noteColor, null);
+            model.scrollRibbon.render(poseStack, buffers.getBuffer(RenderType.entityCutout(SCROLL_TEXTURE)),
+                    light, OverlayTexture.NO_OVERLAY, 0xFF000000 | noteColor);
             poseStack.popPose();
         }
 

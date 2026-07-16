@@ -3,20 +3,16 @@ package com.leclowndu93150.thaumcraft.client.fx.render.particle;
 import com.leclowndu93150.thaumcraft.client.fx.render.texture.TCParticleLayer;
 import com.leclowndu93150.thaumcraft.content.fx.data.VentData;
 import net.minecraft.client.Camera;
-import net.minecraft.client.GraphicsPreset;
+import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
 
 public final class VentParticle extends SingleQuadParticle {
     private static final int GRID = 64;
@@ -31,8 +27,8 @@ public final class VentParticle extends SingleQuadParticle {
     private float scale;
     private final float perParticleGravity;
 
-    private VentParticle(ClientLevel level, double x, double y, double z, VentData data, TextureAtlasSprite sprite) {
-        super(level, x, y, z, 0.0, 0.0, 0.0, sprite);
+    private VentParticle(ClientLevel level, double x, double y, double z, VentData data) {
+        super(level, x, y, z, 0.0, 0.0, 0.0);
         this.setSize(0.02F, 0.02F);
         this.variant = data.variant();
         float initialScale = this.random.nextFloat() * 0.1F + 0.05F;
@@ -60,8 +56,8 @@ public final class VentParticle extends SingleQuadParticle {
         this.lifetime = Integer.MAX_VALUE;
         this.hasPhysics = true;
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
-        Vec3 camPos = camera.position();
-        int visibleDistance = Minecraft.getInstance().options.graphicsPreset().get() == GraphicsPreset.FAST ? 25 : 50;
+        Vec3 camPos = camera.getPosition();
+        int visibleDistance = Minecraft.getInstance().options.graphicsMode().get() == GraphicsStatus.FAST ? 25 : 50;
         double dx = camPos.x() - x;
         double dy = camPos.y() - y;
         double dz = camPos.z() - z;
@@ -113,26 +109,7 @@ public final class VentParticle extends SingleQuadParticle {
             this.xd *= 0.7;
             this.zd *= 0.7;
         }
-    }
-
-    @Override
-    public void extract(QuadParticleRenderState renderState, Camera camera, float partialTickTime) {
-        Quaternionf rotation = new Quaternionf();
-        this.getFacingCameraMode().setRotation(rotation, camera, partialTickTime);
-        Vec3 pos = camera.position();
-        float dx = (float)(Mth.lerp((double)partialTickTime, this.xo, this.x) - pos.x());
-        float dy = (float)(Mth.lerp((double)partialTickTime, this.yo, this.y) - pos.y());
-        float dz = (float)(Mth.lerp((double)partialTickTime, this.zo, this.z) - pos.z());
-        float fadeAlpha = ALPHA * ((this.psm - this.scale) / this.psm);
-        int color = ARGB32.colorFromFloat(fadeAlpha, this.rCol, this.gCol, this.bCol);
-        int light = this.getLightCoords(partialTickTime);
-        renderState.add(
-                this.getLayer(),
-                dx, dy, dz,
-                rotation.x, rotation.y, rotation.z, rotation.w,
-                0.3F * this.scale,
-                this.getU0(), this.getU1(), this.getV0(), this.getV1(),
-                color, light);
+        this.alpha = ALPHA * ((this.psm - this.scale) / this.psm);
     }
 
     private int cellIndex() {
@@ -163,7 +140,7 @@ public final class VentParticle extends SingleQuadParticle {
     }
 
     @Override
-    public SingleQuadParticle.Layer getLayer() {
+    public ParticleRenderType getRenderType() {
         return TCParticleLayer.TRANSLUCENT;
     }
 
@@ -180,8 +157,8 @@ public final class VentParticle extends SingleQuadParticle {
         }
 
         @Override
-        public Particle createParticle(VentData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux, RandomSource random) {
-            return new VentParticle(level, x, y, z, options, this.sprites.first());
+        public Particle createParticle(VentData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux) {
+            return new VentParticle(level, x, y, z, options);
         }
     }
 }

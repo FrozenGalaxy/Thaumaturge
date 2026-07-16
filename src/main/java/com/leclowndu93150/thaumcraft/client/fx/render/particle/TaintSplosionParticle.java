@@ -4,15 +4,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraft.data.AtlasIds;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jspecify.annotations.Nullable;
@@ -23,16 +19,14 @@ public final class TaintSplosionParticle extends SingleQuadParticle {
     private static final int BASE_LIFETIME = 66;
 
     private final TextureAtlasSprite sprite;
-    private final SingleQuadParticle.Layer layer;
     private final float uo;
     private final float vo;
     private final float baseAlpha;
 
     private TaintSplosionParticle(ClientLevel level, double x, double y, double z,
                                   double xd, double yd, double zd, TextureAtlasSprite sprite) {
-        super(level, x, y, z, xd, yd, zd, sprite);
+        super(level, x, y, z, xd, yd, zd);
         this.sprite = sprite;
-        this.layer = SingleQuadParticle.Layer.bySprite(sprite);
         this.uo = this.random.nextFloat() * 3.0F;
         this.vo = this.random.nextFloat() * 3.0F;
         this.gravity = 1.0F;
@@ -74,8 +68,8 @@ public final class TaintSplosionParticle extends SingleQuadParticle {
     }
 
     @Override
-    public SingleQuadParticle.Layer getLayer() {
-        return this.layer;
+    public ParticleRenderType getRenderType() {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
     @Override
@@ -104,18 +98,12 @@ public final class TaintSplosionParticle extends SingleQuadParticle {
     }
 
     public static final class Provider implements ParticleProvider<SimpleParticleType> {
-        private final ItemStackRenderState scratchRenderState = new ItemStackRenderState();
-
         @Override
         public @Nullable Particle createParticle(SimpleParticleType options, ClientLevel level,
                                                  double x, double y, double z,
-                                                 double xd, double yd, double zd, RandomSource random) {
-            Minecraft.getInstance().getItemModelResolver()
-                    .updateForTopItem(scratchRenderState, new ItemStack(Items.SLIME_BALL), ItemDisplayContext.GROUND, level, null, 0);
-            Material.Baked material = scratchRenderState.pickParticleMaterial(random);
-            TextureAtlasSprite sprite = material != null
-                    ? material.sprite()
-                    : Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.ITEMS).missingSprite();
+                                                 double xd, double yd, double zd) {
+            TextureAtlasSprite sprite = Minecraft.getInstance().getItemRenderer()
+                    .getModel(new ItemStack(Items.SLIME_BALL), level, null, 0).getParticleIcon();
             return new TaintSplosionParticle(level, x, y, z, xd, yd, zd, sprite);
         }
     }

@@ -2,17 +2,15 @@ package com.leclowndu93150.thaumcraft.client.fx.render.particle;
 
 import com.leclowndu93150.thaumcraft.client.fx.render.texture.TCParticleLayer;
 import com.leclowndu93150.thaumcraft.content.fx.data.BlockRunesData;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -32,8 +30,8 @@ public final class BlockRunesParticle extends SingleQuadParticle {
     private final float baseScale;
     private float currentAlpha = 0.0F;
 
-    private BlockRunesParticle(ClientLevel level, double x, double y, double z, BlockRunesData data, TextureAtlasSprite sprite) {
-        super(level, x, y, z, 0.0, 0.0, 0.0, sprite);
+    private BlockRunesParticle(ClientLevel level, double x, double y, double z, BlockRunesData data) {
+        super(level, x, y, z, 0.0, 0.0, 0.0);
         this.setSize(0.01F, 0.01F);
         this.xo = x;
         this.yo = y;
@@ -77,6 +75,7 @@ public final class BlockRunesParticle extends SingleQuadParticle {
             this.remove();
             return;
         }
+        this.alpha = this.currentAlpha / 2.0F;
         this.yd -= 0.04 * this.gravity;
         this.x += this.xd;
         this.y += this.yd;
@@ -84,26 +83,19 @@ public final class BlockRunesParticle extends SingleQuadParticle {
     }
 
     @Override
-    public void extract(QuadParticleRenderState renderState, Camera camera, float partialTickTime) {
-        Vec3 pos = camera.position();
-        float dx = (float)(Mth.lerp((double)partialTickTime, this.xo, this.x) - pos.x());
-        float dy = (float)(Mth.lerp((double)partialTickTime, this.yo, this.y) - pos.y());
-        float dz = (float)(Mth.lerp((double)partialTickTime, this.zo, this.z) - pos.z());
-        Quaternionf rot = new Quaternionf();
-        rot.rotateY((float)Math.toRadians(this.rotationY));
+    public void render(VertexConsumer buffer, Camera camera, float partialTick) {
+        Vec3 pos = camera.getPosition();
+        float dx = (float)(Mth.lerp((double)partialTick, this.xo, this.x) - pos.x());
+        float dy = (float)(Mth.lerp((double)partialTick, this.yo, this.y) - pos.y());
+        float dz = (float)(Mth.lerp((double)partialTick, this.zo, this.z) - pos.z());
+        Quaternionf rot = new Quaternionf().rotateY((float)Math.toRadians(this.rotationY));
         Vector3f offset = rot.transform(new Vector3f((float)-this.offsetY, (float)this.offsetX, FACE_OFFSET));
-        float worldX = dx + offset.x();
-        float worldY = dy + offset.y();
-        float worldZ = dz + offset.z();
-        float halfAlpha = this.currentAlpha / 2.0F;
-        int color = ARGB32.colorFromFloat(halfAlpha, this.rCol, this.gCol, this.bCol);
-        renderState.add(
-                this.getLayer(),
-                worldX, worldY, worldZ,
-                rot.x, rot.y, rot.z, rot.w,
-                QUAD_RADIUS * this.baseScale,
-                this.getU0(), this.getU1(), this.getV0(), this.getV1(),
-                color, EMISSIVE_LIGHT);
+        renderRotatedQuad(buffer, rot, dx + offset.x(), dy + offset.y(), dz + offset.z(), partialTick);
+    }
+
+    @Override
+    protected int getLightColor(float partialTick) {
+        return EMISSIVE_LIGHT;
     }
 
     @Override
@@ -127,7 +119,7 @@ public final class BlockRunesParticle extends SingleQuadParticle {
     }
 
     @Override
-    public SingleQuadParticle.Layer getLayer() {
+    public ParticleRenderType getRenderType() {
         return TCParticleLayer.ADDITIVE;
     }
 
@@ -144,8 +136,8 @@ public final class BlockRunesParticle extends SingleQuadParticle {
         }
 
         @Override
-        public Particle createParticle(BlockRunesData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux, RandomSource random) {
-            return new BlockRunesParticle(level, x, y, z, options, this.sprites.first());
+        public Particle createParticle(BlockRunesData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux) {
+            return new BlockRunesParticle(level, x, y, z, options);
         }
     }
 }

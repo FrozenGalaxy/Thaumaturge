@@ -2,27 +2,21 @@ package com.leclowndu93150.thaumcraft.client.fx.render.particle;
 
 import com.leclowndu93150.thaumcraft.client.fx.render.texture.TCParticleLayer;
 import com.leclowndu93150.thaumcraft.content.fx.data.NitorCoreData;
-import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
 
 public final class NitorCoreParticle extends SingleQuadParticle {
     private static final int LIFETIME = 10;
     private static final float QUAD_RADIUS = 0.1F;
     private final float midBoost;
 
-    private NitorCoreParticle(ClientLevel level, double x, double y, double z, NitorCoreData data, TextureAtlasSprite sprite) {
-        super(level, x, y, z, 0.0, 0.0, 0.0, sprite);
+    private NitorCoreParticle(ClientLevel level, double x, double y, double z, NitorCoreData data) {
+        super(level, x, y, z, 0.0, 0.0, 0.0);
         this.xd = 0.0;
         this.yd = 0.0;
         this.zd = 0.0;
@@ -65,26 +59,27 @@ public final class NitorCoreParticle extends SingleQuadParticle {
     }
 
     @Override
-    public void extract(QuadParticleRenderState renderState, Camera camera, float partialTickTime) {
-        Quaternionf rotation = new Quaternionf();
-        this.getFacingCameraMode().setRotation(rotation, camera, partialTickTime);
-        Vec3 pos = camera.position();
-        float dx = (float)(Mth.lerp((double)partialTickTime, this.xo, this.x) - pos.x());
-        float dy = (float)(Mth.lerp((double)partialTickTime, this.yo, this.y) - pos.y());
-        float dz = (float)(Mth.lerp((double)partialTickTime, this.zo, this.z) - pos.z());
-        int color = ARGB32.colorFromFloat(this.alpha, this.rCol, this.gCol, this.bCol);
-        int light = this.getLightCoords(partialTickTime);
-        renderState.add(
-                this.getLayer(),
-                dx, dy, dz,
-                rotation.x, rotation.y, rotation.z, rotation.w,
-                this.getQuadSize(partialTickTime),
-                0.0F, 1.0F, 0.0F, 1.0F,
-                color, light);
+    protected float getU0() {
+        return 0.0F;
     }
 
     @Override
-    public SingleQuadParticle.Layer getLayer() {
+    protected float getU1() {
+        return 1.0F;
+    }
+
+    @Override
+    protected float getV0() {
+        return 0.0F;
+    }
+
+    @Override
+    protected float getV1() {
+        return 1.0F;
+    }
+
+    @Override
+    public ParticleRenderType getRenderType() {
         return TCParticleLayer.NITOR_CORE;
     }
 
@@ -101,8 +96,8 @@ public final class NitorCoreParticle extends SingleQuadParticle {
         }
 
         @Override
-        public Particle createParticle(NitorCoreData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux, RandomSource random) {
-            return new NitorCoreParticle(level, x, y, z, options, this.sprites.first());
+        public Particle createParticle(NitorCoreData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux) {
+            return new NitorCoreParticle(level, x, y, z, options);
         }
     }
 }

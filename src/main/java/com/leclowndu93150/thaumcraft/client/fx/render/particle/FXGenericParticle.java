@@ -2,21 +2,14 @@ package com.leclowndu93150.thaumcraft.client.fx.render.particle;
 
 import com.leclowndu93150.thaumcraft.client.fx.render.texture.TCParticleLayer;
 import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
-import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
 
 public final class FXGenericParticle extends SingleQuadParticle {
     private static final float DEG_TO_RAD = (float)(Math.PI / 180.0);
@@ -48,17 +41,16 @@ public final class FXGenericParticle extends SingleQuadParticle {
     private final float[] alphaFrames;
     private final float[] scaleFrames;
     private int currentCell;
-    private float prevRoll;
-    private float roll;
     private int delayRemaining;
+    private final SingleQuadParticle.FacingCameraMode facingMode;
     private final double driftX;
     private final double driftY;
     private final double driftZ;
     private final int targetEntityId;
     private Entity targetEntity;
 
-    private FXGenericParticle(ClientLevel level, double x, double y, double z, FXGenericData data, TextureAtlasSprite sprite) {
-        super(level, x, y, z, data.vx(), data.vy(), data.vz(), sprite);
+    private FXGenericParticle(ClientLevel level, double x, double y, double z, FXGenericData data) {
+        super(level, x, y, z, data.vx(), data.vy(), data.vz());
         this.setSize(0.1F, 0.1F);
         this.setPos(x, y, z);
         this.xo = x;
@@ -106,9 +98,13 @@ public final class FXGenericParticle extends SingleQuadParticle {
         this.targetEntityId = data.targetEntityId();
         float startAngleRad = (float)(data.rotationStart() * Math.PI * 2.0);
         this.roll = startAngleRad;
-        this.prevRoll = startAngleRad;
+        this.oRoll = startAngleRad;
+        this.facingMode = this.angled
+                ? (quaternion, camera, partialTick) ->
+                        quaternion.rotationYXZ(-this.angleYaw * DEG_TO_RAD, this.anglePitch * DEG_TO_RAD, 0.0F)
+                : SingleQuadParticle.FacingCameraMode.LOOKAT_XYZ;
         if (data.windScale() != 0.0) {
-            int moon = level.environmentAttributes().getValue(EnvironmentAttributes.MOON_PHASE, new Vec3(x, y, z)).index();
+            int moon = level.getMoonPhase();
             double angle = moon * (40.0 + level.getRandom().nextInt(10)) / 180.0 * Math.PI;
             double tx = 0.1 * Math.cos(angle);
             double tz = 0.1 * Math.sin(angle);
@@ -126,7 +122,7 @@ public final class FXGenericParticle extends SingleQuadParticle {
         this.xo = this.x;
         this.yo = this.y;
         this.zo = this.z;
-        this.prevRoll = this.roll;
+        this.oRoll = this.roll;
         if (this.delayRemaining > 0) {
             this.delayRemaining--;
             this.alpha = 0.0F;
@@ -216,30 +212,13 @@ public final class FXGenericParticle extends SingleQuadParticle {
     }
 
     @Override
-    public void extract(QuadParticleRenderState renderState, Camera camera, float partialTickTime) {
-        Quaternionf rotation = new Quaternionf();
-        if (this.angled) {
-            rotation.rotationYXZ(-this.angleYaw * DEG_TO_RAD, this.anglePitch * DEG_TO_RAD, 0.0F);
-            float r = Mth.lerp(partialTickTime, this.prevRoll, this.roll);
-            if (r != 0.0F) rotation.rotateZ(r);
-        } else {
-            this.getFacingCameraMode().setRotation(rotation, camera, partialTickTime);
-            float r = Mth.lerp(partialTickTime, this.prevRoll, this.roll);
-            if (r != 0.0F) rotation.rotateZ(r);
-        }
-        Vec3 pos = camera.position();
-        float dx = (float)(Mth.lerp((double)partialTickTime, this.xo, this.x) - pos.x());
-        float dy = (float)(Mth.lerp((double)partialTickTime, this.yo, this.y) - pos.y());
-        float dz = (float)(Mth.lerp((double)partialTickTime, this.zo, this.z) - pos.z());
-        int color = ARGB32.colorFromFloat(this.alpha, this.rCol, this.gCol, this.bCol);
-        int light = this.getLightCoords(partialTickTime);
-        renderState.add(
-                this.getLayer(),
-                dx, dy, dz,
-                rotation.x, rotation.y, rotation.z, rotation.w,
-                this.getQuadSize(partialTickTime),
-                this.getU0(), this.getU1(), this.getV0(), this.getV1(),
-                color, light);
+    public ParticleRenderType getRenderType() {
+        return TCParticleLayer.byLayer(this.layer);
+    }
+
+    @Override
+    public SingleQuadParticle.FacingCameraMode getFacingCameraMode() {
+        return this.facingMode;
     }
 
     @Override
@@ -270,11 +249,6 @@ public final class FXGenericParticle extends SingleQuadParticle {
         float cellH = 1.0F / this.gridSize;
         int cellY = this.currentCell / this.gridSize;
         return cellY * cellH + cellH;
-    }
-
-    @Override
-    public SingleQuadParticle.Layer getLayer() {
-        return TCParticleLayer.byLayer(this.layer);
     }
 
     @Override
@@ -314,8 +288,8 @@ public final class FXGenericParticle extends SingleQuadParticle {
         }
 
         @Override
-        public Particle createParticle(FXGenericData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux, RandomSource random) {
-            return new FXGenericParticle(level, x, y, z, options, this.sprites.first());
+        public Particle createParticle(FXGenericData options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux) {
+            return new FXGenericParticle(level, x, y, z, options);
         }
     }
 }
