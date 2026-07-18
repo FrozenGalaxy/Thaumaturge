@@ -4,27 +4,23 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import com.leclowndu93150.thaumcraft.api.golems.ISealDisplayer;
 import com.leclowndu93150.thaumcraft.api.golems.parts.GolemPartModel;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
 import com.leclowndu93150.thaumcraft.client.model.obj.MeshModel;
 import com.leclowndu93150.thaumcraft.client.model.obj.MeshPart;
+import com.leclowndu93150.thaumcraft.client.render.ItemRenderHelper;
+import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumcraft.content.golem.EntityThaumcraftGolem;
 import com.leclowndu93150.thaumcraft.content.golem.GolemProperties;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.item.ItemModelResolver;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
@@ -34,44 +30,57 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
-public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, GolemRenderState> {
+public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem> {
     private static final ResourceLocation BASE_MODEL = TCIds.rl("models/obj/golem_base.obj");
+    private static final ResourceLocation FALLBACK_TEXTURE = TCIds.rl("textures/models/golem_decoration.png");
     private static final float GHOST_ALPHA = 0.15F;
     private static final int XRAY_COLOR = ARGB32.colorFromFloat(0.25F, 0.25F, 0.25F, 0.25F);
-    private static final Map<ResourceLocation, RenderType> XRAY_TYPES = new ConcurrentHashMap<>();
-
-    private final ItemModelResolver itemModelResolver;
 
     public GolemRenderer(EntityRendererProvider.Context context) {
         super(context);
-        this.itemModelResolver = context.getItemModelResolver();
         this.shadowRadius = 0.3F;
     }
 
-    private static RenderType xrayType(ResourceLocation texture) {
-        return XRAY_TYPES.computeIfAbsent(texture, tex -> RenderType.create(
-                "tc_golem_xray_" + tex.getPath().hashCode(),
-                RenderSetup.builder(TCRenderPipelines.ENTITY_TRANSLUCENT_NO_DEPTH)
-                        .withTexture("Sampler0", tex)
-                        .createRenderSetup()));
+    @Override
+    public ResourceLocation getTextureLocation(EntityThaumcraftGolem entity) {
+        if (entity.getProperties() instanceof GolemProperties props) {
+            return props.getMaterial().texture();
+        }
+        return FALLBACK_TEXTURE;
     }
 
     @Override
-    public GolemRenderState createRenderState() {
-        return new GolemRenderState();
+    public void render(EntityThaumcraftGolem entity, float entityYaw, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light) {
+        GolemRenderState state = build(entity, partialTick, light);
+        if (state.props != null) {
+            poseStack.pushPose();
+            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - state.bodyRot));
+            if (!state.invisible) {
+                renderParts(state, poseStack, buffers, false, 0xFFFFFFFF);
+            } else if (state.ghost) {
+                renderParts(state, poseStack, buffers, false, ARGB32.colorFromFloat(GHOST_ALPHA, 1.0F, 1.0F, 1.0F));
+            }
+            if (state.xray) {
+                renderParts(state, poseStack, buffers, true, XRAY_COLOR);
+            }
+            poseStack.popPose();
+        }
+        super.render(entity, entityYaw, partialTick, poseStack, buffers, light);
     }
 
-    @Override
-    public void extractRenderState(EntityThaumcraftGolem entity, GolemRenderState state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
+    private static GolemRenderState build(EntityThaumcraftGolem entity, float partialTick, int light) {
+        GolemRenderState state = new GolemRenderState();
         state.props = (GolemProperties) entity.getProperties();
         state.color = entity.getGolemColor();
-        state.bodyRot = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
-        state.headYawDelta = Mth.rotLerp(partialTicks, entity.yHeadRotO, entity.yHeadRot) - state.bodyRot;
-        state.pitch = Mth.lerp(partialTicks, entity.xRotO, entity.getXRot());
-        state.walkPos = entity.walkAnimation.position(partialTicks);
-        state.walkSpeed = Math.min(1.0F, entity.walkAnimation.speed(partialTicks));
-        state.attackTime = entity.getAttackAnim(partialTicks);
+        state.ageInTicks = entity.tickCount + partialTick;
+        state.lightCoords = light;
+        state.bodyRot = Mth.rotLerp(partialTick, entity.yBodyRotO, entity.yBodyRot);
+        state.headYawDelta = Mth.rotLerp(partialTick, entity.yHeadRotO, entity.yHeadRot) - state.bodyRot;
+        state.pitch = Mth.lerp(partialTick, entity.xRotO, entity.getXRot());
+        state.walkPos = entity.walkAnimation.position(partialTick);
+        state.walkSpeed = Math.min(1.0F, entity.walkAnimation.speed(partialTick));
+        state.attackTime = entity.getAttackAnim(partialTick);
         double dx = entity.getX() - entity.xOld;
         double dz = entity.getZ() - entity.zOld;
         state.speedSq = dx * dx + dz * dz;
@@ -92,35 +101,17 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
         ItemStack held = entity.getMainHandItem();
         state.holdingItem = !held.isEmpty();
         state.heldItemIsBlock = held.getItem() instanceof BlockItem;
-        itemModelResolver.updateForTopItem(state.heldItem, held, ItemDisplayContext.HEAD, entity.level(), entity, 0);
+        state.heldItem = held;
         List<ItemStack> carrying = entity.getCarrying();
         ItemStack hauled = carrying.size() > 1 ? carrying.get(1) : ItemStack.EMPTY;
         state.haulingItem = !hauled.isEmpty();
         state.haulerItemIsBlock = hauled.getItem() instanceof BlockItem;
-        itemModelResolver.updateForTopItem(state.haulerItem, hauled, ItemDisplayContext.HEAD, entity.level(), entity, 0);
+        state.haulerItem = hauled;
         state.accessories = entity.getAccessoryString();
+        return state;
     }
 
-    @Override
-    public void submit(GolemRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        super.submit(state, poseStack, collector, camera);
-        if (state.props == null) {
-            return;
-        }
-        poseStack.pushPose();
-        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - state.bodyRot));
-        if (!state.invisible) {
-            renderParts(state, poseStack, collector, false, 0xFFFFFFFF);
-        } else if (state.ghost) {
-            renderParts(state, poseStack, collector, false, ARGB32.colorFromFloat(GHOST_ALPHA, 1.0F, 1.0F, 1.0F));
-        }
-        if (state.xray) {
-            renderParts(state, poseStack, collector, true, XRAY_COLOR);
-        }
-        poseStack.popPose();
-    }
-
-    private void renderParts(GolemRenderState state, PoseStack poseStack, SubmitNodeCollector collector,
+    private void renderParts(GolemRenderState state, PoseStack poseStack, MultiBufferSource buffers,
                              boolean xray, int color) {
         GolemProperties props = state.props;
         ResourceLocation matTexture = props.getMaterial().texture();
@@ -168,18 +159,18 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
 
         poseStack.pushPose();
         poseStack.translate(0.0, 0.5, 0.0);
-        submitNamedPart(base, "chest", poseStack, collector, matTexture, xray, color, state);
-        submitNamedPart(base, "waist", poseStack, collector, matTexture, xray, color, state);
+        renderNamedPart(base, "chest", poseStack, buffers, matTexture, xray, color, state);
+        renderNamedPart(base, "waist", poseStack, buffers, matTexture, xray, color, state);
         if (state.color > 0) {
             DyeColor dye = DyeColor.byId(state.color - 1);
             int flagColor = ARGB32.color(ARGB32.alpha(color), dye.getTextureDiffuseColor());
-            submitNamedPart(base, "flag", poseStack, collector, matTexture, xray, flagColor, state);
+            renderNamedPart(base, "flag", poseStack, buffers, matTexture, xray, flagColor, state);
         }
         for (GolemPartModel part : attachedParts(props, GolemPartModel.AttachPoint.BODY)) {
-            renderPartModel(state, part, GolemPartModel.LimbSide.MIDDLE, poseStack, collector, matTexture, xray, color);
+            renderPartModel(state, part, GolemPartModel.LimbSide.MIDDLE, poseStack, buffers, matTexture, xray, color);
         }
         if (!xray) {
-            GolemAccessoryRenderer.submitBody(state, poseStack, collector);
+            GolemAccessoryRenderer.submitBody(state, poseStack, buffers);
         }
         poseStack.popPose();
 
@@ -188,11 +179,11 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
         poseStack.mulPose(Axis.YN.rotationDegrees(state.headYawDelta));
         poseStack.mulPose(Axis.XN.rotationDegrees(state.pitch));
         for (GolemPartModel part : attachedParts(props, GolemPartModel.AttachPoint.HEAD)) {
-            renderPartModel(state, part, GolemPartModel.LimbSide.MIDDLE, poseStack, collector, matTexture, xray, color);
+            renderPartModel(state, part, GolemPartModel.LimbSide.MIDDLE, poseStack, buffers, matTexture, xray, color);
         }
-        submitNamedPart(base, "head", poseStack, collector, matTexture, xray, color, state);
+        renderNamedPart(base, "head", poseStack, buffers, matTexture, xray, color, state);
         if (!xray) {
-            GolemAccessoryRenderer.submitHead(state, poseStack, collector);
+            GolemAccessoryRenderer.submitHead(state, poseStack, buffers);
         }
         poseStack.popPose();
 
@@ -208,9 +199,9 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
         poseStack.mulPose(Axis.XP.rotationDegrees(rrx));
         poseStack.mulPose(Axis.YP.rotationDegrees(rry));
         poseStack.mulPose(Axis.ZP.rotationDegrees(rrz));
-        submitNamedPart(base, "arm", poseStack, collector, matTexture, xray, color, state);
+        renderNamedPart(base, "arm", poseStack, buffers, matTexture, xray, color, state);
         for (GolemPartModel part : armParts) {
-            renderPartModel(state, part, GolemPartModel.LimbSide.RIGHT, poseStack, collector, matTexture, xray, color);
+            renderPartModel(state, part, GolemPartModel.LimbSide.RIGHT, poseStack, buffers, matTexture, xray, color);
         }
         poseStack.popPose();
 
@@ -225,9 +216,9 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
         poseStack.mulPose(Axis.XP.rotationDegrees(rlx));
         poseStack.mulPose(Axis.YP.rotationDegrees(rly + 180.0F));
         poseStack.mulPose(Axis.ZN.rotationDegrees(rlz));
-        submitNamedPart(base, "arm", poseStack, collector, matTexture, xray, color, state);
+        renderNamedPart(base, "arm", poseStack, buffers, matTexture, xray, color, state);
         for (GolemPartModel part : armParts) {
-            renderPartModel(state, part, GolemPartModel.LimbSide.LEFT, poseStack, collector, matTexture, xray, color);
+            renderPartModel(state, part, GolemPartModel.LimbSide.LEFT, poseStack, buffers, matTexture, xray, color);
         }
         poseStack.popPose();
 
@@ -237,7 +228,7 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
         float legSwing = Mth.cos(state.walkPos * 0.6662F) * state.walkSpeed;
         poseStack.mulPose(Axis.XP.rotationDegrees((float) Math.toDegrees(legSwing)));
         for (GolemPartModel part : legParts) {
-            renderPartModel(state, part, GolemPartModel.LimbSide.RIGHT, poseStack, collector, matTexture, xray, color);
+            renderPartModel(state, part, GolemPartModel.LimbSide.RIGHT, poseStack, buffers, matTexture, xray, color);
         }
         poseStack.popPose();
 
@@ -246,7 +237,7 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
         legSwing = Mth.cos(state.walkPos * 0.6662F + (float) Math.PI) * state.walkSpeed;
         poseStack.mulPose(Axis.XP.rotationDegrees((float) Math.toDegrees(legSwing)));
         for (GolemPartModel part : legParts) {
-            renderPartModel(state, part, GolemPartModel.LimbSide.LEFT, poseStack, collector, matTexture, xray, color);
+            renderPartModel(state, part, GolemPartModel.LimbSide.LEFT, poseStack, buffers, matTexture, xray, color);
         }
         poseStack.popPose();
 
@@ -260,7 +251,8 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
             if (!state.heldItemIsBlock) {
                 poseStack.translate(0.0F, -0.6F, 0.0F);
             }
-            state.heldItem.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+            ItemRenderHelper.render(state.heldItem, ItemDisplayContext.HEAD, poseStack, buffers,
+                    state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             poseStack.popPose();
         }
     }
@@ -281,7 +273,7 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
     }
 
     private void renderPartModel(GolemRenderState state, GolemPartModel part, GolemPartModel.LimbSide side,
-                                 PoseStack poseStack, SubmitNodeCollector collector, ResourceLocation matTexture,
+                                 PoseStack poseStack, MultiBufferSource buffers, ResourceLocation matTexture,
                                  boolean xray, int color) {
         MeshModel mesh = GolemMeshes.get(part.objModel());
         GolemPartRenderHook hook = GolemPartRenderHooks.hookFor(part);
@@ -290,27 +282,26 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem, G
             ResourceLocation texture = part.useMaterialTextureForObjectPart(objectPart.name()) || part.texture() == null
                     ? matTexture : part.texture();
             hook.preRenderObjectPart(objectPart.name(), state, poseStack, side, 0.0F);
-            submitMeshPart(mesh, objectPart, poseStack, collector, texture, xray, color, state);
-            hook.postRenderObjectPart(objectPart.name(), state, poseStack, collector, side);
+            renderMeshPart(mesh, objectPart, poseStack, buffers, texture, xray, color, state);
+            hook.postRenderObjectPart(objectPart.name(), state, poseStack, buffers, side);
             poseStack.popPose();
         }
     }
 
-    private static void submitNamedPart(MeshModel mesh, String name, PoseStack poseStack, SubmitNodeCollector collector,
+    private static void renderNamedPart(MeshModel mesh, String name, PoseStack poseStack, MultiBufferSource buffers,
                                         ResourceLocation texture, boolean xray, int color, GolemRenderState state) {
         for (MeshPart part : mesh.parts()) {
             if (name.equals(part.name())) {
-                submitMeshPart(mesh, part, poseStack, collector, texture, xray, color, state);
+                renderMeshPart(mesh, part, poseStack, buffers, texture, xray, color, state);
             }
         }
     }
 
-    private static void submitMeshPart(MeshModel mesh, MeshPart part, PoseStack poseStack, SubmitNodeCollector collector,
+    private static void renderMeshPart(MeshModel mesh, MeshPart part, PoseStack poseStack, MultiBufferSource buffers,
                                        ResourceLocation texture, boolean xray, int color, GolemRenderState state) {
-        RenderType type = xray ? xrayType(texture)
-                : ARGB32.alpha(color) < 255 ? RenderTypes.entityTranslucent(texture) : RenderTypes.entityCutout(texture);
-        int light = state.lightCoords;
-        collector.submitCustomGeometry(poseStack, type,
-                (pose, buffer) -> GolemMeshes.renderPart(mesh, part, pose, buffer, light, color));
+        RenderType type = xray ? TCRenderTypes.entityTranslucentNoDepth(texture)
+                : ARGB32.alpha(color) < 255 ? RenderType.entityTranslucent(texture) : RenderType.entityCutout(texture);
+        VertexConsumer buffer = buffers.getBuffer(type);
+        GolemMeshes.renderPart(mesh, part, poseStack.last(), buffer, state.lightCoords, color);
     }
 }

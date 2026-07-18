@@ -10,15 +10,11 @@ import com.leclowndu93150.thaumcraft.registry.TCItems;
 import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.client.resources.model.EquipmentClientInfo;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.equipment.Equippable;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -50,15 +46,15 @@ public final class CultistArmorClientExtensions {
         private FortressArmorModel legs;
 
         @Override
-        public Model getHumanoidArmorModel(ItemStack stack, EquipmentClientInfo.LayerType layerType, Model original) {
-            if (layerType == EquipmentClientInfo.LayerType.HUMANOID_LEGGINGS) {
+        public HumanoidModel<?> getHumanoidArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot,
+                                                      HumanoidModel<?> original) {
+            if (slot == EquipmentSlot.LEGS) {
                 if (legs == null) {
                     legs = bake(TCModelLayers.FORTRESS_ARMOR_LEGS);
                 }
                 return legs;
             }
-            Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
-            if (equippable != null && equippable.slot() == EquipmentSlot.HEAD) {
+            if (slot == EquipmentSlot.HEAD) {
                 if (head == null) {
                     head = bake(TCModelLayers.FORTRESS_ARMOR_HEAD);
                 }
@@ -78,15 +74,15 @@ public final class CultistArmorClientExtensions {
     }
 
     private static final class CustomArmorExtension implements IClientItemExtensions {
-        private final Function<ModelPart, HumanoidModel<HumanoidRenderState>> factory;
+        private final Function<ModelPart, HumanoidModel<LivingEntity>> factory;
         private final ModelLayerLocation headLayer;
         private final ModelLayerLocation chestLayer;
         private final ModelLayerLocation legsLayer;
-        private HumanoidModel<HumanoidRenderState> head;
-        private HumanoidModel<HumanoidRenderState> chest;
-        private HumanoidModel<HumanoidRenderState> legs;
+        private HumanoidModel<LivingEntity> head;
+        private HumanoidModel<LivingEntity> chest;
+        private HumanoidModel<LivingEntity> legs;
 
-        private CustomArmorExtension(Function<ModelPart, HumanoidModel<HumanoidRenderState>> factory,
+        private CustomArmorExtension(Function<ModelPart, HumanoidModel<LivingEntity>> factory,
                                      ModelLayerLocation headLayer, ModelLayerLocation chestLayer,
                                      ModelLayerLocation legsLayer) {
             this.factory = factory;
@@ -96,15 +92,15 @@ public final class CultistArmorClientExtensions {
         }
 
         @Override
-        public Model getHumanoidArmorModel(ItemStack stack, EquipmentClientInfo.LayerType layerType, Model original) {
-            if (layerType == EquipmentClientInfo.LayerType.HUMANOID_LEGGINGS) {
+        public HumanoidModel<?> getHumanoidArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot,
+                                                      HumanoidModel<?> original) {
+            if (slot == EquipmentSlot.LEGS) {
                 if (legs == null) {
                     legs = bake(legsLayer);
                 }
                 return legs;
             }
-            Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
-            if (equippable != null && equippable.slot() == EquipmentSlot.HEAD) {
+            if (slot == EquipmentSlot.HEAD) {
                 if (head == null) {
                     head = bake(headLayer);
                 }
@@ -116,7 +112,7 @@ public final class CultistArmorClientExtensions {
             return chest;
         }
 
-        private HumanoidModel<HumanoidRenderState> bake(ModelLayerLocation layer) {
+        private HumanoidModel<LivingEntity> bake(ModelLayerLocation layer) {
             return factory.apply(Minecraft.getInstance().getEntityModels().bakeLayer(layer));
         }
     }

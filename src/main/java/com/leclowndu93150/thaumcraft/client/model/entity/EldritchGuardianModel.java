@@ -1,7 +1,8 @@
 package com.leclowndu93150.thaumcraft.client.model.entity;
 
-import com.leclowndu93150.thaumcraft.client.entity.EldritchGuardianRenderState;
-import net.minecraft.client.model.EntityModel;
+import com.leclowndu93150.thaumcraft.content.entity.EntityEldritchGuardian;
+import com.leclowndu93150.thaumcraft.content.entity.boss.EntityEldritchWarden;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -9,10 +10,12 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Mob;
 
-public final class EldritchGuardianModel extends EntityModel<EldritchGuardianRenderState> {
+public final class EldritchGuardianModel<T extends Mob> extends HierarchicalModel<T> {
     private static final int TEX_WIDTH = 128;
     private static final int TEX_HEIGHT = 64;
+    private static final float DEG_TO_RAD = (float) (Math.PI / 180.0);
     private static final float SHOULDERPLATE_TILT_X = -0.3665191F;
     private static final float SHOULDERPLATE_TILT_Y = 0.3141593F;
     private static final float SHOULDERPLATE_TILT_Z = 0.4363323F;
@@ -39,8 +42,10 @@ public final class EldritchGuardianModel extends EntityModel<EldritchGuardianRen
     private final ModelPart sidepanelR3;
     private final ModelPart sidepanelR4;
 
+    private final ModelPart root;
+
     public EldritchGuardianModel(ModelPart root) {
-        super(root);
+        this.root = root;
         this.hood = root.getChild("hood1");
         this.armL = root.getChild("arm_l1");
         this.armR = root.getChild("arm_r1");
@@ -230,13 +235,27 @@ public final class EldritchGuardianModel extends EntityModel<EldritchGuardianRen
     }
 
     @Override
-    public void setupAnim(EldritchGuardianRenderState state) {
-        super.setupAnim(state);
-        float ticks = state.ageInTicks;
-        this.hood.yRot = state.yRot * (float) (Math.PI / 180.0);
-        this.hood.xRot = state.xRot * (float) (Math.PI / 180.0);
-        this.armL.xRot = -1.0F - state.armLiftL + Mth.sin((ticks + 20.0F) / 10.0F) * 0.08F;
-        this.armR.xRot = -1.0F - state.armLiftR + Mth.sin(ticks / 10.0F) * 0.08F;
+    public ModelPart root() {
+        return root;
+    }
+
+    @Override
+    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+                          float netHeadYaw, float headPitch) {
+        float ticks = ageInTicks;
+        float armLiftL = 0.0F;
+        float armLiftR = 0.0F;
+        if (entity instanceof EntityEldritchGuardian guardian) {
+            armLiftL = guardian.armLiftL;
+            armLiftR = guardian.armLiftR;
+        } else if (entity instanceof EntityEldritchWarden warden) {
+            armLiftL = warden.armLiftL;
+            armLiftR = warden.armLiftR;
+        }
+        this.hood.yRot = netHeadYaw * DEG_TO_RAD;
+        this.hood.xRot = headPitch * DEG_TO_RAD;
+        this.armL.xRot = -1.0F - armLiftL + Mth.sin((ticks + 20.0F) / 10.0F) * 0.08F;
+        this.armR.xRot = -1.0F - armLiftR + Mth.sin(ticks / 10.0F) * 0.08F;
         this.legpanelC1.xRot = -0.15F + Mth.sin(ticks / 8.0F) * 0.12F;
         this.legpanelC2.xRot = Mth.sin((ticks - 5.0F) / 8.0F) * 0.13F;
         this.legpanelC3.xRot = Mth.sin((ticks - 10.0F) / 8.0F) * 0.14F;

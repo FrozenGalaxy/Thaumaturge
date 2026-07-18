@@ -2,7 +2,7 @@ package com.leclowndu93150.thaumcraft.client.golem;
 
 import com.leclowndu93150.thaumcraft.api.golems.parts.GolemPartModel;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
 
 public interface GolemPartRenderHook {
     GolemPartRenderHook NONE = Noop.INSTANCE;
@@ -12,7 +12,7 @@ public interface GolemPartRenderHook {
     }
 
     default void postRenderObjectPart(String partName, GolemRenderState state, PoseStack poseStack,
-                                      SubmitNodeCollector collector, GolemPartModel.LimbSide side) {
+                                      MultiBufferSource buffers, GolemPartModel.LimbSide side) {
     }
 
     default float armRotationX(GolemRenderState state, GolemPartModel.LimbSide side, float inputRot) {

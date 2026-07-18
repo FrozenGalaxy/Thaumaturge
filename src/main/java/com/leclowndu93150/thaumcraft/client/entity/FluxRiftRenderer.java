@@ -1,44 +1,34 @@
 package com.leclowndu93150.thaumcraft.client.entity;
 
 import com.leclowndu93150.thaumcraft.api.items.GogglesAccess;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
+import com.leclowndu93150.thaumcraft.client.render.TCShaders;
 import com.leclowndu93150.thaumcraft.content.entity.EntityFluxRift;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.blockentity.AbstractEndPortalRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.TheEndPortalRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4fc;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public final class FluxRiftRenderer extends EntityRenderer<EntityFluxRift, FluxRiftRenderState> {
-    private static final RenderType RIFT_GLOW_TYPE = RenderType.create(
-            "tc_rift_glow",
-            RenderSetup.builder(TCRenderPipelines.RIFT_GLOW)
-                    .withTexture("Sampler0", AbstractEndPortalRenderer.END_PORTAL_LOCATION)
-                    .withTexture("Sampler1", AbstractEndPortalRenderer.END_PORTAL_LOCATION)
-                    .createRenderSetup());
+public final class FluxRiftRenderer extends EntityRenderer<EntityFluxRift> {
+    private static final ResourceLocation END_PORTAL = TheEndPortalRenderer.END_PORTAL_LOCATION;
 
-    private static final RenderType RIFT_GLOW_NO_DEPTH_TYPE = RenderType.create(
-            "tc_rift_glow_no_depth",
-            RenderSetup.builder(TCRenderPipelines.RIFT_GLOW_NO_DEPTH)
-                    .withTexture("Sampler0", AbstractEndPortalRenderer.END_PORTAL_LOCATION)
-                    .withTexture("Sampler1", AbstractEndPortalRenderer.END_PORTAL_LOCATION)
-                    .createRenderSetup());
-
-    private static final RenderType RIFT_SOLID_TYPE = RenderType.create(
-            "tc_rift_solid",
-            RenderSetup.builder(TCRenderPipelines.RIFT_SOLID)
-                    .withTexture("Sampler0", AbstractEndPortalRenderer.END_PORTAL_LOCATION)
-                    .withTexture("Sampler1", AbstractEndPortalRenderer.END_PORTAL_LOCATION)
-                    .createRenderSetup());
+    private static final RenderType RIFT_GLOW_TYPE = riftType("tc_rift_glow",
+            RenderStateShard.ADDITIVE_TRANSPARENCY, RenderStateShard.LEQUAL_DEPTH_TEST, RenderStateShard.COLOR_WRITE);
+    private static final RenderType RIFT_GLOW_NO_DEPTH_TYPE = riftType("tc_rift_glow_no_depth",
+            RenderStateShard.ADDITIVE_TRANSPARENCY, RenderStateShard.NO_DEPTH_TEST, RenderStateShard.COLOR_WRITE);
+    private static final RenderType RIFT_SOLID_TYPE = riftType("tc_rift_solid",
+            RenderStateShard.TRANSLUCENT_TRANSPARENCY, RenderStateShard.LEQUAL_DEPTH_TEST, RenderStateShard.COLOR_DEPTH_WRITE);
 
     private static final int TUBE_SIDES = 6;
     private static final int GLOW_PASSES = 3;
@@ -58,85 +48,91 @@ public final class FluxRiftRenderer extends EntityRenderer<EntityFluxRift, FluxR
         this.shadowRadius = 0.0F;
     }
 
-    @Override
-    public FluxRiftRenderState createRenderState() {
-        return new FluxRiftRenderState();
+    private static RenderType riftType(String name, RenderStateShard.TransparencyStateShard transparency,
+                                       RenderStateShard.DepthTestStateShard depthTest,
+                                       RenderStateShard.WriteMaskStateShard writeMask) {
+        return RenderType.create(name, DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS, 1536, false, false,
+                RenderType.CompositeState.builder()
+                        .setShaderState(new RenderStateShard.ShaderStateShard(TCShaders::ender))
+                        .setTextureState(RenderStateShard.MultiTextureStateShard.builder()
+                                .add(END_PORTAL, false, false)
+                                .add(END_PORTAL, false, false)
+                                .build())
+                        .setTransparencyState(transparency)
+                        .setDepthTestState(depthTest)
+                        .setWriteMaskState(writeMask)
+                        .setCullState(RenderStateShard.NO_CULL)
+                        .createCompositeState(false));
     }
 
     @Override
-    public void extractRenderState(EntityFluxRift entity, FluxRiftRenderState state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.points.clear();
-        state.points.addAll(entity.points);
-        state.widths.clear();
-        state.widths.addAll(entity.pointsWidth);
-        state.stability = entity.getRiftStability();
-        state.animationTime = entity.tickCount + partialTicks;
-        state.goggles = Minecraft.getInstance().player != null
-                && GogglesAccess.wearsGoggles(Minecraft.getInstance().player);
-    }
-
-    @Override
-    public void submit(FluxRiftRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        super.submit(state, poseStack, collector, camera);
-        int count = state.points.size();
+    public void render(EntityFluxRift entity, float entityYaw, float partialTicks, PoseStack poseStack,
+                       MultiBufferSource buffers, int packedLight) {
+        super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
+        int count = entity.points.size();
         if (count <= 2) {
             return;
         }
-        float stab = Mth.clamp(1.0F - state.stability / STAB_DIVISOR, 0.0F, MAX_STAB_FACTOR);
+        float animationTime = entity.tickCount + partialTicks;
+        boolean goggles = Minecraft.getInstance().player != null
+                && GogglesAccess.wearsGoggles(Minecraft.getInstance().player);
+        float stab = Mth.clamp(1.0F - entity.getRiftStability() / STAB_DIVISOR, 0.0F, MAX_STAB_FACTOR);
         Vec3[] centers = new Vec3[count];
         float[] radii = new float[count];
         for (int a = 0; a < count; a++) {
-            float time = state.animationTime;
+            float time = animationTime;
             if (a > count / 2) {
                 time -= a * TIME_OFFSET_PER_POINT;
             } else if (a < count / 2) {
                 time += a * TIME_OFFSET_PER_POINT;
             }
-            Vec3 p = state.points.get(a);
+            Vec3 p = entity.points.get(a);
             centers[a] = new Vec3(
                     p.x + Math.sin(time / WOBBLE_X_PERIOD) * WOBBLE_AMPLITUDE * stab,
                     p.y + Math.sin(time / WOBBLE_Y_PERIOD) * WOBBLE_AMPLITUDE * stab,
                     p.z + Math.sin(time / WOBBLE_Z_PERIOD) * WOBBLE_AMPLITUDE * stab);
             double pulse = 1.0 - Math.sin(time / WIDTH_PULSE_PERIOD) * 0.1F * stab;
-            radii[a] = (float) (state.widths.get(a) * pulse);
+            radii[a] = (float) (entity.pointsWidth.get(a) * pulse);
         }
         for (int pass = 0; pass <= GLOW_PASSES; pass++) {
             RenderType type;
             float radiusScale;
             if (pass < GLOW_PASSES) {
-                type = pass == 0 && state.goggles ? RIFT_GLOW_NO_DEPTH_TYPE : RIFT_GLOW_TYPE;
+                type = pass == 0 && goggles ? RIFT_GLOW_NO_DEPTH_TYPE : RIFT_GLOW_TYPE;
                 radiusScale = GLOW_RADIUS_BASE + GLOW_RADIUS_STEP * pass;
             } else {
                 type = RIFT_SOLID_TYPE;
                 radiusScale = 1.0F;
             }
-            submitTube(collector, poseStack, type, centers, radii, radiusScale);
+            renderTube(buffers.getBuffer(type), poseStack.last().pose(), centers, radii, radiusScale);
         }
     }
 
-    private static void submitTube(SubmitNodeCollector collector, PoseStack poseStack, RenderType type,
-                                   Vec3[] centers, float[] radii, float radiusScale) {
-        collector.submitCustomGeometry(poseStack, type, (pose, buffer) -> {
-            Vector3f[] previousRing = null;
-            for (int a = 0; a < centers.length; a++) {
-                Vec3 direction = segmentDirection(centers, a);
-                Vector3f[] ring = buildRing(centers[a], direction, radii[a] * radiusScale);
-                if (previousRing != null) {
-                    for (int side = 0; side < TUBE_SIDES; side++) {
-                        int next = (side + 1) % TUBE_SIDES;
-                        addVertex(buffer, pose.pose(), previousRing[side]);
-                        addVertex(buffer, pose.pose(), previousRing[next]);
-                        addVertex(buffer, pose.pose(), ring[next]);
-                        addVertex(buffer, pose.pose(), ring[side]);
-                    }
-                }
-                previousRing = ring;
-            }
-        });
+    @Override
+    public ResourceLocation getTextureLocation(EntityFluxRift entity) {
+        return END_PORTAL;
     }
 
-    private static void addVertex(VertexConsumer buffer, Matrix4fc pose, Vector3f vertex) {
+    private static void renderTube(VertexConsumer buffer, Matrix4f pose, Vec3[] centers, float[] radii,
+                                   float radiusScale) {
+        Vector3f[] previousRing = null;
+        for (int a = 0; a < centers.length; a++) {
+            Vec3 direction = segmentDirection(centers, a);
+            Vector3f[] ring = buildRing(centers[a], direction, radii[a] * radiusScale);
+            if (previousRing != null) {
+                for (int side = 0; side < TUBE_SIDES; side++) {
+                    int next = (side + 1) % TUBE_SIDES;
+                    addVertex(buffer, pose, previousRing[side]);
+                    addVertex(buffer, pose, previousRing[next]);
+                    addVertex(buffer, pose, ring[next]);
+                    addVertex(buffer, pose, ring[side]);
+                }
+            }
+            previousRing = ring;
+        }
+    }
+
+    private static void addVertex(VertexConsumer buffer, Matrix4f pose, Vector3f vertex) {
         buffer.addVertex(pose, vertex.x, vertex.y, vertex.z);
     }
 

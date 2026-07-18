@@ -3,16 +3,12 @@ package com.leclowndu93150.thaumcraft.client.render.blockentity;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEntityEldritchAltar;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.event.RegisterBlockModelsEvent;
-import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;
-import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
 public final class TCBlockEntityRenderers {
@@ -60,16 +56,11 @@ public final class TCBlockEntityRenderers {
     }
 
     @SubscribeEvent
-    public static void onRegisterAdditionalModels(ModelEvent.RegisterStandalone event){
-        for (int i = 0; i < BellowsRenderer.parts.length; i++) {
-            String part = BellowsRenderer.parts[i];
-            ResourceLocation modelId = TCIds.rl("block/bellows/" + part);
-            BellowsRenderer.MODEL_KEYS[i] = new StandaloneModelKey<>(modelId::toString);
-            event.register(BellowsRenderer.MODEL_KEYS[i], SimpleUnbakedStandaloneModel.blockStateModel(modelId));
+    public static void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
+        for (ModelResourceLocation modelId : BellowsRenderer.MODEL_IDS) {
+            event.register(modelId);
         }
-        event.register(MirrorRenderer.FRAME_MODEL,
-                SimpleUnbakedStandaloneModel.blockStateModel(MirrorRenderer.FRAME_MODEL_ID));
-        event.register(MirrorRenderer.FRAME_ESSENTIA_MODEL,
-                SimpleUnbakedStandaloneModel.blockStateModel(MirrorRenderer.FRAME_ESSENTIA_MODEL_ID));
+        event.register(MirrorRenderer.FRAME_MODEL_ID);
+        event.register(MirrorRenderer.FRAME_ESSENTIA_MODEL_ID);
     }
 }

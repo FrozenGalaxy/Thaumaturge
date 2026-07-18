@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.model.entity;
 
-import com.leclowndu93150.thaumcraft.client.entity.TurretCrossbowRenderState;
-import net.minecraft.client.model.EntityModel;
+import com.leclowndu93150.thaumcraft.content.entity.construct.EntityTurretCrossbow;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -9,12 +9,14 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
 
-public final class CrossbowModel extends EntityModel<TurretCrossbowRenderState> {
+public final class CrossbowModel extends HierarchicalModel<EntityTurretCrossbow> {
     private static final float LEG_SPREAD = (float) (Math.PI / 6);
     private static final float CROSS_ANGLE = 0.2443461F;
     private static final float LOADBAR_ANGLE = -0.5585054F;
 
+    private final ModelPart root;
     private final ModelPart crossbow;
     private final ModelPart loadbarcross;
     private final ModelPart loadbarl;
@@ -31,7 +33,7 @@ public final class CrossbowModel extends EntityModel<TurretCrossbowRenderState> 
     private final ModelPart leg4;
 
     public CrossbowModel(ModelPart root) {
-        super(root);
+        this.root = root;
         crossbow = root.getChild("crossbow");
         loadbarcross = crossbow.getChild("loadbarcross");
         loadbarl = crossbow.getChild("loadbarl");
@@ -139,18 +141,23 @@ public final class CrossbowModel extends EntityModel<TurretCrossbowRenderState> 
     }
 
     @Override
-    public void setupAnim(TurretCrossbowRenderState state) {
-        super.setupAnim(state);
-        crossbow.yRot = state.yRot * Mth.DEG_TO_RAD;
-        crossbow.xRot = state.xRot * Mth.DEG_TO_RAD;
-        float swing = state.swingAnim;
+    public ModelPart root() {
+        return root;
+    }
+
+    @Override
+    public void setupAnim(EntityTurretCrossbow entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+                          float netHeadYaw, float headPitch) {
+        crossbow.yRot = netHeadYaw * Mth.DEG_TO_RAD;
+        crossbow.xRot = headPitch * Mth.DEG_TO_RAD;
+        float swing = entity.swingAnim;
         float crossSwing = Mth.sin(Mth.sqrt(swing) * Mth.TWO_PI) * 0.2F;
         crossl1.yRot = crossl2.yRot = crossl3.yRot = -0.2F + crossSwing;
         crossr1.yRot = crossr2.yRot = crossr3.yRot = 0.2F - crossSwing;
-        float load = state.loadProgress;
+        float load = entity.getLoadProgress(ageInTicks - entity.tickCount);
         loadbarcross.xRot = loadbarl.xRot = loadbarr.xRot =
                 -0.5F + Mth.sin(Mth.sqrt(load) * Mth.TWO_PI) * 0.5F;
-        setupTripod(state.ridingMinecart, leg1, leg2, leg3, leg4);
+        setupTripod(entity.getVehicle() instanceof AbstractMinecart, leg1, leg2, leg3, leg4);
     }
 
     static void setupTripod(boolean ridingMinecart, ModelPart... legs) {

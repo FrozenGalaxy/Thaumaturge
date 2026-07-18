@@ -4,53 +4,35 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.client.model.entity.EldritchGuardianModel;
 import com.leclowndu93150.thaumcraft.content.entity.boss.EntityEldritchWarden;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.ResourceLocation;
 
-public final class EldritchWardenRenderer extends MobRenderer<EntityEldritchWarden, EldritchWardenRenderer.State, EldritchGuardianModel> {
-    public static final class State extends EldritchGuardianRenderState {
-        public float spawnFraction;
-        public float height;
-    }
-
+public final class EldritchWardenRenderer
+        extends MobRenderer<EntityEldritchWarden, EldritchGuardianModel<EntityEldritchWarden>> {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/eldritch_warden.png");
     private static final float SHADOW = 0.5F;
     private static final float SPAWN_TICKS = 150.0F;
 
     public EldritchWardenRenderer(EntityRendererProvider.Context context) {
-        super(context, new EldritchGuardianModel(context.bakeLayer(TCModelLayers.ELDRITCH_GUARDIAN)), SHADOW);
+        super(context, new EldritchGuardianModel<>(context.bakeLayer(TCModelLayers.ELDRITCH_GUARDIAN)), SHADOW);
     }
 
     @Override
-    public State createRenderState() {
-        return new State();
-    }
-
-    @Override
-    public void extractRenderState(EntityEldritchWarden entity, State state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.armLiftL = entity.armLiftL;
-        state.armLiftR = entity.armLiftR;
-        state.alpha = 1.0F;
-        state.spawnFraction = entity.getSpawnTimer() / SPAWN_TICKS;
-        state.height = entity.getBbHeight();
-    }
-
-    @Override
-    public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+    public void render(EntityEldritchWarden entity, float entityYaw, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light) {
+        float spawnFraction = entity.getSpawnTimer() / SPAWN_TICKS;
         poseStack.pushPose();
-        if (state.spawnFraction > 0.0F) {
-            poseStack.translate(0.0F, -state.height * state.spawnFraction, 0.0F);
+        if (spawnFraction > 0.0F) {
+            poseStack.translate(0.0F, -entity.getBbHeight() * spawnFraction, 0.0F);
         }
-        super.submit(state, poseStack, collector, camera);
+        super.render(entity, entityYaw, partialTick, poseStack, buffers, light);
         poseStack.popPose();
     }
 
     @Override
-    public ResourceLocation getTextureLocation(State state) {
+    public ResourceLocation getTextureLocation(EntityEldritchWarden entity) {
         return TEXTURE;
     }
 }

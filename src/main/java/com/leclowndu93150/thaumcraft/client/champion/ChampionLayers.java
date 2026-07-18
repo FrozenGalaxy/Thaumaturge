@@ -1,7 +1,6 @@
 package com.leclowndu93150.thaumcraft.client.champion;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.api.distmarker.Dist;
@@ -16,14 +15,14 @@ public final class ChampionLayers {
     @SubscribeEvent
     public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
         for (EntityType<?> type : event.getEntityTypes()) {
-            if (event.getRenderer(type) instanceof LivingEntityRenderer<?, ?, ?> living) {
+            if (event.getRenderer(type) instanceof LivingEntityRenderer<?, ?> living) {
                 addTaintedLayer(living);
             }
         }
     }
 
-    private static <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void addTaintedLayer(
-            LivingEntityRenderer<?, S, M> renderer) {
-        renderer.addLayer(new TaintedSwirlLayer<>(renderer));
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void addTaintedLayer(LivingEntityRenderer<?, ?> renderer) {
+        renderer.addLayer(new TaintedSwirlLayer(renderer));
     }
 }

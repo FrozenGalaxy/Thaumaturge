@@ -2,23 +2,23 @@ package com.leclowndu93150.thaumcraft.client.entity;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.client.model.entity.PechModel;
+import com.leclowndu93150.thaumcraft.client.render.ItemRenderHelper;
 import com.leclowndu93150.thaumcraft.content.entity.EntityPech;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.entity.state.ArmedEntityRenderState;
-import net.minecraft.client.renderer.item.ItemModelResolver;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-public final class PechRenderer extends MobRenderer<EntityPech, PechRenderState, PechModel> {
+public final class PechRenderer extends MobRenderer<EntityPech, PechModel> {
     private static final ResourceLocation[] TEXTURES = {
             TCIds.rl("textures/entity/pech_forage.png"),
             TCIds.rl("textures/entity/pech_thaum.png"),
@@ -33,46 +33,34 @@ public final class PechRenderer extends MobRenderer<EntityPech, PechRenderState,
     private static final float HAND_DOWN_OFFSET = 0.125F;
     private static final float HAND_OUT_OFFSET = -0.625F;
 
-    private final ItemModelResolver itemModelResolver;
-
     public PechRenderer(EntityRendererProvider.Context context) {
         super(context, new PechModel(context.bakeLayer(TCModelLayers.PECH)), SHADOW);
-        this.itemModelResolver = context.getItemModelResolver();
     }
 
     @Override
-    public PechRenderState createRenderState() {
-        return new PechRenderState();
+    public void render(EntityPech entity, float entityYaw, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light) {
+        super.render(entity, entityYaw, partialTick, poseStack, buffers, light);
+        boolean holdingBow = entity.getMainHandItem().is(Items.BOW);
+        HumanoidArm mainArm = entity.getMainArm();
+        float bodyRot = Mth.rotLerp(partialTick, entity.yBodyRotO, entity.yBodyRot);
+        ItemStack rightItem = mainArm == HumanoidArm.RIGHT ? entity.getMainHandItem() : entity.getOffhandItem();
+        ItemStack leftItem = mainArm == HumanoidArm.LEFT ? entity.getMainHandItem() : entity.getOffhandItem();
+        renderHandItem(rightItem, HumanoidArm.RIGHT, this.model.rightArm,
+                mainArm == HumanoidArm.RIGHT && holdingBow, bodyRot, poseStack, buffers, light);
+        renderHandItem(leftItem, HumanoidArm.LEFT, this.model.leftArm,
+                mainArm == HumanoidArm.LEFT && holdingBow, bodyRot, poseStack, buffers, light);
     }
 
-    @Override
-    public void extractRenderState(EntityPech entity, PechRenderState state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        ArmedEntityRenderState.extractArmedEntityRenderState(entity, state, this.itemModelResolver, partialTicks);
-        state.pechType = entity.getPechType();
-        state.mumble = entity.mumble;
-        state.holdingBow = entity.getMainHandItem().is(Items.BOW);
-    }
-
-    @Override
-    public void submit(PechRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        super.submit(state, poseStack, collector, camera);
-        submitHandItem(state, state.rightHandItemState, HumanoidArm.RIGHT, this.model.rightArm,
-                state.mainArm == HumanoidArm.RIGHT && state.holdingBow, poseStack, collector);
-        submitHandItem(state, state.leftHandItemState, HumanoidArm.LEFT, this.model.leftArm,
-                state.mainArm == HumanoidArm.LEFT && state.holdingBow, poseStack, collector);
-    }
-
-    private void submitHandItem(PechRenderState state, ItemStackRenderState item, HumanoidArm arm,
-                                ModelPart armPart, boolean bow, PoseStack poseStack, SubmitNodeCollector collector) {
+    private void renderHandItem(ItemStack item, HumanoidArm arm, ModelPart armPart, boolean bow, float bodyRot,
+                                PoseStack poseStack, MultiBufferSource buffers, int light) {
         if (item.isEmpty()) {
             return;
         }
         poseStack.pushPose();
-        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - state.bodyRot));
+        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyRot));
         poseStack.scale(-1.0F, -1.0F, 1.0F);
         poseStack.translate(0.0F, -1.501F, 0.0F);
-        this.model.setupAnim(state);
         armPart.translateAndRotate(poseStack);
         poseStack.translate(0.0F, ITEM_LIFT, ITEM_FORWARD);
         if (bow) {
@@ -82,12 +70,15 @@ public final class PechRenderer extends MobRenderer<EntityPech, PechRenderState,
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
         poseStack.translate(arm == HumanoidArm.LEFT ? -HAND_SIDE_OFFSET : HAND_SIDE_OFFSET,
                 HAND_DOWN_OFFSET, HAND_OUT_OFFSET);
-        item.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+        ItemDisplayContext context = arm == HumanoidArm.RIGHT
+                ? ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
+                : ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
+        ItemRenderHelper.render(item, context, poseStack, buffers, light, OverlayTexture.NO_OVERLAY, 0);
         poseStack.popPose();
     }
 
     @Override
-    public ResourceLocation getTextureLocation(PechRenderState state) {
-        return TEXTURES[Math.min(state.pechType, TEXTURES.length - 1)];
+    public ResourceLocation getTextureLocation(EntityPech entity) {
+        return TEXTURES[Math.min(entity.getPechType(), TEXTURES.length - 1)];
     }
 }

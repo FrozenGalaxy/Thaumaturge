@@ -3,54 +3,49 @@ package com.leclowndu93150.thaumcraft.client.render.blockentity;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.device.BlockEntityHungryChest;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.model.object.chest.ChestModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.ChestRenderer;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.sprite.SpriteGetter;
-import net.minecraft.client.resources.model.sprite.SpriteId;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.level.block.ChestBlock;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
 
-public final class HungryChestRenderer implements BlockEntityRenderer<BlockEntityHungryChest, HungryChestRenderState> {
-    private static final SpriteId SPRITE = Sheets.CHEST_MAPPER.apply(TCIds.rl("hungry"));
+public final class HungryChestRenderer implements BlockEntityRenderer<BlockEntityHungryChest> {
+    private static final Material MATERIAL = new Material(Sheets.CHEST_SHEET, TCIds.rl("entity/chest/hungry"));
 
-    private final SpriteGetter sprites;
-    private final ChestModel model;
+    private final ModelPart bottom;
+    private final ModelPart lid;
+    private final ModelPart lock;
 
     public HungryChestRenderer(BlockEntityRendererProvider.Context context) {
-        this.sprites = context.sprites();
-        this.model = new ChestModel(context.bakeLayer(ModelLayers.CHEST));
+        ModelPart root = context.bakeLayer(ModelLayers.CHEST);
+        this.bottom = root.getChild("bottom");
+        this.lid = root.getChild("lid");
+        this.lock = root.getChild("lock");
     }
 
     @Override
-    public HungryChestRenderState createRenderState() {
-        return new HungryChestRenderState();
-    }
-
-    @Override
-    public void extractRenderState(BlockEntityHungryChest chest, HungryChestRenderState state, float partialTicks,
-                                   Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(chest, state, partialTicks, cameraPosition, breakProgress);
-        state.facing = chest.getBlockState().getValue(ChestBlock.FACING);
-        state.open = chest.getOpenNess(partialTicks);
-    }
-
-    @Override
-    public void submit(HungryChestRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+    public void render(BlockEntityHungryChest chest, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light, int overlay) {
+        float yRot = chest.getBlockState().getValue(ChestBlock.FACING).toYRot();
         poseStack.pushPose();
-        poseStack.mulPose(ChestRenderer.modelTransformation(state.facing));
-        float open = 1.0F - state.open;
+        poseStack.translate(0.5F, 0.5F, 0.5F);
+        poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
+        poseStack.translate(-0.5F, -0.5F, -0.5F);
+        float open = chest.getOpenNess(partialTick);
+        open = 1.0F - open;
         open = 1.0F - open * open * open;
-        collector.submitModel(model, open, poseStack, state.lightCoords, OverlayTexture.NO_OVERLAY, -1,
-                SPRITE, sprites, 0, state.breakProgress);
+        VertexConsumer buffer = MATERIAL.buffer(buffers, RenderType::entityCutout);
+        lid.xRot = -(open * (float) (Math.PI / 2));
+        lock.xRot = lid.xRot;
+        lid.render(poseStack, buffer, light, overlay);
+        lock.render(poseStack, buffer, light, overlay);
+        bottom.render(poseStack, buffer, light, overlay);
         poseStack.popPose();
     }
 }

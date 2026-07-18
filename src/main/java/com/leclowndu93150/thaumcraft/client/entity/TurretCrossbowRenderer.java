@@ -6,11 +6,8 @@ import com.leclowndu93150.thaumcraft.content.entity.construct.EntityTurretCrossb
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
 
-public final class TurretCrossbowRenderer
-        extends MobRenderer<EntityTurretCrossbow, TurretCrossbowRenderState, CrossbowModel> {
+public final class TurretCrossbowRenderer extends MobRenderer<EntityTurretCrossbow, CrossbowModel> {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/crossbow.png");
     private static final float SHADOW = 0.5F;
 
@@ -19,23 +16,7 @@ public final class TurretCrossbowRenderer
     }
 
     @Override
-    public TurretCrossbowRenderState createRenderState() {
-        return new TurretCrossbowRenderState();
-    }
-
-    @Override
-    public void extractRenderState(EntityTurretCrossbow entity, TurretCrossbowRenderState state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.yRot = Mth.wrapDegrees(Mth.rotLerp(partialTicks, entity.yHeadRotO, entity.yHeadRot));
-        state.bodyRot = 0.0F;
-        state.swingAnim = entity.swingAnim;
-        state.loadProgress = entity.getLoadProgress(partialTicks);
-        state.ridingMinecart = entity.getVehicle() instanceof AbstractMinecart;
-        state.hurtTime = entity.hurtTime;
-    }
-
-    @Override
-    public ResourceLocation getTextureLocation(TurretCrossbowRenderState state) {
+    public ResourceLocation getTextureLocation(EntityTurretCrossbow entity) {
         return TEXTURE;
     }
 }

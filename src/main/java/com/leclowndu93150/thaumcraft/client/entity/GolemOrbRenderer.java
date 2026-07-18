@@ -1,32 +1,21 @@
 package com.leclowndu93150.thaumcraft.client.entity;
 
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
+import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumcraft.client.render.aspect.ParticleTextures;
 import com.leclowndu93150.thaumcraft.content.entity.EntityGolemOrb;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
-import org.joml.Matrix4fc;
+import org.joml.Matrix4f;
 
-public final class GolemOrbRenderer extends EntityRenderer<EntityGolemOrb, GolemOrbRenderer.State> {
-    public static final class State extends EntityRenderState {
-        public int tick;
-        public boolean red;
-    }
-
-    private static final RenderType ORB_TYPE = RenderType.create(
-            "tc_golem_orb",
-            RenderSetup.builder(TCRenderPipelines.FX_ADDITIVE)
-                    .withTexture("Sampler0", ParticleTextures.PARTICLES)
-                    .useLightmap()
-                    .createRenderSetup());
+public final class GolemOrbRenderer extends EntityRenderer<EntityGolemOrb> {
+    private static final RenderType ORB_TYPE = TCRenderTypes.fxAdditive(ParticleTextures.PARTICLES);
 
     private static final int GRID = 32;
     private static final int WHITE_ROW = 7;
@@ -42,39 +31,32 @@ public final class GolemOrbRenderer extends EntityRenderer<EntityGolemOrb, Golem
     }
 
     @Override
-    public State createRenderState() {
-        return new State();
-    }
-
-    @Override
-    public void extractRenderState(EntityGolemOrb entity, State state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.tick = entity.tickCount;
-        state.red = entity.isRed();
-    }
-
-    @Override
-    public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        super.submit(state, poseStack, collector, camera);
+    public void render(EntityGolemOrb entity, float entityYaw, float partialTicks, PoseStack poseStack,
+                       MultiBufferSource buffers, int packedLight) {
+        super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
         poseStack.pushPose();
-        poseStack.mulPose(camera.orientation);
-        float bob = Mth.sin(state.tick / 5.0F) * 0.2F + 0.2F;
+        poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
+        float bob = Mth.sin(entity.tickCount / 5.0F) * 0.2F + 0.2F;
         poseStack.scale(1.0F + bob, 1.0F + bob, 1.0F + bob);
-        int row = state.red ? RED_ROW : WHITE_ROW;
-        int col = 1 + state.tick % FRAME_COUNT;
+        int row = entity.isRed() ? RED_ROW : WHITE_ROW;
+        int col = 1 + entity.tickCount % FRAME_COUNT;
         float texFrame = 1.0F / GRID;
         float u0 = col * texFrame;
         float v0 = row * texFrame;
         float u1 = u0 + texFrame;
         float v1 = v0 + texFrame;
         int tint = ARGB32.colorFromFloat(ALPHA, 1.0F, 1.0F, 1.0F);
-        collector.submitCustomGeometry(poseStack, ORB_TYPE, (pose, buffer) -> {
-            Matrix4fc mat = pose.pose();
-            buffer.addVertex(mat, -HALF, -HALF, 0.0F).setUv(u1, v1).setColor(tint).setLight(EMISSIVE_LIGHT);
-            buffer.addVertex(mat, -HALF, HALF, 0.0F).setUv(u1, v0).setColor(tint).setLight(EMISSIVE_LIGHT);
-            buffer.addVertex(mat, HALF, HALF, 0.0F).setUv(u0, v0).setColor(tint).setLight(EMISSIVE_LIGHT);
-            buffer.addVertex(mat, HALF, -HALF, 0.0F).setUv(u0, v1).setColor(tint).setLight(EMISSIVE_LIGHT);
-        });
+        VertexConsumer buffer = buffers.getBuffer(ORB_TYPE);
+        Matrix4f mat = poseStack.last().pose();
+        buffer.addVertex(mat, -HALF, -HALF, 0.0F).setUv(u1, v1).setColor(tint).setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, -HALF, HALF, 0.0F).setUv(u1, v0).setColor(tint).setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, HALF, HALF, 0.0F).setUv(u0, v0).setColor(tint).setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, HALF, -HALF, 0.0F).setUv(u0, v1).setColor(tint).setLight(EMISSIVE_LIGHT);
         poseStack.popPose();
+    }
+
+    @Override
+    public ResourceLocation getTextureLocation(EntityGolemOrb entity) {
+        return ParticleTextures.PARTICLES;
     }
 }

@@ -1,29 +1,22 @@
 package com.leclowndu93150.thaumcraft.client.render.blockentity;
 
 import com.leclowndu93150.thaumcraft.TCIds;
+import com.leclowndu93150.thaumcraft.client.render.ItemRenderHelper;
 import com.leclowndu93150.thaumcraft.content.eldritch.OuterLands;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import java.util.function.ToIntFunction;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.item.ItemModelResolver;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
 
-public final class EldritchCapRenderer<T extends BlockEntity> implements BlockEntityRenderer<T, EldritchCapRenderState> {
+public final class EldritchCapRenderer<T extends BlockEntity> implements BlockEntityRenderer<T> {
     public static final ResourceLocation CAP_TEXTURE = TCIds.rl("textures/entity/obelisk_cap.png");
     public static final ResourceLocation CAP_TEXTURE_OUTER = TCIds.rl("textures/entity/obelisk_cap_2.png");
     public static final ResourceLocation ALTAR_TEXTURE = TCIds.rl("textures/entity/obelisk_cap_altar.png");
@@ -38,7 +31,6 @@ public final class EldritchCapRenderer<T extends BlockEntity> implements BlockEn
     private final ResourceLocation texture;
     private final ResourceLocation textureOuter;
     private final ToIntFunction<T> eyeCount;
-    private final ItemModelResolver itemModelResolver;
     private ItemStack eyeStack = ItemStack.EMPTY;
 
     public EldritchCapRenderer(BlockEntityRendererProvider.Context context, ResourceLocation texture,
@@ -46,44 +38,26 @@ public final class EldritchCapRenderer<T extends BlockEntity> implements BlockEn
         this.texture = texture;
         this.textureOuter = textureOuter;
         this.eyeCount = eyeCount;
-        this.itemModelResolver = context.itemModelResolver();
     }
 
     @Override
-    public EldritchCapRenderState createRenderState() {
-        return new EldritchCapRenderState();
-    }
-
-    @Override
-    public void extractRenderState(T cap, EldritchCapRenderState state, float partialTicks,
-                                   Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(cap, state, partialTicks, cameraPosition, breakProgress);
-        state.eyes = eyeCount.applyAsInt(cap);
-        state.outerLands = cap.getLevel() != null && cap.getLevel().dimension() == OuterLands.DIMENSION;
-        if (state.eyes > 0) {
-            if (eyeStack.isEmpty()) {
-                eyeStack = new ItemStack(TCItems.ELDRITCH_EYE.get());
-            }
-            ItemStackRenderState itemState = new ItemStackRenderState();
-            itemModelResolver.updateForTopItem(itemState, eyeStack, ItemDisplayContext.FIXED, cap.getLevel(), null, 0);
-            state.eye = itemState;
-        } else {
-            state.eye = null;
-        }
-    }
-
-    @Override
-    public void submit(EldritchCapRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        RenderType type = RenderTypes.entityTranslucent(state.outerLands ? textureOuter : texture);
+    public void render(T cap, float partialTick, PoseStack poseStack, MultiBufferSource buffers, int light, int overlay) {
+        boolean outerLands = cap.getLevel() != null && cap.getLevel().dimension() == OuterLands.DIMENSION;
+        RenderType type = RenderType.entityTranslucent(outerLands ? textureOuter : texture);
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.0F, 0.5F);
         poseStack.mulPose(Axis.XN.rotationDegrees(90.0F));
-        EldritchObeliskRenderer.submitCap(poseStack, collector, type, state.lightCoords);
+        EldritchObeliskRenderer.renderCap(poseStack, buffers, type, light);
         poseStack.popPose();
-        if (state.eye == null) {
+
+        int eyes = eyeCount.applyAsInt(cap);
+        if (eyes <= 0) {
             return;
         }
-        for (int a = 0; a < state.eyes; a++) {
+        if (eyeStack.isEmpty()) {
+            eyeStack = new ItemStack(TCItems.ELDRITCH_EYE.get());
+        }
+        for (int a = 0; a < eyes; a++) {
             poseStack.pushPose();
             poseStack.translate(0.5F, 0.0F, 0.5F);
             poseStack.mulPose(Axis.YP.rotationDegrees(a * 90.0F));
@@ -93,7 +67,7 @@ public final class EldritchCapRenderer<T extends BlockEntity> implements BlockEn
             poseStack.scale(IN_FRAME_SCALE, IN_FRAME_SCALE, IN_FRAME_SCALE);
             poseStack.translate(0.0F, IN_FRAME_DROP + FLAT_ITEM_LIFT, 0.0F);
             poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
-            state.eye.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+            ItemRenderHelper.render(eyeStack, ItemDisplayContext.FIXED, poseStack, buffers, light, overlay, 0);
             poseStack.popPose();
         }
     }

@@ -1,32 +1,20 @@
 package com.leclowndu93150.thaumcraft.client.entity;
 
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
+import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumcraft.client.render.aspect.ParticleTextures;
 import com.leclowndu93150.thaumcraft.content.wands.EntityAspectOrb;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
-import org.joml.Matrix4fc;
+import org.joml.Matrix4f;
 
-public final class AspectOrbRenderer extends EntityRenderer<EntityAspectOrb, AspectOrbRenderer.State> {
-    public static final class State extends EntityRenderState {
-        public int tick;
-        public int age;
-        public int color;
-    }
-
-    private static final RenderType ORB_TYPE = RenderType.create(
-            "tc_aspect_orb",
-            RenderSetup.builder(TCRenderPipelines.FX_ADDITIVE)
-                    .withTexture("Sampler0", ParticleTextures.PARTICLES)
-                    .useLightmap()
-                    .createRenderSetup());
+public final class AspectOrbRenderer extends EntityRenderer<EntityAspectOrb> {
+    private static final RenderType ORB_TYPE = TCRenderTypes.fxAdditive(ParticleTextures.PARTICLES);
 
     private static final int FRAME_COUNT = 16;
     private static final int FRAMES_PER_TICK = 2;
@@ -45,36 +33,28 @@ public final class AspectOrbRenderer extends EntityRenderer<EntityAspectOrb, Asp
     }
 
     @Override
-    public State createRenderState() {
-        return new State();
-    }
-
-    @Override
-    public void extractRenderState(EntityAspectOrb entity, State state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.tick = entity.tickCount;
-        state.age = entity.getAge();
-        state.color = entity.getAspectColor();
-    }
-
-    @Override
-    public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        super.submit(state, poseStack, collector, camera);
+    public void render(EntityAspectOrb entity, float entityYaw, float partialTicks, PoseStack poseStack,
+                       MultiBufferSource buffers, int packedLight) {
+        super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
         poseStack.pushPose();
-        poseStack.mulPose(camera.orientation);
-        float scale = BASE_SCALE + AGE_SCALE * ((float) (EntityAspectOrb.MAX_AGE - state.age) / EntityAspectOrb.MAX_AGE);
+        poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
+        float scale = BASE_SCALE + AGE_SCALE * ((float) (EntityAspectOrb.MAX_AGE - entity.getAge()) / EntityAspectOrb.MAX_AGE);
         poseStack.scale(scale, scale, scale);
-        int frame = state.tick * FRAMES_PER_TICK % FRAME_COUNT;
+        int frame = entity.tickCount * FRAMES_PER_TICK % FRAME_COUNT;
         float u0 = frame / (float) FRAME_COUNT;
         float u1 = (frame + 1) / (float) FRAME_COUNT;
-        int tint = ARGB32.color((int) (ALPHA * 255.0F), state.color);
-        collector.submitCustomGeometry(poseStack, ORB_TYPE, (pose, buffer) -> {
-            Matrix4fc mat = pose.pose();
-            buffer.addVertex(mat, -HALF, -Y_OFFSET, 0.0F).setUv(u0, ROW_V1).setColor(tint).setLight(EMISSIVE_LIGHT);
-            buffer.addVertex(mat, HALF, -Y_OFFSET, 0.0F).setUv(u1, ROW_V1).setColor(tint).setLight(EMISSIVE_LIGHT);
-            buffer.addVertex(mat, HALF, 1.0F - Y_OFFSET, 0.0F).setUv(u1, ROW_V0).setColor(tint).setLight(EMISSIVE_LIGHT);
-            buffer.addVertex(mat, -HALF, 1.0F - Y_OFFSET, 0.0F).setUv(u0, ROW_V0).setColor(tint).setLight(EMISSIVE_LIGHT);
-        });
+        int tint = ARGB32.color((int) (ALPHA * 255.0F), entity.getAspectColor());
+        VertexConsumer buffer = buffers.getBuffer(ORB_TYPE);
+        Matrix4f mat = poseStack.last().pose();
+        buffer.addVertex(mat, -HALF, -Y_OFFSET, 0.0F).setUv(u0, ROW_V1).setColor(tint).setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, HALF, -Y_OFFSET, 0.0F).setUv(u1, ROW_V1).setColor(tint).setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, HALF, 1.0F - Y_OFFSET, 0.0F).setUv(u1, ROW_V0).setColor(tint).setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, -HALF, 1.0F - Y_OFFSET, 0.0F).setUv(u0, ROW_V0).setColor(tint).setLight(EMISSIVE_LIGHT);
         poseStack.popPose();
+    }
+
+    @Override
+    public ResourceLocation getTextureLocation(EntityAspectOrb entity) {
+        return ParticleTextures.PARTICLES;
     }
 }

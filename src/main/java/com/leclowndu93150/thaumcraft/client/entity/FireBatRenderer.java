@@ -9,25 +9,14 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 
-public final class FireBatRenderer extends MobRenderer<EntityFireBat, FireBatRenderState, FireBatModel> {
+public final class FireBatRenderer extends MobRenderer<EntityFireBat, FireBatModel<EntityFireBat>> {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/firebat.png");
     private static final float SHADOW = 0.25F;
     private static final float SCALE = 0.35F;
     private static final int FULLBRIGHT_BLOCK_LIGHT = 15;
 
     public FireBatRenderer(EntityRendererProvider.Context context) {
-        super(context, new FireBatModel(context.bakeLayer(TCModelLayers.FIRE_BAT)), SHADOW);
-    }
-
-    @Override
-    public FireBatRenderState createRenderState() {
-        return new FireBatRenderState();
-    }
-
-    @Override
-    public void extractRenderState(EntityFireBat entity, FireBatRenderState state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.hanging = entity.isHanging();
+        super(context, new FireBatModel<>(context.bakeLayer(TCModelLayers.FIRE_BAT)), SHADOW);
     }
 
     @Override
@@ -36,12 +25,12 @@ public final class FireBatRenderer extends MobRenderer<EntityFireBat, FireBatRen
     }
 
     @Override
-    public ResourceLocation getTextureLocation(FireBatRenderState state) {
+    public ResourceLocation getTextureLocation(EntityFireBat entity) {
         return TEXTURE;
     }
 
     @Override
-    protected void scale(FireBatRenderState state, PoseStack poseStack) {
+    protected void scale(EntityFireBat entity, PoseStack poseStack, float partialTick) {
         poseStack.scale(SCALE, SCALE, SCALE);
     }
 }

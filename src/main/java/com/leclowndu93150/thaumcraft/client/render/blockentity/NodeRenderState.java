@@ -4,10 +4,9 @@ import com.leclowndu93150.thaumcraft.api.nodes.NodeModifier;
 import com.leclowndu93150.thaumcraft.api.nodes.NodeType;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import org.jspecify.annotations.Nullable;
 
-public final class NodeRenderState extends BlockEntityRenderState {
+public final class NodeRenderState {
     public static final class AspectLayer {
         public int color;
         public int amount;

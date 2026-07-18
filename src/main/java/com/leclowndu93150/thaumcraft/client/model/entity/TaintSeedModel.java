@@ -1,27 +1,30 @@
 package com.leclowndu93150.thaumcraft.client.model.entity;
 
-import com.leclowndu93150.thaumcraft.client.entity.TaintSeedRenderState;
-import net.minecraft.client.model.EntityModel;
+import com.leclowndu93150.thaumcraft.content.entity.AbstractTaintSeed;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
 
-public final class TaintSeedModel extends EntityModel<TaintSeedRenderState> {
+public final class TaintSeedModel extends HierarchicalModel<AbstractTaintSeed> {
     private static final int LENGTH = 8;
     private static final int TEXTURE_SIZE = 64;
     private static final float ANGLE_MOD = 0.0625F * 0.2F;
     private static final float BASE_HEIGHT = 1.6F;
+    private static final float HURT_DIVISOR = 200.0F;
     private static final float[] SEGMENT_BASE_Y = {-8.0F, -8.0F, -8.0F, -8.0F, -8.0F, -4.0F, -4.0F};
 
+    private final ModelPart root;
     private final ModelPart[] segments;
 
     public TaintSeedModel(ModelPart root) {
-        super(root, RenderTypes::entityTranslucent);
+        super(RenderType::entityTranslucent);
+        this.root = root;
         this.segments = new ModelPart[LENGTH - 1];
         ModelPart parent = root.getChild("base");
         for (int k = 0; k < LENGTH - 1; k++) {
@@ -50,17 +53,22 @@ public final class TaintSeedModel extends EntityModel<TaintSeedRenderState> {
     }
 
     @Override
-    public void setupAnim(TaintSeedRenderState state) {
-        super.setupAnim(state);
-        float ht = state.hurt;
+    public ModelPart root() {
+        return root;
+    }
+
+    @Override
+    public void setupAnim(AbstractTaintSeed entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+                          float netHeadYaw, float headPitch) {
+        float ht = entity.hurtTime / HURT_DIVISOR;
         float fi = (0.1F + (ht > 0.0F ? ANGLE_MOD : -ANGLE_MOD)) * 3.0F;
         for (int k = 0; k < LENGTH - 1; k++) {
             ModelPart segment = segments[k];
-            segment.xRot = 0.1F / fi * Mth.sin(state.ageInTicks * 0.06F - k / 2.0F) / 5.0F + ht + state.attackAnim;
-            segment.zRot = 0.1F / fi * Mth.sin(state.ageInTicks * 0.05F - k / 2.0F) / 5.0F;
+            segment.xRot = 0.1F / fi * Mth.sin(ageInTicks * 0.06F - k / 2.0F) / 5.0F + ht + entity.attackAnim;
+            segment.zRot = 0.1F / fi * Mth.sin(ageInTicks * 0.05F - k / 2.0F) / 5.0F;
             float qq = (float) (Math.PI * (k / 7.0F));
             float base = BASE_HEIGHT - Mth.sin(qq);
-            float pulse = Mth.sin(state.ageInTicks / 12.0F - qq) * 0.33F;
+            float pulse = Mth.sin(ageInTicks / 12.0F - qq) * 0.33F;
             pulse *= pulse;
             float sxz = base + pulse;
             float sy = base * 0.9F;

@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
-public final class EldritchCrabRenderer extends MobRenderer<EntityEldritchCrab, EldritchCrabRenderState, EldritchCrabModel> {
+public final class EldritchCrabRenderer extends MobRenderer<EntityEldritchCrab, EldritchCrabModel> {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/crab.png");
     private static final float SHADOW = 0.5F;
     private static final float SCALE = 0.8F;
@@ -18,23 +18,12 @@ public final class EldritchCrabRenderer extends MobRenderer<EntityEldritchCrab, 
     }
 
     @Override
-    public EldritchCrabRenderState createRenderState() {
-        return new EldritchCrabRenderState();
-    }
-
-    @Override
-    public void extractRenderState(EntityEldritchCrab entity, EldritchCrabRenderState state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.helm = entity.hasHelm();
-    }
-
-    @Override
-    protected void scale(EldritchCrabRenderState state, PoseStack poseStack) {
+    protected void scale(EntityEldritchCrab entity, PoseStack poseStack, float partialTick) {
         poseStack.scale(SCALE, SCALE, SCALE);
     }
 
     @Override
-    public ResourceLocation getTextureLocation(EldritchCrabRenderState state) {
+    public ResourceLocation getTextureLocation(EntityEldritchCrab entity) {
         return TEXTURE;
     }
 }

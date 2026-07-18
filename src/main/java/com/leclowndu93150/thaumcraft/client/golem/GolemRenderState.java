@@ -1,12 +1,13 @@
 package com.leclowndu93150.thaumcraft.client.golem;
 
 import com.leclowndu93150.thaumcraft.content.golem.GolemProperties;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.world.item.ItemStack;
 
-public class GolemRenderState extends EntityRenderState {
+public final class GolemRenderState {
     public GolemProperties props;
     public byte color;
+    public float ageInTicks;
+    public int lightCoords;
     public float bodyRot;
     public float headYawDelta;
     public float pitch;
@@ -21,9 +22,9 @@ public class GolemRenderState extends EntityRenderState {
     public boolean invisible;
     public boolean ghost;
     public boolean xray;
-    public final ItemStackRenderState heldItem = new ItemStackRenderState();
+    public ItemStack heldItem = ItemStack.EMPTY;
     public boolean holdingItem;
-    public final ItemStackRenderState haulerItem = new ItemStackRenderState();
+    public ItemStack haulerItem = ItemStack.EMPTY;
     public boolean haulingItem;
     public boolean heldItemIsBlock;
     public boolean haulerItemIsBlock;

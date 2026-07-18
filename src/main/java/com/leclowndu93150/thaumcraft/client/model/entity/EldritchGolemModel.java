@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.model.entity;
 
-import com.leclowndu93150.thaumcraft.client.entity.EldritchGolemRenderState;
-import net.minecraft.client.model.EntityModel;
+import com.leclowndu93150.thaumcraft.content.entity.boss.EntityEldritchGolem;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -10,7 +10,7 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 
-public final class EldritchGolemModel extends EntityModel<EldritchGolemRenderState> {
+public final class EldritchGolemModel extends HierarchicalModel<EntityEldritchGolem> {
     private static final int TEX_WIDTH = 128;
     private static final int TEX_HEIGHT = 64;
     private static final float CLOAK1_TILT = 0.1396263F;
@@ -41,8 +41,10 @@ public final class EldritchGolemModel extends EntityModel<EldritchGolemRenderSta
     private final ModelPart cloak2;
     private final ModelPart cloak3;
 
+    private final ModelPart root;
+
     public EldritchGolemModel(ModelPart root) {
-        super(root);
+        this.root = root;
         this.head = root.getChild("head");
         this.head2 = root.getChild("head2");
         this.armL = root.getChild("arm_l");
@@ -171,21 +173,29 @@ public final class EldritchGolemModel extends EntityModel<EldritchGolemRenderSta
     }
 
     @Override
-    public void setupAnim(EldritchGolemRenderState state) {
-        super.setupAnim(state);
-        this.head.visible = !state.headless;
-        this.head2.visible = state.headless;
-        if (state.spawnTimer > 0) {
+    public ModelPart root() {
+        return root;
+    }
+
+    @Override
+    public void setupAnim(EntityEldritchGolem entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+                          float netHeadYaw, float headPitch) {
+        int spawnTimer = entity.getSpawnTimer();
+        float partialTick = ageInTicks - entity.tickCount;
+        float attackTime = Math.max(0.0F, entity.getAttackTimer() - partialTick);
+        this.head.visible = !entity.isHeadless();
+        this.head2.visible = entity.isHeadless();
+        if (spawnTimer > 0) {
             this.head.yRot = 0.0F;
-            this.head.xRot = state.spawnTimer / SPAWN_HEAD_DIVISOR * Mth.DEG_TO_RAD;
+            this.head.xRot = spawnTimer / SPAWN_HEAD_DIVISOR * Mth.DEG_TO_RAD;
         } else {
-            this.head.yRot = state.yRot / 4.0F * Mth.DEG_TO_RAD;
-            this.head.xRot = HEAD_TILT + state.xRot / 2.0F * Mth.DEG_TO_RAD;
-            this.head2.yRot = state.yRot * Mth.DEG_TO_RAD;
-            this.head2.xRot = HEAD_TILT + state.xRot * Mth.DEG_TO_RAD;
+            this.head.yRot = netHeadYaw / 4.0F * Mth.DEG_TO_RAD;
+            this.head.xRot = HEAD_TILT + headPitch / 2.0F * Mth.DEG_TO_RAD;
+            this.head2.yRot = netHeadYaw * Mth.DEG_TO_RAD;
+            this.head2.xRot = HEAD_TILT + headPitch * Mth.DEG_TO_RAD;
         }
-        float limbPos = state.walkAnimationPos;
-        float limbSpeed = state.walkAnimationSpeed;
+        float limbPos = limbSwing;
+        float limbSpeed = limbSwingAmount;
         this.legR.xRot = Mth.cos(limbPos * 0.4662F) * 1.4F * limbSpeed;
         this.legL.xRot = Mth.cos(limbPos * 0.4662F + Mth.PI) * 1.4F * limbSpeed;
         float a = Mth.cos(limbPos * 0.44F) * 1.4F * limbSpeed;
@@ -196,8 +206,8 @@ public final class EldritchGolemModel extends EntityModel<EldritchGolemRenderSta
         this.cloak1.xRot = -c / 3.0F + CLOAK1_TILT;
         this.cloak2.xRot = -c / 3.0F + CLOAK2_TILT;
         this.cloak3.xRot = -c / 3.0F + CLOAK3_TILT;
-        if (state.attackTime > 0.0F) {
-            float swing = ATTACK_SWING_BASE + ATTACK_SWING_SCALE * triangleWave(state.attackTime, ATTACK_SWING_PERIOD);
+        if (attackTime > 0.0F) {
+            float swing = ATTACK_SWING_BASE + ATTACK_SWING_SCALE * triangleWave(attackTime, ATTACK_SWING_PERIOD);
             this.armR.xRot = swing;
             this.armL.xRot = swing;
         } else {

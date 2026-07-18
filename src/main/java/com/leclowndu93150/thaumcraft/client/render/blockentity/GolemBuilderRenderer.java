@@ -9,28 +9,23 @@ import com.leclowndu93150.thaumcraft.content.golem.press.BlockGolemBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.sprite.SpriteId;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
 
-public final class GolemBuilderRenderer implements BlockEntityRenderer<BlockEntityGolemBuilder, GolemBuilderRenderState> {
+public final class GolemBuilderRenderer implements BlockEntityRenderer<BlockEntityGolemBuilder> {
     public static final ResourceLocation MODEL = TCIds.rl("models/obj/golembuilder.obj");
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/golembuilder.png");
-    private static final SpriteId LAVA_SPRITE = new SpriteId(TextureAtlas.LOCATION_BLOCKS,
+    private static final Material LAVA_MATERIAL = new Material(TextureAtlas.LOCATION_BLOCKS,
             ResourceLocation.withDefaultNamespace("block/lava_still"));
     private static final String PRESS_PART = "press";
     private static final float PRESS_DROP = 0.625F;
@@ -43,66 +38,52 @@ public final class GolemBuilderRenderer implements BlockEntityRenderer<BlockEnti
     public GolemBuilderRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public GolemBuilderRenderState createRenderState() {
-        return new GolemBuilderRenderState();
-    }
-
-    @Override
-    public void extractRenderState(BlockEntityGolemBuilder builder, GolemBuilderRenderState state, float partialTicks,
-                                   Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(builder, state, partialTicks, cameraPosition, breakProgress);
-        state.facing = builder.getBlockState().getValue(BlockGolemBuilder.FACING);
-        state.press = builder.press;
-    }
-
-    @Override
-    public void submit(GolemBuilderRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+    public void render(BlockEntityGolemBuilder builder, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light, int overlay) {
+        Direction facing = builder.getBlockState().getValue(BlockGolemBuilder.FACING);
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.0F, 0.5F);
-        switch (state.facing) {
+        switch (facing) {
             case SOUTH -> poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
             case WEST -> poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
             case EAST -> poseStack.mulPose(Axis.YP.rotationDegrees(270.0F));
             default -> {}
         }
-        submitParts(state.press, poseStack, collector, state.lightCoords);
-        submitLava(poseStack, collector);
+        submitParts(builder.press, poseStack, buffers, light);
+        submitLava(poseStack, buffers);
         poseStack.popPose();
     }
 
-    public static void submitParts(int press, PoseStack poseStack, SubmitNodeCollector collector, int light) {
+    public static void submitParts(int press, PoseStack poseStack, MultiBufferSource buffers, int light) {
         MeshModel mesh = GolemMeshes.get(MODEL);
-        RenderType type = RenderTypes.entityCutout(TEXTURE);
+        VertexConsumer buffer = buffers.getBuffer(RenderType.entityCutout(TEXTURE));
         for (MeshPart part : mesh.parts()) {
             if (!PRESS_PART.equals(part.name())) {
-                collector.submitCustomGeometry(poseStack, type,
-                        (pose, buffer) -> GolemMeshes.renderPart(mesh, part, pose, buffer, light, -1));
+                GolemMeshes.renderPart(mesh, part, poseStack.last(), buffer, light, -1);
             }
         }
         poseStack.pushPose();
         poseStack.translate(0.0F, (float) (-Math.sin(Math.toRadians(press)) * PRESS_DROP), 0.0F);
         for (MeshPart part : mesh.parts()) {
             if (PRESS_PART.equals(part.name())) {
-                collector.submitCustomGeometry(poseStack, type,
-                        (pose, buffer) -> GolemMeshes.renderPart(mesh, part, pose, buffer, light, -1));
+                GolemMeshes.renderPart(mesh, part, poseStack.last(), buffer, light, -1);
             }
         }
         poseStack.popPose();
     }
 
-    private static void submitLava(PoseStack poseStack, SubmitNodeCollector collector) {
+    private static void submitLava(PoseStack poseStack, MultiBufferSource buffers) {
         poseStack.pushPose();
         poseStack.translate(LAVA_OFFSET_X, LAVA_OFFSET_Y, LAVA_OFFSET_Z);
         poseStack.mulPose(Axis.XN.rotationDegrees(90.0F));
         poseStack.scale(LAVA_SIZE, LAVA_SIZE, LAVA_SIZE);
-        TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().get(LAVA_SPRITE);
-        collector.submitCustomGeometry(poseStack, Sheets.translucentBlockItemSheet(), (pose, buffer) -> {
-            VertexConsumer wrapped = sprite.wrap(buffer);
-            lavaVertex(wrapped, pose, 0.0F, 0.0F, sprite.getU1(), sprite.getV1());
-            lavaVertex(wrapped, pose, 1.0F, 0.0F, sprite.getU0(), sprite.getV1());
-            lavaVertex(wrapped, pose, 1.0F, 1.0F, sprite.getU0(), sprite.getV0());
-            lavaVertex(wrapped, pose, 0.0F, 1.0F, sprite.getU1(), sprite.getV0());
-        });
+        TextureAtlasSprite sprite = LAVA_MATERIAL.sprite();
+        VertexConsumer wrapped = sprite.wrap(buffers.getBuffer(Sheets.translucentCullBlockSheet()));
+        PoseStack.Pose pose = poseStack.last();
+        lavaVertex(wrapped, pose, 0.0F, 0.0F, sprite.getU1(), sprite.getV1());
+        lavaVertex(wrapped, pose, 1.0F, 0.0F, sprite.getU0(), sprite.getV1());
+        lavaVertex(wrapped, pose, 1.0F, 1.0F, sprite.getU0(), sprite.getV0());
+        lavaVertex(wrapped, pose, 0.0F, 1.0F, sprite.getU1(), sprite.getV0());
         poseStack.popPose();
     }
 

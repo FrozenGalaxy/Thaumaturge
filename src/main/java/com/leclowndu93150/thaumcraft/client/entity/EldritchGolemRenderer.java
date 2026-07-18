@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
-public final class EldritchGolemRenderer extends MobRenderer<EntityEldritchGolem, EldritchGolemRenderState, EldritchGolemModel> {
+public final class EldritchGolemRenderer extends MobRenderer<EntityEldritchGolem, EldritchGolemModel> {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/eldritch_golem.png");
     private static final float SHADOW = 0.7F;
 
@@ -16,20 +16,7 @@ public final class EldritchGolemRenderer extends MobRenderer<EntityEldritchGolem
     }
 
     @Override
-    public EldritchGolemRenderState createRenderState() {
-        return new EldritchGolemRenderState();
-    }
-
-    @Override
-    public void extractRenderState(EntityEldritchGolem entity, EldritchGolemRenderState state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.headless = entity.isHeadless();
-        state.attackTime = Math.max(0.0F, entity.getAttackTimer() - partialTicks);
-        state.spawnTimer = entity.getSpawnTimer();
-    }
-
-    @Override
-    public ResourceLocation getTextureLocation(EldritchGolemRenderState state) {
+    public ResourceLocation getTextureLocation(EntityEldritchGolem entity) {
         return TEXTURE;
     }
 }

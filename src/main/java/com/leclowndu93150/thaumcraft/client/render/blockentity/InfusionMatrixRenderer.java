@@ -2,35 +2,31 @@ package com.leclowndu93150.thaumcraft.client.render.blockentity;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.client.entity.TCModelLayers;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
 import com.leclowndu93150.thaumcraft.client.model.entity.MatrixCubeModel;
+import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumcraft.content.infusion.BlockEntityInfusionMatrix;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
-import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4fc;
-import org.jspecify.annotations.Nullable;
+import org.joml.Matrix4f;
 
-public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEntityInfusionMatrix, InfusionMatrixRenderState> {
+public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEntityInfusionMatrix> {
     private static final ResourceLocation TEX_NORMAL = TCIds.rl("textures/block/infuser_normal.png");
     private static final ResourceLocation TEX_ANCIENT = TCIds.rl("textures/block/infuser_ancient.png");
     private static final ResourceLocation TEX_ELDRITCH = TCIds.rl("textures/block/infuser_eldritch.png");
@@ -49,45 +45,82 @@ public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEn
     private static final float HALO_FADE_TICKS = 500.0F;
     private static final float HALO_RAMP_TICKS = 50.0F;
 
-    private static final RenderType GLOW_NORMAL = glowType("tc_matrix_glow_normal", TEX_NORMAL);
-    private static final RenderType GLOW_ANCIENT = glowType("tc_matrix_glow_ancient", TEX_ANCIENT);
-    private static final RenderType GLOW_ELDRITCH = glowType("tc_matrix_glow_eldritch", TEX_ELDRITCH);
-    private static final RenderType HALO_TYPE = RenderType.create(
-            "tc_matrix_halo",
-            RenderSetup.builder(TCRenderPipelines.SPARKLE_CULLED).createRenderSetup());
+    private static final RenderType GLOW_NORMAL = TCRenderTypes.entityAdditiveEmissive(TEX_NORMAL);
+    private static final RenderType GLOW_ANCIENT = TCRenderTypes.entityAdditiveEmissive(TEX_ANCIENT);
+    private static final RenderType GLOW_ELDRITCH = TCRenderTypes.entityAdditiveEmissive(TEX_ELDRITCH);
+    private static final RenderType HALO_TYPE = TCRenderTypes.SPARKLE_CULLED;
 
     private final MatrixCubeModel model;
     private final RandomSource haloRandom = RandomSource.create();
-
-    private static RenderType glowType(String name, ResourceLocation texture) {
-        return RenderType.create(name,
-                RenderSetup.builder(TCRenderPipelines.ENTITY_ADDITIVE_EMISSIVE)
-                        .withTexture("Sampler0", texture)
-                        .createRenderSetup());
-    }
 
     public InfusionMatrixRenderer(BlockEntityRendererProvider.Context context) {
         this.model = new MatrixCubeModel(context.bakeLayer(TCModelLayers.MATRIX_CUBE));
     }
 
     @Override
-    public InfusionMatrixRenderState createRenderState() {
-        return new InfusionMatrixRenderState();
-    }
-
-    @Override
-    public void extractRenderState(BlockEntityInfusionMatrix matrix, InfusionMatrixRenderState state, float partialTicks,
-                                   Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(matrix, state, partialTicks, cameraPosition, breakProgress);
+    public void render(BlockEntityInfusionMatrix matrix, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light, int overlay) {
         var viewEntity = Minecraft.getInstance().getCameraEntity();
-        state.animationTime = viewEntity == null ? partialTicks : viewEntity.tickCount + partialTicks;
-        state.startUp = matrix.clientStartUp;
-        state.stability = matrix.stability();
-        state.craftTicks = matrix.clientCraftTicks;
-        state.active = matrix.isActive();
-        state.crafting = matrix.isCrafting();
-        state.fancyGraphics = Minecraft.getInstance().options.cutoutLeaves().get();
-        state.texture = pickTexture(matrix);
+        float animationTime = viewEntity == null ? partialTick : viewEntity.tickCount + partialTick;
+        float startUp = matrix.clientStartUp;
+        float stability = matrix.stability();
+        int craftTicks = matrix.clientCraftTicks;
+        boolean active = matrix.isActive();
+        boolean crafting = matrix.isCrafting();
+        boolean fancyGraphics = Minecraft.getInstance().options.graphicsMode().get() != GraphicsStatus.FAST;
+        ResourceLocation texture = pickTexture(matrix);
+
+        RenderType type = RenderType.entityCutout(texture);
+        RenderType glowType = glowTypeFor(texture);
+        float instability = Math.min(6.0F,
+                1.0F + (stability < 0.0F ? -stability * 0.66F : 1.0F) * (Math.min(craftTicks, 50) / 50.0F));
+        poseStack.pushPose();
+        poseStack.translate(0.5F, 0.5F, 0.5F);
+        poseStack.mulPose(Axis.YP.rotationDegrees(animationTime % 360.0F * startUp));
+        poseStack.mulPose(Axis.XP.rotationDegrees(TILT_X * startUp));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(TILT_Z * startUp));
+        for (int a = 0; a < 2; a++) {
+            for (int b = 0; b < 2; b++) {
+                for (int c = 0; c < 2; c++) {
+                    float jx = 0.0F;
+                    float jy = 0.0F;
+                    float jz = 0.0F;
+                    if (active) {
+                        jx = Mth.sin((animationTime + a * 10) / 15.0F) * JITTER_SCALE * startUp * instability;
+                        jy = Mth.sin((animationTime + b * 10) / 14.0F) * JITTER_SCALE * startUp * instability;
+                        jz = Mth.sin((animationTime + c * 10) / 13.0F) * JITTER_SCALE * startUp * instability;
+                    }
+                    int aa = a == 0 ? -1 : 1;
+                    int bb = b == 0 ? -1 : 1;
+                    int cc = c == 0 ? -1 : 1;
+                    poseStack.pushPose();
+                    poseStack.translate(jx + aa * SUB_CUBE_OFFSET, jy + bb * SUB_CUBE_OFFSET, jz + cc * SUB_CUBE_OFFSET);
+                    if (a > 0) {
+                        poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+                    }
+                    if (b > 0) {
+                        poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
+                    }
+                    if (c > 0) {
+                        poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
+                    }
+                    poseStack.scale(SUB_CUBE_SCALE, SUB_CUBE_SCALE, SUB_CUBE_SCALE);
+                    model.cube.render(poseStack, buffers.getBuffer(type), light, OverlayTexture.NO_OVERLAY, -1);
+                    if (active) {
+                        float glowAlpha = (Mth.sin((animationTime + a * 2 + b * 3 + c * 4) / 4.0F) * 0.1F + 0.2F)
+                                * startUp;
+                        model.glow.render(poseStack, buffers.getBuffer(glowType), LightTexture.FULL_BRIGHT,
+                                OverlayTexture.NO_OVERLAY,
+                                ARGB32.colorFromFloat(glowAlpha, GLOW_RED, GLOW_GREEN, GLOW_BLUE));
+                    }
+                    poseStack.popPose();
+                }
+            }
+        }
+        poseStack.popPose();
+        if (crafting) {
+            drawHalo(craftTicks, fancyGraphics, poseStack, buffers);
+        }
     }
 
     private static ResourceLocation pickTexture(BlockEntityInfusionMatrix matrix) {
@@ -106,62 +139,6 @@ public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEn
         return TEX_NORMAL;
     }
 
-    @Override
-    public void submit(InfusionMatrixRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        RenderType type = RenderTypes.entityCutout(state.texture);
-        RenderType glowType = glowTypeFor(state.texture);
-        float instability = Math.min(6.0F,
-                1.0F + (state.stability < 0.0F ? -state.stability * 0.66F : 1.0F) * (Math.min(state.craftTicks, 50) / 50.0F));
-        poseStack.pushPose();
-        poseStack.translate(0.5F, 0.5F, 0.5F);
-        poseStack.mulPose(Axis.YP.rotationDegrees(state.animationTime % 360.0F * state.startUp));
-        poseStack.mulPose(Axis.XP.rotationDegrees(TILT_X * state.startUp));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(TILT_Z * state.startUp));
-        for (int a = 0; a < 2; a++) {
-            for (int b = 0; b < 2; b++) {
-                for (int c = 0; c < 2; c++) {
-                    float jx = 0.0F;
-                    float jy = 0.0F;
-                    float jz = 0.0F;
-                    if (state.active) {
-                        jx = Mth.sin((state.animationTime + a * 10) / 15.0F) * JITTER_SCALE * state.startUp * instability;
-                        jy = Mth.sin((state.animationTime + b * 10) / 14.0F) * JITTER_SCALE * state.startUp * instability;
-                        jz = Mth.sin((state.animationTime + c * 10) / 13.0F) * JITTER_SCALE * state.startUp * instability;
-                    }
-                    int aa = a == 0 ? -1 : 1;
-                    int bb = b == 0 ? -1 : 1;
-                    int cc = c == 0 ? -1 : 1;
-                    poseStack.pushPose();
-                    poseStack.translate(jx + aa * SUB_CUBE_OFFSET, jy + bb * SUB_CUBE_OFFSET, jz + cc * SUB_CUBE_OFFSET);
-                    if (a > 0) {
-                        poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-                    }
-                    if (b > 0) {
-                        poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
-                    }
-                    if (c > 0) {
-                        poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
-                    }
-                    poseStack.scale(SUB_CUBE_SCALE, SUB_CUBE_SCALE, SUB_CUBE_SCALE);
-                    collector.submitModelPart(model.cube, poseStack, type,
-                            state.lightCoords, OverlayTexture.NO_OVERLAY, null, -1, null);
-                    if (state.active) {
-                        float glowAlpha = (Mth.sin((state.animationTime + a * 2 + b * 3 + c * 4) / 4.0F) * 0.1F + 0.2F)
-                                * state.startUp;
-                        collector.submitModelPart(model.glow, poseStack, glowType,
-                                LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, null,
-                                ARGB32.colorFromFloat(glowAlpha, GLOW_RED, GLOW_GREEN, GLOW_BLUE), null);
-                    }
-                    poseStack.popPose();
-                }
-            }
-        }
-        poseStack.popPose();
-        if (state.crafting) {
-            drawHalo(state, poseStack, collector);
-        }
-    }
-
     private static RenderType glowTypeFor(ResourceLocation texture) {
         if (texture.equals(TEX_ANCIENT)) {
             return GLOW_ANCIENT;
@@ -172,14 +149,15 @@ public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEn
         return GLOW_NORMAL;
     }
 
-    private void drawHalo(InfusionMatrixRenderState state, PoseStack poseStack, SubmitNodeCollector collector) {
-        int fans = state.fancyGraphics ? HALO_FANS_FANCY : HALO_FANS_FAST;
-        float f1 = state.craftTicks / HALO_FADE_TICKS;
-        float ramp = Math.min(state.craftTicks, HALO_RAMP_TICKS) / HALO_RAMP_TICKS;
+    private void drawHalo(int craftTicks, boolean fancyGraphics, PoseStack poseStack, MultiBufferSource buffers) {
+        int fans = fancyGraphics ? HALO_FANS_FANCY : HALO_FANS_FAST;
+        float f1 = craftTicks / HALO_FADE_TICKS;
+        float ramp = Math.min(craftTicks, HALO_RAMP_TICKS) / HALO_RAMP_TICKS;
         float centerAlpha = Math.max(0.0F, 1.0F - f1);
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
         haloRandom.setSeed(HALO_SEED);
+        VertexConsumer buffer = buffers.getBuffer(HALO_TYPE);
         for (int i = 0; i < fans; i++) {
             poseStack.mulPose(Axis.XP.rotationDegrees(haloRandom.nextFloat() * 360.0F));
             poseStack.mulPose(Axis.YP.rotationDegrees(haloRandom.nextFloat() * 360.0F));
@@ -187,29 +165,25 @@ public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEn
             poseStack.mulPose(Axis.XP.rotationDegrees(haloRandom.nextFloat() * 360.0F));
             poseStack.mulPose(Axis.YP.rotationDegrees(haloRandom.nextFloat() * 360.0F));
             poseStack.mulPose(Axis.ZP.rotationDegrees(haloRandom.nextFloat() * 360.0F + f1 * 360.0F));
-            final float fa = (haloRandom.nextFloat() * 20.0F + 5.0F) / 20.0F * ramp;
-            final float f4 = (haloRandom.nextFloat() * 2.0F + 1.0F) / 20.0F * ramp;
-            collector.submitCustomGeometry(poseStack, HALO_TYPE, (pose, buffer) -> {
-                Matrix4fc mat = pose.pose();
-                float bx1 = -0.866F * f4;
-                float bz1 = -0.5F * f4;
-                float bx2 = 0.866F * f4;
-                float bz3 = f4;
-                buffer.addVertex(mat, 0.0F, 0.0F, 0.0F).setColor(1.0F, 1.0F, 1.0F, centerAlpha);
-                buffer.addVertex(mat, bx1, fa, bz1).setColor(1.0F, 0.0F, 1.0F, 0.0F);
-                buffer.addVertex(mat, bx2, fa, bz1).setColor(1.0F, 0.0F, 1.0F, 0.0F);
-                buffer.addVertex(mat, 0.0F, 0.0F, 0.0F).setColor(1.0F, 1.0F, 1.0F, centerAlpha);
-                buffer.addVertex(mat, bx2, fa, bz1).setColor(1.0F, 0.0F, 1.0F, 0.0F);
-                buffer.addVertex(mat, 0.0F, fa, bz3).setColor(1.0F, 0.0F, 1.0F, 0.0F);
-                buffer.addVertex(mat, 0.0F, 0.0F, 0.0F).setColor(1.0F, 1.0F, 1.0F, centerAlpha);
-                buffer.addVertex(mat, 0.0F, fa, bz3).setColor(1.0F, 0.0F, 1.0F, 0.0F);
-                buffer.addVertex(mat, bx1, fa, bz1).setColor(1.0F, 0.0F, 1.0F, 0.0F);
-            });
+            float fa = (haloRandom.nextFloat() * 20.0F + 5.0F) / 20.0F * ramp;
+            float f4 = (haloRandom.nextFloat() * 2.0F + 1.0F) / 20.0F * ramp;
+            Matrix4f mat = poseStack.last().pose();
+            float bx1 = -0.866F * f4;
+            float bz1 = -0.5F * f4;
+            float bx2 = 0.866F * f4;
+            float bz3 = f4;
+            buffer.addVertex(mat, 0.0F, 0.0F, 0.0F).setColor(1.0F, 1.0F, 1.0F, centerAlpha);
+            buffer.addVertex(mat, bx1, fa, bz1).setColor(1.0F, 0.0F, 1.0F, 0.0F);
+            buffer.addVertex(mat, bx2, fa, bz1).setColor(1.0F, 0.0F, 1.0F, 0.0F);
+            buffer.addVertex(mat, 0.0F, 0.0F, 0.0F).setColor(1.0F, 1.0F, 1.0F, centerAlpha);
+            buffer.addVertex(mat, bx2, fa, bz1).setColor(1.0F, 0.0F, 1.0F, 0.0F);
+            buffer.addVertex(mat, 0.0F, fa, bz3).setColor(1.0F, 0.0F, 1.0F, 0.0F);
+            buffer.addVertex(mat, 0.0F, 0.0F, 0.0F).setColor(1.0F, 1.0F, 1.0F, centerAlpha);
+            buffer.addVertex(mat, 0.0F, fa, bz3).setColor(1.0F, 0.0F, 1.0F, 0.0F);
+            buffer.addVertex(mat, bx1, fa, bz1).setColor(1.0F, 0.0F, 1.0F, 0.0F);
         }
         poseStack.popPose();
     }
-
-
 
     @Override
     public int getViewDistance() {

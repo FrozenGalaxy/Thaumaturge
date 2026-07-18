@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.model.entity;
 
-import com.leclowndu93150.thaumcraft.client.entity.EldritchCrabRenderState;
-import net.minecraft.client.model.EntityModel;
+import com.leclowndu93150.thaumcraft.content.entity.EntityEldritchCrab;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -10,7 +10,7 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 
-public final class EldritchCrabModel extends EntityModel<EldritchCrabRenderState> {
+public final class EldritchCrabModel extends HierarchicalModel<EntityEldritchCrab> {
     private static final int TEX_WIDTH = 128;
     private static final int TEX_HEIGHT = 64;
     private static final float TAIL_TILT = 0.1047198F;
@@ -18,6 +18,7 @@ public final class EldritchCrabModel extends EntityModel<EldritchCrabRenderState
     private static final float LEG_SPLAY_Z = 0.4363323F;
     private static final float CLAW_TILT = 0.3141593F;
 
+    private final ModelPart root;
     private final ModelPart tailHelm;
     private final ModelPart tailBare;
     private final ModelPart rClaw1;
@@ -34,7 +35,7 @@ public final class EldritchCrabModel extends EntityModel<EldritchCrabRenderState
     private final ModelPart lrLeg1;
 
     public EldritchCrabModel(ModelPart root) {
-        super(root);
+        this.root = root;
         this.tailHelm = root.getChild("tail_helm");
         this.tailBare = root.getChild("tail_bare");
         this.rClaw1 = root.getChild("r_claw1");
@@ -121,12 +122,16 @@ public final class EldritchCrabModel extends EntityModel<EldritchCrabRenderState
     }
 
     @Override
-    public void setupAnim(EldritchCrabRenderState state) {
-        super.setupAnim(state);
-        this.tailHelm.visible = state.helm;
-        this.tailBare.visible = !state.helm;
-        float limbSwing = state.walkAnimationPos;
-        float limbSwingAmount = state.walkAnimationSpeed;
+    public ModelPart root() {
+        return root;
+    }
+
+    @Override
+    public void setupAnim(EntityEldritchCrab entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+                          float netHeadYaw, float headPitch) {
+        boolean helm = entity.hasHelm();
+        this.tailHelm.visible = helm;
+        this.tailBare.visible = !helm;
         setLeg(this.rrLeg0, this.rrLeg1, LEG_SPLAY_Y, LEG_SPLAY_Z);
         setLeg(this.rfLeg0, this.rfLeg1, -LEG_SPLAY_Y, LEG_SPLAY_Z);
         setLeg(this.lrLeg0, this.lrLeg1, -LEG_SPLAY_Y, -LEG_SPLAY_Z);
@@ -143,10 +148,10 @@ public final class EldritchCrabModel extends EntityModel<EldritchCrabRenderState
         this.tailBare.yRot = tailY;
         this.tailHelm.zRot = tailZ;
         this.tailBare.zRot = tailZ;
-        this.rClaw2.xRot = CLAW_TILT - Mth.sin(state.ageInTicks / 4.0F) * 0.25F;
-        this.lClaw2.xRot = CLAW_TILT + Mth.sin(state.ageInTicks / 4.1F) * 0.25F;
-        this.rClaw1.xRot = Mth.sin(state.ageInTicks / 4.0F) * 0.125F;
-        this.lClaw1.xRot = -Mth.sin(state.ageInTicks / 4.1F) * 0.125F;
+        this.rClaw2.xRot = CLAW_TILT - Mth.sin(ageInTicks / 4.0F) * 0.25F;
+        this.lClaw2.xRot = CLAW_TILT + Mth.sin(ageInTicks / 4.1F) * 0.25F;
+        this.rClaw1.xRot = Mth.sin(ageInTicks / 4.0F) * 0.125F;
+        this.lClaw1.xRot = -Mth.sin(ageInTicks / 4.1F) * 0.125F;
     }
 
     private static void setLeg(ModelPart leg0, ModelPart leg1, float yRot, float zRot) {

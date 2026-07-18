@@ -10,21 +10,16 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
 
-public final class EldritchObeliskRenderer implements BlockEntityRenderer<BlockEntityEldritchObelisk, EldritchObeliskRenderState> {
+public final class EldritchObeliskRenderer implements BlockEntityRenderer<BlockEntityEldritchObelisk> {
     public static final ResourceLocation CAP_MODEL = TCIds.rl("models/obj/obelisk_cap.obj");
     public static final String CAP_PART = "Cap";
 
@@ -42,67 +37,60 @@ public final class EldritchObeliskRenderer implements BlockEntityRenderer<BlockE
     public EldritchObeliskRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public EldritchObeliskRenderState createRenderState() {
-        return new EldritchObeliskRenderState();
-    }
-
-    @Override
-    public void extractRenderState(BlockEntityEldritchObelisk obelisk, EldritchObeliskRenderState state, float partialTicks,
-                                   Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(obelisk, state, partialTicks, cameraPosition, breakProgress);
+    public void render(BlockEntityEldritchObelisk obelisk, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light, int overlay) {
         var viewEntity = Minecraft.getInstance().getCameraEntity();
-        state.animationTime = viewEntity == null ? partialTicks : viewEntity.tickCount + partialTicks;
-        state.outerLands = obelisk.getLevel() != null && obelisk.getLevel().dimension() == OuterLands.DIMENSION;
-    }
-
-    @Override
-    public void submit(EldritchObeliskRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        float bob = Mth.sin(state.animationTime / BOB_PERIOD) * BOB_AMPLITUDE + BOB_AMPLITUDE;
+        float animationTime = viewEntity == null ? partialTick : viewEntity.tickCount + partialTick;
+        boolean outerLands = obelisk.getLevel() != null && obelisk.getLevel().dimension() == OuterLands.DIMENSION;
+        float bob = Mth.sin(animationTime / BOB_PERIOD) * BOB_AMPLITUDE + BOB_AMPLITUDE;
         float base = COLUMN_BASE + bob;
         float top = base + COLUMN_HEIGHT;
-        collector.submitCustomGeometry(poseStack, EldritchPortalSurface.SURFACE, (pose, buffer) -> {
-            EldritchPortalSurface.quad(pose, buffer,
-                    0.0F, base, PLANE_INSET, 0.0F, top, PLANE_INSET,
-                    1.0F, top, PLANE_INSET, 1.0F, base, PLANE_INSET);
-            EldritchPortalSurface.quad(pose, buffer,
-                    0.0F, base, 1.0F - PLANE_INSET, 0.0F, top, 1.0F - PLANE_INSET,
-                    1.0F, top, 1.0F - PLANE_INSET, 1.0F, base, 1.0F - PLANE_INSET);
-            EldritchPortalSurface.quad(pose, buffer,
-                    PLANE_INSET, base, 0.0F, PLANE_INSET, top, 0.0F,
-                    PLANE_INSET, top, 1.0F, PLANE_INSET, base, 1.0F);
-            EldritchPortalSurface.quad(pose, buffer,
-                    1.0F - PLANE_INSET, base, 0.0F, 1.0F - PLANE_INSET, top, 0.0F,
-                    1.0F - PLANE_INSET, top, 1.0F, 1.0F - PLANE_INSET, base, 1.0F);
-        });
-        RenderType sideType = RenderTypes.entityTranslucent(state.outerLands ? SIDE_TEXTURE_OUTER : SIDE_TEXTURE);
+
+        VertexConsumer surface = buffers.getBuffer(EldritchPortalSurface.SURFACE);
+        PoseStack.Pose surfacePose = poseStack.last();
+        EldritchPortalSurface.quad(surfacePose, surface,
+                0.0F, base, PLANE_INSET, 0.0F, top, PLANE_INSET,
+                1.0F, top, PLANE_INSET, 1.0F, base, PLANE_INSET);
+        EldritchPortalSurface.quad(surfacePose, surface,
+                0.0F, base, 1.0F - PLANE_INSET, 0.0F, top, 1.0F - PLANE_INSET,
+                1.0F, top, 1.0F - PLANE_INSET, 1.0F, base, 1.0F - PLANE_INSET);
+        EldritchPortalSurface.quad(surfacePose, surface,
+                PLANE_INSET, base, 0.0F, PLANE_INSET, top, 0.0F,
+                PLANE_INSET, top, 1.0F, PLANE_INSET, base, 1.0F);
+        EldritchPortalSurface.quad(surfacePose, surface,
+                1.0F - PLANE_INSET, base, 0.0F, 1.0F - PLANE_INSET, top, 0.0F,
+                1.0F - PLANE_INSET, top, 1.0F, 1.0F - PLANE_INSET, base, 1.0F);
+
+        RenderType sideType = RenderType.entityTranslucent(outerLands ? SIDE_TEXTURE_OUTER : SIDE_TEXTURE);
+        VertexConsumer sideBuffer = buffers.getBuffer(sideType);
         for (int a = 0; a < 4; a++) {
             poseStack.pushPose();
             poseStack.translate(0.5F, base, 0.5F);
             poseStack.mulPose(Axis.YP.rotationDegrees(a * 90.0F));
             poseStack.translate(0.0F, 0.0F, -0.5F);
-            collector.submitCustomGeometry(poseStack, sideType,
-                    (pose, buffer) -> sideQuad(pose, buffer, state.lightCoords));
+            sideQuad(poseStack.last(), sideBuffer, light);
             poseStack.popPose();
         }
-        RenderType capType = RenderTypes.entityTranslucent(state.outerLands ? CAP_TEXTURE_OUTER : CAP_TEXTURE);
+
+        RenderType capType = RenderType.entityTranslucent(outerLands ? CAP_TEXTURE_OUTER : CAP_TEXTURE);
         poseStack.pushPose();
         poseStack.translate(0.5F, base, 0.5F);
         poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-        submitCap(poseStack, collector, capType, state.lightCoords);
+        renderCap(poseStack, buffers, capType, light);
         poseStack.popPose();
         poseStack.pushPose();
         poseStack.translate(0.5F, top, 0.5F);
         poseStack.mulPose(Axis.XN.rotationDegrees(90.0F));
-        submitCap(poseStack, collector, capType, state.lightCoords);
+        renderCap(poseStack, buffers, capType, light);
         poseStack.popPose();
     }
 
-    static void submitCap(PoseStack poseStack, SubmitNodeCollector collector, RenderType type, int light) {
+    static void renderCap(PoseStack poseStack, MultiBufferSource buffers, RenderType type, int light) {
         MeshModel mesh = GolemMeshes.get(CAP_MODEL);
+        VertexConsumer buffer = buffers.getBuffer(type);
         for (MeshPart part : mesh.parts()) {
             if (CAP_PART.equals(part.name())) {
-                collector.submitCustomGeometry(poseStack, type,
-                        (pose, buffer) -> GolemMeshes.renderPart(mesh, part, pose, buffer, light, -1));
+                GolemMeshes.renderPart(mesh, part, poseStack.last(), buffer, light, -1);
             }
         }
     }

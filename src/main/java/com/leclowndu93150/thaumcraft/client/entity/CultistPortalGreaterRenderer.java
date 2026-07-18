@@ -1,13 +1,14 @@
 package com.leclowndu93150.thaumcraft.client.entity;
 
+import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.entity.boss.EntityCultistPortalGreater;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.resources.ResourceLocation;
 
-public final class CultistPortalGreaterRenderer extends EntityRenderer<EntityCultistPortalGreater, CultistPortalRenderer.State> {
+public final class CultistPortalGreaterRenderer extends EntityRenderer<EntityCultistPortalGreater> {
     private static final float BASE_SCALE_Y = 1.5F;
     private static final float SCALE_FACTOR = 1.3F;
     private static final float SHADOW = 0.1F;
@@ -18,24 +19,16 @@ public final class CultistPortalGreaterRenderer extends EntityRenderer<EntityCul
     }
 
     @Override
-    public CultistPortalRenderer.State createRenderState() {
-        return new CultistPortalRenderer.State();
+    public void render(EntityCultistPortalGreater entity, float entityYaw, float partialTicks, PoseStack poseStack,
+                       MultiBufferSource buffers, int packedLight) {
+        super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
+        CultistPortalRenderer.renderPortal(poseStack, buffers, true, entity.tickCount + partialTicks, entity.hurtTime,
+                entity.pulse, entity.getHealth() / entity.getMaxHealth(), entity.getBbHeight() / 2.0F,
+                BASE_SCALE_Y, SCALE_FACTOR);
     }
 
     @Override
-    public void extractRenderState(EntityCultistPortalGreater entity, CultistPortalRenderer.State state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.active = true;
-        state.activeCounter = entity.tickCount + partialTicks;
-        state.hurtTime = entity.hurtTime;
-        state.pulse = entity.pulse;
-        state.healthFraction = entity.getHealth() / entity.getMaxHealth();
-        state.halfHeight = entity.getBbHeight() / 2.0F;
-    }
-
-    @Override
-    public void submit(CultistPortalRenderer.State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        super.submit(state, poseStack, collector, camera);
-        CultistPortalRenderer.submitPortal(state, poseStack, collector, camera, BASE_SCALE_Y, SCALE_FACTOR);
+    public ResourceLocation getTextureLocation(EntityCultistPortalGreater entity) {
+        return TCIds.rl("textures/misc/cultist_portal.png");
     }
 }

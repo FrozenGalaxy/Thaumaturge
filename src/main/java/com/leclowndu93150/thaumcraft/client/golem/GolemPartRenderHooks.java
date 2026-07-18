@@ -1,13 +1,15 @@
 package com.leclowndu93150.thaumcraft.client.golem;
 
 import com.leclowndu93150.thaumcraft.api.golems.parts.GolemPartModel;
+import com.leclowndu93150.thaumcraft.client.render.ItemRenderHelper;
 import com.leclowndu93150.thaumcraft.registry.TCGolemParts;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.item.ItemDisplayContext;
 
 public final class GolemPartRenderHooks {
     private static final Map<GolemPartModel, GolemPartRenderHook> HOOKS = new IdentityHashMap<>();
@@ -86,7 +88,7 @@ public final class GolemPartRenderHooks {
     static final class HaulerHook implements GolemPartRenderHook {
         @Override
         public void postRenderObjectPart(String partName, GolemRenderState state, PoseStack poseStack,
-                                         SubmitNodeCollector collector, GolemPartModel.LimbSide side) {
+                                         MultiBufferSource buffers, GolemPartModel.LimbSide side) {
             if (!state.haulingItem) {
                 return;
             }
@@ -96,7 +98,8 @@ public final class GolemPartRenderHooks {
             if (!state.haulerItemIsBlock) {
                 poseStack.translate(0.0F, 0.0F, -0.25F);
             }
-            state.haulerItem.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+            ItemRenderHelper.render(state.haulerItem, ItemDisplayContext.HEAD, poseStack, buffers,
+                    state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             poseStack.popPose();
         }
     }

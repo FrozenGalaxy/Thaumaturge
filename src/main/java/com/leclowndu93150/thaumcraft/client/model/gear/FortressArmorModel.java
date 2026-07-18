@@ -7,9 +7,9 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.world.entity.LivingEntity;
 
-public final class FortressArmorModel extends HumanoidModel<HumanoidRenderState> {
+public final class FortressArmorModel extends HumanoidModel<LivingEntity> {
     private static final int TEX_WIDTH = 128;
     private static final int TEX_HEIGHT = 64;
     private static final float SIXTH_PI = (float) (Math.PI / 6);

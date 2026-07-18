@@ -2,38 +2,26 @@ package com.leclowndu93150.thaumcraft.client.entity;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
+import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumcraft.client.render.aspect.ParticleTextures;
 import com.leclowndu93150.thaumcraft.content.entity.WispEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
-import org.joml.Matrix4fc;
+import org.joml.Matrix4f;
 
-public final class WispRenderer extends EntityRenderer<WispEntity, WispRenderState> {
+public final class WispRenderer extends EntityRenderer<WispEntity> {
     private static final ResourceLocation NODES = TCIds.rl("textures/misc/auranodes.png");
 
-    private static final RenderType PARTICLES_TYPE = RenderType.create(
-            "tc_wisp_particles",
-            RenderSetup.builder(TCRenderPipelines.FX_ADDITIVE)
-                    .withTexture("Sampler0", ParticleTextures.PARTICLES)
-                    .useLightmap()
-                    .createRenderSetup());
-
-    private static final RenderType NODES_TYPE = RenderType.create(
-            "tc_wisp_nodes",
-            RenderSetup.builder(TCRenderPipelines.FX_ADDITIVE)
-                    .withTexture("Sampler0", NODES)
-                    .useLightmap()
-                    .createRenderSetup());
+    private static final RenderType PARTICLES_TYPE = TCRenderTypes.fxAdditive(ParticleTextures.PARTICLES);
+    private static final RenderType NODES_TYPE = TCRenderTypes.fxAdditive(NODES);
 
     private static final int PARTICLE_GRID = 64;
     private static final int NODE_GRID = 32;
@@ -56,40 +44,33 @@ public final class WispRenderer extends EntityRenderer<WispEntity, WispRenderSta
     }
 
     @Override
-    public WispRenderState createRenderState() {
-        return new WispRenderState();
-    }
-
-    @Override
-    public void extractRenderState(WispEntity entity, WispRenderState state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.tick = entity.tickCount;
-        state.dead = entity.isDeadOrDying();
-        Holder<IAspect> aspect = entity.aspect();
-        state.color = aspect == null ? 0xFFFFFF : aspect.value().color();
-    }
-
-    @Override
-    public void submit(WispRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        super.submit(state, poseStack, collector, camera);
-        if (state.dead) {
+    public void render(WispEntity entity, float entityYaw, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light) {
+        if (entity.isDeadOrDying()) {
             return;
         }
+        Holder<IAspect> aspect = entity.aspect();
+        int color = aspect == null ? 0xFFFFFF : aspect.value().color();
+        int frame = entity.tickCount % FRAME_SPREAD;
         poseStack.pushPose();
         poseStack.translate(0.0F, CENTER_Y, 0.0F);
-        poseStack.mulPose(camera.orientation);
-        int frame = state.tick % FRAME_SPREAD;
-        submitQuad(collector, poseStack, PARTICLES_TYPE, PARTICLE_GRID, CORE_FRAME_START + frame,
+        poseStack.mulPose(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());
+        drawQuad(buffers, poseStack, PARTICLES_TYPE, PARTICLE_GRID, CORE_FRAME_START + frame,
                 CORE_SCALE, 0xFFFFFF, 1.0F);
-        submitQuad(collector, poseStack, PARTICLES_TYPE, PARTICLE_GRID, HALO_FRAME_START + frame,
+        drawQuad(buffers, poseStack, PARTICLES_TYPE, PARTICLE_GRID, HALO_FRAME_START + frame,
                 HALO_SCALE, 0xFFFFFF, HALO_ALPHA);
-        submitQuad(collector, poseStack, NODES_TYPE, NODE_GRID, NODE_FRAME_START + frame,
-                NODE_SCALE, state.color, NODE_ALPHA);
+        drawQuad(buffers, poseStack, NODES_TYPE, NODE_GRID, NODE_FRAME_START + frame,
+                NODE_SCALE, color, NODE_ALPHA);
         poseStack.popPose();
     }
 
-    private static void submitQuad(SubmitNodeCollector collector, PoseStack poseStack, RenderType type,
-                                   int grid, int frame, float scale, int color, float alpha) {
+    @Override
+    public ResourceLocation getTextureLocation(WispEntity entity) {
+        return NODES;
+    }
+
+    private static void drawQuad(MultiBufferSource buffers, PoseStack poseStack, RenderType type,
+                                 int grid, int frame, float scale, int color, float alpha) {
         float texFrame = 1.0F / grid;
         float u0 = (frame % grid) * texFrame;
         float v0 = (frame / grid) * texFrame;
@@ -98,12 +79,8 @@ public final class WispRenderer extends EntityRenderer<WispEntity, WispRenderSta
         float half = scale * QUAD_HALF_FACTOR;
         int tint = ARGB32.colorFromFloat(alpha,
                 ARGB32.red(color) / 255.0F, ARGB32.green(color) / 255.0F, ARGB32.blue(color) / 255.0F);
-        collector.submitCustomGeometry(poseStack, type, (pose, buffer) ->
-                addQuad(buffer, pose.pose(), half, u0, v0, u1, v1, tint));
-    }
-
-    private static void addQuad(VertexConsumer buffer, Matrix4fc mat, float half,
-                                float u0, float v0, float u1, float v1, int tint) {
+        VertexConsumer buffer = buffers.getBuffer(type);
+        Matrix4f mat = poseStack.last().pose();
         buffer.addVertex(mat, -half, -half, 0.0F).setUv(u1, v1).setColor(tint).setLight(EMISSIVE_LIGHT);
         buffer.addVertex(mat, -half, half, 0.0F).setUv(u1, v0).setColor(tint).setLight(EMISSIVE_LIGHT);
         buffer.addVertex(mat, half, half, 0.0F).setUv(u0, v0).setColor(tint).setLight(EMISSIVE_LIGHT);

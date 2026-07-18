@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
-public final class TaintacleRenderer extends MobRenderer<AbstractTaintacle, TaintacleRenderState, TaintacleModel> {
+public final class TaintacleRenderer extends MobRenderer<AbstractTaintacle, TaintacleModel> {
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/entity/taintacle.png");
     private static final float MODEL_Y_OFFSET = 1.501F;
     private static final float TALL_HEIGHT = 3.0F;
@@ -23,29 +23,18 @@ public final class TaintacleRenderer extends MobRenderer<AbstractTaintacle, Tain
     }
 
     @Override
-    public ResourceLocation getTextureLocation(TaintacleRenderState state) {
+    public ResourceLocation getTextureLocation(AbstractTaintacle entity) {
         return TEXTURE;
     }
 
     @Override
-    public TaintacleRenderState createRenderState() {
-        return new TaintacleRenderState();
-    }
-
-    @Override
-    public void extractRenderState(AbstractTaintacle entity, TaintacleRenderState state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.flail = entity.flailIntensity;
-        state.hurt = entity.hurtTime;
-    }
-
-    @Override
-    protected void scale(TaintacleRenderState state, PoseStack poseStack) {
-        float height = state.boundingBoxHeight;
+    protected void scale(AbstractTaintacle entity, PoseStack poseStack, float partialTick) {
+        float height = entity.getBbHeight();
+        float ageInTicks = entity.tickCount + partialTick;
         float emerge = 0.0F;
         float emergeTicks = height * EMERGE_TICKS_PER_HEIGHT;
-        if (state.ageInTicks < emergeTicks) {
-            emerge = (emergeTicks - state.ageInTicks) / emergeTicks * height;
+        if (ageInTicks < emergeTicks) {
+            emerge = (emergeTicks - ageInTicks) / emergeTicks * height;
         }
         float lift = (height == TALL_HEIGHT ? TALL_LIFT : SHORT_LIFT) + emerge;
         float s = height / HEIGHT_SCALE_DIVISOR;

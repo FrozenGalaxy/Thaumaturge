@@ -1,53 +1,45 @@
 package com.leclowndu93150.thaumcraft.client.entity;
 
 import com.leclowndu93150.thaumcraft.TCIds;
+import com.leclowndu93150.thaumcraft.client.render.entity.TintBufferSource;
 import com.leclowndu93150.thaumcraft.content.entity.EntityBrainyZombie;
 import com.leclowndu93150.thaumcraft.content.entity.EntityGiantBrainyZombie;
-import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.model.monster.zombie.BabyZombieModel;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.ZombieModel;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.AbstractZombieRenderer;
-import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 
 public final class BrainyZombieRenderer
-        extends AbstractZombieRenderer<EntityBrainyZombie, BrainyZombieRenderState, ZombieModel<BrainyZombieRenderState>> {
+        extends AbstractZombieRenderer<EntityBrainyZombie, ZombieModel<EntityBrainyZombie>> {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/brainy_zombie.png");
     private static final float ANGER_TINT_STRENGTH = 0.5F;
 
     public BrainyZombieRenderer(EntityRendererProvider.Context context) {
         super(context,
                 new ZombieModel<>(context.bakeLayer(ModelLayers.ZOMBIE)),
-                new BabyZombieModel<>(context.bakeLayer(ModelLayers.ZOMBIE_BABY)),
-                ArmorModelSet.bake(ModelLayers.ZOMBIE_ARMOR, context.getModelSet(), ZombieModel::new),
-                ArmorModelSet.bake(ModelLayers.ZOMBIE_BABY_ARMOR, context.getModelSet(), BabyZombieModel::new));
+                new ZombieModel<>(context.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
+                new ZombieModel<>(context.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)));
     }
 
     @Override
-    public BrainyZombieRenderState createRenderState() {
-        return new BrainyZombieRenderState();
-    }
-
-    @Override
-    public void extractRenderState(EntityBrainyZombie entity, BrainyZombieRenderState state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.anger = entity instanceof EntityGiantBrainyZombie giant ? giant.getAnger() : 0.0F;
-    }
-
-    @Override
-    public ResourceLocation getTextureLocation(BrainyZombieRenderState state) {
-        return TEXTURE;
-    }
-
-    @Override
-    protected int getModelTint(BrainyZombieRenderState state) {
-        if (state.anger <= 0.0F) {
-            return super.getModelTint(state);
+    public void render(EntityBrainyZombie entity, float entityYaw, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light) {
+        float anger = entity instanceof EntityGiantBrainyZombie giant ? giant.getAnger() : 0.0F;
+        if (anger > 0.0F) {
+            float fade = 1.0F - Math.min(1.0F, anger) * ANGER_TINT_STRENGTH;
+            int tint = ARGB32.colorFromFloat(1.0F, 1.0F, Mth.clamp(fade, 0.0F, 1.0F), Mth.clamp(fade, 0.0F, 1.0F));
+            buffers = new TintBufferSource(buffers, tint);
         }
-        float fade = 1.0F - Math.min(1.0F, state.anger) * ANGER_TINT_STRENGTH;
-        return ARGB32.colorFromFloat(1.0F, 1.0F, Mth.clamp(fade, 0.0F, 1.0F), Mth.clamp(fade, 0.0F, 1.0F));
+        super.render(entity, entityYaw, partialTick, poseStack, buffers, light);
+    }
+
+    @Override
+    public ResourceLocation getTextureLocation(EntityBrainyZombie entity) {
+        return TEXTURE;
     }
 }

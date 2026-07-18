@@ -1,8 +1,8 @@
 package com.leclowndu93150.thaumcraft.client.entity;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
 import com.leclowndu93150.thaumcraft.client.model.entity.GrapplerModel;
+import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumcraft.client.render.aspect.ParticleTextures;
 import com.leclowndu93150.thaumcraft.content.entity.projectile.EntityGrapple;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -11,14 +11,10 @@ import com.mojang.math.Axis;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
@@ -26,31 +22,14 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4fc;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public final class GrappleRenderer extends EntityRenderer<EntityGrapple, GrappleRenderer.State> {
-    public static final class State extends EntityRenderState {
-        public float yaw;
-        public float pitch;
-        public int ticks;
-        public final List<Vec3> points = new ArrayList<>();
-    }
-
+public final class GrappleRenderer extends EntityRenderer<EntityGrapple> {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/grappler.png");
     private static final ResourceLocation ROPE = TCIds.rl("textures/misc/rope.png");
-    private static final RenderType ROPE_TYPE = RenderType.create(
-            "tc_grapple_rope",
-            RenderSetup.builder(TCRenderPipelines.FX_TRANSLUCENT)
-                    .withTexture("Sampler0", ROPE)
-                    .useLightmap()
-                    .createRenderSetup());
-    private static final RenderType GLOW_TYPE = RenderType.create(
-            "tc_grapple_glow",
-            RenderSetup.builder(TCRenderPipelines.FX_ADDITIVE)
-                    .withTexture("Sampler0", ParticleTextures.PARTICLES)
-                    .useLightmap()
-                    .createRenderSetup());
+    private static final RenderType ROPE_TYPE = TCRenderTypes.fxTranslucent(ROPE);
+    private static final RenderType GLOW_TYPE = TCRenderTypes.fxAdditive(ParticleTextures.PARTICLES);
 
     private static final double ROPE_RADIUS = 0.025;
     private static final int ROPE_SIDES = 4;
@@ -67,56 +46,48 @@ public final class GrappleRenderer extends EntityRenderer<EntityGrapple, Grapple
     }
 
     @Override
-    public State createRenderState() {
-        return new State();
-    }
-
-    @Override
-    public void extractRenderState(EntityGrapple entity, State state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.yaw = Mth.rotLerp(partialTicks, entity.yRotO, entity.getYRot());
-        state.pitch = Mth.lerp(partialTicks, entity.xRotO, entity.getXRot());
-        state.ticks = entity.tickCount;
-        state.points.clear();
-        calcPoints(entity.getOwner(), entity, partialTicks, state.points);
-    }
-
-    @Override
-    public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        super.submit(state, poseStack, collector, camera);
+    public void render(EntityGrapple entity, float entityYaw, float partialTicks, PoseStack poseStack,
+                       MultiBufferSource buffers, int packedLight) {
+        super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
+        float yaw = Mth.rotLerp(partialTicks, entity.yRotO, entity.getYRot());
+        float pitch = Mth.lerp(partialTicks, entity.xRotO, entity.getXRot());
+        int ticks = entity.tickCount;
+        List<Vec3> points = new ArrayList<>();
+        calcPoints(entity.getOwner(), entity, partialTicks, points);
         poseStack.pushPose();
-        poseStack.mulPose(Axis.YP.rotationDegrees(state.yaw - 90.0F));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(state.pitch));
-        collector.submitModelPart(model.root, poseStack, RenderTypes.entityCutout(TEXTURE),
-                state.lightCoords, OverlayTexture.NO_OVERLAY, null, -1, null);
+        poseStack.mulPose(Axis.YP.rotationDegrees(yaw - 90.0F));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(pitch));
+        model.root.render(poseStack, buffers.getBuffer(RenderType.entityCutout(TEXTURE)),
+                packedLight, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
         poseStack.pushPose();
-        poseStack.mulPose(camera.orientation);
-        float bob = Mth.sin(state.ticks / 5.0F) * 0.2F + 0.2F;
+        poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
+        float bob = Mth.sin(ticks / 5.0F) * 0.2F + 0.2F;
         float glowScale = 1.0F + bob;
-        float u0 = (1 + state.ticks % 6) / 32.0F;
+        float u0 = (1 + ticks % 6) / 32.0F;
         float u1 = u0 + 0.03125F;
         float v0 = 0.21875F;
         float v1 = v0 + 0.03125F;
         int glowTint = ARGB32.colorFromFloat(GLOW_ALPHA, 1.0F, 1.0F, 1.0F);
-        collector.submitCustomGeometry(poseStack, GLOW_TYPE, (pose, buffer) -> {
-            Matrix4fc mat = pose.pose();
-            float half = GLOW_HALF * glowScale;
-            buffer.addVertex(mat, -half, -half, 0.0F).setUv(u0, v1).setColor(glowTint).setLight(EMISSIVE_LIGHT);
-            buffer.addVertex(mat, half, -half, 0.0F).setUv(u1, v1).setColor(glowTint).setLight(EMISSIVE_LIGHT);
-            buffer.addVertex(mat, half, half, 0.0F).setUv(u1, v0).setColor(glowTint).setLight(EMISSIVE_LIGHT);
-            buffer.addVertex(mat, -half, half, 0.0F).setUv(u0, v0).setColor(glowTint).setLight(EMISSIVE_LIGHT);
-        });
+        VertexConsumer glowBuffer = buffers.getBuffer(GLOW_TYPE);
+        Matrix4f glowMat = poseStack.last().pose();
+        float half = GLOW_HALF * glowScale;
+        glowBuffer.addVertex(glowMat, -half, -half, 0.0F).setUv(u0, v1).setColor(glowTint).setLight(EMISSIVE_LIGHT);
+        glowBuffer.addVertex(glowMat, half, -half, 0.0F).setUv(u1, v1).setColor(glowTint).setLight(EMISSIVE_LIGHT);
+        glowBuffer.addVertex(glowMat, half, half, 0.0F).setUv(u1, v0).setColor(glowTint).setLight(EMISSIVE_LIGHT);
+        glowBuffer.addVertex(glowMat, -half, half, 0.0F).setUv(u0, v0).setColor(glowTint).setLight(EMISSIVE_LIGHT);
         poseStack.popPose();
-        if (state.points.size() > 2) {
-            List<Vec3> points = List.copyOf(state.points);
-            int light = state.lightCoords;
-            collector.submitCustomGeometry(poseStack, ROPE_TYPE,
-                    (pose, buffer) -> submitRope(buffer, pose.pose(), points, light));
+        if (points.size() > 2) {
+            submitRope(buffers.getBuffer(ROPE_TYPE), poseStack.last().pose(), points, packedLight);
         }
     }
 
-    private static void submitRope(VertexConsumer buffer, Matrix4fc mat, List<Vec3> points, int light) {
+    @Override
+    public ResourceLocation getTextureLocation(EntityGrapple entity) {
+        return TEXTURE;
+    }
+
+    private static void submitRope(VertexConsumer buffer, Matrix4f mat, List<Vec3> points, int light) {
         Vector3f[] previousRing = null;
         double previousV = 0.0;
         for (int index = 0; index < points.size(); index++) {
@@ -143,7 +114,7 @@ public final class GrappleRenderer extends EntityRenderer<EntityGrapple, Grapple
         }
     }
 
-    private static void addRopeVertex(VertexConsumer buffer, Matrix4fc mat, Vector3f pos, float u, float v, int light) {
+    private static void addRopeVertex(VertexConsumer buffer, Matrix4f mat, Vector3f pos, float u, float v, int light) {
         buffer.addVertex(mat, pos.x(), pos.y(), pos.z()).setUv(u, v).setColor(-1).setLight(light);
     }
 

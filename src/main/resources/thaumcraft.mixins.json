@@ -18,7 +18,6 @@
     "client.gui.GuiGraphicsExtractorAccessor",
     "client.renderer.GameRendererInvoker",
     "client.renderer.entity.LivingEntityRendererMixin",
-    "client.renderer.entity.LivingEntityRenderStateMixin",
     "client.renderer.entity.layers.HumanoidArmorLayerAccessor"
   ],
   "injectors": {

@@ -7,29 +7,26 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
-import org.jspecify.annotations.Nullable;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
-public final class MirrorRenderer implements BlockEntityRenderer<BlockEntityMirrorBase, MirrorRenderState> {
-    public static final ResourceLocation FRAME_MODEL_ID = TCIds.rl("block/mirror");
-    public static final ResourceLocation FRAME_ESSENTIA_MODEL_ID = TCIds.rl("block/mirror_essentia");
-    public static final StandaloneModelKey<BlockStateModel> FRAME_MODEL =
-            new StandaloneModelKey<>(FRAME_MODEL_ID::toString);
-    public static final StandaloneModelKey<BlockStateModel> FRAME_ESSENTIA_MODEL =
-            new StandaloneModelKey<>(FRAME_ESSENTIA_MODEL_ID::toString);
+public final class MirrorRenderer implements BlockEntityRenderer<BlockEntityMirrorBase> {
+    public static final ModelResourceLocation FRAME_MODEL_ID =
+            ModelResourceLocation.standalone(TCIds.rl("block/mirror"));
+    public static final ModelResourceLocation FRAME_ESSENTIA_MODEL_ID =
+            ModelResourceLocation.standalone(TCIds.rl("block/mirror_essentia"));
 
     private static final ResourceLocation PANE_TEXTURE = TCIds.rl("textures/block/mirrorpane.png");
     private static final ResourceLocation PANE_TRANS_TEXTURE = TCIds.rl("textures/block/mirrorpanetrans.png");
@@ -54,40 +51,25 @@ public final class MirrorRenderer implements BlockEntityRenderer<BlockEntityMirr
     private static final float FRAME_CENTER_LIFT = 0.46875F;
     private static final double PORTAL_RANGE_SQ = 1024.0;
 
+    private final RandomSource random = RandomSource.create();
+
     public MirrorRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public MirrorRenderState createRenderState() {
-        return new MirrorRenderState();
-    }
-
-    @Override
-    public void extractRenderState(BlockEntityMirrorBase mirror, MirrorRenderState state, float partialTicks,
-                                   Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(mirror, state, partialTicks, cameraPosition, breakProgress);
-        state.facing = mirror.getBlockState().getValue(BlockMirror.FACING);
-        state.linked = mirror.linked;
+    public void render(BlockEntityMirrorBase mirror, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light, int overlay) {
+        BlockState state = mirror.getBlockState();
+        Direction facing = state.getValue(BlockMirror.FACING);
+        boolean linked = mirror.linked;
         var player = Minecraft.getInstance().player;
-        state.inRange = player != null
+        boolean inRange = player != null
                 && player.distanceToSqr(Vec3.atCenterOf(mirror.getBlockPos())) < PORTAL_RANGE_SQ;
-        state.frameParts.clear();
-        boolean essentia = mirror.getBlockState().getBlock() instanceof BlockMirror mirrorBlock
-                && mirrorBlock.isEssentia();
-        BlockStateModel frameModel = Minecraft.getInstance().getModelManager()
-                .getStandaloneModel(essentia ? FRAME_ESSENTIA_MODEL : FRAME_MODEL);
-        if (frameModel != null && mirror.getLevel() instanceof ClientLevel clientLevel) {
-            frameModel.collectParts(clientLevel, mirror.getBlockPos(), mirror.getBlockState(),
-                    clientLevel.getRandom(), state.frameParts);
-        }
-    }
+        boolean essentia = state.getBlock() instanceof BlockMirror mirrorBlock && mirrorBlock.isEssentia();
 
-    @Override
-    public void submit(MirrorRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
-        float xRot = state.facing == Direction.UP ? 0.0F
-                : state.facing == Direction.DOWN ? 180.0F : 90.0F;
-        float yRot = switch (state.facing) {
+        float xRot = facing == Direction.UP ? 0.0F : facing == Direction.DOWN ? 180.0F : 90.0F;
+        float yRot = switch (facing) {
             case EAST -> 90.0F;
             case SOUTH -> 180.0F;
             case WEST -> 270.0F;
@@ -95,24 +77,31 @@ public final class MirrorRenderer implements BlockEntityRenderer<BlockEntityMirr
         };
         poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
         poseStack.mulPose(Axis.XP.rotationDegrees(-xRot));
-        if (!state.frameParts.isEmpty()) {
-            poseStack.pushPose();
-            poseStack.translate(0.0F, -FRAME_CENTER_LIFT, 0.0F);
-            poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
-            poseStack.translate(-0.5F, -0.5F, -0.5F);
-            collector.submitMultiLayerBlockModel(poseStack, state.frameParts, true, new int[0],
-                    state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
-            poseStack.popPose();
-        }
-        if (state.linked && state.inRange) {
-            collector.submitCustomGeometry(poseStack, EldritchPortalSurface.SURFACE, MirrorRenderer::portalWindow);
-        }
-        RenderType paneType = RenderTypes.entityTranslucent(state.linked && state.inRange
-                ? PANE_TRANS_TEXTURE : PANE_TEXTURE);
-        int light = state.lightCoords;
-        collector.submitCustomGeometry(poseStack, paneType, (pose, buffer) ->
-                paneQuad(pose, buffer, light));
+
+        poseStack.pushPose();
+        poseStack.translate(0.0F, -FRAME_CENTER_LIFT, 0.0F);
+        poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
+        poseStack.translate(-0.5F, -0.5F, -0.5F);
+        renderFrame(essentia ? FRAME_ESSENTIA_MODEL_ID : FRAME_MODEL_ID, state, poseStack, buffers, light, overlay);
         poseStack.popPose();
+
+        if (linked && inRange) {
+            VertexConsumer surface = buffers.getBuffer(EldritchPortalSurface.SURFACE);
+            portalWindow(poseStack.last(), surface);
+        }
+        RenderType paneType = RenderType.entityTranslucent(linked && inRange ? PANE_TRANS_TEXTURE : PANE_TEXTURE);
+        paneQuad(poseStack.last(), buffers.getBuffer(paneType), light);
+        poseStack.popPose();
+    }
+
+    private void renderFrame(ModelResourceLocation id, BlockState state, PoseStack poseStack,
+                             MultiBufferSource buffers, int light, int overlay) {
+        BakedModel model = Minecraft.getInstance().getModelManager().getModel(id);
+        ModelBlockRenderer modelRenderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
+        for (RenderType renderType : model.getRenderTypes(state, random, ModelData.EMPTY)) {
+            modelRenderer.renderModel(poseStack.last(), buffers.getBuffer(renderType), state, model,
+                    1.0F, 1.0F, 1.0F, light, overlay, ModelData.EMPTY, renderType);
+        }
     }
 
     private static void portalWindow(PoseStack.Pose pose, VertexConsumer buffer) {

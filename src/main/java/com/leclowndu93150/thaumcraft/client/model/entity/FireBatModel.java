@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.model.entity;
 
-import com.leclowndu93150.thaumcraft.client.entity.FireBatRenderState;
-import net.minecraft.client.model.EntityModel;
+import com.leclowndu93150.thaumcraft.content.entity.EntityFireBat;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -11,15 +11,18 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Mob;
 import java.util.function.Function;
 
-public final class FireBatModel extends EntityModel<FireBatRenderState> {
+public final class FireBatModel<T extends Mob> extends HierarchicalModel<T> {
     private static final int TEXTURE_SIZE = 64;
+    private static final float DEG_TO_RAD = (float) Math.PI / 180.0F;
     private static final float HANGING_WING_X = (float) (-Math.PI / 20);
     private static final float HANGING_WING_Y = (float) (-Math.PI * 2.0 / 5.0);
     private static final float HANGING_OUTER_WING_Y = -1.7278761F;
     private static final float FLYING_BODY_X = (float) (Math.PI / 4);
 
+    private final ModelPart root;
     private final ModelPart head;
     private final ModelPart body;
     private final ModelPart rightWing;
@@ -28,7 +31,7 @@ public final class FireBatModel extends EntityModel<FireBatRenderState> {
     private final ModelPart leftWingTip;
 
     public FireBatModel(ModelPart root) {
-        super(root);
+        this.root = root;
         this.head = root.getChild("head");
         this.body = root.getChild("body");
         this.rightWing = this.body.getChild("right_wing");
@@ -38,7 +41,8 @@ public final class FireBatModel extends EntityModel<FireBatRenderState> {
     }
 
     public FireBatModel(ModelPart root, Function<ResourceLocation, RenderType> renderType) {
-        super(root, renderType);
+        super(renderType);
+        this.root = root;
         this.head = root.getChild("head");
         this.body = root.getChild("body");
         this.rightWing = this.body.getChild("right_wing");
@@ -80,11 +84,16 @@ public final class FireBatModel extends EntityModel<FireBatRenderState> {
     }
 
     @Override
-    public void setupAnim(FireBatRenderState state) {
-        super.setupAnim(state);
-        if (state.hanging) {
-            this.head.xRot = state.xRot * ((float) Math.PI / 180.0F);
-            this.head.yRot = (float) Math.PI - state.yRot * ((float) Math.PI / 180.0F);
+    public ModelPart root() {
+        return root;
+    }
+
+    @Override
+    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+                          float netHeadYaw, float headPitch) {
+        if (entity instanceof EntityFireBat fireBat && fireBat.isHanging()) {
+            this.head.xRot = headPitch * DEG_TO_RAD;
+            this.head.yRot = (float) Math.PI - netHeadYaw * DEG_TO_RAD;
             this.head.zRot = (float) Math.PI;
             this.head.setPos(0.0F, -2.0F, 0.0F);
             this.rightWing.setPos(-3.0F, 0.0F, 3.0F);
@@ -97,15 +106,15 @@ public final class FireBatModel extends EntityModel<FireBatRenderState> {
             this.leftWing.yRot = -HANGING_WING_Y;
             this.leftWingTip.yRot = -HANGING_OUTER_WING_Y;
         } else {
-            this.head.xRot = state.xRot * ((float) Math.PI / 180.0F);
-            this.head.yRot = state.yRot * ((float) Math.PI / 180.0F);
+            this.head.xRot = headPitch * DEG_TO_RAD;
+            this.head.yRot = netHeadYaw * DEG_TO_RAD;
             this.head.zRot = 0.0F;
             this.head.setPos(0.0F, 0.0F, 0.0F);
             this.rightWing.setPos(0.0F, 0.0F, 0.0F);
             this.leftWing.setPos(0.0F, 0.0F, 0.0F);
-            this.body.xRot = FLYING_BODY_X + Mth.cos(state.ageInTicks * 0.1F) * 0.15F;
+            this.body.xRot = FLYING_BODY_X + Mth.cos(ageInTicks * 0.1F) * 0.15F;
             this.body.yRot = 0.0F;
-            this.rightWing.yRot = Mth.cos(state.ageInTicks * 1.3F) * (float) Math.PI * 0.25F;
+            this.rightWing.yRot = Mth.cos(ageInTicks * 1.3F) * (float) Math.PI * 0.25F;
             this.leftWing.yRot = -this.rightWing.yRot;
             this.rightWingTip.yRot = this.rightWing.yRot * 0.5F;
             this.leftWingTip.yRot = -this.rightWing.yRot * 0.5F;

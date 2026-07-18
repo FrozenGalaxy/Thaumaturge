@@ -8,7 +8,7 @@ import com.leclowndu93150.thaumcraft.api.nodes.NodeType;
 import com.leclowndu93150.thaumcraft.client.casters.WandTipTracker;
 import com.leclowndu93150.thaumcraft.client.fx.render.FloatyLineRenderer;
 import com.leclowndu93150.thaumcraft.client.fx.render.LateWorldRenderQueue;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
+import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityJarNode;
 import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityNode;
 import com.leclowndu93150.thaumcraft.content.item.ThaumometerItem;
@@ -17,45 +17,24 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4fc;
-import org.jspecify.annotations.Nullable;
+import org.joml.Matrix4f;
 
-public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode, NodeRenderState> {
+public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode> {
     private static final ResourceLocation NODES_TEXTURE = TCIds.rl("textures/misc/nodes.png");
 
-    private static final RenderType NODE_ADDITIVE = RenderType.create("tc_node_additive",
-            RenderSetup.builder(TCRenderPipelines.FX_ADDITIVE)
-                    .withTexture("Sampler0", NODES_TEXTURE)
-                    .useLightmap()
-                    .createRenderSetup());
-    private static final RenderType NODE_ADDITIVE_NO_DEPTH = RenderType.create("tc_node_additive_no_depth",
-            RenderSetup.builder(TCRenderPipelines.FX_ADDITIVE_NO_DEPTH)
-                    .withTexture("Sampler0", NODES_TEXTURE)
-                    .useLightmap()
-                    .createRenderSetup());
-    private static final RenderType NODE_TRANSLUCENT = RenderType.create("tc_node_translucent",
-            RenderSetup.builder(TCRenderPipelines.FX_TRANSLUCENT)
-                    .withTexture("Sampler0", NODES_TEXTURE)
-                    .useLightmap()
-                    .createRenderSetup());
-    private static final RenderType NODE_TRANSLUCENT_NO_DEPTH = RenderType.create("tc_node_translucent_no_depth",
-            RenderSetup.builder(TCRenderPipelines.FX_TRANSLUCENT_NO_DEPTH)
-                    .withTexture("Sampler0", NODES_TEXTURE)
-                    .useLightmap()
-                    .createRenderSetup());
+    private static final RenderType NODE_ADDITIVE = TCRenderTypes.fxAdditive(NODES_TEXTURE);
+    private static final RenderType NODE_ADDITIVE_NO_DEPTH = TCRenderTypes.fxAdditiveNoDepth(NODES_TEXTURE);
+    private static final RenderType NODE_TRANSLUCENT = TCRenderTypes.fxTranslucent(NODES_TEXTURE);
+    private static final RenderType NODE_TRANSLUCENT_NO_DEPTH = TCRenderTypes.fxTranslucentNoDepth(NODES_TEXTURE);
 
     private static final int GRID = 32;
     private static final double VIEW_DISTANCE = 64.0;
@@ -86,24 +65,32 @@ public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode, 
     public NodeRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public NodeRenderState createRenderState() {
-        return new NodeRenderState();
-    }
-
-    @Override
-    public void extractRenderState(BlockEntityNode node, NodeRenderState state, float partialTicks,
-                                   Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(node, state, partialTicks, cameraPosition, breakProgress);
-        state.layers.clear();
-        state.type = node.getNodeType();
-        state.modifier = node.getNodeModifier();
-        state.visible = false;
-        state.depthIgnore = false;
-        state.alpha = 0.0F;
+    public void render(BlockEntityNode node, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light, int overlay) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) {
             return;
         }
+        final NodeRenderState data = build(node, partialTick, player);
+        final Vec3 origin = Vec3.atCenterOf(node.getBlockPos());
+        if (data.jarred) {
+            poseStack.pushPose();
+            poseStack.translate(0.5F, JARRED_HEIGHT, 0.5F);
+            poseStack.mulPose(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());
+            drawLayers(data, poseStack, buffers);
+            poseStack.popPose();
+            if (data.draining) {
+                LateWorldRenderQueue.enqueue(origin, (latePose, lateBuffers) -> drawDrainLine(data, latePose, lateBuffers));
+            }
+            return;
+        }
+        LateWorldRenderQueue.enqueue(origin, (latePose, lateBuffers) -> drawLate(data, latePose, lateBuffers));
+    }
+
+    private static NodeRenderState build(BlockEntityNode node, float partialTicks, LocalPlayer player) {
+        NodeRenderState state = new NodeRenderState();
+        state.type = node.getNodeType();
+        state.modifier = node.getNodeModifier();
         Vec3 center = Vec3.atCenterOf(node.getBlockPos());
         double distance = Math.sqrt(player.distanceToSqr(center));
         double viewDistance = VIEW_DISTANCE;
@@ -176,63 +163,12 @@ public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode, 
             layer.blend = entry.aspect().value().blend();
             state.layers.add(layer);
         }
+        return state;
     }
 
-    @Override
-    public void submit(NodeRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        Vec3 origin = Vec3.atCenterOf(state.blockPos);
-        NodeRenderState snapshot = snapshot(state);
-        if (state.jarred) {
-            drawJarred(snapshot, poseStack, collector, camera);
-            if (snapshot.draining) {
-                LateWorldRenderQueue.enqueue(origin, (latePose, buffers) -> drawDrainLine(snapshot, latePose, buffers));
-            }
-            return;
-        }
-        LateWorldRenderQueue.enqueue(origin, (latePose, buffers) -> drawLate(snapshot, latePose, buffers));
-    }
-
-    private static void drawJarred(NodeRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        poseStack.pushPose();
-        poseStack.translate(0.5F, JARRED_HEIGHT, 0.5F);
-        poseStack.mulPose(camera.orientation);
-        submitLayers(state, poseStack, collector, 0);
-        poseStack.popPose();
-    }
-
-    public static void submitLayers(NodeRenderState state, PoseStack poseStack, SubmitNodeCollector collector, int orderBase) {
-        forEachLayer(state, (index, type, angle, scale, alpha, color, strip, frame) -> {
-            poseStack.pushPose();
-            if (angle != 0.0F) {
-                poseStack.mulPose(Axis.ZP.rotation(angle));
-            }
-            int tint = ARGB32.color((int) (Mth.clamp(alpha, 0.0F, 1.0F) * 255.0F), color);
-            collector.order(orderBase + index).submitCustomGeometry(poseStack, type,
-                    (pose, buffer) -> emitQuad(pose.pose(), buffer, scale, tint, strip, frame));
-            poseStack.popPose();
-        });
-    }
-
-    private static NodeRenderState snapshot(NodeRenderState state) {
-        NodeRenderState copy = new NodeRenderState();
-        copy.type = state.type;
-        copy.modifier = state.modifier;
-        copy.visible = state.visible;
-        copy.depthIgnore = state.depthIgnore;
-        copy.alpha = state.alpha;
-        copy.size = state.size;
-        copy.ticks = state.ticks;
-        copy.time = state.time;
-        copy.frameSeed = state.frameSeed;
-        copy.draining = state.draining;
-        copy.drainFromX = state.drainFromX;
-        copy.drainFromY = state.drainFromY;
-        copy.drainFromZ = state.drainFromZ;
-        copy.drainTime = state.drainTime;
-        copy.drainColor = state.drainColor;
-        copy.jarred = state.jarred;
-        copy.layers.addAll(state.layers);
-        return copy;
+    public static void drawLayers(NodeRenderState state, PoseStack poseStack, MultiBufferSource buffers) {
+        forEachLayer(state, (index, type, angle, scale, alpha, color, strip, frame) ->
+                drawLayer(poseStack, buffers, type, angle, scale, alpha, color, strip, frame));
     }
 
     public interface LayerSink {
@@ -292,8 +228,7 @@ public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode, 
         }
         poseStack.pushPose();
         poseStack.mulPose(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());
-        forEachLayer(state, (index, type, angle, scale, alpha, color, strip, frame) ->
-                drawLayer(poseStack, buffers, type, angle, scale, alpha, color, strip, frame));
+        drawLayers(state, poseStack, buffers);
         poseStack.popPose();
     }
 
@@ -315,7 +250,7 @@ public final class NodeRenderer implements BlockEntityRenderer<BlockEntityNode, 
         poseStack.popPose();
     }
 
-    public static void emitQuad(Matrix4fc mat, VertexConsumer buffer, float half, int tint, int strip, int frame) {
+    public static void emitQuad(Matrix4f mat, VertexConsumer buffer, float half, int tint, int strip, int frame) {
         float u0 = frame / (float) GRID;
         float u1 = (frame + 1) / (float) GRID;
         float v0 = strip / (float) GRID;

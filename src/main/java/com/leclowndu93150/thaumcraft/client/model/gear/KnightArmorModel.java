@@ -7,10 +7,10 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 
-public final class KnightArmorModel extends HumanoidModel<HumanoidRenderState> {
+public final class KnightArmorModel extends HumanoidModel<LivingEntity> {
     private static final int TEX_WIDTH = 128;
     private static final int TEX_HEIGHT = 64;
     private static final float QUARTER_PI = (float) (Math.PI / 4);
@@ -180,10 +180,11 @@ public final class KnightArmorModel extends HumanoidModel<HumanoidRenderState> {
     }
 
     @Override
-    public void setupAnim(HumanoidRenderState state) {
-        super.setupAnim(state);
-        float a = Mth.cos(state.walkAnimationPos * 0.6662F) * 1.4F * state.walkAnimationSpeed;
-        float b = Mth.cos(state.walkAnimationPos * 0.6662F + (float) Math.PI) * 1.4F * state.walkAnimationSpeed;
+    public void setupAnim(LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+                          float netHeadYaw, float headPitch) {
+        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        float a = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+        float b = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
         float c = Math.min(a, b);
         this.frontcloth1.xRot = c + FRONTCLOTH_1_ROT;
         this.frontcloth2.xRot = c + FRONTCLOTH_2_ROT;

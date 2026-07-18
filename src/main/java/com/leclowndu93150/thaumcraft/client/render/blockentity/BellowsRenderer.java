@@ -3,158 +3,78 @@ package com.leclowndu93150.thaumcraft.client.render.blockentity;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.essentia.bellows.BlockBellows;
 import com.leclowndu93150.thaumcraft.content.essentia.bellows.BlockEntityBellows;
-import com.leclowndu93150.thaumcraft.content.essentia.tube.BlockEntityTubeBuffer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
-import org.jspecify.annotations.Nullable;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
-import java.util.ArrayList;
+public final class BellowsRenderer implements BlockEntityRenderer<BlockEntityBellows> {
+    private static final int BOTTOM = 0;
+    private static final int TOP = 1;
+    private static final int BAG = 2;
+    public static final ModelResourceLocation[] MODEL_IDS = {
+            ModelResourceLocation.standalone(TCIds.rl("block/bellows/bottom_plank")),
+            ModelResourceLocation.standalone(TCIds.rl("block/bellows/top_plank")),
+            ModelResourceLocation.standalone(TCIds.rl("block/bellows/bag"))
+    };
 
-public class BellowsRenderer implements BlockEntityRenderer<BlockEntityBellows, BellowsRenderState> {
+    private final RandomSource random = RandomSource.create();
 
-    public static final String[] parts = new String[]{"bottom_plank","top_plank","bag"};
-
-    public static final StandaloneModelKey<BlockStateModel>[] MODEL_KEYS = new StandaloneModelKey[3];
-
-
-    public BellowsRenderer(BlockEntityRendererProvider.Context context) {
-    }
-
-
-    @Override
-    public BellowsRenderState createRenderState() {
-        return new BellowsRenderState();
-    }
+    public BellowsRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void submit(BellowsRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
-        if (state.models != null) {
-            poseStack.pushPose();
-            poseStack.translate(0.5, 0.5, 0.5);
-            switch (state.facing){
-                case DOWN -> poseStack.mulPose(Axis.XP.rotationDegrees(90));
-                case UP -> poseStack.mulPose(Axis.XP.rotationDegrees(270));
-                default -> poseStack.mulPose(Axis.YP.rotationDegrees(state.facing.toYRot()));
-            }
-            poseStack.translate(-0.5, -0.5, -0.5);
+    public void render(BlockEntityBellows bellows, float partialTick, PoseStack poseStack,
+                       MultiBufferSource buffers, int light, int overlay) {
+        BlockState state = bellows.getBlockState();
+        Direction facing = state.getValue(BlockBellows.FACING);
+        float scale = bellows.inflation;
 
-            // BAG
-            {
-                poseStack.pushPose();
-                poseStack.translate(0,0.5F,0F);
-                poseStack.translate(0F,  (state.scale + 0.1F) *  -0.5f, 0F);
-                poseStack.scale(1F, (state.scale + 0.1F) , 1F);
-                //poseStack.translate(0F, -0.5F, 0F);
-                //poseStack.scale(1f,2F,1f);
-                submitNodeCollector.submitMultiLayerBlockModel(
-                        poseStack,
-                        state.parts[2],
-                        true,
-                        new int[0],
-                        state.lightCoords,
-                        OverlayTexture.NO_OVERLAY,
-                        0
-                );
+        poseStack.pushPose();
+        poseStack.translate(0.5F, 0.5F, 0.5F);
+        switch (facing) {
+            case DOWN -> poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+            case UP -> poseStack.mulPose(Axis.XP.rotationDegrees(270.0F));
+            default -> poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
+        }
+        poseStack.translate(-0.5F, -0.5F, -0.5F);
 
-                if (state.breakProgress != null)
-                    submitNodeCollector.submitBreakingBlockModel(
-                            poseStack,
-                            state.models[2],
-                            state.seed,
-                            state.breakProgress.progress()
-                    );
-                poseStack.popPose();
-            }
+        poseStack.pushPose();
+        poseStack.translate(0.0F, 0.5F, 0.0F);
+        poseStack.translate(0.0F, (scale + 0.1F) * -0.5F, 0.0F);
+        poseStack.scale(1.0F, scale + 0.1F, 1.0F);
+        renderPart(BAG, state, poseStack, buffers, light, overlay);
+        poseStack.popPose();
 
-            // Top Plank
-            {
-                poseStack.pushPose();
-                poseStack.translate(0F, (1-state.scale) * -0.25F, 0F);
-                submitNodeCollector.submitMultiLayerBlockModel(
-                        poseStack,
-                        state.parts[1],
-                        true,
-                        new int[0],
-                        state.lightCoords,
-                        OverlayTexture.NO_OVERLAY,
-                        0
-                );
+        poseStack.pushPose();
+        poseStack.translate(0.0F, (1.0F - scale) * -0.25F, 0.0F);
+        renderPart(TOP, state, poseStack, buffers, light, overlay);
+        poseStack.popPose();
 
-                if (state.breakProgress != null)
-                    submitNodeCollector.submitBreakingBlockModel(
-                            poseStack,
-                            state.models[1],
-                            state.seed,
-                            state.breakProgress.progress()
-                    );
-                poseStack.popPose();
-            }
+        poseStack.pushPose();
+        poseStack.translate(0.0F, (1.0F - scale) * 0.25F, 0.0F);
+        renderPart(BOTTOM, state, poseStack, buffers, light, overlay);
+        poseStack.popPose();
 
-            // Bottom Plank
-            {
-                poseStack.pushPose();
-                poseStack.translate(0F, (1-state.scale) * 0.25F, 0F);
-                submitNodeCollector.submitMultiLayerBlockModel(
-                        poseStack,
-                        state.parts[0],
-                        true,
-                        new int[0],
-                        state.lightCoords,
-                        OverlayTexture.NO_OVERLAY,
-                        0
-                );
+        poseStack.popPose();
+    }
 
-                if (state.breakProgress != null)
-                    submitNodeCollector.submitBreakingBlockModel(
-                            poseStack,
-                            state.models[0],
-                            state.seed,
-                            state.breakProgress.progress()
-                    );
-                poseStack.popPose();
-            }
-
-
-            poseStack.popPose();
+    private void renderPart(int index, BlockState state, PoseStack poseStack,
+                            MultiBufferSource buffers, int light, int overlay) {
+        BakedModel model = Minecraft.getInstance().getModelManager().getModel(MODEL_IDS[index]);
+        ModelBlockRenderer modelRenderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
+        for (RenderType renderType : model.getRenderTypes(state, random, ModelData.EMPTY)) {
+            modelRenderer.renderModel(poseStack.last(), buffers.getBuffer(renderType), state, model,
+                    1.0F, 1.0F, 1.0F, light, overlay, ModelData.EMPTY, renderType);
         }
     }
-
-    @Override
-    public void extractRenderState(BlockEntityBellows blockEntity, BellowsRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
-        state.facing = blockEntity.getBlockState().getValue(BlockBellows.FACING);
-        state.scale = blockEntity.inflation;
-        state.seed = blockEntity.getBlockState().getSeed(blockEntity.getBlockPos());
-        BlockEntity be = blockEntity.getLevel().getBlockEntity(blockEntity.getBlockPos().relative(state.facing));
-        if (be != null && be instanceof BlockEntityTubeBuffer)
-            state.extension = true;
-        for (int i = 0; i < parts.length; i++){
-            state.parts[i] = new ArrayList<>();
-            state.models[i] = Minecraft.getInstance().getModelManager().getStandaloneModel(MODEL_KEYS[i]);
-            if (state.models[i] != null) {
-                state.models[i].collectParts(
-                        (ClientLevel) blockEntity.getLevel(),
-                        blockEntity.getBlockPos(),
-                        blockEntity.getBlockState(),
-                        blockEntity.getLevel().getRandom(),
-                        state.parts[i]
-                );
-            }
-        }
-
-    }
-
 }

@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.model.entity;
 
-import com.leclowndu93150.thaumcraft.client.entity.ArcaneBoreRenderState;
-import net.minecraft.client.model.EntityModel;
+import com.leclowndu93150.thaumcraft.content.entity.construct.EntityArcaneBore;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -10,11 +10,12 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 
-public final class ArcaneBoreModel extends EntityModel<ArcaneBoreRenderState> {
+public final class ArcaneBoreModel extends HierarchicalModel<EntityArcaneBore> {
+    private final ModelPart root;
     private final ModelPart base;
 
     public ArcaneBoreModel(ModelPart root) {
-        super(root);
+        this.root = root;
         base = root.getChild("base");
     }
 
@@ -50,9 +51,14 @@ public final class ArcaneBoreModel extends EntityModel<ArcaneBoreRenderState> {
     }
 
     @Override
-    public void setupAnim(ArcaneBoreRenderState state) {
-        super.setupAnim(state);
-        base.yRot = state.yRot * Mth.DEG_TO_RAD;
-        base.xRot = state.xRot * Mth.DEG_TO_RAD;
+    public ModelPart root() {
+        return root;
+    }
+
+    @Override
+    public void setupAnim(EntityArcaneBore entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+                          float netHeadYaw, float headPitch) {
+        base.yRot = netHeadYaw * Mth.DEG_TO_RAD;
+        base.xRot = headPitch * Mth.DEG_TO_RAD;
     }
 }

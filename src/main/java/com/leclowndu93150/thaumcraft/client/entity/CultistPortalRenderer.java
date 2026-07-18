@@ -1,38 +1,23 @@
 package com.leclowndu93150.thaumcraft.client.entity;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
+import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumcraft.content.entity.EntityCultistPortalLesser;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
-import org.joml.Matrix4fc;
+import org.joml.Matrix4f;
 
-public final class CultistPortalRenderer extends EntityRenderer<EntityCultistPortalLesser, CultistPortalRenderer.State> {
-    public static final class State extends EntityRenderState {
-        public boolean active;
-        public float activeCounter;
-        public int hurtTime;
-        public int pulse;
-        public float healthFraction;
-        public float halfHeight;
-    }
-
+public final class CultistPortalRenderer extends EntityRenderer<EntityCultistPortalLesser> {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/misc/cultist_portal.png");
-    private static final RenderType PORTAL_TYPE = RenderType.create(
-            "tc_cultist_portal",
-            RenderSetup.builder(TCRenderPipelines.FX_TRANSLUCENT)
-                    .withTexture("Sampler0", TEXTURE)
-                    .useLightmap()
-                    .createRenderSetup());
+    private static final RenderType PORTAL_TYPE = TCRenderTypes.fxTranslucent(TEXTURE);
 
     private static final int FRAMES = 16;
     private static final float FRAME_WIDTH = 0.0625F;
@@ -47,67 +32,59 @@ public final class CultistPortalRenderer extends EntityRenderer<EntityCultistPor
     }
 
     @Override
-    public State createRenderState() {
-        return new State();
+    public void render(EntityCultistPortalLesser entity, float entityYaw, float partialTicks, PoseStack poseStack,
+                       MultiBufferSource buffers, int packedLight) {
+        super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
+        renderPortal(poseStack, buffers, entity.isActive(), entity.activeCounter + partialTicks, entity.hurtTime,
+                entity.pulse, entity.getHealth() / entity.getMaxHealth(), entity.getBbHeight() / 2.0F,
+                BASE_SCALE_Y, SCALE_FACTOR);
     }
 
     @Override
-    public void extractRenderState(EntityCultistPortalLesser entity, State state, float partialTicks) {
-        super.extractRenderState(entity, state, partialTicks);
-        state.active = entity.isActive();
-        state.activeCounter = entity.activeCounter + partialTicks;
-        state.hurtTime = entity.hurtTime;
-        state.pulse = entity.pulse;
-        state.healthFraction = entity.getHealth() / entity.getMaxHealth();
-        state.halfHeight = entity.getBbHeight() / 2.0F;
+    public ResourceLocation getTextureLocation(EntityCultistPortalLesser entity) {
+        return TEXTURE;
     }
 
-    @Override
-    public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        super.submit(state, poseStack, collector, camera);
-        submitPortal(state, poseStack, collector, camera, BASE_SCALE_Y, SCALE_FACTOR);
-    }
-
-    static void submitPortal(State state, PoseStack poseStack, SubmitNodeCollector collector,
-                             CameraRenderState camera, float baseScaleY, float scaleFactor) {
-        if (!state.active) {
+    static void renderPortal(PoseStack poseStack, MultiBufferSource buffers, boolean active, float activeCounter,
+                             int hurtTime, int pulse, float healthFraction, float halfHeight,
+                             float baseScaleY, float scaleFactor) {
+        if (!active) {
             return;
         }
         float scaleY = baseScaleY;
-        float grown = Math.min(GROW_TICKS, state.activeCounter);
-        if (state.hurtTime > 0) {
-            double d = Math.sin(state.hurtTime * 72.0 * Math.PI / 180.0);
+        float grown = Math.min(GROW_TICKS, activeCounter);
+        if (hurtTime > 0) {
+            double d = Math.sin(hurtTime * 72.0 * Math.PI / 180.0);
             scaleY -= (float) (d / 4.0);
             grown += (float) (6.0 * d);
         }
-        if (state.pulse > 0) {
-            double d = Math.sin(state.pulse * 36.0 * Math.PI / 180.0);
+        if (pulse > 0) {
+            double d = Math.sin(pulse * 36.0 * Math.PI / 180.0);
             scaleY += (float) (d / 4.0);
             grown += (float) (12.0 * d);
         }
         float scale = grown / GROW_TICKS * scaleFactor;
-        float m = (1.0F - state.healthFraction) / 3.0F;
-        float bob = Mth.sin(state.activeCounter / (5.0F - 12.0F * m)) * m + m;
-        float bob2 = Mth.sin(state.activeCounter / (6.0F - 15.0F * m)) * m + m;
+        float m = (1.0F - healthFraction) / 3.0F;
+        float bob = Mth.sin(activeCounter / (5.0F - 12.0F * m)) * m + m;
+        float bob2 = Mth.sin(activeCounter / (6.0F - 15.0F * m)) * m + m;
         float alpha = 1.0F - bob;
         scaleY -= bob / 4.0F;
         scale -= bob2 / 3.0F;
-        int frame = FRAMES - 1 - (int) state.activeCounter % FRAMES;
+        int frame = FRAMES - 1 - (int) activeCounter % FRAMES;
         float u0 = frame * FRAME_WIDTH;
         float u1 = u0 + FRAME_WIDTH;
         int tint = ARGB32.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F);
         float sx = scale;
         float sy = scaleY;
         poseStack.pushPose();
-        poseStack.translate(0.0F, state.halfHeight, 0.0F);
-        poseStack.mulPose(camera.orientation);
-        collector.submitCustomGeometry(poseStack, PORTAL_TYPE, (pose, buffer) -> {
-            Matrix4fc mat = pose.pose();
-            buffer.addVertex(mat, -sx, -sy, 0.0F).setUv(u1, 0.0F).setColor(tint).setLight(LIGHT);
-            buffer.addVertex(mat, -sx, sy, 0.0F).setUv(u1, 1.0F).setColor(tint).setLight(LIGHT);
-            buffer.addVertex(mat, sx, sy, 0.0F).setUv(u0, 1.0F).setColor(tint).setLight(LIGHT);
-            buffer.addVertex(mat, sx, -sy, 0.0F).setUv(u0, 0.0F).setColor(tint).setLight(LIGHT);
-        });
+        poseStack.translate(0.0F, halfHeight, 0.0F);
+        poseStack.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
+        VertexConsumer buffer = buffers.getBuffer(PORTAL_TYPE);
+        Matrix4f mat = poseStack.last().pose();
+        buffer.addVertex(mat, -sx, -sy, 0.0F).setUv(u1, 0.0F).setColor(tint).setLight(LIGHT);
+        buffer.addVertex(mat, -sx, sy, 0.0F).setUv(u1, 1.0F).setColor(tint).setLight(LIGHT);
+        buffer.addVertex(mat, sx, sy, 0.0F).setUv(u0, 1.0F).setColor(tint).setLight(LIGHT);
+        buffer.addVertex(mat, sx, -sy, 0.0F).setUv(u0, 0.0F).setColor(tint).setLight(LIGHT);
         poseStack.popPose();
     }
 }

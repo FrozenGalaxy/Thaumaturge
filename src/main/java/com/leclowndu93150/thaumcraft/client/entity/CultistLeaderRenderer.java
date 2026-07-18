@@ -4,31 +4,25 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.entity.boss.EntityCultistLeader;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.resources.ResourceLocation;
 
-public final class CultistLeaderRenderer extends HumanoidMobRenderer<EntityCultistLeader, HumanoidRenderState, HumanoidModel<HumanoidRenderState>> {
+public final class CultistLeaderRenderer extends HumanoidMobRenderer<EntityCultistLeader, HumanoidModel<EntityCultistLeader>> {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/cultist.png");
     private static final float SHADOW = 0.5F;
 
     public CultistLeaderRenderer(EntityRendererProvider.Context context) {
         super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)), SHADOW);
         this.addLayer(new HumanoidArmorLayer<>(this,
-                ArmorModelSet.bake(ModelLayers.PLAYER_ARMOR, context.getModelSet(), HumanoidModel::new),
-                context.getEquipmentRenderer()));
+                new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)),
+                new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)),
+                context.getModelManager()));
     }
 
     @Override
-    public HumanoidRenderState createRenderState() {
-        return new HumanoidRenderState();
-    }
-
-    @Override
-    public ResourceLocation getTextureLocation(HumanoidRenderState state) {
+    public ResourceLocation getTextureLocation(EntityCultistLeader entity) {
         return TEXTURE;
     }
 }

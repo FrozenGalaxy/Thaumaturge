@@ -3,18 +3,14 @@ package com.leclowndu93150.thaumcraft.client.golem;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.golems.ISealDisplayer;
 import com.leclowndu93150.thaumcraft.api.golems.seals.ISealConfigArea;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCFXPipelines;
+import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumcraft.content.golem.seals.ClientSealHolder;
 import com.leclowndu93150.thaumcraft.content.golem.seals.SealEntity;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,10 +36,6 @@ public final class SealWorldRenderer {
     private static final float RING_ALPHA = 0.8F;
     private static final float CORNER_ALPHA = 0.7F;
 
-    private static final RenderPipeline PIPELINE =
-            TCFXPipelines.translucentTextured(TCIds.rl("pipeline/seal_overlay"));
-    private static final Map<ResourceLocation, RenderType> TYPES = new ConcurrentHashMap<>();
-
     private static final Direction[][] ROT_FACES = {
             {Direction.DOWN, Direction.NORTH, Direction.WEST},
             {Direction.UP, Direction.NORTH, Direction.WEST},
@@ -62,15 +54,14 @@ public final class SealWorldRenderer {
     private SealWorldRenderer() {}
 
     private static RenderType typeFor(ResourceLocation texture) {
-        return TYPES.computeIfAbsent(texture, tex -> RenderType.create(
-                "tc_seal_overlay_" + tex.getPath().hashCode(),
-                RenderSetup.builder(PIPELINE)
-                        .withTexture("Sampler0", tex)
-                        .createRenderSetup()));
+        return TCRenderTypes.translucentTextured(texture);
     }
 
     @SubscribeEvent
-    public static void onRender(RenderLevelStageEvent.AfterWeather event) {
+    public static void onRender(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) {
+            return;
+        }
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (mc.level == null || player == null || mc.options.hideGui) {
@@ -84,9 +75,9 @@ public final class SealWorldRenderer {
             return;
         }
         PoseStack poseStack = event.getPoseStack();
-        Vec3 cam = mc.gameRenderer.getMainCamera().position();
+        Vec3 cam = mc.gameRenderer.getMainCamera().getPosition();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
-        float partialTicks = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float partialTicks = mc.getTimer().getGameTimeDeltaPartialTick(false);
         float time = player.tickCount % 360 + partialTicks;
         for (SealEntity seal : ClientSealHolder.all().values()) {
             BlockPos pos = seal.getSealPos().pos();
