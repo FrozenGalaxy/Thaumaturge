@@ -2,8 +2,7 @@ package com.leclowndu93150.thaumcraft.client.casters;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.items.IArchitect;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCFXPipelines;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.ArrayList;
@@ -37,11 +36,9 @@ public final class ArchitectOverlayRenderer {
     private static final ResourceLocation FRAME_SIDE = TCIds.rl("textures/misc/frame_side.png");
     private static final ResourceLocation ARROWS = TCIds.rl("textures/misc/architect_arrows.png");
 
-    private static final RenderPipeline PIPELINE =
-            TCFXPipelines.additiveTexturedNoDepth(TCIds.rl("pipeline/architect_overlay"));
-    private static final RenderType SIDE_TYPE = makeType("thaumcraft_architect_side", FRAME_SIDE);
-    private static final RenderType CORNER_TYPE = makeType("thaumcraft_architect_corner", FRAME_CORNER);
-    private static final RenderType ARROWS_TYPE = makeType("thaumcraft_architect_arrows", ARROWS);
+    private static final RenderType SIDE_TYPE = TCRenderTypes.additiveTexturedNoDepth(FRAME_SIDE);
+    private static final RenderType CORNER_TYPE = TCRenderTypes.additiveTexturedNoDepth(FRAME_CORNER);
+    private static final RenderType ARROWS_TYPE = TCRenderTypes.additiveTexturedNoDepth(ARROWS);
 
     private static final int[][] MOS = {
             {4, 5, 6, 7}, {0, 1, 2, 3}, {0, 1, 4, 5}, {2, 3, 6, 7}, {0, 2, 4, 6}, {1, 3, 5, 7}
@@ -70,20 +67,11 @@ public final class ArchitectOverlayRenderer {
 
     private ArchitectOverlayRenderer() {}
 
-    private static RenderType makeType(String name, ResourceLocation texture) {
-        return RenderType.create(name,
-                RenderSetup.builder(PIPELINE)
-                        .withTexture("Sampler0", texture)
-                        .createRenderSetup());
-    }
-
     @SubscribeEvent
-    static void registerPipelines(RegisterRenderPipelinesEvent event) {
-        event.registerPipeline(PIPELINE);
-    }
-
-    @SubscribeEvent
-    public static void onRender(RenderLevelStageEvent.AfterWeather event) {
+    public static void onRender(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) {
+            return;
+        }
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (mc.level == null || player == null || mc.options.hideGui) {
@@ -114,7 +102,7 @@ public final class ArchitectOverlayRenderer {
             return;
         }
         PoseStack poseStack = event.getPoseStack();
-        Vec3 cam = mc.gameRenderer.getMainCamera().position();
+        Vec3 cam = mc.gameRenderer.getMainCamera().getPosition();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         drawArchitectAxis(poseStack, buffers, player, anchor, cam,
                 architect.showAxis(stack, mc.level, player, hit.getDirection(), IArchitect.EnumAxis.X),

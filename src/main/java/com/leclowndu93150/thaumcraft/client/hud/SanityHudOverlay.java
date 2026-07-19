@@ -5,11 +5,11 @@ import com.leclowndu93150.thaumcraft.api.warp.IPlayerWarp;
 import com.leclowndu93150.thaumcraft.api.warp.WarpHelper;
 import com.leclowndu93150.thaumcraft.api.warp.WarpType;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.player.Player;
@@ -51,12 +51,10 @@ public final class SanityHudOverlay implements LeftHudStack.Gauge {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
-                HUD_X, HUD_Y, FRAME_U, FRAME_V, FRAME_W, FRAME_H,
-                FRAME_W, FRAME_H, TEX_SIZE, TEX_SIZE);
+        graphics.blit(HUD, HUD_X, HUD_Y, FRAME_U, FRAME_V, FRAME_W, FRAME_H, TEX_SIZE, TEX_SIZE);
         IPlayerWarp warp = WarpHelper.getWarp(player);
         int permanent = warp.get(WarpType.PERMANENT);
         int normal = warp.get(WarpType.NORMAL);
@@ -79,19 +77,17 @@ public final class SanityHudOverlay implements LeftHudStack.Gauge {
         if (permanent > 0) {
             fill(graphics, temporaryHeight + normalHeight + gap, FILL_RANGE, PERMANENT_TINT);
         }
-        graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
-                HUD_X, HUD_Y, OVERLAY_U, FRAME_V, FRAME_W, FRAME_H,
-                FRAME_W, FRAME_H, TEX_SIZE, TEX_SIZE);
+        graphics.blit(HUD, HUD_X, HUD_Y, OVERLAY_U, FRAME_V, FRAME_W, FRAME_H, TEX_SIZE, TEX_SIZE);
     }
 
-    private static void fill(GuiGraphicsExtractor graphics, int from, int to, int tint) {
+    private static void fill(GuiGraphics graphics, int from, int to, int tint) {
         int height = to - from;
         if (height <= 0) {
             return;
         }
-        graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
+        GuiBlend.blitTinted(graphics, HUD,
                 HUD_X + FILL_X - 1, HUD_Y + FILL_TOP - 1 + from, FILL_U, from,
-                FILL_W, height, FILL_W, height, TEX_SIZE, TEX_SIZE, tint);
+                FILL_W, height, TEX_SIZE, TEX_SIZE, tint);
     }
 
     private static boolean holds(Player player, boolean main) {

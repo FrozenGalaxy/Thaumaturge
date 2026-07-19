@@ -5,15 +5,14 @@ import com.leclowndu93150.thaumcraft.api.aspect.AspectComponents;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.client.render.aspect.AspectTagRenderer;
 import com.leclowndu93150.thaumcraft.client.screen.AbstractTCContainerScreen;
+import com.leclowndu93150.thaumcraft.client.screen.tooltip.DeferredTooltip;
 import com.leclowndu93150.thaumcraft.content.research.decon.BlockEntityDeconstructionTable;
 import com.leclowndu93150.thaumcraft.content.research.decon.MenuDeconstructionTable;
 import com.leclowndu93150.thaumcraft.network.ServerboundDeconCollectPayload;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.List;
-import java.util.Optional;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -41,10 +40,16 @@ public final class DeconstructionTableScreen extends AbstractTCContainerScreen<M
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {}
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {}
 
     @Override
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.render(graphics, mouseX, mouseY, partialTick);
+        DeferredTooltip.render(graphics, font);
+    }
+
+    @Override
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         BlockEntityDeconstructionTable table = menu.blockEntity();
         if (table == null) {
             return;
@@ -52,7 +57,7 @@ public final class DeconstructionTableScreen extends AbstractTCContainerScreen<M
         int fill = BAR_MAX_H - table.breakTime() * BAR_MAX_H / BlockEntityDeconstructionTable.BREAK_TIME_TICKS;
         fill = Math.max(0, Math.min(BAR_MAX_H, fill));
         if (fill > 0) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
+            graphics.blit(TEXTURE,
                     leftPos + BAR_X, topPos + BAR_Y + BAR_MAX_H - fill,
                     (float) BAR_U, (float) (BAR_MAX_H - fill), BAR_W, fill, 256, 256);
         }
@@ -61,9 +66,9 @@ public final class DeconstructionTableScreen extends AbstractTCContainerScreen<M
             AspectTagRenderer.render(graphics, font, leftPos + RESULT_X, topPos + RESULT_Y, result, 1);
             if (mouseX >= leftPos + RESULT_X && mouseX < leftPos + RESULT_X + RESULT_SIZE
                     && mouseY >= topPos + RESULT_Y && mouseY < topPos + RESULT_Y + RESULT_SIZE) {
-                graphics.setTooltipForNextFrame(font,
+                DeferredTooltip.set(
                         List.of(AspectComponents.name(result), Component.translatable("tc.decon.collect")),
-                        Optional.empty(), mouseX, mouseY);
+                        mouseX, mouseY);
             }
         }
     }
@@ -80,19 +85,19 @@ public final class DeconstructionTableScreen extends AbstractTCContainerScreen<M
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
             BlockEntityDeconstructionTable table = menu.blockEntity();
             if (table != null && table.resultAspect() != null
-                    && event.x() >= leftPos + RESULT_X && event.x() < leftPos + RESULT_X + RESULT_SIZE
-                    && event.y() >= topPos + RESULT_Y && event.y() < topPos + RESULT_Y + RESULT_SIZE) {
+                    && mouseX >= leftPos + RESULT_X && mouseX < leftPos + RESULT_X + RESULT_SIZE
+                    && mouseY >= topPos + RESULT_Y && mouseY < topPos + RESULT_Y + RESULT_SIZE) {
                 PacketDistributor.sendToServer(new ServerboundDeconCollectPayload(menu.pos()));
                 if (minecraft != null && minecraft.player != null) {
-                    minecraft.player.playSound(TCSounds.HHON.get(), 0.3F, 1.0F);
+                    minecraft.getSoundManager().play(SimpleSoundInstance.forUI(TCSounds.HHON.get(), 1.0F, 0.3F));
                 }
                 return true;
             }
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 }

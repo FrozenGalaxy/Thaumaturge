@@ -7,36 +7,31 @@ import com.leclowndu93150.thaumcraft.content.casters.CasterManager;
 import com.leclowndu93150.thaumcraft.content.casters.FocusPouchItem;
 import com.leclowndu93150.thaumcraft.content.casters.ItemFocus;
 import com.leclowndu93150.thaumcraft.network.ServerboundFocusChangePayload;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.math.Axis;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
-import net.minecraft.network.chat.Component;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.Util;
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.gui.GuiLayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
-public final class RadialFocusOverlay implements GuiLayer {
+public final class RadialFocusOverlay implements LayeredDraw.Layer {
     private static final ResourceLocation RADIAL_1 = TCIds.rl("textures/misc/radial.png");
     private static final ResourceLocation RADIAL_2 = TCIds.rl("textures/misc/radial2.png");
 
@@ -85,7 +80,7 @@ public final class RadialFocusOverlay implements GuiLayer {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         long time = Util.getMillis();
         if (mc.player != null && (CasterKeyHandler.radialActive || radialHudScale > 0.0F)) {
@@ -215,7 +210,7 @@ public final class RadialFocusOverlay implements GuiLayer {
         fociHover.put(key, false);
     }
 
-    private void renderRadialHud(GuiGraphicsExtractor graphics, Minecraft mc, float partialTicks, long time) {
+    private void renderRadialHud(GuiGraphics graphics, Minecraft mc, float partialTicks, long time) {
         ItemStack casterStack = mc.player.getMainHandItem();
         if (!(casterStack.getItem() instanceof ICaster)) {
             casterStack = mc.player.getOffhandItem();
@@ -226,8 +221,10 @@ public final class RadialFocusOverlay implements GuiLayer {
         if (fociItem.isEmpty() && !(wand.getFocusStack(casterStack).getItem() instanceof ItemFocus)) {
             return;
         }
-        int mouseX = (int) mc.mouseHandler.getScaledXPos(mc.getWindow());
-        int mouseY = (int) mc.mouseHandler.getScaledYPos(mc.getWindow());
+        int mouseX = (int) (mc.mouseHandler.xpos()
+                * mc.getWindow().getGuiScaledWidth() / mc.getWindow().getScreenWidth());
+        int mouseY = (int) (mc.mouseHandler.ypos()
+                * mc.getWindow().getGuiScaledHeight() / mc.getWindow().getScreenHeight());
         int cx = graphics.guiWidth() / 2;
         int cy = graphics.guiHeight() / 2;
         ItemStack tooltipStack = ItemStack.EMPTY;
@@ -239,7 +236,7 @@ public final class RadialFocusOverlay implements GuiLayer {
 
         ItemStack socketed = wand.getFocusStack(casterStack);
         if (socketed.getItem() instanceof ItemFocus) {
-            graphics.item(socketed.copy(), cx - ITEM_HALF, cy - ITEM_HALF);
+            graphics.renderItem(socketed.copy(), cx - ITEM_HALF, cy - ITEM_HALF);
             int mx = mouseX - cx;
             int my = mouseY - cy;
             if (mx >= -HOVER_BOX && mx <= HOVER_BOX && my >= -HOVER_BOX && my <= HOVER_BOX) {
@@ -269,14 +266,14 @@ public final class RadialFocusOverlay implements GuiLayer {
             double yy = Mth.sin(currentRot / 180.0F * (float) Math.PI) * width;
             currentRot += pieSlice;
 
-            graphics.pose().pushMatrix();
-            graphics.pose().translate(cx, cy);
-            graphics.pose().scale(radialHudScale, radialHudScale);
-            graphics.pose().translate((int) xx, (int) yy);
+            graphics.pose().pushPose();
+            graphics.pose().translate(cx, cy, 0.0F);
+            graphics.pose().scale(radialHudScale, radialHudScale, 1.0F);
+            graphics.pose().translate((int) xx, (int) yy, 0.0F);
             float scale = fociScale.get(key);
-            graphics.pose().scale(scale, scale);
-            graphics.item(fociItem.get(key).copy(), -ITEM_HALF, -ITEM_HALF);
-            graphics.pose().popMatrix();
+            graphics.pose().scale(scale, scale, 1.0F);
+            graphics.renderItem(fociItem.get(key).copy(), -ITEM_HALF, -ITEM_HALF);
+            graphics.pose().popPose();
 
             if (!CasterKeyHandler.radialLock && CasterKeyHandler.radialActive) {
                 int mx = (int) (mouseX - cx - xx);
@@ -301,32 +298,23 @@ public final class RadialFocusOverlay implements GuiLayer {
         }
 
         if (!tooltipStack.isEmpty()) {
-            List<ClientTooltipComponent> lines = tooltipStack.getTooltipLines(
-                            Item.TooltipContext.of(mc.level),
-                            mc.player,
-                            mc.options.advancedItemTooltips ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL).stream()
-                    .map(Component::getVisualOrderText)
-                    .map(ClientTooltipComponent::create)
-                    .toList();
-            graphics.tooltip(mc.font, lines,
-                    cx + TOOLTIP_X_OFFSET, cy + TOOLTIP_Y_OFFSET,
-                    DefaultTooltipPositioner.INSTANCE, null);
+            graphics.renderTooltip(mc.font, tooltipStack, cx + TOOLTIP_X_OFFSET, cy + TOOLTIP_Y_OFFSET);
         }
     }
 
-    private static void drawRing(GuiGraphicsExtractor graphics, ResourceLocation texture,
+    private static void drawRing(GuiGraphics graphics, ResourceLocation texture,
                                  int cx, int cy, float angleDeg, float size) {
         if (size <= 0.0F) {
             return;
         }
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(cx, cy);
-        graphics.pose().rotate((float) Math.toRadians(angleDeg - 90.0F));
-        graphics.pose().translate(-size / 2.0F, -size / 2.0F);
-        graphics.pose().scale(size / RADIAL_TEX_SIZE, size / RADIAL_TEX_SIZE);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, texture,
+        graphics.pose().pushPose();
+        graphics.pose().translate(cx, cy, 0.0F);
+        graphics.pose().mulPose(Axis.ZP.rotationDegrees(angleDeg - 90.0F));
+        graphics.pose().translate(-size / 2.0F, -size / 2.0F, 0.0F);
+        graphics.pose().scale(size / RADIAL_TEX_SIZE, size / RADIAL_TEX_SIZE, 1.0F);
+        GuiBlend.blitTinted(graphics, texture,
                 0, 0, 0.0F, 0.0F, RADIAL_TEX_SIZE, RADIAL_TEX_SIZE,
-                RADIAL_TEX_SIZE, RADIAL_TEX_SIZE, RADIAL_TEX_SIZE, RADIAL_TEX_SIZE, RING_TINT);
-        graphics.pose().popMatrix();
+                RADIAL_TEX_SIZE, RADIAL_TEX_SIZE, RING_TINT);
+        graphics.pose().popPose();
     }
 }

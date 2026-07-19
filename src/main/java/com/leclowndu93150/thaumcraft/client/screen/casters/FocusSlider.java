@@ -2,11 +2,9 @@ package com.leclowndu93150.thaumcraft.client.screen.casters;
 
 import com.leclowndu93150.thaumcraft.client.screen.TCScreenTextures;
 import java.util.function.Consumer;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
@@ -51,7 +49,7 @@ public final class FocusSlider extends AbstractWidget {
     }
 
     @Override
-    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         graphics.fill(getX(), getY(), getX() + width, getY() + height, TRACK_FILL);
         if (vertical) {
             graphics.fill(getX(), getY(), getX() + 1, getY() + height, TRACK_EDGE);
@@ -62,18 +60,18 @@ public final class FocusSlider extends AbstractWidget {
         }
         int hx = vertical ? getX() : getX() + (int) (position * (width - HANDLE_SIZE));
         int hy = vertical ? getY() + (int) (position * (height - HANDLE_SIZE)) : getY();
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.GUI_BASE,
+        graphics.blit(TCScreenTextures.GUI_BASE,
                 hx, hy, HANDLE_U, HANDLE_V, HANDLE_SIZE, HANDLE_SIZE, ATLAS, ATLAS);
     }
 
     @Override
-    public void onClick(MouseButtonEvent event, boolean doubleClick) {
-        updateFromMouse(event.x(), event.y());
+    public void onClick(double mouseX, double mouseY, int button) {
+        updateFromMouse(mouseX, mouseY);
     }
 
     @Override
-    protected void onDrag(MouseButtonEvent event, double dragX, double dragY) {
-        updateFromMouse(event.x(), event.y());
+    protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
+        updateFromMouse(mouseX, mouseY);
     }
 
     @Override

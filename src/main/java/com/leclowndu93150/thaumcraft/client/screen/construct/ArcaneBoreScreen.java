@@ -4,8 +4,7 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.client.screen.AbstractTCContainerScreen;
 import com.leclowndu93150.thaumcraft.content.entity.construct.EntityArcaneBore;
 import com.leclowndu93150.thaumcraft.content.entity.construct.MenuArcaneBore;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -46,56 +45,56 @@ public final class ArcaneBoreScreen extends AbstractTCContainerScreen<MenuArcane
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {}
+    protected void renderLabels(GuiGraphics graphics, int xm, int ym) {}
 
     @Override
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         EntityArcaneBore bore = menu.bore();
         if (bore == null) {
             return;
         }
         int fill = (int) (HEALTH_BAR_WIDTH * (bore.getHealth() / bore.getMaxHealth()));
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
+        graphics.blit(TEXTURE,
                 leftPos + HEALTH_BAR_X, topPos + HEALTH_BAR_Y, HEALTH_BAR_U, HEALTH_BAR_V,
                 fill, HEALTH_BAR_HEIGHT, 256, 256);
         ItemStack held = bore.getMainHandItem();
         if (!held.isEmpty() && held.isDamageableItem() && held.getDamageValue() + 1 >= held.getMaxDamage()) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
+            graphics.blit(TEXTURE,
                     leftPos + BROKEN_X, topPos + BROKEN_Y, BROKEN_U, BROKEN_V,
                     BROKEN_SIZE, BROKEN_SIZE, 256, 256);
         }
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(leftPos + STATS_X, topPos + STATS_Y);
-        graphics.pose().scale(STATS_SCALE, STATS_SCALE);
-        graphics.text(font, Component.translatable("gui.thaumcraft.bore.width", 1 + bore.getDigRadius() * 2),
+        graphics.pose().pushPose();
+        graphics.pose().translate(leftPos + STATS_X, topPos + STATS_Y, 0.0F);
+        graphics.pose().scale(STATS_SCALE, STATS_SCALE, 1.0F);
+        graphics.drawString(font, Component.translatable("gui.thaumcraft.bore.width", 1 + bore.getDigRadius() * 2),
                 0, 0, COLOR_WHITE, true);
-        graphics.text(font, Component.translatable("gui.thaumcraft.bore.depth", bore.getDigDepth()),
+        graphics.drawString(font, Component.translatable("gui.thaumcraft.bore.depth", bore.getDigDepth()),
                 STATS_COLUMN_2, 0, COLOR_WHITE, true);
-        graphics.text(font, Component.translatable("gui.thaumcraft.bore.speed",
+        graphics.drawString(font, Component.translatable("gui.thaumcraft.bore.speed",
                         bore.getDigSpeed(Blocks.STONE.defaultBlockState())),
                 0, STATS_LINE_2, COLOR_WHITE, true);
         int refining = bore.getRefining();
         int fortune = bore.getFortune();
         boolean silk = bore.hasSilkTouch();
         if (silk || refining > 0 || fortune > 0) {
-            graphics.text(font, Component.translatable("gui.thaumcraft.bore.properties"),
+            graphics.drawString(font, Component.translatable("gui.thaumcraft.bore.properties"),
                     0, PROPS_HEADER_Y, COLOR_WHITE, true);
         }
         int lineY = PROPS_FIRST_Y;
         if (refining > 0) {
-            graphics.text(font, Component.translatable("gui.thaumcraft.bore.refining", refining),
+            graphics.drawString(font, Component.translatable("gui.thaumcraft.bore.refining", refining),
                     PROPS_INDENT, lineY, COLOR_REFINING, true);
             lineY += PROPS_LINE_STEP;
         }
         if (fortune > 0) {
-            graphics.text(font, Component.translatable("gui.thaumcraft.bore.fortune", fortune),
+            graphics.drawString(font, Component.translatable("gui.thaumcraft.bore.fortune", fortune),
                     PROPS_INDENT, lineY, COLOR_FORTUNE, true);
             lineY += PROPS_LINE_STEP;
         }
         if (silk) {
-            graphics.text(font, Component.translatable("gui.thaumcraft.bore.silktouch"),
+            graphics.drawString(font, Component.translatable("gui.thaumcraft.bore.silktouch"),
                     PROPS_INDENT, lineY, COLOR_SILK, true);
         }
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 }

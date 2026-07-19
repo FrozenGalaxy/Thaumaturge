@@ -1,21 +1,26 @@
 package com.leclowndu93150.thaumcraft.client.render.research;
 
-import com.leclowndu93150.thaumcraft.content.recipe.workbench.ArcaneCraftingRecipeDisplay;
+import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
+import com.leclowndu93150.thaumcraft.api.recipe.IArcaneRecipe;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.leclowndu93150.thaumcraft.client.screen.TCScreenTextures;
+import com.leclowndu93150.thaumcraft.content.recipe.workbench.ArcaneShapedCraftingRecipe;
+import com.leclowndu93150.thaumcraft.content.recipe.workbench.ArcaneShapelessCraftingRecipe;
+import com.leclowndu93150.thaumcraft.content.taint.item.EssentiaCrystalFactory;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.display.RecipeDisplay;
-import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
-import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplayContext;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 import org.jspecify.annotations.Nullable;
 
 public final class RecipeDisplayWidget {
@@ -92,16 +97,15 @@ public final class RecipeDisplayWidget {
     }
 
     public static void renderCrafting(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int x,
             int y,
-            RecipeDisplay display,
+            RecipeHolder<?> holder,
             long gameTime
     ) {
         int cx = x + CENTER_OFFSET;
         int cy = y + CENTER_OFFSET;
-        ContextMap context = SlotDisplayContext.fromLevel(Minecraft.getInstance().level);
-        Layout layout = collect(display, context);
+        Layout layout = collect(holder, registries());
         Font font = Minecraft.getInstance().font;
         if (layout.kind == Kind.ARCANE_SHAPED || layout.kind == Kind.ARCANE_SHAPELESS) {
             drawArcanePanel(graphics, cx, cy);
@@ -120,15 +124,14 @@ public final class RecipeDisplayWidget {
     public static @Nullable ItemStack hoverStackForDisplay(
             int x,
             int y,
-            RecipeDisplay display,
+            RecipeHolder<?> holder,
             long gameTime,
             double mouseX,
             double mouseY
     ) {
         int cx = x + CENTER_OFFSET;
         int cy = y + CENTER_OFFSET;
-        ContextMap context = SlotDisplayContext.fromLevel(Minecraft.getInstance().level);
-        Layout layout = collect(display, context);
+        Layout layout = collect(holder, registries());
         ItemStack inputHover = hoverInput(cx, cy, layout, mouseX, mouseY);
         if (inputHover != null && !inputHover.isEmpty()) {
             return inputHover;
@@ -152,14 +155,13 @@ public final class RecipeDisplayWidget {
     public static @Nullable Component hoverPopupForDisplay(
             int x,
             int y,
-            RecipeDisplay display,
+            RecipeHolder<?> holder,
             double mouseX,
             double mouseY
     ) {
         int cx = x + CENTER_OFFSET;
         int cy = y + CENTER_OFFSET;
-        ContextMap context = SlotDisplayContext.fromLevel(Minecraft.getInstance().level);
-        Layout layout = collect(display, context);
+        Layout layout = collect(holder, registries());
         if (layout.kind != Kind.ARCANE_SHAPED && layout.kind != Kind.ARCANE_SHAPELESS) {
             return null;
         }
@@ -173,83 +175,81 @@ public final class RecipeDisplayWidget {
         return null;
     }
 
-    private static void drawWorkbenchPanel(GuiGraphicsExtractor graphics, int cx, int cy) {
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(cx, cy);
-        graphics.pose().scale(PANEL_SCALE, PANEL_SCALE);
+    private static HolderLookup.Provider registries() {
+        Minecraft mc = Minecraft.getInstance();
+        return mc.level == null ? null : mc.level.registryAccess();
+    }
+
+    private static void drawWorkbenchPanel(GuiGraphics graphics, int cx, int cy) {
+        graphics.pose().pushPose();
+        graphics.pose().translate(cx, cy, 0);
+        graphics.pose().scale(PANEL_SCALE, PANEL_SCALE, 1F);
         graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
                 WORKBENCH_PANEL_OFFSET_X, WORKBENCH_PANEL_OFFSET_Y,
                 (float) WORKBENCH_PANEL_U, (float) WORKBENCH_PANEL_V,
                 WORKBENCH_PANEL_W, WORKBENCH_PANEL_H,
-                WORKBENCH_PANEL_W, WORKBENCH_PANEL_H,
                 TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE
         );
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 
-    private static void drawArcanePanel(GuiGraphicsExtractor graphics, int cx, int cy) {
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(cx, cy);
-        graphics.pose().scale(PANEL_SCALE, PANEL_SCALE);
+    private static void drawArcanePanel(GuiGraphics graphics, int cx, int cy) {
+        graphics.pose().pushPose();
+        graphics.pose().translate(cx, cy, 0);
+        graphics.pose().scale(PANEL_SCALE, PANEL_SCALE, 1F);
         graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
                 ARCANE_PANEL_OFFSET_X, ARCANE_PANEL_OFFSET_Y,
                 (float) ARCANE_PANEL_U, (float) ARCANE_PANEL_V,
                 ARCANE_PANEL_W, ARCANE_PANEL_H,
-                ARCANE_PANEL_W, ARCANE_PANEL_H,
                 TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE
         );
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 
-    private static void drawSlotFrame(GuiGraphicsExtractor graphics, int cx, int cy) {
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(cx, cy);
-        graphics.pose().scale(PANEL_SCALE, PANEL_SCALE);
+    private static void drawSlotFrame(GuiGraphics graphics, int cx, int cy) {
+        graphics.pose().pushPose();
+        graphics.pose().translate(cx, cy, 0);
+        graphics.pose().scale(PANEL_SCALE, PANEL_SCALE, 1F);
         graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
                 SLOT_FRAME_OFFSET_X, SLOT_FRAME_OFFSET_Y,
                 (float) SLOT_FRAME_U, (float) SLOT_FRAME_V,
                 SLOT_FRAME_W, SLOT_FRAME_H,
-                SLOT_FRAME_W, SLOT_FRAME_H,
                 TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE
         );
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 
-    private static void drawVisOverlay(GuiGraphicsExtractor graphics, int cx, int cy) {
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(cx, cy);
-        graphics.pose().scale(PANEL_SCALE, PANEL_SCALE);
-        graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
+    private static void drawVisOverlay(GuiGraphics graphics, int cx, int cy) {
+        graphics.pose().pushPose();
+        graphics.pose().translate(cx, cy, 0);
+        graphics.pose().scale(PANEL_SCALE, PANEL_SCALE, 1F);
+        GuiBlend.blitTinted(
+                graphics,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
                 VIS_COST_OFFSET_X, VIS_COST_OFFSET_Y,
                 (float) VIS_COST_U, (float) VIS_COST_V,
                 VIS_COST_W, VIS_COST_H,
-                VIS_COST_W, VIS_COST_H,
                 TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
                 VIS_OVERLAY_TINT
         );
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 
-    private static void drawVisCostText(GuiGraphicsExtractor graphics, Font font, int cx, int cy, int visCost) {
+    private static void drawVisCostText(GuiGraphics graphics, Font font, int cx, int cy, int visCost) {
         String text = Integer.toString(visCost);
         int offset = font.width(text);
-        graphics.text(font, Component.literal(text), cx - offset / 2, cy + VIS_TEXT_OFFSET_Y, LABEL_COLOR, false);
+        graphics.drawString(font, Component.literal(text), cx - offset / 2, cy + VIS_TEXT_OFFSET_Y, LABEL_COLOR, false);
     }
 
-    private static void drawLabel(GuiGraphicsExtractor graphics, Font font, int cx, int cy, Kind kind) {
+    private static void drawLabel(GuiGraphics graphics, Font font, int cx, int cy, Kind kind) {
         String key = labelKey(kind);
         if (key == null) return;
         Component text = Component.translatable(key);
         int offset = font.width(text);
-        graphics.text(font, text, cx - offset / 2, cy + LABEL_OFFSET_Y, LABEL_COLOR, false);
+        graphics.drawString(font, text, cx - offset / 2, cy + LABEL_OFFSET_Y, LABEL_COLOR, false);
     }
 
     private static @Nullable String labelKey(Kind kind) {
@@ -262,27 +262,27 @@ public final class RecipeDisplayWidget {
         };
     }
 
-    private static void drawOutput(GuiGraphicsExtractor graphics, int cx, int cy, ItemStack output) {
+    private static void drawOutput(GuiGraphics graphics, int cx, int cy, ItemStack output) {
         if (output.isEmpty()) return;
-        graphics.item(output, cx + OUTPUT_OFFSET_X, cy + OUTPUT_OFFSET_Y);
+        graphics.renderItem(output, cx + OUTPUT_OFFSET_X, cy + OUTPUT_OFFSET_Y);
     }
 
-    private static void drawInputs(GuiGraphicsExtractor graphics, int cx, int cy, Layout layout) {
+    private static void drawInputs(GuiGraphics graphics, int cx, int cy, Layout layout) {
         for (Slot slot : layout.slots) {
             ItemStack stack = pickRotating(slot.cycle, slot.counter);
             if (!stack.isEmpty()) {
-                graphics.item(stack, cx + GRID_ANCHOR_X + slot.col * GRID_STRIDE, cy + GRID_ANCHOR_Y + slot.row * GRID_STRIDE);
+                graphics.renderItem(stack, cx + GRID_ANCHOR_X + slot.col * GRID_STRIDE, cy + GRID_ANCHOR_Y + slot.row * GRID_STRIDE);
             }
         }
     }
 
-    private static void drawCrystals(GuiGraphicsExtractor graphics, int cx, int cy, List<ItemStack> crystals) {
+    private static void drawCrystals(GuiGraphics graphics, int cx, int cy, List<ItemStack> crystals) {
         if (crystals.isEmpty()) return;
         int sz = crystals.size();
         for (int a = 0; a < sz; a++) {
             ItemStack stack = crystals.get(a);
             if (stack.isEmpty()) continue;
-            graphics.item(stack, cx + CRYSTAL_BASE_OFFSET_X - sz * CRYSTAL_HALF_STRIDE + a * CRYSTAL_STRIDE, cy + CRYSTAL_OFFSET_Y);
+            graphics.renderItem(stack, cx + CRYSTAL_BASE_OFFSET_X - sz * CRYSTAL_HALF_STRIDE + a * CRYSTAL_STRIDE, cy + CRYSTAL_OFFSET_Y);
         }
     }
 
@@ -313,83 +313,93 @@ public final class RecipeDisplayWidget {
         return null;
     }
 
-    private static Layout collect(RecipeDisplay display, ContextMap context) {
-        if (display instanceof ArcaneCraftingRecipeDisplay arcane) {
-            return collectArcane(arcane, context);
+    private static Layout collect(RecipeHolder<?> holder, HolderLookup.Provider reg) {
+        Recipe<?> recipe = holder.value();
+        if (recipe instanceof ArcaneShapedCraftingRecipe arcane) {
+            return collectArcaneShaped(arcane, reg);
         }
-        if (display instanceof ShapedCraftingRecipeDisplay shaped) {
-            return collectShaped(shaped, context);
+        if (recipe instanceof ArcaneShapelessCraftingRecipe arcane) {
+            return collectArcaneShapeless(arcane, reg);
         }
-        if (display instanceof ShapelessCraftingRecipeDisplay shapeless) {
-            return collectShapeless(shapeless, context);
+        if (recipe instanceof ShapedRecipe shaped) {
+            return collectShaped(shaped, reg);
         }
-        ItemStack result = ItemStack.EMPTY;
-        if (display.result() instanceof SlotDisplay slot) {
-            result = slot.resolveForFirstStack(context);
+        if (recipe instanceof ShapelessRecipe shapeless) {
+            return collectShapeless(shapeless, reg);
         }
-        return new Layout(Kind.UNKNOWN, new ArrayList<>(), result, 0, List.of());
+        return new Layout(Kind.UNKNOWN, new ArrayList<>(), resultOf(recipe, reg), 0, List.of());
     }
 
-    private static Layout collectShaped(ShapedCraftingRecipeDisplay shaped, ContextMap context) {
-        int rw = shaped.width();
-        int rh = shaped.height();
-        List<SlotDisplay> ingredients = shaped.ingredients();
+    private static ItemStack resultOf(Recipe<?> recipe, HolderLookup.Provider reg) {
+        return reg == null ? ItemStack.EMPTY : recipe.getResultItem(reg);
+    }
+
+    private static List<ItemStack> cycle(Ingredient ingredient) {
+        if (ingredient == null || ingredient.hasNoItems()) {
+            return List.of();
+        }
+        return List.of(ingredient.getItems());
+    }
+
+    private static List<ItemStack> crystals(IArcaneRecipe arcane) {
+        List<ItemStack> list = new ArrayList<>();
+        for (AspectInstance entry : arcane.getCrystals().entries()) {
+            ItemStack stack = EssentiaCrystalFactory.of(entry.aspect(), entry.amount());
+            if (!stack.isEmpty()) {
+                list.add(stack);
+            }
+        }
+        return list;
+    }
+
+    private static Layout collectShaped(ShapedRecipe shaped, HolderLookup.Provider reg) {
+        int rw = shaped.getWidth();
+        int rh = shaped.getHeight();
+        NonNullList<Ingredient> ingredients = shaped.getIngredients();
+        List<Slot> slots = gridSlots(rw, rh, ingredients);
+        return new Layout(Kind.WORKBENCH_SHAPED, slots, resultOf(shaped, reg), 0, List.of());
+    }
+
+    private static Layout collectShapeless(ShapelessRecipe shapeless, HolderLookup.Provider reg) {
+        List<Slot> slots = linearSlots(shapeless.getIngredients());
+        return new Layout(Kind.WORKBENCH_SHAPELESS, slots, resultOf(shapeless, reg), 0, List.of());
+    }
+
+    private static Layout collectArcaneShaped(ArcaneShapedCraftingRecipe arcane, HolderLookup.Provider reg) {
+        int rw = arcane.getWidth();
+        int rh = arcane.getHeight();
+        List<Slot> slots = gridSlots(rw, rh, arcane.getIngredients());
+        return new Layout(Kind.ARCANE_SHAPED, slots, resultOf(arcane, reg), arcane.getBaseVis(), crystals(arcane));
+    }
+
+    private static Layout collectArcaneShapeless(ArcaneShapelessCraftingRecipe arcane, HolderLookup.Provider reg) {
+        List<Slot> slots = linearSlots(arcane.ingredients());
+        return new Layout(Kind.ARCANE_SHAPELESS, slots, resultOf(arcane, reg), arcane.getBaseVis(), crystals(arcane));
+    }
+
+    private static List<Slot> gridSlots(int rw, int rh, List<Ingredient> ingredients) {
         List<Slot> slots = new ArrayList<>();
         for (int i = 0; i < rw && i < GRID_DIM_MAX; i++) {
             for (int j = 0; j < rh && j < GRID_DIM_MAX; j++) {
                 int index = i + j * rw;
                 if (index >= ingredients.size()) continue;
-                List<ItemStack> cycle = ingredients.get(index).resolveForStacks(context);
-                if (cycle.isEmpty()) continue;
-                slots.add(new Slot(i, j, index, cycle));
+                List<ItemStack> c = cycle(ingredients.get(index));
+                if (c.isEmpty()) continue;
+                slots.add(new Slot(i, j, index, c));
             }
         }
-        return new Layout(Kind.WORKBENCH_SHAPED, slots, shaped.result().resolveForFirstStack(context), 0, List.of());
+        return slots;
     }
 
-    private static Layout collectArcane(ArcaneCraftingRecipeDisplay arcane, ContextMap context) {
-        List<SlotDisplay> ingredients = arcane.ingredients();
-        List<Slot> slots = new ArrayList<>();
-        List<ItemStack> crystals = new ArrayList<>();
-        for (SlotDisplay crystal : arcane.crystals()) {
-            ItemStack stack = crystal.resolveForFirstStack(context);
-            if (!stack.isEmpty()) crystals.add(stack);
-        }
-        if (arcane.shapeless()) {
-            int cap = Math.min(ingredients.size(), 9);
-            for (int i = 0; i < cap; i++) {
-                List<ItemStack> cycle = ingredients.get(i).resolveForStacks(context);
-                if (cycle.isEmpty()) continue;
-                slots.add(new Slot(i % GRID_DIM_MAX, i / GRID_DIM_MAX, i, cycle));
-            }
-            return new Layout(Kind.ARCANE_SHAPELESS, slots,
-                    arcane.result().resolveForFirstStack(context), arcane.visCost(), crystals);
-        }
-        int rw = arcane.width();
-        int rh = arcane.height();
-        for (int i = 0; i < rw && i < GRID_DIM_MAX; i++) {
-            for (int j = 0; j < rh && j < GRID_DIM_MAX; j++) {
-                int index = i + j * rw;
-                if (index >= ingredients.size()) continue;
-                List<ItemStack> cycle = ingredients.get(index).resolveForStacks(context);
-                if (cycle.isEmpty()) continue;
-                slots.add(new Slot(i, j, index, cycle));
-            }
-        }
-        return new Layout(Kind.ARCANE_SHAPED, slots,
-                arcane.result().resolveForFirstStack(context), arcane.visCost(), crystals);
-    }
-
-    private static Layout collectShapeless(ShapelessCraftingRecipeDisplay shapeless, ContextMap context) {
-        List<SlotDisplay> ingredients = shapeless.ingredients();
+    private static List<Slot> linearSlots(List<Ingredient> ingredients) {
         List<Slot> slots = new ArrayList<>();
         int cap = Math.min(ingredients.size(), 9);
         for (int i = 0; i < cap; i++) {
-            List<ItemStack> cycle = ingredients.get(i).resolveForStacks(context);
-            if (cycle.isEmpty()) continue;
-            slots.add(new Slot(i % GRID_DIM_MAX, i / GRID_DIM_MAX, i, cycle));
+            List<ItemStack> c = cycle(ingredients.get(i));
+            if (c.isEmpty()) continue;
+            slots.add(new Slot(i % GRID_DIM_MAX, i / GRID_DIM_MAX, i, c));
         }
-        return new Layout(Kind.WORKBENCH_SHAPELESS, slots, shapeless.result().resolveForFirstStack(context), 0, List.of());
+        return slots;
     }
 
     private static ItemStack pickRotating(List<ItemStack> stacks, int counter) {

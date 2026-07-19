@@ -13,7 +13,6 @@ import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.*;
 import com.leclowndu93150.thaumcraft.api.recipe.DustTrigger;
 import com.leclowndu93150.thaumcraft.api.recipe.ResearchGated;
-import com.leclowndu93150.thaumcraft.client.recipes.TCClientRecipes;
 import com.leclowndu93150.thaumcraft.compat.jei.category.*;
 import com.leclowndu93150.thaumcraft.compat.jei.ingredient.AspectIngredientHelper;
 import com.leclowndu93150.thaumcraft.compat.jei.ingredient.AspectIngredientRenderer;
@@ -42,14 +41,12 @@ import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.helpers.IJeiHelpers;
-import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
+import mezz.jei.api.ingredients.subtypes.IIngredientSubtypeInterpreter;
 import mezz.jei.api.ingredients.subtypes.UidContext;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import mezz.jei.api.recipe.types.IRecipeHolderType;
-import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.registration.*;
 import mezz.jei.api.runtime.IJeiRuntime;
-import mezz.jei.library.recipes.collect.RecipeMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import com.leclowndu93150.thaumcraft.content.research.pool.AspectPools;
@@ -82,10 +79,10 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
-        ISubtypeInterpreter<ItemStack> aspectsInterpreter = ThaumcraftJEIPlugin::aspectsSubtype;
-        ISubtypeInterpreter<ItemStack> essentiaInterpreter = ThaumcraftJEIPlugin::essentiaSubtype;
-        ISubtypeInterpreter<ItemStack> filterInterpreter = ThaumcraftJEIPlugin::aspectFilterSubtype;
-        ISubtypeInterpreter<ItemStack> crystalAspectInterpreter = ThaumcraftJEIPlugin::crystalAspectSubtype;
+        IIngredientSubtypeInterpreter<ItemStack> aspectsInterpreter = ThaumcraftJEIPlugin::aspectsSubtype;
+        IIngredientSubtypeInterpreter<ItemStack> essentiaInterpreter = ThaumcraftJEIPlugin::essentiaSubtype;
+        IIngredientSubtypeInterpreter<ItemStack> filterInterpreter = ThaumcraftJEIPlugin::aspectFilterSubtype;
+        IIngredientSubtypeInterpreter<ItemStack> crystalAspectInterpreter = ThaumcraftJEIPlugin::crystalAspectSubtype;
         registration.registerSubtypeInterpreter(TCItems.JAR_NORMAL.get(), essentiaInterpreter);
         registration.registerSubtypeInterpreter(TCItems.JAR_VOID.get(), essentiaInterpreter);
         registration.registerSubtypeInterpreter(TCItems.LABEL.get(), filterInterpreter);
@@ -93,8 +90,8 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
         registration.registerSubtypeInterpreter(TCItems.SALIS_MUNDUS.get(), aspectsInterpreter);
         registration.registerSubtypeInterpreter(TCItems.ESSENTIA_CRYSTAL.get(), crystalAspectInterpreter);
         registration.registerSubtypeInterpreter(TCItems.PHIAL.get(), aspectsInterpreter);
-        registration.registerFromDataComponentTypes(TCItems.CELESTIAL_NOTES.asItem(), TCDataComponents.CELESTIAL_BODY.get());
-        registration.registerFromDataComponentTypes(TCItems.RESEARCH_NOTE.get(), TCDataComponents.RESEARCH_NOTE.get());
+        registration.registerSubtypeInterpreter(TCItems.CELESTIAL_NOTES.asItem(), ThaumcraftJEIPlugin::celestialBodySubtype);
+        registration.registerSubtypeInterpreter(TCItems.RESEARCH_NOTE.get(), ThaumcraftJEIPlugin::researchNoteSubtype);
     }
 
     @Override
@@ -138,19 +135,19 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
         if (registryAccess == null) {
             return;
         }
-        Optional<Registry<IAspect>> registryOpt = registryAccess.lookup(IAspect.REGISTRY_KEY);
+        Optional<Registry<IAspect>> registryOpt = registryAccess.registry(IAspect.REGISTRY_KEY);
         if (registryOpt.isEmpty()) {
             return;
         }
         Registry<IAspect> registry = registryOpt.get();
         Player player = Minecraft.getInstance().player;
         List<Holder<IAspect>> all = new ArrayList<>(registry.size());
-        registry.listElements()
+        registry.holders()
                 .filter(ref -> player != null && AspectPools.isDiscovered(player, ref))
                 .forEach(all::add);
         registration.register(
                 AspectIngredientType.INSTANCE,
-                all.stream().sorted(Comparator.comparingInt(e->clientRegistryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).getId(e.getKey()))).sorted(Comparator.comparing(h->!h.value().isPrimal())).map(aspect->new AspectInstance(aspect,1)).toList(),
+                all.stream().sorted(Comparator.comparingInt(e->registry.getId(e.value()))).sorted(Comparator.comparing(h->!h.value().isPrimal())).map(aspect->new AspectInstance(aspect,1)).toList(),
                 AspectIngredientHelper.INSTANCE,
                 AspectIngredientRenderer.INSTANCE,
                 AspectInstance.CODEC
@@ -238,13 +235,13 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
         if (registryAccess == null) {
             return;
         }
-        Optional<Registry<IAspect>> registryOpt = registryAccess.lookup(IAspect.REGISTRY_KEY);
+        Optional<Registry<IAspect>> registryOpt = registryAccess.registry(IAspect.REGISTRY_KEY);
         if (registryOpt.isEmpty()) {
             return;
         }
         Registry<IAspect> registry = registryOpt.get();
         List<AspectCompositionCategory.Composition> compositions =
-                AspectCompositionCategory.collect(registry.listElements().toList());
+                AspectCompositionCategory.collect(registry.holders().toList());
         registration.addRecipes(AspectCompositionCategory.RECIPE_TYPE, compositions);
     }
 
@@ -253,12 +250,12 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
         if (registryAccess == null) {
             return;
         }
-        Optional<Registry<IAspect>> registryOpt = registryAccess.lookup(IAspect.REGISTRY_KEY);
+        Optional<Registry<IAspect>> registryOpt = registryAccess.registry(IAspect.REGISTRY_KEY);
         if (registryOpt.isEmpty()) {
             return;
         }
         Registry<IAspect> registry = registryOpt.get();
-        registry.listElements().forEach(holder -> {
+        registry.holders().forEach(holder -> {
             Component description = AspectComponents.description(holder);
             registration.addIngredientInfo(new AspectInstance(holder,1), AspectIngredientType.INSTANCE, description);
         });
@@ -282,7 +279,7 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
                     });
                 });
 
-        invertedIndex.entrySet().stream().sorted(Comparator.comparingInt(e->clientRegistryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).getId(e.getKey().getKey()))).sorted(Comparator.comparing(e->!clientRegistryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).getOrThrow(e.getKey().getKey()).value().isPrimal())).forEach((e)->{
+        invertedIndex.entrySet().stream().sorted(Comparator.comparingInt(e->clientRegistryAccess().registryOrThrow(IAspect.REGISTRY_KEY).getId(e.getKey().value()))).sorted(Comparator.comparing(e->!e.getKey().value().isPrimal())).forEach((e)->{
             Holder<IAspect> aspect = e.getKey();
             List<ItemStack> stacks = e.getValue().stream()
                     .map(it-> it.copyWithCount(index.get(it).amountOf(aspect)))
@@ -306,14 +303,14 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
     private static Holder<IAspect> pickIconAspect() {
         RegistryAccess registryAccess = clientRegistryAccess();
         if (registryAccess != null) {
-            Optional<Registry<IAspect>> registryOpt = registryAccess.lookup(IAspect.REGISTRY_KEY);
+            Optional<Registry<IAspect>> registryOpt = registryAccess.registry(IAspect.REGISTRY_KEY);
             if (registryOpt.isPresent()) {
                 Registry<IAspect> registry = registryOpt.get();
-                Optional<Holder.Reference<IAspect>> stable = registry.get(TCAspects.PRAECANTATIO);
+                Optional<Holder.Reference<IAspect>> stable = registry.getHolder(TCAspects.PRAECANTATIO);
                 if (stable.isPresent()) {
                     return stable.get();
                 }
-                Optional<Holder.Reference<IAspect>> first = registry.listElements().findFirst();
+                Optional<Holder.Reference<IAspect>> first = registry.holders().findFirst();
                 if (first.isPresent()) {
                     return first.get();
                 }
@@ -322,9 +319,8 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
         return null;
     }
 
-    private <I extends RecipeInput, R extends Recipe<I>> void addTypedRecipes(IRecipeRegistration registration, IRecipeType<RecipeHolder<R>> type, RecipeType<R> vanillaType, @Nullable Predicate<RecipeHolder<R>> filter){
-        RecipeMap recipes = TCClientRecipes.getRecipeMapForType(Minecraft.getInstance().level, vanillaType);
-        List<RecipeHolder<R>> holders = List.copyOf(recipes.byType(vanillaType));
+    private <I extends RecipeInput, R extends Recipe<I>> void addTypedRecipes(IRecipeRegistration registration, RecipeType<RecipeHolder<R>> type, net.minecraft.world.item.crafting.RecipeType<R> vanillaType, @Nullable Predicate<RecipeHolder<R>> filter){
+        List<RecipeHolder<R>> holders = Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(vanillaType);
         if (filter != null) {
             holders = holders.stream().filter(filter).toList();
         }
@@ -341,23 +337,36 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
         return null;
     }
 
-    private static @Nullable Object aspectsSubtype(ItemStack stack, UidContext context) {
+    private static String aspectsSubtype(ItemStack stack, UidContext context) {
         AspectList list = stack.get(TCDataComponents.ASPECTS.get());
         if (list == null || list.isEmpty()) {
-            return null;
+            return IIngredientSubtypeInterpreter.NONE;
         }
-        return list;
+        return list.toString();
     }
 
-    private static @Nullable Object essentiaSubtype(ItemStack stack, UidContext context) {
-        return stack.get(TCDataComponents.ESSENTIA_CONTENTS.get());
+    private static String essentiaSubtype(ItemStack stack, UidContext context) {
+        var contents = stack.get(TCDataComponents.ESSENTIA_CONTENTS.get());
+        return contents == null ? IIngredientSubtypeInterpreter.NONE : contents.toString();
     }
 
-    private static @Nullable Object aspectFilterSubtype(ItemStack stack, UidContext context) {
-        return stack.get(TCDataComponents.ASPECT_FILTER.get());
+    private static String aspectFilterSubtype(ItemStack stack, UidContext context) {
+        var filter = stack.get(TCDataComponents.ASPECT_FILTER.get());
+        return filter == null ? IIngredientSubtypeInterpreter.NONE : filter.toString();
     }
 
-    private static @Nullable Object crystalAspectSubtype(ItemStack stack, UidContext context) {
-        return stack.get(TCDataComponents.CRYSTAL_ASPECT.get());
+    private static String crystalAspectSubtype(ItemStack stack, UidContext context) {
+        var crystal = stack.get(TCDataComponents.CRYSTAL_ASPECT.get());
+        return crystal == null ? IIngredientSubtypeInterpreter.NONE : crystal.toString();
+    }
+
+    private static String celestialBodySubtype(ItemStack stack, UidContext context) {
+        var body = stack.get(TCDataComponents.CELESTIAL_BODY.get());
+        return body == null ? IIngredientSubtypeInterpreter.NONE : body.toString();
+    }
+
+    private static String researchNoteSubtype(ItemStack stack, UidContext context) {
+        var note = stack.get(TCDataComponents.RESEARCH_NOTE.get());
+        return note == null ? IIngredientSubtypeInterpreter.NONE : note.toString();
     }
 }

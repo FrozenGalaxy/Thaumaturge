@@ -15,10 +15,9 @@
     "world.level.block.entity.AbstractFurnaceBlockEntityAccessor"
   ],
   "client": [
-    "client.gui.GuiGraphicsExtractorAccessor",
+    "client.gui.GuiGraphicsAccessor",
     "client.renderer.GameRendererInvoker",
-    "client.renderer.entity.LivingEntityRendererMixin",
-    "client.renderer.entity.layers.HumanoidArmorLayerAccessor"
+    "client.renderer.entity.LivingEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -23,10 +23,12 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -40,8 +42,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class ArcaneWorkbenchCategory implements IRecipeCategory<RecipeHolder<ArcaneCraftingRecipe>> {
-    public static final IRecipeHo<ArcaneCraftingRecipe> RECIPE_TYPE =
-            IRecipeCategory.create(TCRecipeTypes.ARCANE.get());
+    public static final RecipeType<RecipeHolder<ArcaneCraftingRecipe>> RECIPE_TYPE =
+            RecipeType.createFromVanilla(TCRecipeTypes.ARCANE.get());
 
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png");
 
@@ -86,7 +88,7 @@ public final class ArcaneWorkbenchCategory implements IRecipeCategory<RecipeHold
     }
 
     @Override
-    public IRecipeCategory<ArcaneCraftingRecipe> getRecipeType() {
+    public RecipeType<RecipeHolder<ArcaneCraftingRecipe>> getRecipeType() {
         return RECIPE_TYPE;
     }
 
@@ -126,19 +128,19 @@ public final class ArcaneWorkbenchCategory implements IRecipeCategory<RecipeHold
         }
 
         layoutCrystals(builder, recipe.getCrystals());
-        builder.addOutputSlot(OUTPUT_X, OUTPUT_Y).add(output);
+        builder.addOutputSlot(OUTPUT_X, OUTPUT_Y).addItemStack(output);
     }
 
     private void layoutShaped(IRecipeLayoutBuilder builder, ArcaneShapedCraftingRecipe recipe) {
         int width = recipe.getWidth();
         int height = recipe.getHeight();
-        List<Optional<Ingredient>> ingredients = recipe.getIngredients();
+        List<Optional<Ingredient>> ingredients = recipe.optionalIngredients();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Optional<Ingredient> ingredient = ingredients.get(x + y * width);
                 IRecipeSlotBuilder slot = builder.addInputSlot(GRID_ORIGIN_X + x * GRID_SPACING, GRID_ORIGIN_Y + y * GRID_SPACING);
                 if (ingredient.isPresent())
-                    slot.add(ingredient.get());
+                    slot.addIngredients(ingredient.get());
 
             }
         }
@@ -151,7 +153,7 @@ public final class ArcaneWorkbenchCategory implements IRecipeCategory<RecipeHold
             int y = i / 3;
             IRecipeSlotBuilder slot = builder.addInputSlot(GRID_ORIGIN_X + x * GRID_SPACING, GRID_ORIGIN_Y + y * GRID_SPACING);
             try  {
-                slot.add(ingredients.get(i));
+                slot.addIngredients(ingredients.get(i));
             } catch (Exception ignored){}
         }
     }
@@ -165,7 +167,7 @@ public final class ArcaneWorkbenchCategory implements IRecipeCategory<RecipeHold
             if (isAdded) {
                 IRecipeSlotBuilder slot = builder.addInputSlot(CRYSTAL_X, CRYSTAL_Y + index * CRYSTAL_SPACING);
                 AspectInstance instance = aspects.get(index);
-                slot.add(EssentiaCrystalFactory.of(instance.aspect(), instance.amount()));
+                slot.addItemStack(EssentiaCrystalFactory.of(instance.aspect(), instance.amount()));
                 index++;
                 if (index >= aspects.size()) break;
             } else {
@@ -175,18 +177,18 @@ public final class ArcaneWorkbenchCategory implements IRecipeCategory<RecipeHold
     }
 
     @Override
-    public void draw(RecipeHolder<ArcaneCraftingRecipe> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<ArcaneCraftingRecipe> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         background.draw(guiGraphics);
         plate.draw(guiGraphics, PLATE_X, PLATE_Y);
         arrow.draw(guiGraphics, ARROW_X, ARROW_Y);
 
         Font font = Minecraft.getInstance().font;
         String vis = Integer.toString(recipe.value().getBaseVis());
-        guiGraphics.text(font, vis, VIS_CENTER_X - font.width(vis) / 2, VIS_Y,
+        guiGraphics.drawString(font, vis, VIS_CENTER_X - font.width(vis) / 2, VIS_Y,
                 0xFF000000 | ChatFormatting.DARK_GRAY.getColor(), false);
 
         if (!recipe.value().doesPassGate(Minecraft.getInstance().player)) {
-            guiGraphics.item(Items.BARRIER.getDefaultInstance(), BARRIER_X, BARRIER_Y);
+            guiGraphics.renderItem(Items.BARRIER.getDefaultInstance(), BARRIER_X, BARRIER_Y);
         }
     }
 

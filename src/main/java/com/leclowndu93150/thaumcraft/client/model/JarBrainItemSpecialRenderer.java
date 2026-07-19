@@ -4,22 +4,19 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.client.entity.TCModelLayers;
 import com.leclowndu93150.thaumcraft.client.model.entity.BrainModel;
 import com.leclowndu93150.thaumcraft.client.model.entity.JarBrineModel;
+import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.mojang.serialization.MapCodec;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
-import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
-import org.jspecify.annotations.Nullable;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 
-import java.util.function.Consumer;
-
-public final class JarBrainItemSpecialRenderer implements NoDataSpecialModelRenderer {
+public final class JarBrainItemSpecialRenderer extends BlockEntityWithoutLevelRenderer {
     private static final ResourceLocation TEX_BRAIN = TCIds.rl("textures/entity/brain2.png");
     private static final ResourceLocation TEX_BRINE = TCIds.rl("textures/entity/jarbrine.png");
     private static final float BRAIN_SCALE = 0.4F;
@@ -28,14 +25,19 @@ public final class JarBrainItemSpecialRenderer implements NoDataSpecialModelRend
     private final BrainModel brain;
     private final JarBrineModel brine;
 
-    public JarBrainItemSpecialRenderer(BrainModel brain, JarBrineModel brine) {
-        this.brain = brain;
-        this.brine = brine;
+    public JarBrainItemSpecialRenderer() {
+        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+        EntityModelSet models = Minecraft.getInstance().getEntityModels();
+        this.brain = new BrainModel(models.bakeLayer(TCModelLayers.BRAIN));
+        this.brine = new JarBrineModel(models.bakeLayer(TCModelLayers.JAR_BRINE));
     }
 
     @Override
-    public void submit(PoseStack poseStack, SubmitNodeCollector collector, int lightCoords, int overlayCoords,
-                       boolean hasFoil, int outlineColor) {
+    public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack,
+                             MultiBufferSource buffers, int light, int overlay) {
+        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
+                TCBlocks.JAR_BRAIN.get().defaultBlockState(), poseStack, buffers, light, overlay);
+
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.01F, 0.5F);
         poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
@@ -44,34 +46,10 @@ public final class JarBrainItemSpecialRenderer implements NoDataSpecialModelRend
         poseStack.translate(0.0F, BRAIN_LIFT, 0.0F);
         poseStack.mulPose(Axis.YN.rotationDegrees(90.0F));
         poseStack.scale(BRAIN_SCALE, BRAIN_SCALE, BRAIN_SCALE);
-        collector.submitModelPart(brain.root, poseStack, RenderTypes.entityCutout(TEX_BRAIN),
-                lightCoords, OverlayTexture.NO_OVERLAY, null, -1, null);
+        brain.root.render(poseStack, buffers.getBuffer(RenderType.entityCutout(TEX_BRAIN)), light, overlay);
         poseStack.popPose();
 
-        collector.submitModelPart(brine.root, poseStack, RenderTypes.entityTranslucent(TEX_BRINE),
-                lightCoords, OverlayTexture.NO_OVERLAY, null, -1, null);
+        brine.root.render(poseStack, buffers.getBuffer(RenderType.entityTranslucent(TEX_BRINE)), light, overlay);
         poseStack.popPose();
-    }
-
-    @Override
-    public void getExtents(Consumer<Vector3fc> consumer) {
-        consumer.accept(new Vector3f(0.1875F, 0.0625F, 0.1875F));
-        consumer.accept(new Vector3f(0.8125F, 0.6875F, 0.8125F));
-    }
-
-    public record Unbaked() implements NoDataSpecialModelRenderer.Unbaked {
-        public static final MapCodec<Unbaked> MAP_CODEC = MapCodec.unit(Unbaked::new);
-
-        @Override
-        public @Nullable SpecialModelRenderer<Void> bake(SpecialModelRenderer.BakingContext context) {
-            return new JarBrainItemSpecialRenderer(
-                    new BrainModel(context.entityModelSet().bakeLayer(TCModelLayers.BRAIN)),
-                    new JarBrineModel(context.entityModelSet().bakeLayer(TCModelLayers.JAR_BRINE)));
-        }
-
-        @Override
-        public MapCodec<? extends NoDataSpecialModelRenderer.Unbaked> type() {
-            return MAP_CODEC;
-        }
     }
 }

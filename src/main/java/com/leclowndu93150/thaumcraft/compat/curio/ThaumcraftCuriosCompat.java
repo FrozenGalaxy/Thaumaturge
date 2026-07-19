@@ -29,7 +29,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.SlotResult;
-import top.theillusivec4.curios.api.client.ICurioRenderer;
+import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -105,8 +105,8 @@ public final class ThaumcraftCuriosCompat {
     }
 
     private static void onClientSetup(FMLClientSetupEvent event) {
-        ICurioRenderer.register(TCItems.GOGGLES_REVEALING.get(), GoggleCurioRenderer::new);
-        ICurioRenderer.register(TCItems.CURIOSITY_BAND.get(), CuriosityBandCurioRenderer::new);
+        CuriosRendererRegistry.register(TCItems.GOGGLES_REVEALING.get(), GoggleCurioRenderer::new);
+        CuriosRendererRegistry.register(TCItems.CURIOSITY_BAND.get(), CuriosityBandCurioRenderer::new);
     }
 
     public static boolean checkForGoggles(LivingEntity entity) {

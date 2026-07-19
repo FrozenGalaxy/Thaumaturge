@@ -12,6 +12,7 @@ import com.leclowndu93150.thaumcraft.api.research.ResearchParent;
 import com.leclowndu93150.thaumcraft.api.research.ResearchRequirement;
 import com.leclowndu93150.thaumcraft.client.render.research.ConnectorRenderer;
 import com.leclowndu93150.thaumcraft.api.research.ResearchIcon;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.leclowndu93150.thaumcraft.client.render.research.EntryIconRenderer;
 import com.leclowndu93150.thaumcraft.client.screen.AbstractTCScreen;
 import com.leclowndu93150.thaumcraft.client.screen.TCScreenTextures;
@@ -27,11 +28,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -435,8 +434,8 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractBackground(graphics, mouseX, mouseY, partialTick);
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(graphics, mouseX, mouseY, partialTick);
         if (!searching) {
             updateDragging(mouseX, mouseY);
             clampTempMap();
@@ -447,12 +446,12 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         locY = clampInt(locY, (int) (guiBoundsTop * screenZoom), (int) (guiBoundsBottom * screenZoom - 1.0F));
         currentHighlight = null;
         if (!searching && activeCategory != null) {
-            graphics.pose().pushMatrix();
-            graphics.pose().scale(1.0F / screenZoom, 1.0F / screenZoom);
+            graphics.pose().pushPose();
+            graphics.pose().scale(1.0F / screenZoom, 1.0F / screenZoom, 1F);
             renderBackgroundLayers(graphics, locX, locY);
             renderConnectors(graphics, locX, locY);
             renderEntries(graphics, mouseX, mouseY, locX, locY);
-            graphics.pose().popMatrix();
+            graphics.pose().popPose();
         } else if (searching) {
             renderSearchResults(graphics, mouseX, mouseY);
         }
@@ -461,7 +460,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         renderSearchButton(graphics, mouseX, mouseY);
         renderScrollButtons(graphics, mouseX, mouseY);
         if (popupMessage != null && popupTimeMs > System.currentTimeMillis()) {
-            graphics.setTooltipForNextFrame(font, List.of(popupMessage), Optional.empty(), POPUP_X, POPUP_Y);
+            graphics.renderComponentTooltip(font, List.of(popupMessage), POPUP_X, POPUP_Y);
         }
         if (currentHighlight != null && minecraft != null && minecraft.player != null) {
             IPlayerKnowledge knowledge = KnowledgeAccess.of(minecraft.player);
@@ -494,7 +493,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
 
     private boolean isMouseLeftButtonDown() {
         if (minecraft == null) return false;
-        return GLFW.glfwGetMouseButton(minecraft.getWindow().handle(), 0) == 1;
+        return GLFW.glfwGetMouseButton(minecraft.getWindow().getWindow(), 0) == 1;
     }
 
     private void clampTempMap() {
@@ -526,7 +525,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         }
     }
 
-    private void renderBackgroundLayers(GuiGraphicsExtractor graphics, int locX, int locY) {
+    private void renderBackgroundLayers(GuiGraphics graphics, int locX, int locY) {
         if (activeCategory == null) return;
         IResearchCategory cat = activeCategory.value();
         int x = (int) ((START_X - 2) * screenZoom);
@@ -534,21 +533,19 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         int w = (int) ((screenX + 4) * screenZoom);
         int h = (int) ((screenY + 4) * screenZoom);
         graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
                 cat.background(),
                 x, y,
                 (float) (locX / 2.0), (float) (locY / 2.0),
-                w, h, w, h, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+                w, h, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
         cat.overlayBackground().ifPresent(overlay ->
                 graphics.blit(
-                        RenderPipelines.GUI_TEXTURED,
                         overlay,
                         x, y,
                         (float) (locX / 1.5), (float) (locY / 1.5),
-                        w, h, w, h, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE));
+                        w, h, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE));
     }
 
-    private void renderConnectors(GuiGraphicsExtractor graphics, int locX, int locY) {
+    private void renderConnectors(GuiGraphics graphics, int locX, int locY) {
         if (minecraft == null || minecraft.player == null || activeCategory == null) return;
         IPlayerKnowledge knowledge = KnowledgeAccess.of(minecraft.player);
         List<EntryNode> nodes = nodesByCategory.getOrDefault(activeCategory, List.of());
@@ -615,7 +612,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         ConnectorRenderer.flush(graphics);
     }
 
-    private void renderEntries(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int locX, int locY) {
+    private void renderEntries(GuiGraphics graphics, int mouseX, int mouseY, int locX, int locY) {
         if (minecraft == null || minecraft.player == null || activeCategory == null) return;
         IPlayerKnowledge knowledge = KnowledgeAccess.of(minecraft.player);
         List<EntryNode> nodes = nodesByCategory.getOrDefault(activeCategory, List.of());
@@ -698,7 +695,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         return false;
     }
 
-    private void renderSearchResults(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    private void renderSearchResults(GuiGraphics graphics, int mouseX, int mouseY) {
         if (searchField != null) searchField.setVisible(true);
         int q = 0;
         for (SearchResult sr : searchResults) {
@@ -710,24 +707,22 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
                     && mouseY < textY + 8;
             int color = sr.color(hover);
             if (sr.recipeIcon()) {
-                graphics.pose().pushMatrix();
-                graphics.pose().scale(SEARCH_RESULT_ICON_SCALE, SEARCH_RESULT_ICON_SCALE);
+                graphics.pose().pushPose();
+                graphics.pose().scale(SEARCH_RESULT_ICON_SCALE, SEARCH_RESULT_ICON_SCALE, 1F);
                 int iconScreenX = (SEARCH_RESULT_ICON_X * 2);
                 int iconScreenY = textY * 2;
                 graphics.blit(
-                        RenderPipelines.GUI_TEXTURED,
                         TCScreenTextures.RESEARCH_BROWSER,
                         iconScreenX, iconScreenY,
                         (float) SEARCH_RESULT_ICON_U, (float) SEARCH_RESULT_ICON_V,
                         SEARCH_RESULT_ICON_W, SEARCH_RESULT_ICON_W,
-                        SEARCH_RESULT_ICON_W, SEARCH_RESULT_ICON_W,
                         TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
-                graphics.pose().popMatrix();
+                graphics.pose().popPose();
             }
-            graphics.text(font, sr.displayName(), SEARCH_RESULT_TEXT_X, textY, color, false);
+            graphics.drawString(font, sr.displayName(), SEARCH_RESULT_TEXT_X, textY, color, false);
             q++;
             if (SEARCH_RESULT_TEXT_Y_START + (q + 1) * SEARCH_RESULT_ROW_HEIGHT > screenY) {
-                graphics.text(font, Component.translatable("tc.search.more"),
+                graphics.drawString(font, Component.translatable("tc.search.more"),
                         SEARCH_RESULT_HIT_LEFT_X,
                         SEARCH_RESULT_TEXT_Y_START + q * SEARCH_RESULT_ROW_HEIGHT + SEARCH_RESULT_OVERFLOW_Y_OFFSET,
                         SEARCH_OVERFLOW_COLOR, false);
@@ -736,26 +731,26 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         }
     }
 
-    private void drawBrassFrame(GuiGraphicsExtractor graphics) {
+    private void drawBrassFrame(GuiGraphics graphics) {
         for (int x = FRAME_MARGIN; x < width - FRAME_MARGIN; x += EDGE_TILE) {
             int len = Math.min(EDGE_TILE, width - FRAME_MARGIN - x);
             if (len <= 0) continue;
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BROWSER,
+            graphics.blit(TCScreenTextures.RESEARCH_BROWSER,
                     x, BORDER_OFFSET, EDGE_UV, CORNER_UV, len, CORNER_SIZE,
-                    len, CORNER_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BROWSER,
+                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+            graphics.blit(TCScreenTextures.RESEARCH_BROWSER,
                     x, height - FRAME_EDGE_FROM_BOTTOM, EDGE_UV, CORNER_UV, len, CORNER_SIZE,
-                    len, CORNER_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
         }
         for (int y = FRAME_MARGIN; y < height - FRAME_MARGIN; y += EDGE_TILE) {
             int len = Math.min(EDGE_TILE, height - FRAME_MARGIN - y);
             if (len <= 0) continue;
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BROWSER,
+            graphics.blit(TCScreenTextures.RESEARCH_BROWSER,
                     BORDER_OFFSET, y, CORNER_UV, EDGE_UV, CORNER_SIZE, len,
-                    CORNER_SIZE, len, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BROWSER,
+                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+            graphics.blit(TCScreenTextures.RESEARCH_BROWSER,
                     width - FRAME_EDGE_FROM_RIGHT, y, CORNER_UV, EDGE_UV, CORNER_SIZE, len,
-                    CORNER_SIZE, len, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
         }
         drawCorner(graphics, BORDER_OFFSET, BORDER_OFFSET);
         drawCorner(graphics, BORDER_OFFSET, height - FRAME_EDGE_FROM_BOTTOM);
@@ -763,13 +758,13 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         drawCorner(graphics, width - FRAME_EDGE_FROM_RIGHT, height - FRAME_EDGE_FROM_BOTTOM);
     }
 
-    private void drawCorner(GuiGraphicsExtractor graphics, int x, int y) {
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BROWSER,
+    private void drawCorner(GuiGraphics graphics, int x, int y) {
+        graphics.blit(TCScreenTextures.RESEARCH_BROWSER,
                 x, y, CORNER_UV, CORNER_UV, CORNER_SIZE, CORNER_SIZE,
-                CORNER_SIZE, CORNER_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
     }
 
-    private void renderCategoryButtons(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    private void renderCategoryButtons(GuiGraphics graphics, int mouseX, int mouseY) {
         if (minecraft == null || minecraft.player == null) return;
         IPlayerKnowledge knowledge = KnowledgeAccess.of(minecraft.player);
         for (int i = 0; i < categoriesTC.size(); i++) {
@@ -787,7 +782,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
     }
 
     private void drawCategoryButton(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             IPlayerKnowledge knowledge,
             Holder.Reference<IResearchCategory> ref,
             int x,
@@ -802,18 +797,16 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
                 && mouseX < x + CATEGORY_ICON_SIZE
                 && mouseY < y + CATEGORY_ICON_SIZE + yShift;
         int frameTint = active ? CATEGORY_TAB_ACTIVE_TINT : CATEGORY_TAB_INACTIVE_TINT;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BROWSER,
+        GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BROWSER,
                 x - CATEGORY_FRAME_OFFSET, y - CATEGORY_FRAME_OFFSET + yShift,
                 CORNER_UV, CORNER_UV,
-                CATEGORY_FRAME_SIZE, CATEGORY_FRAME_SIZE,
                 CATEGORY_FRAME_SIZE, CATEGORY_FRAME_SIZE,
                 TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
                 frameTint);
         int iconTint = (active || hover) ? CATEGORY_TAB_ACTIVE_ICON_TINT : CATEGORY_TAB_INACTIVE_ICON_TINT;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, ref.value().icon(),
+        GuiBlend.blitTinted(graphics, ref.value().icon(),
                 x, y + yShift,
                 0.0F, 0.0F,
-                CATEGORY_ICON_SIZE, CATEGORY_ICON_SIZE,
                 CATEGORY_ICON_SIZE, CATEGORY_ICON_SIZE,
                 CATEGORY_ICON_SIZE, CATEGORY_ICON_SIZE,
                 iconTint);
@@ -839,34 +832,33 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
             String full = name + " (" + completion + "%)";
             int labelX = !flip ? x + CATEGORY_LABEL_GAP_X : screenX + CATEGORY_LABEL_FROM_RIGHT_OFFSET - font.width(full);
             int labelY = y + CATEGORY_LABEL_Y_OFFSET + yShift;
-            graphics.text(font, full, labelX, labelY, HOVER_LABEL_COLOR, false);
+            graphics.drawString(font, full, labelX, labelY, HOVER_LABEL_COLOR, false);
             int t = CATEGORY_LABEL_LINE_HEIGHT;
             if (hasNewResearch) {
                 String s = Component.translatable("tc.research.newresearch").getString();
                 int sx = !flip ? x + CATEGORY_LABEL_GAP_X : screenX + CATEGORY_LABEL_FROM_RIGHT_OFFSET - font.width(s);
-                graphics.text(font, s, sx, labelY + t, HOVER_LABEL_COLOR, false);
+                graphics.drawString(font, s, sx, labelY + t, HOVER_LABEL_COLOR, false);
                 t += CATEGORY_LABEL_LINE_HEIGHT;
             }
             if (hasNewPage) {
                 String s = Component.translatable("tc.research.newpage").getString();
                 int sx = !flip ? x + CATEGORY_LABEL_GAP_X : screenX + CATEGORY_LABEL_FROM_RIGHT_OFFSET - font.width(s);
-                graphics.text(font, s, sx, labelY + t, HOVER_LABEL_COLOR, false);
+                graphics.drawString(font, s, sx, labelY + t, HOVER_LABEL_COLOR, false);
             }
         }
     }
 
-    private void drawCategoryBadge(GuiGraphicsExtractor graphics, int x, int y, int u) {
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(x, y);
-        graphics.pose().scale(CATEGORY_BADGE_SCALE, CATEGORY_BADGE_SCALE);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BROWSER,
+    private void drawCategoryBadge(GuiGraphics graphics, int x, int y, int u) {
+        graphics.pose().pushPose();
+        graphics.pose().translate(x, y, 0);
+        graphics.pose().scale(CATEGORY_BADGE_SCALE, CATEGORY_BADGE_SCALE, 1F);
+        GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BROWSER,
                 0, 0,
                 (float) u, (float) CATEGORY_BADGE_V,
                 CATEGORY_BADGE_SIZE, CATEGORY_BADGE_SIZE,
-                CATEGORY_BADGE_SIZE, CATEGORY_BADGE_SIZE,
                 TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
                 CATEGORY_BADGE_TINT);
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 
     private int categoryCompletionPercent(IPlayerKnowledge knowledge, Holder.Reference<IResearchCategory> ref) {
@@ -882,28 +874,27 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         return (int) ((float) rco / rt * 100.0F);
     }
 
-    private void renderSearchButton(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    private void renderSearchButton(GuiGraphics graphics, int mouseX, int mouseY) {
         int x = SEARCH_BUTTON_X;
         int y = height - SEARCH_BUTTON_Y_OFFSET_FROM_BOTTOM;
         boolean hover = mouseX >= x && mouseX < x + SEARCH_BUTTON_SIZE
                 && mouseY >= y && mouseY < y + SEARCH_BUTTON_SIZE;
         int tint = hover ? SEARCH_BUTTON_TINT_HOVER : SEARCH_BUTTON_TINT_IDLE;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BROWSER,
+        GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BROWSER,
                 x, y,
                 (float) SEARCH_BUTTON_U, (float) SEARCH_BUTTON_V,
-                SEARCH_BUTTON_SIZE, SEARCH_BUTTON_SIZE,
                 SEARCH_BUTTON_SIZE, SEARCH_BUTTON_SIZE,
                 TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
                 tint);
         if (hover) {
-            graphics.text(font, Component.translatable("tc.search").getString(),
+            graphics.drawString(font, Component.translatable("tc.search").getString(),
                     x + SEARCH_BUTTON_LABEL_X_OFFSET,
                     y + SEARCH_BUTTON_LABEL_Y_OFFSET,
                     HOVER_LABEL_COLOR, false);
         }
     }
 
-    private void renderScrollButtons(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    private void renderScrollButtons(GuiGraphics graphics, int mouseX, int mouseY) {
         if (catScrollMax <= 0 && catScrollPos == 0) return;
         int upX = width - SCROLL_BUTTON_X_FROM_RIGHT;
         int upY = SCROLL_BUTTON_UP_Y;
@@ -913,23 +904,21 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
                 && mouseY >= upY && mouseY < upY + SCROLL_BUTTON_HEIGHT;
         boolean downHover = mouseX >= downX && mouseX < downX + SCROLL_BUTTON_WIDTH
                 && mouseY >= downY && mouseY < downY + SCROLL_BUTTON_HEIGHT;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BROWSER,
+        GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BROWSER,
                 upX, upY,
                 (float) SCROLL_BUTTON_UV_U, (float) SCROLL_BUTTON_UV_UP_V,
                 SCROLL_BUTTON_WIDTH, SCROLL_BUTTON_HEIGHT,
-                SCROLL_BUTTON_WIDTH, SCROLL_BUTTON_HEIGHT,
                 TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
                 upHover ? SCROLL_BUTTON_TINT_HOVER : SCROLL_BUTTON_TINT_IDLE);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BROWSER,
+        GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BROWSER,
                 downX, downY,
                 (float) SCROLL_BUTTON_UV_U, (float) SCROLL_BUTTON_UV_DOWN_V,
-                SCROLL_BUTTON_WIDTH, SCROLL_BUTTON_HEIGHT,
                 SCROLL_BUTTON_WIDTH, SCROLL_BUTTON_HEIGHT,
                 TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
                 downHover ? SCROLL_BUTTON_TINT_HOVER : SCROLL_BUTTON_TINT_IDLE);
     }
 
-    private void renderEntryTooltip(GuiGraphicsExtractor graphics, IPlayerKnowledge knowledge, EntryNode node, int mouseX, int mouseY) {
+    private void renderEntryTooltip(GuiGraphics graphics, IPlayerKnowledge knowledge, EntryNode node, int mouseX, int mouseY) {
         List<Component> lines = new ArrayList<>();
         Component name = Component.translatable(node.entry.nameKey()).withStyle(ChatFormatting.GOLD);
         lines.add(name);
@@ -981,23 +970,23 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
 
     private void playButtonClack() {
         if (minecraft != null && minecraft.player != null) {
-            minecraft.player.playSound(TCSounds.CLACK.get(), BUTTON_CLACK_VOLUME, 1.0F);
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(TCSounds.CLACK.get(), 1.0F, BUTTON_CLACK_VOLUME));
         }
     }
 
     private void playPageOpen() {
         if (minecraft != null && minecraft.player != null) {
-            minecraft.player.playSound(TCSounds.PAGE.get(), PAGE_OPEN_VOLUME, 1.0F);
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(TCSounds.PAGE.get(), 1.0F, PAGE_OPEN_VOLUME));
         }
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         popupTimeMs = System.currentTimeMillis() - 1L;
-        if (event.button() != 0) return super.mouseClicked(event, doubleClick);
-        int mx = (int) event.x();
-        int my = (int) event.y();
-        if (minecraft == null || minecraft.player == null) return super.mouseClicked(event, doubleClick);
+        if (button != 0) return super.mouseClicked(mouseX, mouseY, button);
+        int mx = (int) mouseX;
+        int my = (int) mouseY;
+        if (minecraft == null || minecraft.player == null) return super.mouseClicked(mouseX, mouseY, button);
         IPlayerKnowledge knowledge = KnowledgeAccess.of(minecraft.player);
         if (hitSearchButton(mx, my)) {
             playButtonClack();
@@ -1081,7 +1070,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
                 }
             }
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     private void toggleSearch() {
@@ -1156,25 +1145,25 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        if (searching && searchField != null && searchField.keyPressed(event)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (searching && searchField != null && searchField.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        if (event.key() == GLFW.GLFW_KEY_ESCAPE && searching) {
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE && searching) {
             toggleSearch();
             return true;
         }
-        if (minecraft != null && minecraft.options.keyInventory.matches(event)) {
+        if (minecraft != null && minecraft.options.keyInventory.matches(keyCode, scanCode)) {
             onClose();
             return true;
         }
-        return super.keyPressed(event);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public boolean mouseReleased(MouseButtonEvent event) {
-        if (event.button() == 0) isMouseButtonDown = 0;
-        return super.mouseReleased(event);
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (button == 0) isMouseButtonDown = 0;
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override

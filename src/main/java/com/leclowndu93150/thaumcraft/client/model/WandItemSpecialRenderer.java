@@ -3,9 +3,9 @@ package com.leclowndu93150.thaumcraft.client.model;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.wands.WandCap;
 import com.leclowndu93150.thaumcraft.api.wands.WandRod;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
 import com.leclowndu93150.thaumcraft.client.render.BoxGeometry;
 import com.leclowndu93150.thaumcraft.client.render.TCFlatRenderTypes;
+import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumcraft.content.casters.ItemFocus;
 import com.leclowndu93150.thaumcraft.content.wands.WandParts;
 import com.leclowndu93150.thaumcraft.content.wands.WandVisHelper;
@@ -13,37 +13,25 @@ import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import com.mojang.serialization.MapCodec;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
-import net.minecraft.Util;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
-import org.jspecify.annotations.Nullable;
 
-public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandItemSpecialRenderer.WandArg> {
+public final class WandItemSpecialRenderer extends BlockEntityWithoutLevelRenderer {
     public record WandArg(WandCap cap, WandRod rod, boolean sceptre, boolean hasFocus, int focusColor) {}
 
     private static final ResourceLocation WAND_TEXTURE = TCIds.rl("textures/models/wand.png");
     private static final ResourceLocation SCRIPT_TEXTURE = TCIds.rl("textures/misc/script.png");
 
-    private static final RenderType RUNES = RenderType.create("tc_wand_runes",
-            RenderSetup.builder(TCRenderPipelines.ENTITY_ADDITIVE_EMISSIVE)
-                    .withTexture("Sampler0", SCRIPT_TEXTURE)
-                    .useLightmap()
-                    .createRenderSetup());
+    private static final RenderType RUNES = TCRenderTypes.entityAdditiveEmissive(SCRIPT_TEXTURE);
 
     private static final float PX = 0.0625F;
     private static final int TEX_W = 32;
@@ -64,20 +52,22 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
     private static final float CAP_STAFF_SCALE_Y = 1.1F;
     private static final float SCEPTRE_CAP_SCALE = 1.3F;
 
+    public WandItemSpecialRenderer() {
+        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+    }
+
     @Override
-    public void submit(@Nullable WandArg arg, PoseStack poseStack, SubmitNodeCollector collector,
-                       int light, int overlay, boolean glint, int seed) {
-        if (arg == null) {
-            return;
-        }
+    public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack,
+                             MultiBufferSource buffers, int light, int overlay) {
+        WandArg arg = extract(stack);
         poseStack.pushPose();
         poseStack.translate(0.5F, MODEL_LIFT, 0.5F);
         poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
-        submitParts(arg, poseStack, collector, light);
+        submitParts(arg, poseStack, buffers, light);
         poseStack.popPose();
     }
 
-    public static void submitParts(WandArg arg, PoseStack poseStack, SubmitNodeCollector collector, int light) {
+    public static void submitParts(WandArg arg, PoseStack poseStack, MultiBufferSource buffers, int light) {
         boolean staff = arg.rod().staff();
         boolean runes = arg.rod().runes();
         float ticks = clientTicks();
@@ -94,10 +84,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
             poseStack.translate(0.0F, -0.1F, 0.0F);
             poseStack.scale(1.2F, 2.0F, 1.2F);
         }
-        PoseStack.Pose rodPose = poseStack.last().copy();
-        int rodLightFinal = rodLight;
-        collector.submitCustomGeometry(poseStack, rodType, (pose, buffer) ->
-                box(rodPose, buffer, -1.0F, 1.0F, -1.0F, 2, 18, 2, 0, 8, 0xFFFFFFFF, rodLightFinal));
+        box(poseStack.last(), buffers.getBuffer(rodType), -1.0F, 1.0F, -1.0F, 2, 18, 2, 0, 8, 0xFFFFFFFF, rodLight);
         poseStack.popPose();
 
         RenderType capType = TCFlatRenderTypes.entityCutoutFlat(arg.cap().texture());
@@ -110,25 +97,25 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
         if (arg.sceptre()) {
             poseStack.pushPose();
             poseStack.scale(1.3F, 1.3F, 1.3F);
-            submitCap(poseStack, collector, capType, 0.0F, light);
+            submitCap(poseStack, buffers, capType, 0.0F, light);
             poseStack.popPose();
             poseStack.pushPose();
             poseStack.translate(0.0F, 0.3F, 0.0F);
             poseStack.scale(1.0F, 0.66F, 1.0F);
-            submitCap(poseStack, collector, capType, 0.0F, light);
+            submitCap(poseStack, buffers, capType, 0.0F, light);
             poseStack.popPose();
         } else {
-            submitCap(poseStack, collector, capType, 0.0F, light);
+            submitCap(poseStack, buffers, capType, 0.0F, light);
         }
         if (staff) {
             poseStack.translate(0.0F, 0.225F, 0.0F);
             poseStack.pushPose();
             poseStack.scale(1.0F, 0.66F, 1.0F);
-            submitCap(poseStack, collector, capType, 0.0F, light);
+            submitCap(poseStack, buffers, capType, 0.0F, light);
             poseStack.popPose();
             poseStack.translate(0.0F, 0.65F, 0.0F);
         }
-        submitCap(poseStack, collector, capType, 20.0F, light);
+        submitCap(poseStack, buffers, capType, 20.0F, light);
         poseStack.popPose();
 
         if (arg.hasFocus()) {
@@ -142,9 +129,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
             }
             int tint = ARGB32.color((int) (FOCUS_ALPHA * 255.0F), arg.focusColor());
             int focusLight = (int) (195.0F + Mth.sin(ticks / 3.0F) * 10.0F + 10.0F);
-            PoseStack.Pose focusPose = poseStack.last().copy();
-            collector.submitCustomGeometry(poseStack, focusType, (pose, buffer) ->
-                    box(focusPose, buffer, -3.0F, -6.0F, -3.0F, 6, 6, 6, 0, 0, tint, focusLight));
+            box(poseStack.last(), buffers.getBuffer(focusType), -3.0F, -6.0F, -3.0F, 6, 6, 6, 0, 0, tint, focusLight);
             poseStack.popPose();
         }
 
@@ -152,7 +137,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
             for (int rot = 0; rot < SCEPTRE_RUNE_COUNT; rot++) {
                 poseStack.pushPose();
                 poseStack.mulPose(Axis.YP.rotationDegrees(36.0F * rot + ticks));
-                submitRune(poseStack, collector, 0.16F, -0.01F, -0.125F, rot, ticks);
+                submitRune(poseStack, buffers, 0.16F, -0.01F, -0.125F, rot, ticks);
                 poseStack.popPose();
             }
         }
@@ -163,7 +148,7 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
                 poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
                 for (int a = 0; a < STAFF_RUNE_LENGTH; a++) {
                     int rune = (a + rot * 3) % SCRIPT_GLYPHS;
-                    submitRune(poseStack, collector, 0.36F + a * 0.14F, -0.01F, -0.08F, rune, ticks);
+                    submitRune(poseStack, buffers, 0.36F + a * 0.14F, -0.01F, -0.08F, rune, ticks);
                 }
             }
             poseStack.popPose();
@@ -191,21 +176,19 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
 
     private static float clientTicks() {
         LocalPlayer player = Minecraft.getInstance().player;
-        return player == null ? 0.0F : player.tickCount + Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        return player == null ? 0.0F : player.tickCount + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
     }
 
-    private static void submitCap(PoseStack poseStack, SubmitNodeCollector collector, RenderType type,
-                           float rotationPointY, int light) {
+    private static void submitCap(PoseStack poseStack, MultiBufferSource buffers, RenderType type,
+                                  float rotationPointY, int light) {
         poseStack.pushPose();
         poseStack.translate(0.0F, rotationPointY * PX, 0.0F);
-        PoseStack.Pose pose = poseStack.last().copy();
-        collector.submitCustomGeometry(poseStack, type, (p, buffer) ->
-                box(pose, buffer, -1.0F, -1.0F, -1.0F, 2, 2, 2, 0, 0, 0xFFFFFFFF, light));
+        box(poseStack.last(), buffers.getBuffer(type), -1.0F, -1.0F, -1.0F, 2, 2, 2, 0, 0, 0xFFFFFFFF, light);
         poseStack.popPose();
     }
 
-    private static void submitRune(PoseStack poseStack, SubmitNodeCollector collector,
-                            float x, float y, float z, int rune, float ticks) {
+    private static void submitRune(PoseStack poseStack, MultiBufferSource buffers,
+                                   float x, float y, float z, int rune, float ticks) {
         float r = Mth.sin((ticks + rune * 5) / 5.0F) * 0.1F + 0.88F;
         float g = Mth.sin((ticks + rune * 5) / 7.0F) * 0.1F + 0.63F;
         float wobble = Mth.sin((ticks + rune * 5) / 10.0F) * 0.2F;
@@ -216,17 +199,16 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
         poseStack.pushPose();
         poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
         poseStack.translate(x, y, z);
-        PoseStack.Pose pose = poseStack.last().copy();
-        collector.submitCustomGeometry(poseStack, RUNES, (p, buffer) -> {
-            buffer.addVertex(pose, -half, half, 0.0F).setColor(tint).setUv(u1, 1.0F)
-                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
-            buffer.addVertex(pose, half, half, 0.0F).setColor(tint).setUv(u1, 0.0F)
-                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
-            buffer.addVertex(pose, half, -half, 0.0F).setColor(tint).setUv(u0, 0.0F)
-                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
-            buffer.addVertex(pose, -half, -half, 0.0F).setColor(tint).setUv(u0, 1.0F)
-                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
-        });
+        PoseStack.Pose pose = poseStack.last();
+        VertexConsumer buffer = buffers.getBuffer(RUNES);
+        buffer.addVertex(pose, -half, half, 0.0F).setColor(tint).setUv(u1, 1.0F)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
+        buffer.addVertex(pose, half, half, 0.0F).setColor(tint).setUv(u1, 0.0F)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
+        buffer.addVertex(pose, half, -half, 0.0F).setColor(tint).setUv(u0, 0.0F)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
+        buffer.addVertex(pose, -half, -half, 0.0F).setColor(tint).setUv(u0, 1.0F)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
         poseStack.popPose();
     }
 
@@ -238,40 +220,15 @@ public final class WandItemSpecialRenderer implements SpecialModelRenderer<WandI
                 u, v, dx, dy, dz, TEX_W, TEX_H, tint, light, true);
     }
 
-    @Override
-    public void getExtents(Consumer<Vector3fc> consumer) {
-        consumer.accept(new Vector3f(-0.3F, -0.2F, -0.3F));
-        consumer.accept(new Vector3f(0.3F, 1.6F, 0.3F));
-    }
-
-    @Override
-    public @Nullable WandArg extractArgument(ItemStack stack) {
-        return extract(stack);
-    }
-
     public static WandArg extract(ItemStack stack) {
         WandParts parts = WandVisHelper.getParts(stack);
         ItemStack focusStack = ItemStack.EMPTY;
-        var template = stack.get(TCDataComponents.SOCKETED_FOCUS.get());
+        ItemStack template = stack.get(TCDataComponents.SOCKETED_FOCUS.get());
         if (template != null) {
-            focusStack = template.create();
+            focusStack = template;
         }
         boolean hasFocus = focusStack.getItem() instanceof ItemFocus;
         int color = hasFocus ? ItemFocus.getFocusColor(focusStack) : 0xFFFFFF;
         return new WandArg(parts.cap(), parts.rod(), parts.sceptre(), hasFocus, color);
-    }
-
-    public record Unbaked() implements SpecialModelRenderer.Unbaked<WandArg> {
-        public static final MapCodec<Unbaked> MAP_CODEC = MapCodec.unit(Unbaked::new);
-
-        @Override
-        public @Nullable SpecialModelRenderer<WandArg> bake(BakingContext context) {
-            return new WandItemSpecialRenderer();
-        }
-
-        @Override
-        public MapCodec<Unbaked> type() {
-            return MAP_CODEC;
-        }
     }
 }

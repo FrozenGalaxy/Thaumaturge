@@ -2,41 +2,35 @@ package com.leclowndu93150.thaumcraft.compat.jei.category;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.recipe.*;
-import com.leclowndu93150.thaumcraft.client.screen.pip.BlockPreviewRenderState;
 import com.leclowndu93150.thaumcraft.compat.jei.ThaumcraftJEIPlugin;
 import com.leclowndu93150.thaumcraft.compat.jei.drawables.AlphaDrawable;
 import com.leclowndu93150.thaumcraft.compat.jei.utils.ResearchUtils;
-import com.leclowndu93150.thaumcraft.content.recipe.dust.BlueprintMatrix;
 import com.leclowndu93150.thaumcraft.content.recipe.dust.DustTriggerMultiblockRecipe;
-import com.leclowndu93150.thaumcraft.content.recipe.dust.DustTriggerSimpleRecipe;
-import com.leclowndu93150.thaumcraft.content.recipe.dust.DustTriggerTagRecipe;
-import com.leclowndu93150.thaumcraft.mixin.client.gui.GuiGraphicsExtractorAccessor;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.leclowndu93150.thaumcraft.registry.TCRecipeTypes;
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
-import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
-import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import mezz.jei.api.recipe.types.IRecipeHolderType;
-import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.Rect2i;
-import org.joml.Matrix3x2f;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
@@ -53,7 +47,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 
 public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<DustTrigger>> {
-    public static final IRecipeHolderType<DustTrigger> RECIPE_TYPE = IRecipeHolderType.create(ResourceLocation.fromNamespaceAndPath(TCIds.MODID,"multiblock_dust_trigger"));
+    public static final RecipeType<RecipeHolder<DustTrigger>> RECIPE_TYPE = RecipeType.createRecipeHolderType(ResourceLocation.fromNamespaceAndPath(TCIds.MODID,"multiblock_dust_trigger"));
 
     private static final int WIDTH = 144;
     private static final int HEIGHT = 108;
@@ -75,11 +69,11 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
     }
 
     @Override
-    public IRecipeType<RecipeHolder<DustTrigger>> getRecipeType() {
+    public RecipeType<RecipeHolder<DustTrigger>> getRecipeType() {
         return RECIPE_TYPE;
     }
 
-    public static IRecipeType<RecipeHolder<DustTrigger>> type() {
+    public static RecipeType<RecipeHolder<DustTrigger>> type() {
         return RECIPE_TYPE;
     }
 
@@ -108,7 +102,7 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
 
         Component usage = Component.translatable("jei.thaumcraft.dust_trigger.target.multiblock");
         builder.addSlot(RecipeIngredientRole.INPUT, DUST_SLOT_X + 1, DUST_SLOT_Y + 1)
-                .add(TCItems.SALIS_MUNDUS.get())
+                .addItemStack(new ItemStack(TCItems.SALIS_MUNDUS.get()))
                 .addRichTooltipCallback((view, tooltip) -> tooltip.add(usage));
 
         DustTrigger recipe = holder.value();
@@ -116,7 +110,7 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
         ItemStack result = DustTriggerCategory.resultStack(recipe);
         if (!result.isEmpty()) {
             builder.addSlot(RecipeIngredientRole.OUTPUT, RESULT_SLOT_X + 1, RESULT_SLOT_Y + 1)
-                    .add(result);
+                    .addItemStack(result);
         }
 
         Object2IntMap<BlueprintSource> inputMap = new Object2IntOpenHashMap<>();
@@ -143,61 +137,86 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
         }
     }
 
+    private static final float PREVIEW_CENTER_X = (WIDTH - 35) / 2.0F;
+    private static final float PREVIEW_CENTER_Y = (HEIGHT + 5) / 2.0F;
+    private static final float PREVIEW_SCALE = 15.0F;
+    private static final float PREVIEW_ROT_X = 25.0F;
+    private static final float PREVIEW_DEPTH = 200.0F;
+
     @Override
-    public void draw(RecipeHolder<DustTrigger> holder, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<DustTrigger> holder, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         resultIcon.draw(guiGraphics,RESULT_SLOT_X - 6, RESULT_SLOT_Y - 6);
         arrow.draw(guiGraphics,WIDTH / 2 -arrow.getWidth() / 2 - 20,0);
         boolean doesPassGate = holder.value().doesPassGate(Minecraft.getInstance().player);
-        if (!doesPassGate) guiGraphics.item(Items.BARRIER.getDefaultInstance(),WIDTH / 2 -arrow.getWidth() / 2 - 14, 4);
-        Matrix3x2f pose = guiGraphics.pose();
-        drawExtra(holder, new Rect2i(Math.round(pose.m20), Math.round(pose.m21), WIDTH, HEIGHT), guiGraphics, mouseX, mouseY);
+        if (!doesPassGate) guiGraphics.renderItem(Items.BARRIER.getDefaultInstance(),WIDTH / 2 -arrow.getWidth() / 2 - 14, 4);
+        drawExtra(holder, guiGraphics);
     }
 
-    private void drawExtra(RecipeHolder<DustTrigger> holder,Rect2i area, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    private void drawExtra(RecipeHolder<DustTrigger> holder, GuiGraphics guiGraphics) {
         DustTriggerMultiblockRecipe recipe = (DustTriggerMultiblockRecipe) holder.value();
         Blueprint blueprint = lookupBlueprint(recipe.blueprintId());
-        if (blueprint != null){
-            Map<BlockPos, BlockState> blocks = new HashMap<>();
-            for (int y = 0; y < blueprint.ySize(); y++) {
-                for (int x = 0; x < blueprint.xSize(); x++) {
-                    for (int z = 0; z < blueprint.zSize(); z++) {
-                        BlueprintPart part = blueprint.cell(y,x,z);
-                        if (part != null) {
-                            blocks.put(new BlockPos(x, -y + (blueprint.ySize() - 1), z),  part.source().getState());
-                        }
+        if (blueprint == null) {
+            return;
+        }
+        Map<BlockPos, BlockState> blocks = new HashMap<>();
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        for (int y = 0; y < blueprint.ySize(); y++) {
+            for (int x = 0; x < blueprint.xSize(); x++) {
+                for (int z = 0; z < blueprint.zSize(); z++) {
+                    BlueprintPart part = blueprint.cell(y, x, z);
+                    if (part != null) {
+                        int py = -y + (blueprint.ySize() - 1);
+                        blocks.put(new BlockPos(x, py, z), part.source().getState());
+                        minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+                        minY = Math.min(minY, py); maxY = Math.max(maxY, py);
+                        minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
                     }
                 }
             }
-            ((GuiGraphicsExtractorAccessor)guiGraphics)
-                    .thaumcraft$getGuiRenderState()
-                    .addPicturesInPictureState(new BlockPreviewRenderState(
-                            blocks,
-                            25,
-                            rotation / 8F+90,
-                            1,
-                            15,
-                             0,
-                             0,
-                            area.getX() - 35,
-                            area.getY() + 5,
-                            area.getX() + WIDTH,
-                            area.getY() + HEIGHT,
-                            null
-                    ));
-            rotation++;
         }
+        if (blocks.isEmpty()) {
+            return;
+        }
+        float centerX = (minX + maxX + 1) / 2.0F;
+        float centerY = (minY + maxY + 1) / 2.0F;
+        float centerZ = (minZ + maxZ + 1) / 2.0F;
+
+        BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
+        MultiBufferSource.BufferSource buffers = guiGraphics.bufferSource();
+        PoseStack pose = guiGraphics.pose();
+        pose.pushPose();
+        pose.translate(PREVIEW_CENTER_X, PREVIEW_CENTER_Y, PREVIEW_DEPTH);
+        pose.scale(PREVIEW_SCALE, -PREVIEW_SCALE, PREVIEW_SCALE);
+        pose.mulPose(Axis.XP.rotationDegrees(PREVIEW_ROT_X));
+        pose.mulPose(Axis.YP.rotationDegrees(rotation / 8F + 90));
+        pose.translate(-centerX, -centerY, -centerZ);
+        Lighting.setupFor3DItems();
+        for (Map.Entry<BlockPos, BlockState> entry : blocks.entrySet()) {
+            BlockPos blockPos = entry.getKey();
+            pose.pushPose();
+            pose.translate(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+            dispatcher.renderSingleBlock(entry.getValue(), pose, buffers,
+                    LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+            pose.popPose();
+        }
+        buffers.endBatch();
+        Lighting.setupForFlatItems();
+        pose.popPose();
+        rotation++;
     }
 
 
     private @Nullable Blueprint lookupBlueprint(ResourceLocation blueprintId) {
         ResourceKey<Blueprint> key = ResourceKey.create(Blueprint.REGISTRY_KEY, blueprintId);
-        if (ThaumcraftJEIPlugin.clientRegistryAccess() == null) return null;
-        Registry<Blueprint> registry = ThaumcraftJEIPlugin.clientRegistryAccess().lookup(Blueprint.REGISTRY_KEY).orElse(null);
-        if (registry == null) {
+        RegistryAccess access = ThaumcraftJEIPlugin.clientRegistryAccess();
+        if (access == null) {
             return null;
         }
-        Holder<Blueprint> holder = registry.get(key);
-        return holder == null ? null : holder.value();
+        return access.lookup(Blueprint.REGISTRY_KEY)
+                .flatMap(lookup -> lookup.get(key))
+                .map(Holder::value)
+                .orElse(null);
     }
 
     @Override

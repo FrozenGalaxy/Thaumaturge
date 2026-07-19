@@ -3,9 +3,8 @@ package com.leclowndu93150.thaumcraft.client.screen;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.pech.MenuPech;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -26,13 +25,13 @@ public class PechScreen extends AbstractTCContainerScreen<MenuPech> {
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
     }
 
     @Override
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (menu.canTrade()) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
+            graphics.blit(TEXTURE,
                     leftPos + TRADE_BUTTON_X, topPos + TRADE_BUTTON_Y,
                     TRADE_BUTTON_U, TRADE_BUTTON_V,
                     TRADE_BUTTON_SIZE, TRADE_BUTTON_SIZE, 256, 256);
@@ -40,17 +39,17 @@ public class PechScreen extends AbstractTCContainerScreen<MenuPech> {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        int mx = (int) event.x() - (leftPos + TRADE_BUTTON_X);
-        int my = (int) event.y() - (topPos + TRADE_BUTTON_Y);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        int mx = (int) mouseX - (leftPos + TRADE_BUTTON_X);
+        int my = (int) mouseY - (topPos + TRADE_BUTTON_Y);
         if (mx >= 0 && my >= 0 && mx < TRADE_BUTTON_SIZE && my < TRADE_BUTTON_SIZE && menu.canTrade()) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MenuPech.TRADE_BUTTON_ID);
             if (minecraft.player != null) {
-                minecraft.player.playSound(TCSounds.PECH_DICE.get(), DICE_VOLUME,
-                        0.95F + minecraft.player.getRandom().nextFloat() * 0.1F);
+                minecraft.getSoundManager().play(SimpleSoundInstance.forUI(TCSounds.PECH_DICE.get(),
+                        0.95F + minecraft.player.getRandom().nextFloat() * 0.1F, DICE_VOLUME));
             }
             return true;
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 }

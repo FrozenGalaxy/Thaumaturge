@@ -1,17 +1,16 @@
 package com.leclowndu93150.thaumcraft.client.hud;
 
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.items.GogglesAccess;
 import com.leclowndu93150.thaumcraft.client.aura.ClientAuraCache;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.leclowndu93150.thaumcraft.content.item.ThaumometerItem;
 import com.leclowndu93150.thaumcraft.network.ServerboundRequestAuraChunkPayload;
 import java.text.DecimalFormat;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -79,11 +78,11 @@ public final class AuraHudOverlay implements LeftHudStack.Gauge {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         ClientAuraCache.tick();
-        ChunkPos pos = ChunkPos.containing(player.blockPosition());
+        ChunkPos pos = new ChunkPos(player.blockPosition());
         if (ClientAuraCache.shouldRequest(pos)) {
             PacketDistributor.sendToServer(new ServerboundRequestAuraChunkPayload(pos.x, pos.z));
         }
@@ -112,12 +111,12 @@ public final class AuraHudOverlay implements LeftHudStack.Gauge {
             float start = BAR_TOP + (1.0F - vis) * BAR_RANGE;
             int fillHeight = Math.round(vis * BAR_RANGE);
             int y = Math.round(BAR_TOP + BAR_RANGE) - fillHeight;
-            graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
-                    HUD_X + BAR_X, y, FILL_U, FILL_V,
-                    FILL_W, fillHeight, FILL_W, FILL_H, TEX_SIZE, TEX_SIZE, VIS_FILL_TINT);
-            graphics.blit(TCRenderPipelines.GUI_TEXTURED_ADDITIVE, HUD,
+            GuiBlend.blitTinted(graphics, HUD,
+                    HUD_X + BAR_X, y, FILL_W, fillHeight, FILL_U, FILL_V,
+                    FILL_W, FILL_H, TEX_SIZE, TEX_SIZE, VIS_FILL_TINT);
+            GuiBlend.blitAdditive(graphics, HUD,
                     HUD_X + BAR_X, y, VIS_RIPPLE_U, RIPPLE_V_BASE + count % BAR_RANGE,
-                    FILL_W, fillHeight, FILL_W, fillHeight, TEX_SIZE, TEX_SIZE, VIS_RIPPLE_TINT);
+                    FILL_W, fillHeight, TEX_SIZE, TEX_SIZE, VIS_RIPPLE_TINT);
             if (player.isShiftKeyDown()) {
                 drawAmount(graphics, AMOUNT_FORMAT.format(snap.vis()), start, VIS_TEXT_COLOR);
             }
@@ -127,34 +126,32 @@ public final class AuraHudOverlay implements LeftHudStack.Gauge {
             float start = BAR_TOP + (1.0F - flux - vis) * BAR_RANGE;
             int fillHeight = Math.round(flux * BAR_RANGE);
             int y = Math.round(start);
-            graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
-                    HUD_X + BAR_X, y, FILL_U, FILL_V,
-                    FILL_W, fillHeight, FILL_W, FILL_H, TEX_SIZE, TEX_SIZE, FLUX_FILL_TINT);
-            graphics.blit(TCRenderPipelines.GUI_TEXTURED_ADDITIVE, HUD,
+            GuiBlend.blitTinted(graphics, HUD,
+                    HUD_X + BAR_X, y, FILL_W, fillHeight, FILL_U, FILL_V,
+                    FILL_W, FILL_H, TEX_SIZE, TEX_SIZE, FLUX_FILL_TINT);
+            GuiBlend.blitAdditive(graphics, HUD,
                     HUD_X + BAR_X, y, FLUX_RIPPLE_U, FLUX_RIPPLE_V_BASE - count2 % BAR_RANGE,
-                    FILL_W, fillHeight, FILL_W, fillHeight, TEX_SIZE, TEX_SIZE, FLUX_RIPPLE_TINT);
+                    FILL_W, fillHeight, TEX_SIZE, TEX_SIZE, FLUX_RIPPLE_TINT);
             if (player.isShiftKeyDown()) {
                 drawAmount(graphics, AMOUNT_FORMAT.format(snap.flux()), start - 4.0F, FLUX_TEXT_COLOR);
             }
         }
 
-        graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
-                HUD_X + FRAME_X, FRAME_Y, FRAME_U, FRAME_V,
-                FRAME_W, FRAME_H, FRAME_W, FRAME_H, TEX_SIZE, TEX_SIZE);
+        graphics.blit(HUD, HUD_X + FRAME_X, FRAME_Y, FRAME_U, FRAME_V,
+                FRAME_W, FRAME_H, TEX_SIZE, TEX_SIZE);
 
         float needleStart = NEEDLE_TOP + (1.0F - base) * BAR_RANGE;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
-                HUD_X + NEEDLE_X, Math.round(needleStart), NEEDLE_U, NEEDLE_V,
-                NEEDLE_W, NEEDLE_H, NEEDLE_W, NEEDLE_H, TEX_SIZE, TEX_SIZE);
+        graphics.blit(HUD, HUD_X + NEEDLE_X, Math.round(needleStart), NEEDLE_U, NEEDLE_V,
+                NEEDLE_W, NEEDLE_H, TEX_SIZE, TEX_SIZE);
     }
 
-    private static void drawAmount(GuiGraphicsExtractor graphics, String text, float y, int color) {
+    private static void drawAmount(GuiGraphics graphics, String text, float y, int color) {
         Minecraft mc = Minecraft.getInstance();
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(HUD_X + TEXT_X, y);
-        graphics.pose().scale(TEXT_SCALE, TEXT_SCALE);
-        graphics.text(mc.font, text, 0, 0, color, false);
-        graphics.pose().popMatrix();
+        graphics.pose().pushPose();
+        graphics.pose().translate(HUD_X + TEXT_X, y, 0.0F);
+        graphics.pose().scale(TEXT_SCALE, TEXT_SCALE, 1.0F);
+        graphics.drawString(mc.font, text, 0, 0, color, false);
+        graphics.pose().popPose();
     }
 
     private static boolean shouldShow(Player player) {

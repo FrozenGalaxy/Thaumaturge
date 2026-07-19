@@ -11,6 +11,7 @@ import com.leclowndu93150.thaumcraft.api.casters.FocusNode;
 import com.leclowndu93150.thaumcraft.api.casters.IFocusElement;
 import com.leclowndu93150.thaumcraft.api.casters.NodeSetting;
 import com.leclowndu93150.thaumcraft.api.casters.NodeSettingIntList;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.leclowndu93150.thaumcraft.client.screen.AbstractTCContainerScreen;
 import com.leclowndu93150.thaumcraft.client.screen.widget.TCImageButton;
 import com.leclowndu93150.thaumcraft.content.casters.BlockEntityFocalManipulator;
@@ -30,9 +31,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.renderer.RenderPipelines;
+
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.gui.components.Tooltip;
@@ -43,8 +44,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jspecify.annotations.Nullable;
 
@@ -192,6 +191,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
     private double lastDragY;
     private int lastDataStamp = -1;
     private ItemStack lastFocusStack = ItemStack.EMPTY;
+    private @Nullable List<Component> tooltipLines;
 
     public FocalManipulatorScreen(MenuFocalManipulator menu, Inventory inventory, Component title) {
         super(menu, inventory, title, TEX2, GUI_SIZE, GUI_SIZE);
@@ -274,7 +274,16 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {}
+    protected void renderLabels(GuiGraphics graphics, int xm, int ym) {}
+
+    @Override
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        tooltipLines = null;
+        super.render(graphics, mouseX, mouseY, partialTick);
+        if (tooltipLines != null) {
+            graphics.renderComponentTooltip(font, tooltipLines, mouseX, mouseY);
+        }
+    }
 
     public List<Rect2i> jeiExtraAreas() {
         List<Rect2i> areas = new ArrayList<>();
@@ -284,11 +293,11 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
     }
 
     @Override
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEX3, leftPos + SIDE_PANEL_X, topPos + SIDE_PANEL_Y,
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        graphics.blit(TEX3, leftPos + SIDE_PANEL_X, topPos + SIDE_PANEL_Y,
                 0, 0, SIDE_PANEL_W, SIDE_PANEL_H, ATLAS, ATLAS);
         drawNodes(graphics, leftPos + NODE_ORIGIN_X - scrollX, topPos + NODE_ORIGIN_Y - scrollY, mouseX, mouseY);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEX, leftPos, topPos, 0, 0, GUI_SIZE, GUI_SIZE, ATLAS, ATLAS);
+        graphics.blit(TEX, leftPos, topPos, 0, 0, GUI_SIZE, GUI_SIZE, ATLAS, ATLAS);
         drawStats(graphics, mouseX, mouseY);
         drawPartsList(graphics, mouseX, mouseY);
         drawNamePlate(graphics);
@@ -297,41 +306,39 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
         }
     }
 
-    private void drawStats(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    private void drawStats(GuiGraphics graphics, int mouseX, int mouseY) {
         drawStatIcon(graphics, TEX_COMPLEXITY, INFO_COMPLEXITY_Y, "gui.thaumcraft.wandtable.complexity", mouseX, mouseY);
         drawStatIcon(graphics, TEX_COST_XP, INFO_XP_Y, "gui.thaumcraft.wandtable.xp_cost", mouseX, mouseY);
         drawStatIcon(graphics, TEX_COST_VIS, INFO_VIS_Y, "gui.thaumcraft.wandtable.vis_cost", mouseX, mouseY);
         if (maxComplexity > 0) {
-            graphics.text(font, Component.literal(totalComplexity + "/" + maxComplexity),
+            graphics.drawString(font, Component.literal(totalComplexity + "/" + maxComplexity),
                     leftPos + STAT_TEXT_X, topPos + INFO_COMPLEXITY_Y + STAT_TEXT_Y_NUDGE,
                     totalComplexity > maxComplexity ? COLOR_STAT_BAD : COLOR_STAT_GOOD, true);
         }
         int playerLevel = minecraft != null && minecraft.player != null ? minecraft.player.experienceLevel : 0;
-        graphics.text(font, Component.literal(Integer.toString(costXp)),
+        graphics.drawString(font, Component.literal(Integer.toString(costXp)),
                 leftPos + STAT_TEXT_X, topPos + INFO_XP_Y + STAT_TEXT_Y_NUDGE,
                 costXp > playerLevel ? COLOR_STAT_BAD : COLOR_STAT_NEUTRAL, true);
         int visShown = table != null && table.vis > 0.0F ? (int) table.vis : costVis;
-        graphics.text(font, Component.literal(Integer.toString(visShown)).withStyle(ChatFormatting.AQUA),
+        graphics.drawString(font, Component.literal(Integer.toString(visShown)).withStyle(ChatFormatting.AQUA),
                 leftPos + STAT_TEXT_X, topPos + INFO_VIS_Y + STAT_TEXT_Y_NUDGE, COLOR_STAT_NEUTRAL, true);
         if (costCast > 0.0F) {
-            graphics.text(font, Component.translatable("gui.thaumcraft.wandtable.cast_cost", format.format(costCast))
+            graphics.drawString(font, Component.translatable("gui.thaumcraft.wandtable.cast_cost", format.format(costCast))
                             .withStyle(ChatFormatting.AQUA),
                     leftPos + CAST_COST_X, topPos + CAST_COST_Y, COLOR_STAT_NEUTRAL, true);
         }
         if (components != null && !components.isEmpty()) {
-            graphics.text(font, Component.translatable("gui.thaumcraft.wandtable.components").withStyle(ChatFormatting.GOLD),
+            graphics.drawString(font, Component.translatable("gui.thaumcraft.wandtable.components").withStyle(ChatFormatting.GOLD),
                     leftPos + CAST_COST_X, topPos + COMPONENTS_LABEL_Y, COLOR_STAT_NEUTRAL, true);
             int i = 0;
             int q = 0;
             for (ItemStack stack : components) {
                 int ix = leftPos + COMPONENT_X + i * 16;
                 int iy = topPos + COMPONENT_Y + q * 16;
-                graphics.item(stack, ix, iy);
+                graphics.renderItem(stack, ix, iy);
                 if (mouseX >= ix && mouseX < ix + 16 && mouseY >= iy && mouseY < iy + 16) {
-                    graphics.setComponentTooltipForNextFrame(font,
-                            List.of(stack.getHoverName(),
-                                    Component.literal("x" + stack.getCount()).withStyle(ChatFormatting.GRAY)),
-                            mouseX, mouseY);
+                    tooltipLines = List.of(stack.getHoverName(),
+                            Component.literal("x" + stack.getCount()).withStyle(ChatFormatting.GRAY));
                 }
                 if (++i > 4) {
                     i = 0;
@@ -341,31 +348,30 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
         }
     }
 
-    private void drawStatIcon(GuiGraphicsExtractor graphics, ResourceLocation texture, int y, String tooltipKey, int mouseX, int mouseY) {
-        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, leftPos + INFO_X, topPos + y,
-                0, 0, INFO_W, INFO_H, INFO_W, INFO_H);
+    private void drawStatIcon(GuiGraphics graphics, ResourceLocation texture, int y, String tooltipKey, int mouseX, int mouseY) {
+        graphics.blit(texture, leftPos + INFO_X, topPos + y, 0, 0, INFO_W, INFO_H, INFO_W, INFO_H);
         if (mouseX >= leftPos + INFO_X && mouseX < leftPos + INFO_X + INFO_W
                 && mouseY >= topPos + y && mouseY < topPos + y + INFO_H) {
-            graphics.setComponentTooltipForNextFrame(font, List.of(Component.translatable(tooltipKey)), mouseX, mouseY);
+            tooltipLines = List.of(Component.translatable(tooltipKey));
         }
     }
 
-    private void drawNamePlate(GuiGraphicsExtractor graphics) {
+    private void drawNamePlate(GuiGraphics graphics) {
         if (table == null || table.data.isEmpty()) {
             return;
         }
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEX_BASE, leftPos + NAME_PLATE_X, topPos + NAME_PLATE_Y,
+        graphics.blit(TEX_BASE, leftPos + NAME_PLATE_X, topPos + NAME_PLATE_Y,
                 NAME_PLATE_U_LEFT, NAME_PLATE_V, NAME_PLATE_SEG_W, NAME_PLATE_H, ATLAS, ATLAS);
         int a = 1;
         for (a = 1; a < NAME_PLATE_SEGMENTS; a++) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TEX_BASE, leftPos + NAME_PLATE_X + a * NAME_PLATE_SEG_W,
+            graphics.blit(TEX_BASE, leftPos + NAME_PLATE_X + a * NAME_PLATE_SEG_W,
                     topPos + NAME_PLATE_Y, NAME_PLATE_U_MID, NAME_PLATE_V, NAME_PLATE_SEG_W, NAME_PLATE_H, ATLAS, ATLAS);
         }
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEX_BASE, leftPos + NAME_PLATE_X + a * NAME_PLATE_SEG_W,
+        graphics.blit(TEX_BASE, leftPos + NAME_PLATE_X + a * NAME_PLATE_SEG_W,
                 topPos + NAME_PLATE_Y, NAME_PLATE_U_RIGHT, NAME_PLATE_V, NAME_PLATE_SEG_W, NAME_PLATE_H, ATLAS, ATLAS);
     }
 
-    private void drawPartsList(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    private void drawPartsList(GuiGraphics graphics, int mouseX, int mouseY) {
         int count = 0;
         int index = 0;
         for (ResourceLocation key : shownParts) {
@@ -379,7 +385,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
                 float scale = node.getType() == IFocusElement.EnumUnitType.MOD ? 24.0F : 32.0F;
                 drawPart(graphics, node, leftPos + PART_LIST_X, topPos + PART_LIST_Y + PART_DRAW_SPACING * index, scale, hover);
                 if (hover) {
-                    graphics.setComponentTooltipForNextFrame(font, genPartText(node, -1), mouseX, mouseY);
+                    tooltipLines = genPartText(node, -1);
                 }
             }
             if (++index >= PARTS_SHOWN) {
@@ -388,7 +394,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
         }
     }
 
-    private void drawNodes(GuiGraphicsExtractor graphics, int originX, int originY, int mouseX, int mouseY) {
+    private void drawNodes(GuiGraphics graphics, int originX, int originY, int mouseX, int mouseY) {
         if (table == null || table.data.isEmpty()) {
             return;
         }
@@ -434,12 +440,12 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
                     int s = parent.target && parent.trajectory ? 4 : 0;
                     if (inClipRegion(xx - leftPos - 4, yy - topPos - 4, NODE_CLIP_X, NODE_CLIP_Y, 168, NODE_CLIP_H)) {
                         if (parent.target) {
-                            graphics.blit(RenderPipelines.GUI_TEXTURED, TEX, xx - s - 4, yy - 4,
-                                    U_MARK_TARGET, V_SPLIT, 8, 8, MARK_SIZE, MARK_SIZE, ATLAS, ATLAS);
+                            graphics.blit(TEX, xx - s - 4, yy - 4, 8, 8,
+                                    U_MARK_TARGET, V_SPLIT, MARK_SIZE, MARK_SIZE, ATLAS, ATLAS);
                         }
                         if (parent.trajectory) {
-                            graphics.blit(RenderPipelines.GUI_TEXTURED, TEX, xx + s - 4, yy - 4,
-                                    U_MARK_TRAJECTORY, V_SPLIT, 8, 8, MARK_SIZE, MARK_SIZE, ATLAS, ATLAS);
+                            graphics.blit(TEX, xx + s - 4, yy - 4, 8, 8,
+                                    U_MARK_TRAJECTORY, V_SPLIT, MARK_SIZE, MARK_SIZE, ATLAS, ATLAS);
                         }
                     }
                 }
@@ -452,14 +458,14 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
         if (hover >= 0) {
             FocusElementNode fn = table.data.get(hover);
             if (fn != null && fn.node != null) {
-                graphics.setComponentTooltipForNextFrame(font, genPartText(fn.node, hover), mouseX, mouseY);
+                tooltipLines = genPartText(fn.node, hover);
             }
         }
     }
 
-    private void drawClippedRect(GuiGraphicsExtractor graphics, ResourceLocation texture, int x, int y, int u, int v, int w, int h) {
+    private void drawClippedRect(GuiGraphics graphics, ResourceLocation texture, int x, int y, int u, int v, int w, int h) {
         if (inClipRegion(x - leftPos + w / 2, y - topPos + h / 2, CLIP_CENTER_X, CLIP_CENTER_Y, CLIP_CENTER_W, CLIP_CENTER_H)) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w, h, ATLAS, ATLAS);
+            graphics.blit(texture, x, y, u, v, w, h, ATLAS, ATLAS);
         }
     }
 
@@ -467,7 +473,7 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
         return px >= x && px < x + w && py >= y && py < y + h;
     }
 
-    private void drawPart(GuiGraphicsExtractor graphics, FocusNode node, int x, int y, float scale, boolean mouseover) {
+    private void drawPart(GuiGraphics graphics, FocusNode node, int x, int y, float scale, boolean mouseover) {
         boolean big = node.getType() == IFocusElement.EnumUnitType.MOD || node instanceof FocusMediumRoot;
         if (big) {
             scale *= 2.0F;
@@ -483,10 +489,10 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
         blitCentered(graphics, FocusEngine.getElementIcon(node.getKey()), x, y, iconSize, 0xFFFFFFFF);
     }
 
-    private static void blitCentered(GuiGraphicsExtractor graphics, ResourceLocation texture, int cx, int cy, float size, int color) {
+    private static void blitCentered(GuiGraphics graphics, ResourceLocation texture, int cx, int cy, float size, int color) {
         int s = Math.round(size);
         int half = s / 2;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, cx - half, cy - half, 0.0F, 0.0F, s, s, 32, 32, 32, 32, color);
+        GuiBlend.blitTinted(graphics, texture, cx - half, cy - half, s, s, 0.0F, 0.0F, 32, 32, 32, 32, color);
     }
 
     private List<Component> genPartText(FocusNode node, int idx) {
@@ -527,25 +533,22 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        if (event.isEscape()) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) { // ESC
             if (minecraft != null && minecraft.player != null) {
                 minecraft.player.closeContainer();
             }
             return true;
         }
-        if (nameField != null && (nameField.keyPressed(event) || nameField.canConsumeInput())) {
+        if (nameField != null && (nameField.keyPressed(keyCode, scanCode, modifiers) || nameField.canConsumeInput())) {
             return true;
         }
-        return super.keyPressed(event);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        double mouseX = event.x();
-        double mouseY = event.y();
-        int button = event.button();
-        if (nameField != null && nameField.mouseClicked(event, doubleClick)) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (nameField != null && nameField.mouseClicked(mouseX, mouseY, button)) {
             setFocused(nameField);
             return true;
         }
@@ -587,14 +590,12 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
             lastDragX = mouseX;
             lastDragY = mouseY;
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
-        double mouseX = event.x();
-        double mouseY = event.y();
-        if (draggingCanvas && event.button() == 0) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (draggingCanvas && button == 0) {
             scrollX -= (int) (mouseX - lastDragX);
             scrollY -= (int) (mouseY - lastDragY);
             lastDragX = mouseX;
@@ -603,15 +604,15 @@ public final class FocalManipulatorScreen extends AbstractTCContainerScreen<Menu
             syncSliders();
             return true;
         }
-        return super.mouseDragged(event, dragX, dragY);
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     @Override
-    public boolean mouseReleased(MouseButtonEvent event) {
-        if (event.button() == 0) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (button == 0) {
             draggingCanvas = false;
         }
-        return super.mouseReleased(event);
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override

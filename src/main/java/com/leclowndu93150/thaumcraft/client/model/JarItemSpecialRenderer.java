@@ -2,88 +2,41 @@ package com.leclowndu93150.thaumcraft.client.model;
 
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.client.render.blockentity.JarRenderer;
-import com.leclowndu93150.thaumcraft.content.essentia.jar.BlockEntityJar;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Quadrant;
-import com.mojang.math.Transformation;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
-import net.minecraft.client.color.item.Constant;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.renderer.blockentity.AbstractEndPortalRenderer;
-import net.minecraft.client.renderer.item.*;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
-import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelDebugName;
-import net.minecraft.client.resources.model.cuboid.*;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.sprite.MaterialBaker;
-import net.minecraft.client.resources.model.sprite.TextureSlots;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.NeoForgeRenderTypes;
-import org.joml.Matrix4fc;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
-import org.jspecify.annotations.Nullable;
 
+public final class JarItemSpecialRenderer extends BlockEntityWithoutLevelRenderer {
 
-public class JarItemSpecialRenderer implements SpecialModelRenderer<AspectInstance> {
-
-    private final BakingContext context;
-
-    public JarItemSpecialRenderer(BakingContext context) {
-        this.context = context;
+    public JarItemSpecialRenderer() {
+        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
     }
 
     @Override
-    public void submit(@Nullable AspectInstance aspectInstance, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int i1, boolean b, int i2) {
-        if (aspectInstance == null) return;
-        // Render the essentia inside the jar using the sprite and aspectInstance
-        JarRenderer.submitFluid(aspectInstance.amount(), aspectInstance.aspect().value().color(), lightCoords,context.sprites().get(JarRenderer.ANIMATED_GLOW_SPRITE),poseStack,submitNodeCollector);
+    public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack,
+                             MultiBufferSource buffers, int light, int overlay) {
+        if (!(stack.getItem() instanceof BlockItem blockItem)) {
+            return;
+        }
+        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
+                blockItem.getBlock().defaultBlockState(), poseStack, buffers, light, overlay);
+        AspectInstance contents = extractContents(stack);
+        if (contents != null) {
+            JarRenderer.submitFluid(contents.amount(), contents.aspect().value().color(), light,
+                    JarRenderer.ANIMATED_GLOW_MATERIAL.sprite(), poseStack, buffers);
+        }
     }
 
-    @Override
-    public void getExtents(Consumer<Vector3fc> consumer) {
-        AbstractEndPortalRenderer.getExtents(consumer);
-    }
-
-    @Override
-    public @Nullable AspectInstance extractArgument(ItemStack itemStack) {
-        var essentiaList = itemStack.get(TCDataComponents.ESSENTIA_CONTENTS.get());
-        if (essentiaList == null || essentiaList.isEmpty()) return null;
+    private static AspectInstance extractContents(ItemStack stack) {
+        var essentiaList = stack.get(TCDataComponents.ESSENTIA_CONTENTS.get());
+        if (essentiaList == null || essentiaList.isEmpty()) {
+            return null;
+        }
         return essentiaList.contents().entries().getFirst();
-    }
-
-    public record Unbaked() implements SpecialModelRenderer.Unbaked<AspectInstance> {
-        public static final MapCodec<Unbaked> MAP_CODEC = MapCodec.unit(Unbaked::new);
-
-        @Override
-        public @Nullable SpecialModelRenderer<AspectInstance> bake(BakingContext bakingContext) {
-            return new JarItemSpecialRenderer(bakingContext);
-        }
-
-        @Override
-        public MapCodec<? extends SpecialModelRenderer.Unbaked<AspectInstance>> type() {
-            return MAP_CODEC;
-        }
     }
 }

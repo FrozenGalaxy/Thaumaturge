@@ -23,13 +23,12 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import mezz.jei.api.recipe.types.IRecipeHolderType;
-import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -42,7 +41,7 @@ import net.minecraft.world.level.block.Block;
 import org.jspecify.annotations.Nullable;
 
 public final class DustTriggerCategory implements IRecipeCategory<RecipeHolder<DustTrigger>> {
-    public static final IRecipeHolderType<DustTrigger> RECIPE_TYPE = IRecipeHolderType.create(TCRecipeTypes.DUST_TRIGGER.get());
+    public static final RecipeType<RecipeHolder<DustTrigger>> RECIPE_TYPE = RecipeType.createFromVanilla(TCRecipeTypes.DUST_TRIGGER.get());
 
     private static final int WIDTH = 144;
     private static final int HEIGHT = 54;
@@ -63,11 +62,11 @@ public final class DustTriggerCategory implements IRecipeCategory<RecipeHolder<D
     }
 
     @Override
-    public IRecipeType<RecipeHolder<DustTrigger>> getRecipeType() {
+    public RecipeType<RecipeHolder<DustTrigger>> getRecipeType() {
         return RECIPE_TYPE;
     }
 
-    public static IRecipeType<RecipeHolder<DustTrigger>> type() {
+    public static RecipeType<RecipeHolder<DustTrigger>> type() {
         return RECIPE_TYPE;
     }
 
@@ -96,14 +95,14 @@ public final class DustTriggerCategory implements IRecipeCategory<RecipeHolder<D
 
         Component usage = Component.translatable("jei.thaumcraft.dust_trigger.usage");
         builder.addSlot(RecipeIngredientRole.INPUT, DUST_SLOT_X + 1, DUST_SLOT_Y + 1)
-                .add(TCItems.SALIS_MUNDUS.get())
+                .addItemStack(new ItemStack(TCItems.SALIS_MUNDUS.get()))
                 .addRichTooltipCallback((view, tooltip) -> tooltip.add(usage));
 
         DustTrigger recipe = holder.value();
-        IRecipeSlotBuilder targetSlot = builder.addSlot(RecipeIngredientRole.CRAFTING_STATION,
+        IRecipeSlotBuilder targetSlot = builder.addSlot(RecipeIngredientRole.CATALYST,
                 TARGET_SLOT_X + 1, TARGET_SLOT_Y + 1);
         if (recipe instanceof DustTriggerSimpleRecipe simple) {
-            targetSlot.add(new ItemStack(simple.target()));
+            targetSlot.addItemStack(new ItemStack(simple.target()));
         } else if (recipe instanceof DustTriggerTagRecipe tagRecipe) {
             TagKey<Block> tag = tagRecipe.targetTag();
             List<ItemStack> stacks = stacksFromBlockTag(tag);
@@ -119,7 +118,7 @@ public final class DustTriggerCategory implements IRecipeCategory<RecipeHolder<D
         ItemStack result = resultStack(recipe);
         if (!result.isEmpty()) {
             builder.addSlot(RecipeIngredientRole.OUTPUT, RESULT_SLOT_X + 1, RESULT_SLOT_Y + 1)
-                    .add(result);
+                    .addItemStack(result);
         }
     }
 
@@ -135,18 +134,18 @@ public final class DustTriggerCategory implements IRecipeCategory<RecipeHolder<D
     }
 
     @Override
-    public void draw(RecipeHolder<DustTrigger> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<DustTrigger> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         resultIcon.draw(guiGraphics,RESULT_SLOT_X - 6, RESULT_SLOT_Y - 6);
 
         Font font = Minecraft.getInstance().font;
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().scale(2);
-        guiGraphics.text(font,"+",(((DUST_SLOT_X + 16) + TARGET_SLOT_X) / 2 - 5) / 2,20/2, 0xFF000000 | ChatFormatting.DARK_GRAY.getColor(), false);
-        guiGraphics.text(font,"=",(((TARGET_SLOT_X + 16) + RESULT_SLOT_X) / 2 - 5) / 2,20/2, 0xFF000000 | ChatFormatting.DARK_GRAY.getColor(), false);
-        guiGraphics.pose().popMatrix();
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().scale(2, 2, 2);
+        guiGraphics.drawString(font,"+",(((DUST_SLOT_X + 16) + TARGET_SLOT_X) / 2 - 5) / 2,20/2, 0xFF000000 | ChatFormatting.DARK_GRAY.getColor(), false);
+        guiGraphics.drawString(font,"=",(((TARGET_SLOT_X + 16) + RESULT_SLOT_X) / 2 - 5) / 2,20/2, 0xFF000000 | ChatFormatting.DARK_GRAY.getColor(), false);
+        guiGraphics.pose().popPose();
 
         boolean doesPassGate = recipe.value().doesPassGate(Minecraft.getInstance().player);
-        if (!doesPassGate) guiGraphics.item(Items.BARRIER.getDefaultInstance(),((TARGET_SLOT_X + 16) + RESULT_SLOT_X) / 2 - 8,20);
+        if (!doesPassGate) guiGraphics.renderItem(Items.BARRIER.getDefaultInstance(),((TARGET_SLOT_X + 16) + RESULT_SLOT_X) / 2 - 8,20);
 
     }
 

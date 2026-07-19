@@ -1,9 +1,10 @@
 package com.leclowndu93150.thaumcraft.client.screen.tooltip;
 
+import com.leclowndu93150.thaumcraft.mixin.client.gui.GuiGraphicsAccessor;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
@@ -17,7 +18,7 @@ public final class TCTooltipRenderer {
 
     private TCTooltipRenderer() {}
 
-    public static void render(GuiGraphicsExtractor graphics, Font font, List<Component> lines, int x, int y) {
+    public static void render(GuiGraphics graphics, Font font, List<Component> lines, int x, int y) {
         if (lines.isEmpty()) return;
         List<ClientTooltipComponent> built = new ArrayList<>();
         for (Component line : lines) {
@@ -36,7 +37,8 @@ public final class TCTooltipRenderer {
                 }
             }
         }
-        graphics.tooltip(font, built, x, y, DefaultTooltipPositioner.INSTANCE, null);
+        ((GuiGraphicsAccessor) graphics).thaumcraft$renderTooltipInternal(
+                font, built, x, y, DefaultTooltipPositioner.INSTANCE);
     }
 
     private static Component stripPrefix(Component line) {

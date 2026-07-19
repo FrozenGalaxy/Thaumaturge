@@ -1,11 +1,13 @@
 package com.leclowndu93150.thaumcraft.client.render.research;
 
 import com.leclowndu93150.thaumcraft.api.research.ResearchRequirement;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.leclowndu93150.thaumcraft.client.screen.TCScreenTextures;
 import com.leclowndu93150.thaumcraft.client.screen.TCTooltips;
+import com.leclowndu93150.thaumcraft.client.screen.tooltip.DeferredTooltip;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -59,17 +61,17 @@ public final class ItemRequirementWidget {
         return SLOT_OFFSET_X;
     }
 
-    public static void renderObtainHeader(GuiGraphicsExtractor graphics, int x, int y) {
+    public static void renderObtainHeader(GuiGraphics graphics, int x, int y) {
         renderSectionHeader(graphics, x, y, SECTION_HEADER_OBTAIN_V);
     }
 
-    public static void renderCraftHeader(GuiGraphicsExtractor graphics, int x, int y) {
+    public static void renderCraftHeader(GuiGraphics graphics, int x, int y) {
         renderSectionHeader(graphics, x, y, SECTION_HEADER_CRAFT_V);
     }
 
-    private static void renderSectionHeader(GuiGraphicsExtractor graphics, int x, int y, int v) {
-        graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
+    private static void renderSectionHeader(GuiGraphics graphics, int x, int y, int v) {
+        GuiBlend.blitTinted(
+                graphics,
                 TCScreenTextures.RESEARCH_BOOK,
                 x + SECTION_HEADER_OFFSET_X,
                 y + SECTION_HEADER_OFFSET_Y,
@@ -77,30 +79,28 @@ public final class ItemRequirementWidget {
                 (float) v,
                 SECTION_HEADER_WIDTH,
                 SECTION_HEADER_HEIGHT,
-                SECTION_HEADER_WIDTH,
-                SECTION_HEADER_HEIGHT,
                 TCScreenTextures.TEX_SIZE,
                 TCScreenTextures.TEX_SIZE,
                 SECTION_HEADER_TINT);
     }
 
-    public static void renderObtainHeaderTooltip(GuiGraphicsExtractor graphics, Font font, int x, int y, int mouseX, int mouseY) {
+    public static void renderObtainHeaderTooltip(GuiGraphics graphics, Font font, int x, int y, int mouseX, int mouseY) {
         renderSectionTooltip(graphics, font, x, y, mouseX, mouseY, "obtain");
     }
 
-    public static void renderCraftHeaderTooltip(GuiGraphicsExtractor graphics, Font font, int x, int y, int mouseX, int mouseY) {
+    public static void renderCraftHeaderTooltip(GuiGraphics graphics, Font font, int x, int y, int mouseX, int mouseY) {
         renderSectionTooltip(graphics, font, x, y, mouseX, mouseY, "craft");
     }
 
-    private static void renderSectionTooltip(GuiGraphicsExtractor graphics, Font font, int x, int y, int mouseX, int mouseY, String which) {
+    private static void renderSectionTooltip(GuiGraphics graphics, Font font, int x, int y, int mouseX, int mouseY, String which) {
         int popupX = x + SECTION_POPUP_OFFSET_X;
         if (mouseX >= popupX && mouseY >= y && mouseX < popupX + SECTION_POPUP_WIDTH && mouseY < y + SECTION_POPUP_HEIGHT) {
-            graphics.setTooltipForNextFrame(font, TCTooltips.need(which), mouseX, mouseY);
+            DeferredTooltip.set(TCTooltips.need(which), mouseX, mouseY);
         }
     }
 
     public static void renderSlot(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             Font font,
             int x,
             int y,
@@ -111,11 +111,10 @@ public final class ItemRequirementWidget {
             int mouseY) {
         ItemStack stack = cycleItemStack(requirement, slotIndex);
         if (!stack.isEmpty()) {
-            graphics.item(stack, x, y);
+            graphics.renderItem(stack, x, y);
         }
         if (hasItem) {
             graphics.blit(
-                    RenderPipelines.GUI_TEXTURED,
                     TCScreenTextures.RESEARCH_BOOK,
                     x + CHECKMARK_OFFSET_X,
                     y,
@@ -123,13 +122,11 @@ public final class ItemRequirementWidget {
                     (float) CHECKMARK_V,
                     CHECKMARK_SIZE,
                     CHECKMARK_SIZE,
-                    CHECKMARK_SIZE,
-                    CHECKMARK_SIZE,
                     TCScreenTextures.TEX_SIZE,
                     TCScreenTextures.TEX_SIZE);
         }
         if (mouseX >= x && mouseY >= y && mouseX < x + ICON_SIZE && mouseY < y + ICON_SIZE && !stack.isEmpty()) {
-            graphics.setTooltipForNextFrame(font, stack, mouseX, mouseY);
+            DeferredTooltip.setItem(stack, mouseX, mouseY);
         }
     }
 

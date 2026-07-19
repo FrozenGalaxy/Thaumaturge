@@ -1,14 +1,18 @@
 package com.leclowndu93150.thaumcraft.client.taint;
 
+import com.leclowndu93150.thaumcraft.TCIds;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.fog.FogData;
-import net.minecraft.client.renderer.fog.environment.FogEnvironment;
+import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.blaze3d.shaders.FogShape;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import org.jspecify.annotations.Nullable;
-import org.joml.Vector4f;
+import org.joml.Vector3f;
 
 public final class FluxGooClientExtensions implements IClientFluidTypeExtensions {
+    private static final ResourceLocation STILL = TCIds.rl("block/flux_goo");
+    private static final ResourceLocation FLOWING = TCIds.rl("block/flux_goo");
     private static final float FOG_R = 1.0F;
     private static final float FOG_G = 0.0F;
     private static final float FOG_B = 0.5F;
@@ -16,15 +20,26 @@ public final class FluxGooClientExtensions implements IClientFluidTypeExtensions
     private static final float FOG_END = 3.0F;
 
     @Override
-    public void modifyFogColor(Camera camera, float partialTick, ClientLevel level,
-                                int renderDistance, float darkenWorldAmount, Vector4f fluidFogColor) {
-        fluidFogColor.set(FOG_R, FOG_G, FOG_B, fluidFogColor.w);
+    public ResourceLocation getStillTexture() {
+        return STILL;
     }
 
     @Override
-    public void modifyFogRender(Camera camera, @Nullable FogEnvironment environment,
-                                  float renderDistance, float partialTick, FogData fogData) {
-        fogData.environmentalStart = FOG_START;
-        fogData.environmentalEnd = FOG_END;
+    public ResourceLocation getFlowingTexture() {
+        return FLOWING;
+    }
+
+    @Override
+    public Vector3f modifyFogColor(Camera camera, float partialTick, ClientLevel level,
+                                    int renderDistance, float darkenWorldAmount, Vector3f fluidFogColor) {
+        return fluidFogColor.set(FOG_R, FOG_G, FOG_B);
+    }
+
+    @Override
+    public void modifyFogRender(Camera camera, FogRenderer.FogMode mode, float renderDistance,
+                                 float partialTick, float nearDistance, float farDistance, FogShape shape) {
+        RenderSystem.setShaderFogStart(FOG_START);
+        RenderSystem.setShaderFogEnd(FOG_END);
+        RenderSystem.setShaderFogShape(shape);
     }
 }

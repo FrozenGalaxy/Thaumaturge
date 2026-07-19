@@ -4,8 +4,7 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.client.screen.AbstractTCContainerScreen;
 import com.leclowndu93150.thaumcraft.content.entity.construct.EntityTurretCrossbow;
 import com.leclowndu93150.thaumcraft.content.entity.construct.MenuTurretBasic;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -30,20 +29,20 @@ public class TurretBasicScreen<T extends MenuTurretBasic> extends AbstractTCCont
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {}
+    protected void renderLabels(GuiGraphics graphics, int xm, int ym) {}
 
     @Override
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         drawHealthBar(graphics, HEALTH_BAR_X, TEXTURE);
     }
 
-    void drawHealthBar(GuiGraphicsExtractor graphics, int barX, ResourceLocation texture) {
+    void drawHealthBar(GuiGraphics graphics, int barX, ResourceLocation texture) {
         EntityTurretCrossbow turret = menu.turret();
         if (turret == null) {
             return;
         }
         int fill = (int) (HEALTH_BAR_WIDTH * (turret.getHealth() / turret.getMaxHealth()));
-        graphics.blit(RenderPipelines.GUI_TEXTURED, texture,
+        graphics.blit(texture,
                 leftPos + barX, topPos + HEALTH_BAR_Y, HEALTH_BAR_U, HEALTH_BAR_V,
                 fill, HEALTH_BAR_HEIGHT, 256, 256);
     }

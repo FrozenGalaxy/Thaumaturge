@@ -4,35 +4,35 @@ import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.client.render.blockentity.NodeRenderState;
 import com.leclowndu93150.thaumcraft.client.render.blockentity.NodeRenderer;
 import com.leclowndu93150.thaumcraft.content.aura.node.NodeData;
+import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.mojang.serialization.MapCodec;
-import java.util.function.Consumer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.util.Mth;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
-import org.jspecify.annotations.Nullable;
 
-public final class JarNodeItemSpecialRenderer implements SpecialModelRenderer<NodeData> {
+public final class JarNodeItemSpecialRenderer extends BlockEntityWithoutLevelRenderer {
     private static final float NODE_HEIGHT = 0.4F;
     private static final float NODE_SIZE = 1.0F;
     private static final float BASE_ALPHA = 0.5F;
     private static final float TICKS_WRAP = 1000000.0F;
-    private static final int PLANE_ORDER_STRIDE = 64;
 
-    @Override
-    public @Nullable NodeData extractArgument(ItemStack stack) {
-        return stack.get(TCDataComponents.NODE_DATA.get());
+    public JarNodeItemSpecialRenderer() {
+        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
     }
 
     @Override
-    public void submit(@Nullable NodeData data, PoseStack poseStack, SubmitNodeCollector collector,
-                       int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
+    public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack,
+                             MultiBufferSource buffers, int light, int overlay) {
+        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
+                TCBlocks.JAR_NODE.get().defaultBlockState(), poseStack, buffers, light, overlay);
+
+        NodeData data = stack.get(TCDataComponents.NODE_DATA.get());
         if (data == null || data.aspects().isEmpty()) {
             return;
         }
@@ -61,31 +61,11 @@ public final class JarNodeItemSpecialRenderer implements SpecialModelRenderer<No
         }
         poseStack.pushPose();
         poseStack.translate(0.5F, NODE_HEIGHT, 0.5F);
-        NodeRenderer.submitLayers(state, poseStack, collector, 0);
+        NodeRenderer.drawLayers(state, poseStack, buffers);
         poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
-        NodeRenderer.submitLayers(state, poseStack, collector, PLANE_ORDER_STRIDE);
+        NodeRenderer.drawLayers(state, poseStack, buffers);
         poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-        NodeRenderer.submitLayers(state, poseStack, collector, PLANE_ORDER_STRIDE * 2);
+        NodeRenderer.drawLayers(state, poseStack, buffers);
         poseStack.popPose();
-    }
-
-    @Override
-    public void getExtents(Consumer<Vector3fc> consumer) {
-        consumer.accept(new Vector3f(0.1875F, 0.0625F, 0.1875F));
-        consumer.accept(new Vector3f(0.8125F, 0.6875F, 0.8125F));
-    }
-
-    public record Unbaked() implements SpecialModelRenderer.Unbaked<NodeData> {
-        public static final MapCodec<Unbaked> MAP_CODEC = MapCodec.unit(Unbaked::new);
-
-        @Override
-        public SpecialModelRenderer<NodeData> bake(SpecialModelRenderer.BakingContext context) {
-            return new JarNodeItemSpecialRenderer();
-        }
-
-        @Override
-        public MapCodec<? extends SpecialModelRenderer.Unbaked<NodeData>> type() {
-            return MAP_CODEC;
-        }
     }
 }

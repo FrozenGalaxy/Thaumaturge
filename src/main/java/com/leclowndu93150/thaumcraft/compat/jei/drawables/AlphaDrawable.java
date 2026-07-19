@@ -4,8 +4,8 @@ package com.leclowndu93150.thaumcraft.compat.jei.drawables;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
@@ -50,22 +50,22 @@ public class AlphaDrawable implements IDrawableStatic {
 
 
     @Override
-    public void draw(GuiGraphicsExtractor guiGraphics) {
+    public void draw(GuiGraphics guiGraphics) {
         draw(guiGraphics, 0, 0);
     }
 
     @Override
-    public void draw(GuiGraphicsExtractor guiGraphics, int xOffset, int yOffset) {
+    public void draw(GuiGraphics guiGraphics, int xOffset, int yOffset) {
         draw(guiGraphics, xOffset, yOffset, 0, 0, 0, 0);
     }
     @Override
-    public void draw(GuiGraphicsExtractor guiGraphics, int xOffset, int yOffset, int maskTop, int maskBottom, int maskLeft, int maskRight) {
+    public void draw(GuiGraphics guiGraphics, int xOffset, int yOffset, int maskTop, int maskBottom, int maskLeft, int maskRight) {
         int x = xOffset + this.paddingLeft + maskLeft;
         int y = yOffset + this.paddingTop + maskTop;
         int u = this.u + maskLeft;
         int v = this.v + maskTop;
         int width = this.width - maskRight - maskLeft;
         int height = this.height - maskBottom - maskTop;
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, identifier,x,y,u,v,width,height,512,512);
+        guiGraphics.blit(identifier, x, y, u, v, width, height, 512, 512);
     }
 }

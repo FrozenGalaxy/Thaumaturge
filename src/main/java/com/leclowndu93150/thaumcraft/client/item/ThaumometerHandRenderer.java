@@ -1,21 +1,19 @@
 package com.leclowndu93150.thaumcraft.client.item;
 
 import com.leclowndu93150.thaumcraft.TCIds;
+import com.leclowndu93150.thaumcraft.client.render.ItemRenderHelper;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.entity.player.AvatarRenderer;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -56,9 +54,9 @@ public final class ThaumometerHandRenderer {
 
     private static void renderTwoHanded(RenderHandEvent event, Minecraft mc, LocalPlayer player) {
         PoseStack poseStack = event.getPoseStack();
-        SubmitNodeCollector collector = event.getSubmitNodeCollector();
+        MultiBufferSource buffers = event.getMultiBufferSource();
         int light = event.getPackedLight();
-        float partial = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float partial = mc.getTimer().getGameTimeDeltaPartialTick(false);
         float equip = event.getEquipProgress();
         boolean scanning = player.isUsingItem()
                 && player.getUseItem().is(TCItems.THAUMOMETER.get());
@@ -79,42 +77,37 @@ public final class ThaumometerHandRenderer {
         if (!player.isInvisible()) {
             poseStack.pushPose();
             poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
-            renderMapHand(mc, player, poseStack, collector, light, HumanoidArm.RIGHT);
-            renderMapHand(mc, player, poseStack, collector, light, HumanoidArm.LEFT);
+            renderMapHand(mc, player, poseStack, buffers, light, HumanoidArm.RIGHT);
+            renderMapHand(mc, player, poseStack, buffers, light, HumanoidArm.LEFT);
             poseStack.popPose();
         }
         poseStack.mulPose(Axis.XP.rotationDegrees(Mth.sin(sqrtSwing * (float) Math.PI) * 20.0F * SWING_SCALE));
-        renderScanner(mc, player, event.getItemStack(), poseStack, collector, light);
+        renderScanner(mc, player, event.getItemStack(), poseStack, buffers, light);
         poseStack.translate(0.0F, 0.0F, GLASS_Z);
         poseStack.scale(READOUT_SCALE, -READOUT_SCALE, READOUT_SCALE);
-        ThaumometerLensRenderer.submitReadout(mc, player, poseStack, collector);
+        ThaumometerLensRenderer.submitReadout(mc, player, poseStack, buffers);
         poseStack.popPose();
     }
 
     private static void renderScanner(Minecraft mc, AbstractClientPlayer player, ItemStack stack,
-                                      PoseStack poseStack, SubmitNodeCollector collector, int light) {
-        ItemStackRenderState renderState = new ItemStackRenderState();
-        mc.getItemModelResolver().updateForTopItem(renderState, stack, ItemDisplayContext.HEAD,
-                player.level(), player, player.getId() + ItemDisplayContext.HEAD.ordinal());
-        renderState.submit(poseStack, collector, light, OverlayTexture.NO_OVERLAY, 0);
+                                      PoseStack poseStack, MultiBufferSource buffers, int light) {
+        ItemRenderHelper.render(stack, ItemDisplayContext.HEAD, poseStack, buffers, light,
+                OverlayTexture.NO_OVERLAY, player.getId() + ItemDisplayContext.HEAD.ordinal());
     }
 
     private static void renderMapHand(Minecraft mc, AbstractClientPlayer player, PoseStack poseStack,
-                                      SubmitNodeCollector collector, int light, HumanoidArm arm) {
-        AvatarRenderer<AbstractClientPlayer> renderer = mc.getEntityRenderDispatcher().getPlayerRenderer(player);
+                                      MultiBufferSource buffers, int light, HumanoidArm arm) {
+        PlayerRenderer renderer = (PlayerRenderer) mc.getEntityRenderDispatcher().getRenderer(player);
         poseStack.pushPose();
         float invert = arm == HumanoidArm.RIGHT ? 1.0F : -1.0F;
         poseStack.mulPose(Axis.YP.rotationDegrees(HAND_YAW));
         poseStack.mulPose(Axis.XP.rotationDegrees(HAND_PITCH));
         poseStack.mulPose(Axis.ZP.rotationDegrees(invert * HAND_ROLL));
         poseStack.translate(invert * HAND_X, HAND_Y, HAND_Z);
-        ResourceLocation skinTexture = player.getSkin().body().texturePath();
         if (arm == HumanoidArm.RIGHT) {
-            renderer.renderRightHand(poseStack, collector, light, skinTexture,
-                    player.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE));
+            renderer.renderRightHand(poseStack, buffers, light, player);
         } else {
-            renderer.renderLeftHand(poseStack, collector, light, skinTexture,
-                    player.isModelPartShown(PlayerModelPart.LEFT_SLEEVE));
+            renderer.renderLeftHand(poseStack, buffers, light, player);
         }
         poseStack.popPose();
     }

@@ -7,6 +7,7 @@ import com.leclowndu93150.thaumcraft.config.ThaumcraftClientConfig;
 import com.leclowndu93150.thaumcraft.content.aspect.AspectIndexHolder;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -40,7 +41,7 @@ public final class AspectTooltipEvents {
     }
 
     private static boolean shouldShowAspects() {
-        boolean shift = Minecraft.getInstance().hasShiftDown();
+        boolean shift = Screen.hasShiftDown();
         return shift != ThaumcraftClientConfig.showAspectsByDefault();
     }
 }

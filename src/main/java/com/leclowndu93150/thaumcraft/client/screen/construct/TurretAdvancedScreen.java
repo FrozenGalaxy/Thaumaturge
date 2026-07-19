@@ -4,9 +4,8 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.entity.construct.EntityTurretCrossbowAdvanced;
 import com.leclowndu93150.thaumcraft.content.entity.construct.MenuTurretAdvanced;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -32,7 +31,7 @@ public final class TurretAdvancedScreen extends TurretBasicScreen<MenuTurretAdva
     }
 
     @Override
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         drawHealthBar(graphics, HEALTH_BAR_X, TEXTURE);
         EntityTurretCrossbowAdvanced turret = advancedTurret();
         if (turret == null) {
@@ -43,13 +42,11 @@ public final class TurretAdvancedScreen extends TurretBasicScreen<MenuTurretAdva
         for (int index = 0; index < toggles.length; index++) {
             int x = leftPos + BUTTON_X;
             int y = topPos + BUTTON_FIRST_Y + index * BUTTON_SPACING;
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y,
-                    BUTTON_U, BUTTON_V, BUTTON_SIZE, BUTTON_SIZE, 256, 256);
+            graphics.blit(TEXTURE, x, y, BUTTON_U, BUTTON_V, BUTTON_SIZE, BUTTON_SIZE, 256, 256);
             if (toggles[index]) {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y,
-                        BUTTON_U, BUTTON_TOGGLED_V, BUTTON_SIZE, BUTTON_SIZE, 256, 256);
+                graphics.blit(TEXTURE, x, y, BUTTON_U, BUTTON_TOGGLED_V, BUTTON_SIZE, BUTTON_SIZE, 256, 256);
             }
-            graphics.text(font, Component.translatable(BUTTON_LABELS[index]),
+            graphics.drawString(font, Component.translatable(BUTTON_LABELS[index]),
                     x + LABEL_OFFSET_X, y, LABEL_COLOR, false);
         }
     }
@@ -59,20 +56,20 @@ public final class TurretAdvancedScreen extends TurretBasicScreen<MenuTurretAdva
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        int mx = (int) event.x() - (leftPos + BUTTON_X);
-        int my = (int) event.y() - (topPos + BUTTON_FIRST_Y);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        int mx = (int) mouseX - (leftPos + BUTTON_X);
+        int my = (int) mouseY - (topPos + BUTTON_FIRST_Y);
         if (mx >= 0 && mx < BUTTON_SIZE && my >= 0) {
             int index = my / BUTTON_SPACING;
             if (index < 4 && my - index * BUTTON_SPACING < BUTTON_SIZE) {
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId,
                         MenuTurretAdvanced.BUTTON_ANIMAL + index);
                 if (minecraft.player != null) {
-                    minecraft.player.playSound(TCSounds.CLACK.get(), CLICK_VOLUME, 1.0F);
+                    minecraft.getSoundManager().play(SimpleSoundInstance.forUI(TCSounds.CLACK.get(), 1.0F, CLICK_VOLUME));
                 }
                 return true;
             }
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 }

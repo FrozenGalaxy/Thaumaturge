@@ -4,56 +4,30 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.client.entity.TCModelLayers;
 import com.leclowndu93150.thaumcraft.client.model.entity.CentrifugeModel;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.serialization.MapCodec;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
-import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
-import org.jspecify.annotations.Nullable;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 
-import java.util.function.Consumer;
-
-public final class CentrifugeItemSpecialRenderer implements NoDataSpecialModelRenderer {
+public final class CentrifugeItemSpecialRenderer extends BlockEntityWithoutLevelRenderer {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/centrifuge.png");
 
     private final CentrifugeModel model;
 
-    public CentrifugeItemSpecialRenderer(CentrifugeModel model) {
-        this.model = model;
+    public CentrifugeItemSpecialRenderer() {
+        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+        this.model = new CentrifugeModel(Minecraft.getInstance().getEntityModels().bakeLayer(TCModelLayers.CENTRIFUGE));
     }
 
     @Override
-    public void submit(PoseStack poseStack, SubmitNodeCollector collector, int lightCoords, int overlayCoords,
-                       boolean hasFoil, int outlineColor) {
+    public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack,
+                             MultiBufferSource buffers, int light, int overlay) {
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
-        collector.submitModelPart(model.root, poseStack, RenderTypes.entityCutout(TEXTURE),
-                lightCoords, OverlayTexture.NO_OVERLAY, null, -1, null);
+        model.root.render(poseStack, buffers.getBuffer(RenderType.entityCutout(TEXTURE)), light, overlay);
         poseStack.popPose();
-    }
-
-    @Override
-    public void getExtents(Consumer<Vector3fc> consumer) {
-        consumer.accept(new Vector3f(0.0F, 0.0F, 0.0F));
-        consumer.accept(new Vector3f(1.0F, 1.0F, 1.0F));
-    }
-
-    public record Unbaked() implements NoDataSpecialModelRenderer.Unbaked {
-        public static final MapCodec<Unbaked> MAP_CODEC = MapCodec.unit(Unbaked::new);
-
-        @Override
-        public @Nullable SpecialModelRenderer<Void> bake(SpecialModelRenderer.BakingContext context) {
-            return new CentrifugeItemSpecialRenderer(
-                    new CentrifugeModel(context.entityModelSet().bakeLayer(TCModelLayers.CENTRIFUGE)));
-        }
-
-        @Override
-        public MapCodec<? extends NoDataSpecialModelRenderer.Unbaked> type() {
-            return MAP_CODEC;
-        }
     }
 }

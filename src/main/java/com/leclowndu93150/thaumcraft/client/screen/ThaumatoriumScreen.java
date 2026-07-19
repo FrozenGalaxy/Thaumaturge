@@ -6,14 +6,14 @@ import com.leclowndu93150.thaumcraft.client.render.aspect.AspectTagRenderer;
 import com.leclowndu93150.thaumcraft.content.essentia.thaumatorium.BlockEntityThaumatorium;
 import com.leclowndu93150.thaumcraft.content.essentia.thaumatorium.MenuThaumatorium;
 import com.leclowndu93150.thaumcraft.network.ClientboundThaumatoriumRecipesPayload;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.leclowndu93150.thaumcraft.network.ServerboundThaumatoriumTogglePayload;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
@@ -50,16 +50,26 @@ public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThau
     private static final int MAX_ASPECTS = 8;
 
     private int index;
+    private ItemStack hoverTooltip = ItemStack.EMPTY;
 
     public ThaumatoriumScreen(MenuThaumatorium menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title, TEXTURE, 175, 216);
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {}
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {}
 
     @Override
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        hoverTooltip = ItemStack.EMPTY;
+        super.render(graphics, mouseX, mouseY, partialTick);
+        if (!hoverTooltip.isEmpty()) {
+            graphics.renderTooltip(font, hoverTooltip, mouseX, mouseY);
+        }
+    }
+
+    @Override
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         List<ClientboundThaumatoriumRecipesPayload.Entry> recipes = menu.clientRecipes;
         int k = leftPos;
         int l = topPos;
@@ -71,10 +81,10 @@ public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThau
         }
         if (recipes.size() > VISIBLE) {
             if (index > 0) {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, k + ARROW_X, l + ARROW_UP_Y, 176, 56, ARROW_W, ARROW_H, 256, 256);
+                graphics.blit(TEXTURE, k + ARROW_X, l + ARROW_UP_Y, 176, 56, ARROW_W, ARROW_H, 256, 256);
             }
             if (index < recipes.size() / (float) COLS - ROWS) {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, k + ARROW_X, l + ARROW_DOWN_Y, 176, 93, ARROW_W, ARROW_H, 256, 256);
+                graphics.blit(TEXTURE, k + ARROW_X, l + ARROW_DOWN_Y, 176, 93, ARROW_W, ARROW_H, 256, 256);
             }
         }
         int cell = 0;
@@ -85,28 +95,28 @@ public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThau
             int y = l + GRID_Y + py * CELL;
             ClientboundThaumatoriumRecipesPayload.Entry entry = recipes.get(i);
             if (entry.queued()) {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, QUEUED_U, QUEUED_V, CELL, CELL, 256, 256);
+                graphics.blit(TEXTURE, x, y, QUEUED_U, QUEUED_V, CELL, CELL, 256, 256);
             }
-            graphics.item(entry.output(), x, y);
+            graphics.renderItem(entry.output(), x, y);
             if (mouseX >= x && mouseY >= y && mouseX < x + CELL && mouseY < y + CELL) {
-                graphics.setTooltipForNextFrame(font, entry.output(), mouseX, mouseY);
+                hoverTooltip = entry.output();
             }
         }
         BlockEntityThaumatorium machine = menu.blockEntity;
         if (machine != null) {
             if (machine.maxRecipes() > 1) {
                 String text = machine.queue().size() + "/" + machine.maxRecipes();
-                graphics.pose().pushMatrix();
-                graphics.pose().translate(k + COUNT_X, l + COUNT_Y);
-                graphics.pose().scale(0.5F, 0.5F);
-                graphics.text(font, text, -font.width(text) / 2, 0, 0xFFFFFFFF, false);
-                graphics.pose().popMatrix();
+                graphics.pose().pushPose();
+                graphics.pose().translate(k + COUNT_X, l + COUNT_Y, 0.0F);
+                graphics.pose().scale(0.5F, 0.5F, 1.0F);
+                graphics.drawString(font, text, -font.width(text) / 2, 0, 0xFFFFFFFF, false);
+                graphics.pose().popPose();
             }
             drawAspectBars(graphics, machine, k, l);
         }
     }
 
-    private void drawAspectBars(GuiGraphicsExtractor graphics, BlockEntityThaumatorium machine, int k, int l) {
+    private void drawAspectBars(GuiGraphics graphics, BlockEntityThaumatorium machine, int k, int l) {
         List<ResourceLocation> queue = machine.queue();
         if (queue.isEmpty()) {
             return;
@@ -131,11 +141,11 @@ public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThau
             int py = count / ASPECTS_PER_ROW;
             int x = k + BAR_X + BAR_SPACING_X * px;
             int y = l + BAR_Y + BAR_SPACING_Y * py;
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, BAR_U, BAR_BACK_V, BAR_WIDTH, BAR_HEIGHT, 256, 256);
+            graphics.blit(TEXTURE, x, y, BAR_U, BAR_BACK_V, BAR_WIDTH, BAR_HEIGHT, 256, 256);
             int fill = (int) (machine.essentia().amountOf(entry.aspect()) / (float) entry.amount() * BAR_WIDTH);
             if (fill > 0) {
                 int color = ARGB32.opaque(entry.aspect().value().color());
-                graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, BAR_U, BAR_FILL_V, Math.min(fill, BAR_WIDTH), BAR_HEIGHT, 256, 256, color);
+                GuiBlend.blitTinted(graphics, TEXTURE, x, y, BAR_U, BAR_FILL_V, Math.min(fill, BAR_WIDTH), BAR_HEIGHT, 256, 256, color);
             }
             count++;
         }
@@ -153,9 +163,9 @@ public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThau
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubled) {
-        int mx = (int) event.x();
-        int my = (int) event.y();
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        int mx = (int) mouseX;
+        int my = (int) mouseY;
         List<ClientboundThaumatoriumRecipesPayload.Entry> recipes = menu.clientRecipes;
         int cell = 0;
         for (int i = index * COLS; i < recipes.size() && cell < VISIBLE; i++, cell++) {
@@ -184,6 +194,6 @@ public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThau
                 return true;
             }
         }
-        return super.mouseClicked(event, doubled);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 }

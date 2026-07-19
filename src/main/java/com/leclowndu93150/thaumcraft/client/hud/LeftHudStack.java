@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.player.LocalPlayer;
-import net.neoforged.neoforge.client.gui.GuiLayer;
 import org.jspecify.annotations.Nullable;
 
-public final class LeftHudStack implements GuiLayer {
+public final class LeftHudStack implements LayeredDraw.Layer {
     public interface Gauge {
         boolean visible(Minecraft mc, LocalPlayer player);
 
@@ -18,7 +18,7 @@ public final class LeftHudStack implements GuiLayer {
         @Nullable
         String exclusiveGroup();
 
-        void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker);
+        void render(GuiGraphics graphics, DeltaTracker deltaTracker);
     }
 
     private final List<Gauge> gauges;
@@ -28,7 +28,7 @@ public final class LeftHudStack implements GuiLayer {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null || mc.options.hideGui) {
@@ -47,10 +47,10 @@ public final class LeftHudStack implements GuiLayer {
                 }
                 claimedGroups.add(group);
             }
-            graphics.pose().pushMatrix();
-            graphics.pose().translate(0.0F, y);
+            graphics.pose().pushPose();
+            graphics.pose().translate(0.0F, y, 0.0F);
             gauge.render(graphics, deltaTracker);
-            graphics.pose().popMatrix();
+            graphics.pose().popPose();
             y += gauge.height();
         }
     }

@@ -13,9 +13,10 @@ import com.leclowndu93150.thaumcraft.client.screen.widget.TCButtonIcon;
 import com.leclowndu93150.thaumcraft.client.screen.widget.TCHoverButton;
 import com.leclowndu93150.thaumcraft.client.screen.widget.TCImageButton;
 import com.leclowndu93150.thaumcraft.client.screen.widget.TCPlusMinusButton;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.leclowndu93150.thaumcraft.content.golem.seals.MenuSealBase;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
@@ -221,17 +222,17 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.GUI_BASE,
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        graphics.blit(TCScreenTextures.GUI_BASE,
                 leftPos + middleX - 80, topPos + middleY - 80, CIRCLE_U, CIRCLE_V,
                 CIRCLE_SIZE, CIRCLE_SIZE, ATLAS, ATLAS);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.GUI_BASE,
+        graphics.blit(TCScreenTextures.GUI_BASE,
                 leftPos, topPos + PANEL_Y, 0, PANEL_V, PANEL_WIDTH, PANEL_HEIGHT, ATLAS, ATLAS);
-        super.extractBackground(graphics, mouseX, mouseY, partialTick);
+        super.renderBackground(graphics, mouseX, mouseY, partialTick);
     }
 
     @Override
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         ISealEntity seal = menu.seal();
         if (seal == null) {
             return;
@@ -240,11 +241,11 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
                 leftPos + middleX, topPos + middleY - 64, WHITE);
         switch (menu.category()) {
             case ISealGui.CAT_PRIORITY -> {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.GUI_BASE,
+                graphics.blit(TCScreenTextures.GUI_BASE,
                         leftPos + middleX + 17, topPos + middleY + 3, COLOR_DIAL_U, COLOR_DIAL_V, 12, 12, ATLAS, ATLAS);
                 if (menu.color() >= 1 && menu.color() <= 16) {
                     int dye = DyeColor.byId(menu.color() - 1).getTextureDiffuseColor();
-                    graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.GUI_BASE,
+                    GuiBlend.blitTinted(graphics, TCScreenTextures.GUI_BASE,
                             leftPos + middleX + 20, topPos + middleY + 6, COLOR_SWATCH_U, COLOR_SWATCH_V,
                             6, 6, ATLAS, ATLAS, ARGB32.opaque(dye));
                 }
@@ -274,7 +275,7 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
                     for (int a = 0; a < size; a++) {
                         int x = a % 3;
                         int y = a / 3;
-                        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.GUI_BASE,
+                        graphics.blit(TCScreenTextures.GUI_BASE,
                                 leftPos + middleX + x * 24 - offsetX, topPos + middleY + y * 24 - offsetY,
                                 FILTER_FRAME_U, FILTER_FRAME_V, FILTER_FRAME_SIZE, FILTER_FRAME_SIZE, ATLAS, ATLAS);
                     }
@@ -284,7 +285,7 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
                             if (slot.isActive() && !slot.getItem().isEmpty()) {
                                 int limit = filter.getFilterSlotSize(i);
                                 String text = limit == 0 ? "*" : String.valueOf(limit);
-                                graphics.text(font, text,
+                                graphics.drawString(font, text,
                                         leftPos + slot.x + 17 - font.width(text), topPos + slot.y + 9,
                                         limit == 0 ? 0xFFAA00 : WHITE, true);
                             }
@@ -315,11 +316,11 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
     }
 
-    private void drawCentered(GuiGraphicsExtractor graphics, String text, int x, int y, int color) {
-        graphics.text(font, text, x - font.width(text) / 2, y, ARGB32.opaque(color), true);
+    private void drawCentered(GuiGraphics graphics, String text, int x, int y, int color) {
+        graphics.drawString(font, text, x - font.width(text) / 2, y, ARGB32.opaque(color), true);
     }
 
     interface UvSupplier {
@@ -354,9 +355,9 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
         }
 
         @Override
-        protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             setMessage(messageSupplier.get());
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.GUI_BASE,
+            GuiBlend.blitTinted(graphics, TCScreenTextures.GUI_BASE,
                     getX(), getY(), uv.get(), TOGGLE_V, 16, 16, ATLAS, ATLAS,
                     activeTintColor(tintColor(), isHovered(), active));
         }
@@ -371,14 +372,14 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
         }
 
         @Override
-        protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.GUI_BASE,
+        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            graphics.blit(TCScreenTextures.GUI_BASE,
                     getX() - 2, getY() - 2, PROP_BG_U, PROP_BG_V, 12, 12, ATLAS, ATLAS);
             if (prop.getValue()) {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.GUI_BASE,
+                graphics.blit(TCScreenTextures.GUI_BASE,
                         getX() - 2, getY() - 2, PROP_CHECK_U, PROP_BG_V, 12, 12, ATLAS, ATLAS);
             }
-            graphics.text(font, Component.translatable(prop.getName()).getString(),
+            graphics.drawString(font, Component.translatable(prop.getName()).getString(),
                     getX() + 12, getY(), 0xFFFFFFFF, true);
         }
     }

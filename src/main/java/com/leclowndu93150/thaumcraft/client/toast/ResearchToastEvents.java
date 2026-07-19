@@ -43,7 +43,7 @@ public final class ResearchToastEvents {
             }
             mc.player.registryAccess().lookup(IResearchEntry.REGISTRY_KEY)
                     .flatMap(lookup -> lookup.get(ResourceKey.create(IResearchEntry.REGISTRY_KEY, research)))
-                    .ifPresent(holder -> mc.getToastManager().addToast(new ResearchToast(research,
+                    .ifPresent(holder -> mc.getToasts().addToast(new ResearchToast(research,
                             Component.translatable("tc.research.complete"),
                             Component.translatable(holder.value().nameKey()),
                             iconOf(holder.value()))));

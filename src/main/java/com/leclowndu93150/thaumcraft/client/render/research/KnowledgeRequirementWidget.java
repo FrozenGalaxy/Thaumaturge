@@ -5,14 +5,15 @@ import com.leclowndu93150.thaumcraft.api.capability.IPlayerKnowledge;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeType;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import com.leclowndu93150.thaumcraft.api.research.KnowledgeReward;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.leclowndu93150.thaumcraft.client.screen.TCScreenTextures;
 import java.util.EnumMap;
 import java.util.Map;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
@@ -58,7 +59,7 @@ public final class KnowledgeRequirementWidget {
     }
 
     public static void render(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             Font font,
             int x,
             int y,
@@ -86,24 +87,23 @@ public final class KnowledgeRequirementWidget {
         drawCount(graphics, font, x, y, required, hasKnow);
     }
 
-    private static void drawIcon(GuiGraphicsExtractor graphics, int x, int y, KnowledgeType type) {
+    private static void drawIcon(GuiGraphics graphics, int x, int y, KnowledgeType type) {
         ResourceLocation icon = ICONS.get(type);
         if (icon == null) return;
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(x, y);
-        graphics.pose().scale(ICON_MATRIX_SCALE, ICON_MATRIX_SCALE);
+        graphics.pose().pushPose();
+        graphics.pose().translate(x, y, 0);
+        graphics.pose().scale(ICON_MATRIX_SCALE, ICON_MATRIX_SCALE, 1F);
         graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
                 icon,
                 0, 0,
                 0.0F, 0.0F,
                 SPRITE_SIZE, SPRITE_SIZE,
                 ATLAS_REF, ATLAS_REF
         );
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 
-    private static void drawCategoryOverlay(GuiGraphicsExtractor graphics, int x, int y, ResourceKey<IResearchCategory> categoryKey) {
+    private static void drawCategoryOverlay(GuiGraphics graphics, int x, int y, ResourceKey<IResearchCategory> categoryKey) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         HolderLookup.Provider registries = mc.player.registryAccess();
@@ -112,68 +112,61 @@ public final class KnowledgeRequirementWidget {
                 .ifPresent(holder -> drawCategoryOverlayInternal(graphics, x, y, holder));
     }
 
-    private static void drawCategoryOverlayInternal(GuiGraphicsExtractor graphics, int x, int y, Holder.Reference<IResearchCategory> holder) {
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(x + CATEGORY_OVERLAY_TRANSLATE, y + CATEGORY_OVERLAY_TRANSLATE);
-        graphics.pose().scale(CATEGORY_OVERLAY_SCALE, CATEGORY_OVERLAY_SCALE);
-        graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
+    private static void drawCategoryOverlayInternal(GuiGraphics graphics, int x, int y, Holder.Reference<IResearchCategory> holder) {
+        graphics.pose().pushPose();
+        graphics.pose().translate(x + CATEGORY_OVERLAY_TRANSLATE, y + CATEGORY_OVERLAY_TRANSLATE, 0);
+        graphics.pose().scale(CATEGORY_OVERLAY_SCALE, CATEGORY_OVERLAY_SCALE, 1F);
+        GuiBlend.blitTinted(
+                graphics,
                 holder.value().icon(),
                 0, 0,
                 0.0F, 0.0F,
                 SPRITE_SIZE, SPRITE_SIZE,
-                SPRITE_SIZE, SPRITE_SIZE,
                 ATLAS_REF, ATLAS_REF,
                 CATEGORY_OVERLAY_COLOR
         );
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 
-    private static void drawCheckmark(GuiGraphicsExtractor graphics, int x, int y) {
+    private static void drawCheckmark(GuiGraphics graphics, int x, int y) {
         graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
                 TCScreenTextures.RESEARCH_BOOK,
                 x + CHECKMARK_OFFSET_X, y,
                 (float) CHECKMARK_U, (float) CHECKMARK_V,
-                CHECKMARK_SIZE, CHECKMARK_SIZE,
                 CHECKMARK_SIZE, CHECKMARK_SIZE,
                 TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE
         );
     }
 
-    private static void drawCount(GuiGraphicsExtractor graphics, Font font, int x, int y, int required, boolean hasKnow) {
+    private static void drawCount(GuiGraphics graphics, Font font, int x, int y, int required, boolean hasKnow) {
         Component amount = hasKnow
                 ? Component.literal(Integer.toString(required))
                 : Component.literal(Integer.toString(required)).withStyle(ChatFormatting.RED);
         int width = font.width(amount);
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(x + COUNT_BASELINE_X - width / 2.0F, y + COUNT_BASELINE_Y);
-        graphics.pose().scale(COUNT_TEXT_SCALE, COUNT_TEXT_SCALE);
-        graphics.text(font, amount, 0, 0, COUNT_TEXT_COLOR, true);
-        graphics.pose().popMatrix();
+        graphics.pose().pushPose();
+        graphics.pose().translate(x + COUNT_BASELINE_X - width / 2.0F, y + COUNT_BASELINE_Y, 0);
+        graphics.pose().scale(COUNT_TEXT_SCALE, COUNT_TEXT_SCALE, 1F);
+        graphics.drawString(font, amount, 0, 0, COUNT_TEXT_COLOR, true);
+        graphics.pose().popPose();
     }
 
-    private static void drawProgressBar(GuiGraphicsExtractor graphics, int x, int y, int partial, int progression) {
+    private static void drawProgressBar(GuiGraphics graphics, int x, int y, int partial, int progression) {
         int filledWidth = Math.max(0, Math.min(ICON_SIZE, partial * ICON_SIZE / progression));
         int emptyWidth = ICON_SIZE - filledWidth;
         if (filledWidth > 0) {
             graphics.blit(
-                    RenderPipelines.GUI_TEXTURED,
                     TCScreenTextures.RESEARCH_BOOK,
                     x, y,
                     0.0F, (float) PROGRESS_BAR_FILLED_V,
-                    filledWidth, PROGRESS_BAR_HEIGHT,
                     filledWidth, PROGRESS_BAR_HEIGHT,
                     TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE
             );
         }
         if (emptyWidth > 0) {
             graphics.blit(
-                    RenderPipelines.GUI_TEXTURED,
                     TCScreenTextures.RESEARCH_BOOK,
                     x + filledWidth, y,
                     (float) filledWidth, (float) PROGRESS_BAR_EMPTY_V,
-                    emptyWidth, PROGRESS_BAR_HEIGHT,
                     emptyWidth, PROGRESS_BAR_HEIGHT,
                     TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE
             );

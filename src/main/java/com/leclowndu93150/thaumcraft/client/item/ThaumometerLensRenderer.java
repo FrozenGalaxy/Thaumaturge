@@ -6,7 +6,6 @@ import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
 import com.leclowndu93150.thaumcraft.api.research.scan.ScanKeys;
 import com.leclowndu93150.thaumcraft.client.render.TCFlatRenderTypes;
 import com.leclowndu93150.thaumcraft.client.render.aspect.AspectTagWorldRenderer;
-import net.minecraft.util.LightCoordsUtil;
 import com.leclowndu93150.thaumcraft.content.aspect.AspectIndexHolder;
 import com.leclowndu93150.thaumcraft.content.aspect.EntityAspects;
 import com.leclowndu93150.thaumcraft.content.aura.node.BlockEntityNode;
@@ -14,10 +13,12 @@ import com.leclowndu93150.thaumcraft.content.item.ThaumometerItem;
 import com.leclowndu93150.thaumcraft.content.research.pool.AspectPools;
 import com.leclowndu93150.thaumcraft.content.research.scan.ScanNode;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -46,7 +47,7 @@ public final class ThaumometerLensRenderer {
     private ThaumometerLensRenderer() {}
 
     public static void submitReadout(Minecraft mc, AbstractClientPlayer player,
-                                     PoseStack poseStack, SubmitNodeCollector collector) {
+                                     PoseStack poseStack, MultiBufferSource buffers) {
         if (mc.level == null) {
             return;
         }
@@ -99,20 +100,20 @@ public final class ThaumometerLensRenderer {
         if (nodeLine != null) {
             poseStack.pushPose();
             poseStack.scale(NODE_LINE_SCALE, NODE_LINE_SCALE, NODE_LINE_SCALE);
-            collector.submitText(poseStack, -font.width(nodeLine) / 2.0F, NODE_LINE_TEXT_Y,
-                    nodeLine.getVisualOrderText(), false, Font.DisplayMode.NORMAL,
-                    LightCoordsUtil.FULL_BRIGHT, NODE_LINE_COLOR, 0, 0);
+            font.drawInBatch(nodeLine.getVisualOrderText(), -font.width(nodeLine) / 2.0F, NODE_LINE_TEXT_Y,
+                    NODE_LINE_COLOR, false, poseStack.last().pose(), buffers, Font.DisplayMode.NORMAL,
+                    0, LightTexture.FULL_BRIGHT);
             poseStack.popPose();
         }
         if (aspects != null && !aspects.isEmpty()) {
-            submitAspectGrid(poseStack, collector, font, player, aspects);
+            submitAspectGrid(poseStack, buffers, font, player, aspects);
         }
         poseStack.pushPose();
         poseStack.translate(0.0F, NAME_Y, 0.0F);
         float scale = nameScale(font, name);
         poseStack.scale(scale, scale, scale);
-        collector.submitText(poseStack, -font.width(name) / 2.0F, 0.0F, name.getVisualOrderText(),
-                false, Font.DisplayMode.NORMAL, LightCoordsUtil.FULL_BRIGHT, NAME_COLOR, 0, 0);
+        font.drawInBatch(name.getVisualOrderText(), -font.width(name) / 2.0F, 0.0F, NAME_COLOR,
+                false, poseStack.last().pose(), buffers, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
         poseStack.popPose();
     }
 
@@ -123,7 +124,7 @@ public final class ThaumometerLensRenderer {
                 : NAME_SCALE;
     }
 
-    private static void submitAspectGrid(PoseStack poseStack, SubmitNodeCollector collector, Font font,
+    private static void submitAspectGrid(PoseStack poseStack, MultiBufferSource buffers, Font font,
                                          AbstractClientPlayer player, AspectList aspects) {
         poseStack.pushPose();
         poseStack.scale(TAG_SPACE_SCALE, TAG_SPACE_SCALE, TAG_SPACE_SCALE);
@@ -140,21 +141,20 @@ public final class ThaumometerLensRenderer {
             poseStack.pushPose();
             poseStack.scale(TAG_SIZE, -TAG_SIZE, TAG_SIZE);
             PoseStack.Pose tagPose = poseStack.last().copy();
-            collector.submitCustomGeometry(poseStack,
-                    TCFlatRenderTypes.entityTranslucentFlat(known
-                            ? entry.aspect().value().texture()
-                            : AspectTagWorldRenderer.UNKNOWN_TEXTURE),
-                    (pose, buffer) -> AspectTagWorldRenderer.renderQuad(tagPose, buffer, entry.aspect(),
-                            TAG_ALPHA, !known, LightCoordsUtil.FULL_BRIGHT));
+            VertexConsumer tagBuffer = buffers.getBuffer(TCFlatRenderTypes.entityTranslucentFlat(known
+                    ? entry.aspect().value().texture()
+                    : AspectTagWorldRenderer.UNKNOWN_TEXTURE));
+            AspectTagWorldRenderer.renderQuad(tagPose, tagBuffer, entry.aspect(),
+                    TAG_ALPHA, !known, LightTexture.FULL_BRIGHT);
             poseStack.popPose();
             if (known) {
                 String amount = Integer.toString(entry.amount());
                 poseStack.pushPose();
                 poseStack.translate(TAG_SIZE / 2.0F, TAG_SIZE / 2.0F, -0.01F);
                 poseStack.scale(TAG_AMOUNT_TEXT_SCALE, TAG_AMOUNT_TEXT_SCALE, TAG_AMOUNT_TEXT_SCALE);
-                collector.submitText(poseStack, -font.width(amount) - 1, -font.lineHeight,
-                        Component.literal(amount).getVisualOrderText(),
-                        true, Font.DisplayMode.NORMAL, LightCoordsUtil.FULL_BRIGHT, TAG_TEXT_COLOR, 0, 0);
+                font.drawInBatch(Component.literal(amount).getVisualOrderText(), -font.width(amount) - 1,
+                        -font.lineHeight, TAG_TEXT_COLOR, true, poseStack.last().pose(), buffers,
+                        Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                 poseStack.popPose();
             }
             poseStack.popPose();

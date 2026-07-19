@@ -24,7 +24,7 @@ public final class ResearchUtils {
                 if (access == null) {
                     list.add(Component.literal("- ").append(gate.entry().toString()).withStyle(ChatFormatting.RED));
                 } else {
-                    IResearchEntry entry = access.lookupOrThrow(IResearchEntry.REGISTRY_KEY).get(gate.entry()).map(Holder::value).orElse(null);
+                    IResearchEntry entry = access.registryOrThrow(IResearchEntry.REGISTRY_KEY).getHolder(gate.entry()).map(Holder::value).orElse(null);
                     if (entry != null) {
                         list.add(Component.literal("- ").append(Component.translatable(entry.nameKey())).withStyle(ChatFormatting.RED));
                     } else {

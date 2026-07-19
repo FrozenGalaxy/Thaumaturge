@@ -15,12 +15,12 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import mezz.jei.api.recipe.types.IRecipeType;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -32,7 +32,7 @@ import java.util.List;
 
 public final class AspectFromStacksCategory implements IRecipeCategory<AspectFromStacksCategory.Wrapper> {
     public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "aspect_from_stacks");
-    public static final IRecipeType<Wrapper> RECIPE_TYPE = IRecipeType.create(UID, Wrapper.class);
+    public static final RecipeType<Wrapper> RECIPE_TYPE = new RecipeType<>(UID, Wrapper.class);
 
     private static final int WIDTH = 100;
     private static final int HEIGHT = 26;
@@ -53,7 +53,7 @@ public final class AspectFromStacksCategory implements IRecipeCategory<AspectFro
     }
 
     @Override
-    public IRecipeType<Wrapper> getRecipeType() {
+    public RecipeType<Wrapper> getRecipeType() {
         return RECIPE_TYPE;
     }
 
@@ -81,21 +81,21 @@ public final class AspectFromStacksCategory implements IRecipeCategory<AspectFro
     public void setRecipe(IRecipeLayoutBuilder builder, Wrapper recipe, IFocusGroup focuses) {
         builder.addOutputSlot(8+81-9, 8)
                 .setCustomRenderer(AspectIngredientType.INSTANCE, AspectIngredientRenderer.INSTANCE)
-                .add(AspectIngredientType.INSTANCE, new AspectInstance(recipe.aspect(),1));
+                .addIngredient(AspectIngredientType.INSTANCE, new AspectInstance(recipe.aspect(),1));
 
         int slot = 0;
         int row = 9;
         for (ItemStack stack : recipe.stacks()){
             builder.addInputSlot((slot % row) *18-18*3-21+81, (slot / row ) * 18 + 32)
-                    .add(stack);
+                    .addItemStack(stack);
             ++slot;
         }
     }
 
     @Override
-    public void draw(Wrapper recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(Wrapper recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         resultSlot.draw(guiGraphics);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.fromNamespaceAndPath(TCIds.MODID,"textures/gui/gui_inner.png"),5,30,0,0,163,74,256,256);
+        guiGraphics.blit(ResourceLocation.fromNamespaceAndPath(TCIds.MODID,"textures/gui/gui_inner.png"),5,30,0,0,163,74,256,256);
     }
 
 

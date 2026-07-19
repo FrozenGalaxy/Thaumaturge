@@ -20,11 +20,10 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import mezz.jei.api.recipe.types.IRecipeHolderType;
-import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -34,7 +33,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import java.util.Optional;
 
 public final class CrucibleCategory implements IRecipeCategory<RecipeHolder<CrucibleRecipe>> {
-    public static final IRecipeHolderType<CrucibleRecipe> RECIPE_TYPE = IRecipeHolderType.create(TCRecipeTypes.CRUCIBLE.get());
+    public static final RecipeType<RecipeHolder<CrucibleRecipe>> RECIPE_TYPE = RecipeType.createFromVanilla(TCRecipeTypes.CRUCIBLE.get());
 
     public static final int ASPECT_Y = 66;
     public static final int ASPECT_X = 66;
@@ -49,7 +48,7 @@ public final class CrucibleCategory implements IRecipeCategory<RecipeHolder<Cruc
     }
 
     @Override
-    public IRecipeType<RecipeHolder<CrucibleRecipe>> getRecipeType() {
+    public RecipeType<RecipeHolder<CrucibleRecipe>> getRecipeType() {
         return RECIPE_TYPE;
     }
 
@@ -79,9 +78,9 @@ public final class CrucibleCategory implements IRecipeCategory<RecipeHolder<Cruc
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<CrucibleRecipe> holder, IFocusGroup focuses) {
         CrucibleRecipe recipe = holder.value();
         builder.addOutputSlot(55, 8)
-                .add(recipe.rawResult());
+                .addItemStack(recipe.rawResult());
         builder.addInputSlot(2, 2)
-                .add(recipe.catalyst());
+                .addIngredients(recipe.catalyst());
 
         int center = (recipe.aspects().size() * SPACE) / 2;
         int x = 0;
@@ -89,10 +88,10 @@ public final class CrucibleCategory implements IRecipeCategory<RecipeHolder<Cruc
         for (AspectInstance instance : recipe.aspects().sortedByAmount()){
             builder.addInputSlot(ASPECT_X - center + x * SPACE,ASPECT_Y)
                     .setCustomRenderer(AspectIngredientType.INSTANCE,AspectIngredientRenderer.INSTANCE)
-                    .add(AspectIngredientType.INSTANCE,instance);
+                    .addIngredient(AspectIngredientType.INSTANCE,instance);
 
-            builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).add(PhialItem.makeFilled(instance.aspect()));
-            builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).add(EssentiaCrystalFactory.of(instance.aspect()));
+            builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(PhialItem.makeFilled(instance.aspect()));
+            builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(EssentiaCrystalFactory.of(instance.aspect()));
             x+=1;
         }
 
@@ -108,11 +107,11 @@ public final class CrucibleCategory implements IRecipeCategory<RecipeHolder<Cruc
     }
 
     @Override
-    public void draw(RecipeHolder<CrucibleRecipe> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<CrucibleRecipe> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         background.draw(guiGraphics);
         arrow.draw(guiGraphics,16,6);
         boolean doesPassGate = recipe.value().doesPassGate(Minecraft.getInstance().player);
-        if (!doesPassGate) guiGraphics.item(Items.BARRIER.getDefaultInstance(),22,14);
+        if (!doesPassGate) guiGraphics.renderItem(Items.BARRIER.getDefaultInstance(),22,14);
 
     }
 }

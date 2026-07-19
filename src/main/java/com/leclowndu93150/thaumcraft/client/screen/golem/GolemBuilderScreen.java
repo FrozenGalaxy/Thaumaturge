@@ -22,10 +22,11 @@ import com.leclowndu93150.thaumcraft.content.golem.press.BlockEntityGolemBuilder
 import com.leclowndu93150.thaumcraft.content.golem.press.MenuGolemBuilder;
 import com.leclowndu93150.thaumcraft.network.ServerboundGolemPressPayload;
 import com.leclowndu93150.thaumcraft.registry.TCGolemParts;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
@@ -405,13 +406,13 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
     }
 
     @Override
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (!components.isEmpty()) {
             int row = 1;
             int col = 0;
             for (int i = 0; i < components.size(); i++) {
                 if (owns.length > i && !owns[i]) {
-                    graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
+                    GuiBlend.blitTinted(graphics, TEXTURE,
                             leftPos + COMPONENT_GRID_X + col * 16, topPos + COMPONENT_GRID_Y + 16 * row,
                             MISSING_U, MISSING_V, 16, 16, 256, 256,
                             ARGB32.color(128, 0xFFFFFF));
@@ -423,7 +424,7 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
             }
         }
         if (menu.cost() > 0) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
+            graphics.blit(TEXTURE,
                     leftPos + PROGRESS_X, topPos + PROGRESS_Y, PROGRESS_U, PROGRESS_V,
                     (int) (PROGRESS_WIDTH * (1.0F - (float) menu.cost() / Math.max(1, menu.maxCost()))),
                     PROGRESS_HEIGHT, 256, 256);
@@ -445,21 +446,21 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
         drawCentered(graphics, String.valueOf(damage), leftPos + STAT_DAMAGE_X, topPos + STAT_Y);
     }
 
-    private void drawCentered(GuiGraphicsExtractor graphics, String text, int centerX, int y) {
-        graphics.text(font, text, centerX - font.width(text) / 2, y, WHITE, true);
+    private void drawCentered(GuiGraphics graphics, String text, int centerX, int y) {
+        graphics.drawString(font, text, centerX - font.width(text) / 2, y, WHITE, true);
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         if (!components.isEmpty()) {
             String costText = String.valueOf(cost);
-            graphics.text(font, costText, COST_RIGHT_X - font.width(costText), COST_Y, WHITE, true);
+            graphics.drawString(font, costText, COST_RIGHT_X - font.width(costText), COST_Y, WHITE, true);
         }
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, 12, 12, SOCKET_U, SOCKET_V, SOCKET_SIZE, SOCKET_SIZE, 256, 256);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, 12, 60, SOCKET_U, SOCKET_V, SOCKET_SIZE, SOCKET_SIZE, 256, 256);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, 108, 12, SOCKET_U, SOCKET_V, SOCKET_SIZE, SOCKET_SIZE, 256, 256);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, 108, 36, SOCKET_U, SOCKET_V, SOCKET_SIZE, SOCKET_SIZE, 256, 256);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, 108, 60, SOCKET_U, SOCKET_V, SOCKET_SIZE, SOCKET_SIZE, 256, 256);
+        graphics.blit(TEXTURE, 12, 12, SOCKET_U, SOCKET_V, SOCKET_SIZE, SOCKET_SIZE, 256, 256);
+        graphics.blit(TEXTURE, 12, 60, SOCKET_U, SOCKET_V, SOCKET_SIZE, SOCKET_SIZE, 256, 256);
+        graphics.blit(TEXTURE, 108, 12, SOCKET_U, SOCKET_V, SOCKET_SIZE, SOCKET_SIZE, 256, 256);
+        graphics.blit(TEXTURE, 108, 36, SOCKET_U, SOCKET_V, SOCKET_SIZE, SOCKET_SIZE, 256, 256);
+        graphics.blit(TEXTURE, 108, 60, SOCKET_U, SOCKET_V, SOCKET_SIZE, SOCKET_SIZE, 256, 256);
     }
 
     static final class CraftButton extends TCButton {
@@ -468,13 +469,13 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
         }
 
         @Override
-        protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             int alpha = isHovered() && active ? 255 : 230;
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, getX(), getY(),
+            GuiBlend.blitTinted(graphics, TEXTURE, getX(), getY(),
                     CRAFT_U, CRAFT_V, CRAFT_WIDTH, CRAFT_HEIGHT, 256, 256,
                     ARGB32.color(alpha, 0xFFFFFF));
             if (!active) {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, getX(), getY(),
+                graphics.blit(TEXTURE, getX(), getY(),
                         CRAFT_U, CRAFT_DISABLED_V, CRAFT_WIDTH, CRAFT_HEIGHT, 256, 256);
             }
         }

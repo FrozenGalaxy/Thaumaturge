@@ -27,13 +27,14 @@ import com.leclowndu93150.thaumcraft.api.research.ResearchRequirement;
 import com.leclowndu93150.thaumcraft.client.render.research.KnowledgeRequirementWidget;
 import com.leclowndu93150.thaumcraft.client.render.research.PageParser;
 import com.leclowndu93150.thaumcraft.content.research.ResearchManager;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.leclowndu93150.thaumcraft.client.render.research.RecipeDisplayCache;
 import com.leclowndu93150.thaumcraft.client.render.research.RecipeDisplayWidget;
 import com.leclowndu93150.thaumcraft.client.screen.AbstractTCScreen;
 import com.leclowndu93150.thaumcraft.client.screen.TCScreenTextures;
 import com.leclowndu93150.thaumcraft.client.screen.TCTooltips;
+import com.leclowndu93150.thaumcraft.client.screen.tooltip.DeferredTooltip;
 import com.leclowndu93150.thaumcraft.network.ServerboundAdvanceStagePayload;
-import com.leclowndu93150.thaumcraft.network.ServerboundRequestItemRecipePayload;
 import com.leclowndu93150.thaumcraft.network.ServerboundClearResearchFlagsPayload;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.ArrayDeque;
@@ -44,10 +45,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -65,9 +65,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.display.RecipeDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplayContext;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jspecify.annotations.Nullable;
 
@@ -421,8 +419,14 @@ public final class EntryDetailScreen extends AbstractTCScreen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractBackground(graphics, mouseX, mouseY, partialTick);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.render(graphics, mouseX, mouseY, partialTick);
+        DeferredTooltip.render(graphics, font);
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(graphics, mouseX, mouseY, partialTick);
         renderPaneBackground(graphics);
         IResearchStage stage = entry.value().stages().get(currentStageIndex());
         boolean insertOpen = insertOpen();
@@ -449,22 +453,17 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         drawNavigation(graphics, mouseX, mouseY);
     }
 
-    private void renderPaneBackground(GuiGraphicsExtractor graphics) {
+    private void renderPaneBackground(GuiGraphics graphics) {
         float ox = (width - PANE_W * PANE_SCALE) / 2.0F;
         float oy = (height - PANE_H * PANE_SCALE) / 2.0F;
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(ox, oy);
-        graphics.pose().scale(PANE_SCALE, PANE_SCALE);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                0, 0,
-                0.0F, 0.0F,
-                PANE_W, PANE_H,
-                PANE_W, PANE_H,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
-        graphics.pose().popMatrix();
+        graphics.pose().pushPose();
+        graphics.pose().translate(ox, oy, 0);
+        graphics.pose().scale(PANE_SCALE, PANE_SCALE, 1F);
+        graphics.blit(TCScreenTextures.RESEARCH_BOOK, 0, 0, 0.0F, 0.0F, PANE_W, PANE_H, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+        graphics.pose().popPose();
     }
 
-    private void renderTextPages(GuiGraphicsExtractor graphics, int baseY, int mouseX, int mouseY) {
+    private void renderTextPages(GuiGraphics graphics, int baseY, int mouseX, int mouseY) {
         if (parsedPages.isEmpty()) return;
         int leftIndex = currentPage;
         int rightIndex = currentPage + 1;
@@ -476,7 +475,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         }
     }
 
-    private void drawPage(GuiGraphicsExtractor graphics, PageParser.Page page, int side, int x, int y, boolean drawTitle) {
+    private void drawPage(GuiGraphics graphics, PageParser.Page page, int side, int x, int y, boolean drawTitle) {
         int currentY = y;
         if (drawTitle) {
             drawDivider(graphics, x + 4, currentY - 7);
@@ -489,7 +488,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             if (element instanceof PageParser.PageElement.Text text) {
                 FormattedCharSequence sequence = sink ->
                         StringDecomposer.iterateFormatted(text.content(), text.style(), sink);
-                graphics.text(font, sequence, textX, currentY - 6, TEXT_LINE_COLOR, false);
+                graphics.drawString(font, sequence, textX, currentY - 6, TEXT_LINE_COLOR, false);
                 currentY += LINE_HEIGHT;
                 if (text.paragraphBreak()) {
                     currentY += (int) (LINE_HEIGHT * 0.66F);
@@ -497,47 +496,37 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             } else if (element instanceof PageParser.PageElement.Image image) {
                 PageParser.PageImage pi = image.image();
                 int pad = (PAGE_WIDTH - pi.renderedWidth()) / 2;
-                graphics.pose().pushMatrix();
-                graphics.pose().translate(textX + pad, currentY - 5);
-                graphics.pose().scale(pi.scale, pi.scale);
-                graphics.blit(RenderPipelines.GUI_TEXTURED, pi.texture,
-                        0, 0,
-                        (float) pi.u, (float) pi.v,
-                        pi.w, pi.h,
-                        pi.w, pi.h,
-                        TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
-                graphics.pose().popMatrix();
+                graphics.pose().pushPose();
+                graphics.pose().translate(textX + pad, currentY - 5, 0);
+                graphics.pose().scale(pi.scale, pi.scale, 1F);
+                graphics.blit(pi.texture, 0, 0, (float) pi.u, (float) pi.v, pi.w, pi.h, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+                graphics.pose().popPose();
                 currentY += pi.renderedHeight() + 2;
             }
         }
     }
 
-    private void renderTitle(GuiGraphicsExtractor graphics, int x, int y) {
+    private void renderTitle(GuiGraphics graphics, int x, int y) {
         Component title = getTitle();
         int titleWidth = font.width(title);
         if (titleWidth <= PAGE_WIDTH) {
             int titleX = x + PAGE_LEFT_OFFSET + PAGE_WIDTH / 2 - titleWidth / 2;
-            graphics.text(font, title, titleX, y, TITLE_COLOR, false);
+            graphics.drawString(font, title, titleX, y, TITLE_COLOR, false);
         } else {
             float scale = (float) PAGE_WIDTH / titleWidth;
-            graphics.pose().pushMatrix();
-            graphics.pose().translate(x + PAGE_LEFT_OFFSET + PAGE_WIDTH / 2.0F - titleWidth / 2.0F * scale, y + scale);
-            graphics.pose().scale(scale, scale);
-            graphics.text(font, title, 0, 0, TITLE_COLOR, false);
-            graphics.pose().popMatrix();
+            graphics.pose().pushPose();
+            graphics.pose().translate(x + PAGE_LEFT_OFFSET + PAGE_WIDTH / 2.0F - titleWidth / 2.0F * scale, y + scale, 0);
+            graphics.pose().scale(scale, scale, 1F);
+            graphics.drawString(font, title, 0, 0, TITLE_COLOR, false);
+            graphics.pose().popPose();
         }
     }
 
-    private void drawDivider(GuiGraphicsExtractor graphics, int x, int y) {
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                x, y,
-                (float) DIVIDER_U, (float) DIVIDER_V,
-                DIVIDER_WIDTH, DIVIDER_THICK,
-                DIVIDER_WIDTH, DIVIDER_THICK,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+    private void drawDivider(GuiGraphics graphics, int x, int y) {
+        graphics.blit(TCScreenTextures.RESEARCH_BOOK, x, y, (float) DIVIDER_U, (float) DIVIDER_V, DIVIDER_WIDTH, DIVIDER_THICK, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
     }
 
-    private void renderRequirements(GuiGraphicsExtractor graphics, IResearchStage stage, int x, int mouseX, int mouseY) {
+    private void renderRequirements(GuiGraphics graphics, IResearchStage stage, int x, int mouseX, int mouseY) {
         if (minecraft == null || minecraft.player == null) return;
         if (currentPage > 0) return;
         if (isComplete) return;
@@ -578,12 +567,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         }
         if (hasAny) {
             reqY -= 12;
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                    x + 4, reqY - 2,
-                    (float) COMPLETE_DIVIDER_U, (float) COMPLETE_DIVIDER_V,
-                    COMPLETE_DIVIDER_W, COMPLETE_DIVIDER_H,
-                    COMPLETE_DIVIDER_W, COMPLETE_DIVIDER_H,
-                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+            graphics.blit(TCScreenTextures.RESEARCH_BOOK, x + 4, reqY - 2, (float) COMPLETE_DIVIDER_U, (float) COMPLETE_DIVIDER_V, COMPLETE_DIVIDER_W, COMPLETE_DIVIDER_H, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
             boolean allMet = allTrue(researchSatisfied)
                     && allTrue(obtainSatisfied)
                     && allTrue(craftSatisfied)
@@ -594,23 +578,17 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                 if (hold) {
                     Component holdLabel = Component.translatable("tc.stage.hold");
                     int lblWidth = font.width(holdLabel);
-                    graphics.text(font, holdLabel,
+                    graphics.drawString(font, holdLabel,
                             x + 52 - lblWidth / 2,
                             reqY - 4,
                             COMPLETE_LABEL_COLOR, true);
                 } else {
                     boolean hover = mouseInside(hrx, hry, COMPLETE_BUTTON_W, COMPLETE_BUTTON_H, mouseX, mouseY);
                     int tint = hover ? COMPLETE_BUTTON_TINT_NORMAL : COMPLETE_BUTTON_TINT_HOVER;
-                    graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                            hrx, hry,
-                            (float) COMPLETE_BUTTON_U, (float) COMPLETE_BUTTON_V,
-                            COMPLETE_BUTTON_W, COMPLETE_BUTTON_H,
-                            COMPLETE_BUTTON_W, COMPLETE_BUTTON_H,
-                            TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
-                            tint);
+                    GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BOOK, hrx, hry, (float) COMPLETE_BUTTON_U, (float) COMPLETE_BUTTON_V, COMPLETE_BUTTON_W, COMPLETE_BUTTON_H, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE, tint);
                     Component label = Component.translatable("tc.stage.complete");
                     int lblWidth = font.width(label);
-                    graphics.text(font, label,
+                    graphics.drawString(font, label,
                             x + 52 - lblWidth / 2,
                             reqY - 4,
                             COMPLETE_LABEL_COLOR, true);
@@ -629,7 +607,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         return KnowledgeAccess.of(minecraft.player).isResearchComplete(id);
     }
 
-    private void renderWarpIndicator(GuiGraphicsExtractor graphics, IResearchStage stage, int x, int y, int mouseX, int mouseY) {
+    private void renderWarpIndicator(GuiGraphics graphics, IResearchStage stage, int x, int y, int mouseX, int mouseY) {
         if (minecraft == null || minecraft.player == null) return;
         if (isComplete) return;
         int warp = stage.warp();
@@ -638,17 +616,17 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         drawForbiddenNode(graphics, x + FORBIDDEN_OFFSET_X, y + FORBIDDEN_Y_OFFSET);
         Component label = Component.translatable("tc.forbidden.level." + warp);
         int labelW = font.width(label);
-        graphics.text(font, label, x + FORBIDDEN_LABEL_OFFSET_X - labelW / 2, y + FORBIDDEN_LABEL_Y_OFFSET, FORBIDDEN_COLOR, false);
+        graphics.drawString(font, label, x + FORBIDDEN_LABEL_OFFSET_X - labelW / 2, y + FORBIDDEN_LABEL_Y_OFFSET, FORBIDDEN_COLOR, false);
         int hx = x + FORBIDDEN_HOVER_OFFSET_X;
         int hy = y + FORBIDDEN_HOVER_OFFSET_Y;
         if (mouseInside(hx, hy, FORBIDDEN_HOVER_W, FORBIDDEN_HOVER_H, mouseX, mouseY)) {
             Component warn = Component.translatable("tc.warp.warn");
             String warnStr = warn.getString().replace("%n", label.getString());
-            graphics.setTooltipForNextFrame(font, Component.literal(warnStr), mouseX, mouseY);
+            DeferredTooltip.set(Component.literal(warnStr), mouseX, mouseY);
         }
     }
 
-    private void drawForbiddenNode(GuiGraphicsExtractor graphics, int centerX, int centerY) {
+    private void drawForbiddenNode(GuiGraphics graphics, int centerX, int centerY) {
         if (minecraft == null || minecraft.player == null) return;
         int ticksExisted = minecraft.player.tickCount;
         int frame = ticksExisted % FORBIDDEN_NODE_FRAME_COUNT;
@@ -656,26 +634,14 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         int u = frame * FORBIDDEN_NODE_CELL_PX;
         int v = FORBIDDEN_NODE_ROW * FORBIDDEN_NODE_CELL_PX;
         int half = FORBIDDEN_NODE_DRAW_SIZE / 2;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, nodeTex,
-                centerX - half, centerY - half,
-                (float) u, (float) v,
-                FORBIDDEN_NODE_DRAW_SIZE, FORBIDDEN_NODE_DRAW_SIZE,
-                FORBIDDEN_NODE_CELL_PX, FORBIDDEN_NODE_CELL_PX,
-                FORBIDDEN_NODE_SHEET, FORBIDDEN_NODE_SHEET,
-                FORBIDDEN_NODE_TINT);
+        GuiBlend.blitTinted(graphics, nodeTex, centerX - half, centerY - half, FORBIDDEN_NODE_DRAW_SIZE, FORBIDDEN_NODE_DRAW_SIZE, (float) u, (float) v, FORBIDDEN_NODE_CELL_PX, FORBIDDEN_NODE_CELL_PX, FORBIDDEN_NODE_SHEET, FORBIDDEN_NODE_SHEET, FORBIDDEN_NODE_TINT);
     }
 
-    private void renderRowLabel(GuiGraphicsExtractor graphics, int x, int y, int v) {
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                x + LABEL_OFFSET_X, y - 1,
-                (float) REQUIREMENT_LABEL_U, (float) v,
-                LABEL_WIDTH, LABEL_HEIGHT,
-                LABEL_WIDTH, LABEL_HEIGHT,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
-                LABEL_TINT);
+    private void renderRowLabel(GuiGraphics graphics, int x, int y, int v) {
+        GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BOOK, x + LABEL_OFFSET_X, y - 1, (float) REQUIREMENT_LABEL_U, (float) v, LABEL_WIDTH, LABEL_HEIGHT, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE, LABEL_TINT);
     }
 
-    private void renderItemRow(GuiGraphicsExtractor graphics, List<ResearchRequirement> reqs, int x, int y, long gameTime, int mouseX, int mouseY, boolean obtain, boolean[] satisfied) {
+    private void renderItemRow(GuiGraphics graphics, List<ResearchRequirement> reqs, int x, int y, long gameTime, int mouseX, int mouseY, boolean obtain, boolean[] satisfied) {
         int spacing = reqs.size() > 6 ? SLOT_BUDGET / reqs.size() : SLOT_DEFAULT_SPACING;
         int shift = SLOT_BASE_SHIFT;
         int innerX = x + SLOT_INNER_OFFSET_X;
@@ -685,60 +651,50 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             int slotX = innerX + shift;
             ItemStack stack = pickRotatingItem(req, i);
             if (!stack.isEmpty()) {
-                graphics.item(stack, slotX, y);
+                graphics.renderItem(stack, slotX, y);
             }
             boolean met = obtain
                     ? countMatching(player, req) >= req.amount()
                     : ResearchManager.isCraftSatisfied(KnowledgeAccess.of(player), req);
             satisfied[i] = met;
             if (met) {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                        slotX + CHECKMARK_OFFSET_X, y,
-                        (float) CHECKMARK_U, (float) CHECKMARK_V,
-                        CHECKMARK_SIZE, CHECKMARK_SIZE,
-                        CHECKMARK_SIZE, CHECKMARK_SIZE,
-                        TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+                graphics.blit(TCScreenTextures.RESEARCH_BOOK, slotX + CHECKMARK_OFFSET_X, y, (float) CHECKMARK_U, (float) CHECKMARK_V, CHECKMARK_SIZE, CHECKMARK_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
             }
             if (mouseInside(slotX, y, SLOT_HIT_SIZE, SLOT_HIT_SIZE, mouseX, mouseY)) {
                 if (!stack.isEmpty()) {
-                    graphics.setTooltipForNextFrame(font, stack, mouseX, mouseY);
+                    DeferredTooltip.setItem(stack, mouseX, mouseY);
                 } else {
-                    graphics.setTooltipForNextFrame(font, TCTooltips.need(obtain ? "obtain" : "craft"), mouseX, mouseY);
+                    DeferredTooltip.set(TCTooltips.need(obtain ? "obtain" : "craft"), mouseX, mouseY);
                 }
             }
             shift += spacing;
         }
     }
 
-    private void renderResearchPrereqs(GuiGraphicsExtractor graphics, List<ResourceLocation> prereqs, IPlayerKnowledge knowledge, int x, int y, int mouseX, int mouseY, boolean[] satisfied) {
+    private void renderResearchPrereqs(GuiGraphics graphics, List<ResourceLocation> prereqs, IPlayerKnowledge knowledge, int x, int y, int mouseX, int mouseY, boolean[] satisfied) {
         int spacing = prereqs.size() > 6 ? SLOT_BUDGET / prereqs.size() : SLOT_DEFAULT_SPACING;
         int shift = SLOT_BASE_SHIFT;
         int innerX = x + SLOT_INNER_OFFSET_X;
         for (int i = 0; i < prereqs.size(); i++) {
             ResourceLocation prereq = prereqs.get(i);
             int slotX = innerX + shift;
-            graphics.text(font,
+            graphics.drawString(font,
                     Component.literal("?").withStyle(ChatFormatting.GOLD),
                     slotX + 5, y + 4,
                     0xFFFFFFFF, true);
             boolean met = knowledge.isResearchComplete(prereq);
             satisfied[i] = met;
             if (met) {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                        slotX + CHECKMARK_OFFSET_X, y,
-                        (float) CHECKMARK_U, (float) CHECKMARK_V,
-                        CHECKMARK_SIZE, CHECKMARK_SIZE,
-                        CHECKMARK_SIZE, CHECKMARK_SIZE,
-                        TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+                graphics.blit(TCScreenTextures.RESEARCH_BOOK, slotX + CHECKMARK_OFFSET_X, y, (float) CHECKMARK_U, (float) CHECKMARK_V, CHECKMARK_SIZE, CHECKMARK_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
             }
             if (mouseInside(slotX, y, SLOT_HIT_SIZE, SLOT_HIT_SIZE, mouseX, mouseY)) {
-                graphics.setTooltipForNextFrame(font, TCTooltips.prereqEntryName(prereq), mouseX, mouseY);
+                DeferredTooltip.set(TCTooltips.prereqEntryName(prereq), mouseX, mouseY);
             }
             shift += spacing;
         }
     }
 
-    private void renderKnowledgeRow(GuiGraphicsExtractor graphics, List<KnowledgeReward> rewards, IPlayerKnowledge knowledge, int x, int y, int mouseX, int mouseY, boolean[] satisfied) {
+    private void renderKnowledgeRow(GuiGraphics graphics, List<KnowledgeReward> rewards, IPlayerKnowledge knowledge, int x, int y, int mouseX, int mouseY, boolean[] satisfied) {
         int spacing = rewards.size() > 6 ? SLOT_BUDGET / rewards.size() : SLOT_DEFAULT_SPACING;
         int shift = SLOT_BASE_SHIFT;
         int innerX = x + SLOT_INNER_OFFSET_X;
@@ -751,7 +707,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                 ResourceLocation learnKey = ResearchNoteData.learnKey(entryId, theoryOrdinal);
                 theoryOrdinal++;
                 met = knowledge.isResearchKnown(learnKey);
-                graphics.item(new ItemStack(TCItems.RESEARCH_NOTE.get()), slotX, y);
+                graphics.renderItem(new ItemStack(TCItems.RESEARCH_NOTE.get()), slotX, y);
                 if (mouseInside(slotX, y, SLOT_HIT_SIZE, SLOT_HIT_SIZE, mouseX, mouseY)) {
                     List<Component> lines = new ArrayList<>();
                     lines.add(Component.translatable("tc.researchtheory",
@@ -762,7 +718,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                                         ? "tc.researchnote.table" : "tc.researchnote.click")
                                 .withStyle(ChatFormatting.GRAY));
                     }
-                    graphics.setTooltipForNextFrame(font, lines, Optional.empty(), mouseX, mouseY);
+                    DeferredTooltip.set(lines, mouseX, mouseY);
                 }
             } else {
                 AspectList cost = ResearchNotes.observationCost(entry.value(), reward.amount());
@@ -785,17 +741,16 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                             lines.add(AspectComponents.name(instance.aspect()).copy()
                                     .append(Component.literal(" " + have + "/" + instance.amount()))
                                     .withStyle(have >= instance.amount() ? ChatFormatting.GREEN : ChatFormatting.RED));
-                            graphics.setTooltipForNextFrame(font, lines, Optional.empty(), mouseX, mouseY);
+                            DeferredTooltip.set(lines, mouseX, mouseY);
                         }
                     } else {
-                        graphics.blit(RenderPipelines.GUI_TEXTURED, UNKNOWN_ASPECT_TEXTURE, chipX, y,
-                                0.0F, 0.0F, 16, 16, 32, 32, 32, 32, UNKNOWN_ASPECT_TINT);
+                        GuiBlend.blitTinted(graphics, UNKNOWN_ASPECT_TEXTURE, chipX, y, 16, 16, 0.0F, 0.0F, 32, 32, 32, 32, UNKNOWN_ASPECT_TINT);
                         if (mouseInside(chipX, y, SLOT_HIT_SIZE, SLOT_HIT_SIZE, mouseX, mouseY)) {
                             List<Component> lines = new ArrayList<>();
                             lines.add(Component.translatable("tc.aspect.unknown"));
                             lines.add(Component.translatable("tc.discoveryerror",
                                     AspectComponents.help(instance.aspect())).withStyle(ChatFormatting.GRAY));
-                            graphics.setTooltipForNextFrame(font, lines, Optional.empty(), mouseX, mouseY);
+                            DeferredTooltip.set(lines, mouseX, mouseY);
                         }
                     }
                 }
@@ -807,43 +762,28 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             }
             satisfied[i] = met;
             if (met) {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                        slotX + CHECKMARK_OFFSET_X, y,
-                        (float) CHECKMARK_U, (float) CHECKMARK_V,
-                        CHECKMARK_SIZE, CHECKMARK_SIZE,
-                        CHECKMARK_SIZE, CHECKMARK_SIZE,
-                        TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+                graphics.blit(TCScreenTextures.RESEARCH_BOOK, slotX + CHECKMARK_OFFSET_X, y, (float) CHECKMARK_U, (float) CHECKMARK_V, CHECKMARK_SIZE, CHECKMARK_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
             }
             if (reward.type() == KnowledgeType.THEORY
                     && mouseInside(slotX, y, SLOT_HIT_SIZE, SLOT_HIT_SIZE, mouseX, mouseY)) {
                 reward.category().unwrapKey().ifPresent(k ->
-                        graphics.setTooltipForNextFrame(font, TCTooltips.knowledgeLabel(reward.type(), k), mouseX, mouseY));
+                        DeferredTooltip.set(TCTooltips.knowledgeLabel(reward.type(), k), mouseX, mouseY));
             }
             shift += spacing;
         }
     }
 
-    private void renderBookmarks(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    private void renderBookmarks(GuiGraphics graphics, int mouseX, int mouseY) {
         if (knowsResearch(FIRSTSTEPS_RESEARCH)) {
             int aspectX = sw + BOOKMARK_OFFSET_X;
             int aspectY = sh + BOOKMARK_ASPECT_RENDER_Y;
             boolean aspectHover = mouseInside(aspectX, aspectY, BOOKMARK_W, BOOKMARK_H, mouseX, mouseY);
             int aspectLeft = aspectHover ? 0 : 3;
             int aspectBodyWidth = 24 - aspectLeft;
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                    aspectX + aspectLeft, aspectY,
-                    (float) BOOKMARK_ASPECT_U, (float) BOOKMARK_V,
-                    aspectBodyWidth, BOOKMARK_H,
-                    aspectBodyWidth, BOOKMARK_H,
-                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                    aspectX + 20, aspectY,
-                    (float) BOOKMARK_TIP_U, (float) BOOKMARK_V,
-                    BOOKMARK_TIP_W, BOOKMARK_H,
-                    BOOKMARK_TIP_W, BOOKMARK_H,
-                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+            graphics.blit(TCScreenTextures.RESEARCH_BOOK, aspectX + aspectLeft, aspectY, (float) BOOKMARK_ASPECT_U, (float) BOOKMARK_V, aspectBodyWidth, BOOKMARK_H, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+            graphics.blit(TCScreenTextures.RESEARCH_BOOK, aspectX + 20, aspectY, (float) BOOKMARK_TIP_U, (float) BOOKMARK_V, BOOKMARK_TIP_W, BOOKMARK_H, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
             if (aspectHover) {
-                graphics.setTooltipForNextFrame(font, Component.translatable("tc.aspect.name"), mouseX, mouseY);
+                DeferredTooltip.set(Component.translatable("tc.aspect.name"), mouseX, mouseY);
             }
         }
 
@@ -853,25 +793,15 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             boolean knowHover = mouseInside(knowX, knowY, BOOKMARK_W, BOOKMARK_H, mouseX, mouseY);
             int knowLeft = knowHover ? 0 : 3;
             int knowBodyWidth = 24 - knowLeft;
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                    knowX - 1 + knowLeft, knowY,
-                    (float) BOOKMARK_KNOWLEDGE_U, (float) BOOKMARK_V,
-                    knowBodyWidth, BOOKMARK_H,
-                    knowBodyWidth, BOOKMARK_H,
-                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                    knowX + 19, knowY,
-                    (float) BOOKMARK_TIP_U, (float) BOOKMARK_V,
-                    BOOKMARK_TIP_W, BOOKMARK_H,
-                    BOOKMARK_TIP_W, BOOKMARK_H,
-                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+            graphics.blit(TCScreenTextures.RESEARCH_BOOK, knowX - 1 + knowLeft, knowY, (float) BOOKMARK_KNOWLEDGE_U, (float) BOOKMARK_V, knowBodyWidth, BOOKMARK_H, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+            graphics.blit(TCScreenTextures.RESEARCH_BOOK, knowX + 19, knowY, (float) BOOKMARK_TIP_U, (float) BOOKMARK_V, BOOKMARK_TIP_W, BOOKMARK_H, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
             if (knowHover) {
-                graphics.setTooltipForNextFrame(font, Component.translatable("tc.knowledge.name"), mouseX, mouseY);
+                DeferredTooltip.set(Component.translatable("tc.knowledge.name"), mouseX, mouseY);
             }
         }
     }
 
-    private void renderRecipeBookmarks(GuiGraphicsExtractor graphics, IResearchStage stage, int mouseX, int mouseY) {
+    private void renderRecipeBookmarks(GuiGraphics graphics, IResearchStage stage, int mouseX, int mouseY) {
         List<ResourceLocation> recipes = displayRecipes(stage);
         boolean hasConstruct = stage.construct().isPresent();
         int totalBookmarks = recipes.size() + (hasConstruct ? 1 : 0);
@@ -880,39 +810,26 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         int slotY = sh + RECIPE_BOOKMARK_BASE_Y_OFFSET;
         Random rng = new Random(rhash);
         for (ResourceLocation rid : recipes) {
-            List<RecipeDisplay> displays = RecipeDisplayCache.get(rid);
-            if (displays == null || displays.isEmpty()) {
+            List<RecipeHolder<?>> displays = RecipeDisplayCache.get(rid);
+            if (displays.isEmpty()) {
                 slotY += space;
                 continue;
             }
             ItemStack result = ItemStack.EMPTY;
-            RecipeDisplay first = displays.get(0);
-            SlotDisplay sd = first.result();
             try {
-                result = sd.resolveForFirstStack(SlotDisplayContext.fromLevel(minecraft.level));
+                result = displays.get(0).value().getResultItem(minecraft.level.registryAccess());
             } catch (Exception ignored) {}
             int x = sw + RECIPE_BOOKMARK_OFFSET_X;
             int shJitter = rng.nextInt(3);
             boolean hoverState = mouseInside(x, slotY - 1, RECIPE_BOOKMARK_HOVER_W, RECIPE_BOOKMARK_H, mouseX, mouseY);
             int le = rng.nextInt(3) + (hoverState ? 0 : 3);
             int tint = rid.equals(shownRecipe) ? RECIPE_BOOKMARK_TINT_SELECTED : RECIPE_BOOKMARK_TINT_NORMAL;
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                    x + shJitter, slotY - 1,
-                    (float) (RECIPE_BOOKMARK_U_BASE + le), (float) RECIPE_BOOKMARK_V,
-                    RECIPE_BOOKMARK_W, RECIPE_BOOKMARK_H,
-                    RECIPE_BOOKMARK_W, RECIPE_BOOKMARK_H,
-                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
-                    tint);
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                    x + shJitter, slotY - 1,
-                    (float) RECIPE_BOOKMARK_TIP_U, (float) RECIPE_BOOKMARK_V,
-                    RECIPE_BOOKMARK_TIP_W, RECIPE_BOOKMARK_H,
-                    RECIPE_BOOKMARK_TIP_W, RECIPE_BOOKMARK_H,
-                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+            GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BOOK, x + shJitter, slotY - 1, (float) (RECIPE_BOOKMARK_U_BASE + le), (float) RECIPE_BOOKMARK_V, RECIPE_BOOKMARK_W, RECIPE_BOOKMARK_H, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE, tint);
+            graphics.blit(TCScreenTextures.RESEARCH_BOOK, x + shJitter, slotY - 1, (float) RECIPE_BOOKMARK_TIP_U, (float) RECIPE_BOOKMARK_V, RECIPE_BOOKMARK_TIP_W, RECIPE_BOOKMARK_H, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
             if (!result.isEmpty()) {
-                graphics.item(result, x + shJitter + RECIPE_BOOKMARK_ICON_OFFSET - le, slotY - 1);
+                graphics.renderItem(result, x + shJitter + RECIPE_BOOKMARK_ICON_OFFSET - le, slotY - 1);
                 if (hoverState) {
-                    graphics.setTooltipForNextFrame(font, result, mouseX, mouseY);
+                    DeferredTooltip.setItem(result, mouseX, mouseY);
                 }
             }
             slotY += space;
@@ -923,25 +840,14 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             boolean hoverState = mouseInside(x, slotY - 1, RECIPE_BOOKMARK_HOVER_W, RECIPE_BOOKMARK_H, mouseX, mouseY);
             int le = rng.nextInt(3) + (hoverState ? 0 : 3);
             int tint = showingConstruct ? RECIPE_BOOKMARK_TINT_SELECTED : RECIPE_BOOKMARK_TINT_NORMAL;
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                    x + shJitter, slotY - 1,
-                    (float) (RECIPE_BOOKMARK_U_BASE + le), (float) RECIPE_BOOKMARK_V,
-                    RECIPE_BOOKMARK_W, RECIPE_BOOKMARK_H,
-                    RECIPE_BOOKMARK_W, RECIPE_BOOKMARK_H,
-                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
-                    tint);
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                    x + shJitter, slotY - 1,
-                    (float) RECIPE_BOOKMARK_TIP_U, (float) RECIPE_BOOKMARK_V,
-                    RECIPE_BOOKMARK_TIP_W, RECIPE_BOOKMARK_H,
-                    RECIPE_BOOKMARK_TIP_W, RECIPE_BOOKMARK_H,
-                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+            GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BOOK, x + shJitter, slotY - 1, (float) (RECIPE_BOOKMARK_U_BASE + le), (float) RECIPE_BOOKMARK_V, RECIPE_BOOKMARK_W, RECIPE_BOOKMARK_H, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE, tint);
+            graphics.blit(TCScreenTextures.RESEARCH_BOOK, x + shJitter, slotY - 1, (float) RECIPE_BOOKMARK_TIP_U, (float) RECIPE_BOOKMARK_V, RECIPE_BOOKMARK_TIP_W, RECIPE_BOOKMARK_H, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
             ItemStack icon = entryIconStack();
             if (!icon.isEmpty()) {
-                graphics.item(icon, x + shJitter + RECIPE_BOOKMARK_ICON_OFFSET - le, slotY - 1);
+                graphics.renderItem(icon, x + shJitter + RECIPE_BOOKMARK_ICON_OFFSET - le, slotY - 1);
             }
             if (hoverState) {
-                graphics.setTooltipForNextFrame(font,
+                DeferredTooltip.set(
                         Component.translatable("recipe.type.construct"), mouseX, mouseY);
             }
         }
@@ -957,22 +863,17 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         return ItemStack.EMPTY;
     }
 
-    private void renderRecipePage(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    private void renderRecipePage(GuiGraphics graphics, int mouseX, int mouseY) {
         if (shownRecipe == null) return;
         int paperX = (width - 256) / 2;
         int paperY = (height - 256) / 2;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.PAPER,
-                paperX, paperY,
-                0.0F, 0.0F,
-                INSERT_PAPER_SIZE, INSERT_PAPER_SIZE,
-                INSERT_PAPER_SIZE, INSERT_PAPER_SIZE,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
-        List<RecipeDisplay> displays = RecipeDisplayCache.get(shownRecipe);
-        if (displays == null || displays.isEmpty()) return;
+        graphics.blit(TCScreenTextures.PAPER, paperX, paperY, 0.0F, 0.0F, INSERT_PAPER_SIZE, INSERT_PAPER_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+        List<RecipeHolder<?>> displays = RecipeDisplayCache.get(shownRecipe);
+        if (displays.isEmpty()) return;
         long gameTime = minecraft.player.level().getGameTime();
         if (recipePage >= displays.size()) recipePage = displays.size() - 1;
         if (recipePage < 0) recipePage = 0;
-        RecipeDisplay current = displays.get(recipePage);
+        RecipeHolder<?> current = displays.get(recipePage);
         int cx = paperX + 128;
         int cy = paperY + 128;
         int gridW = RecipeDisplayWidget.width();
@@ -980,7 +881,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         RecipeDisplayWidget.renderCrafting(graphics, cx - gridW / 2, cy - gridH / 2, current, gameTime);
         ItemStack hover = RecipeDisplayWidget.hoverStackForDisplay(cx - gridW / 2, cy - gridH / 2, current, gameTime, mouseX, mouseY);
         if (hover != null && !hover.isEmpty()) {
-            graphics.setTooltipForNextFrame(font, hover, mouseX, mouseY);
+            DeferredTooltip.setItem(hover, mouseX, mouseY);
         }
         if (displays.size() > 1) {
             float bob = bob();
@@ -995,7 +896,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         }
     }
 
-    private void renderConstructInsert(GuiGraphicsExtractor graphics, IResearchStage stage, int mouseX, int mouseY) {
+    private void renderConstructInsert(GuiGraphics graphics, IResearchStage stage, int mouseX, int mouseY) {
         ResearchConstruct construct = stage.construct().orElse(null);
         if (construct == null) {
             showingConstruct = false;
@@ -1003,17 +904,12 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         }
         int paperX = (width - 256) / 2;
         int paperY = (height - 256) / 2;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.PAPER,
-                paperX, paperY,
-                0.0F, 0.0F,
-                INSERT_PAPER_SIZE, INSERT_PAPER_SIZE,
-                INSERT_PAPER_SIZE, INSERT_PAPER_SIZE,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+        graphics.blit(TCScreenTextures.PAPER, paperX, paperY, 0.0F, 0.0F, INSERT_PAPER_SIZE, INSERT_PAPER_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
         long gameTime = minecraft.player.level().getGameTime();
         int centerX = paperX + INSERT_PAPER_SIZE / 2;
         int pageY = paperY + CONSTRUCT_PAGE_Y;
         Component title = Component.translatable("recipe.type.construct");
-        graphics.text(font, title, centerX - font.width(title) / 2, pageY,
+        graphics.drawString(font, title, centerX - font.width(title) / 2, pageY,
                 CONSTRUCT_TITLE_COLOR, false);
         int dx = construct.xSize();
         int dy = construct.ySize();
@@ -1024,21 +920,15 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         float structScale = 1.0F - shrink;
         float originX = centerX - structWidth * structScale / 2.0F;
         float originY = pageY + CONSTRUCT_STRUCT_Y + yoff * structScale;
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(originX, originY);
-        graphics.pose().scale(structScale, structScale);
-        graphics.pose().pushMatrix();
+        graphics.pose().pushPose();
+        graphics.pose().translate(originX, originY, 0);
+        graphics.pose().scale(structScale, structScale, 1F);
+        graphics.pose().pushPose();
         graphics.pose().translate(structWidth / 2.0F - CONSTRUCT_BACKDROP_DRAW_W,
-                CONSTRUCT_BACKDROP_Y_BASE + Math.max(3 - dx, 3 - dz) * 8 + dx * 4 + dz * 4 + dy * CONSTRUCT_LAYER_STRIDE);
-        graphics.pose().scale(2.0F, 2.0F);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK_OVERLAY,
-                0, 0,
-                CONSTRUCT_BACKDROP_U, CONSTRUCT_BACKDROP_V,
-                CONSTRUCT_BACKDROP_DRAW_W, CONSTRUCT_BACKDROP_DRAW_H,
-                CONSTRUCT_BACKDROP_W, CONSTRUCT_BACKDROP_H,
-                OVERLAY_TEX_SIZE, OVERLAY_TEX_SIZE,
-                alphaTint(CONSTRUCT_BACKDROP_ALPHA));
-        graphics.pose().popMatrix();
+                CONSTRUCT_BACKDROP_Y_BASE + Math.max(3 - dx, 3 - dz) * 8 + dx * 4 + dz * 4 + dy * CONSTRUCT_LAYER_STRIDE, 0);
+        graphics.pose().scale(2.0F, 2.0F, 1F);
+        GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BOOK_OVERLAY, 0, 0, CONSTRUCT_BACKDROP_DRAW_W, CONSTRUCT_BACKDROP_DRAW_H, CONSTRUCT_BACKDROP_U, CONSTRUCT_BACKDROP_V, CONSTRUCT_BACKDROP_W, CONSTRUCT_BACKDROP_H, OVERLAY_TEX_SIZE, OVERLAY_TEX_SIZE, alphaTint(CONSTRUCT_BACKDROP_ALPHA));
+        graphics.pose().popPose();
         ItemStack hover = ItemStack.EMPTY;
         List<ConstructCellDraw> layer = new ArrayList<>();
         int count = 0;
@@ -1057,39 +947,33 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             }
             layer.sort(Comparator.comparingInt(ConstructCellDraw::py));
             for (ConstructCellDraw cell : layer) {
-                graphics.item(cell.stack(), cell.px(), cell.py());
+                graphics.renderItem(cell.stack(), cell.px(), cell.py());
                 if (mouseInside((int) (originX + cell.px() * structScale), (int) (originY + cell.py() * structScale),
                         (int) (16 * structScale), (int) (16 * structScale), mouseX, mouseY)) {
                     hover = cell.stack();
                 }
             }
         }
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
         AspectList cost = construct.cost();
         if (!cost.isEmpty()) {
             List<AspectInstance> entries = cost.entries();
             int rowWidth = CONSTRUCT_COST_STRIDE * (entries.size() - 1) + 16;
             int rowX = centerX - rowWidth / 2;
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK_OVERLAY,
-                    rowX - CONSTRUCT_WAND_SIZE - CONSTRUCT_WAND_GAP, pageY + CONSTRUCT_WAND_Y,
-                    CONSTRUCT_WAND_U, CONSTRUCT_WAND_V,
-                    CONSTRUCT_WAND_SIZE, CONSTRUCT_WAND_SIZE,
-                    CONSTRUCT_WAND_SIZE, CONSTRUCT_WAND_SIZE,
-                    OVERLAY_TEX_SIZE, OVERLAY_TEX_SIZE,
-                    alphaTint(CONSTRUCT_WAND_ALPHA));
+            GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BOOK_OVERLAY, rowX - CONSTRUCT_WAND_SIZE - CONSTRUCT_WAND_GAP, pageY + CONSTRUCT_WAND_Y, CONSTRUCT_WAND_U, CONSTRUCT_WAND_V, CONSTRUCT_WAND_SIZE, CONSTRUCT_WAND_SIZE, OVERLAY_TEX_SIZE, OVERLAY_TEX_SIZE, alphaTint(CONSTRUCT_WAND_ALPHA));
             int tagIndex = 0;
             for (AspectInstance costEntry : entries) {
                 int tx = rowX + CONSTRUCT_COST_STRIDE * tagIndex;
                 int ty = pageY + CONSTRUCT_COST_Y;
                 AspectTagRenderer.render(graphics, font, tx, ty, costEntry.aspect(), costEntry.amount());
                 if (mouseInside(tx, ty, 16, 16, mouseX, mouseY)) {
-                    graphics.setTooltipForNextFrame(font, AspectComponents.name(costEntry.aspect()), mouseX, mouseY);
+                    DeferredTooltip.set(AspectComponents.name(costEntry.aspect()), mouseX, mouseY);
                 }
                 tagIndex++;
             }
         }
         if (!hover.isEmpty()) {
-            graphics.setTooltipForNextFrame(font, hover, mouseX, mouseY);
+            DeferredTooltip.setItem(hover, mouseX, mouseY);
         }
     }
 
@@ -1117,19 +1001,14 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         return ((int) (alpha * 0xFF)) << 24 | 0x00FFFFFF;
     }
 
-    private void renderAspectsInsert(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    private void renderAspectsInsert(GuiGraphics graphics, int mouseX, int mouseY) {
         int paperX = (width - 256) / 2;
         int paperY = (height - 256) / 2;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.PAPER,
-                paperX, paperY,
-                0.0F, 0.0F,
-                INSERT_PAPER_SIZE, INSERT_PAPER_SIZE,
-                INSERT_PAPER_SIZE, INSERT_PAPER_SIZE,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+        graphics.blit(TCScreenTextures.PAPER, paperX, paperY, 0.0F, 0.0F, INSERT_PAPER_SIZE, INSERT_PAPER_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
         drawAspectPage(graphics, paperX + ASPECTS_INSERT_OFFSET_X, paperY + ASPECTS_INSERT_OFFSET_Y, mouseX, mouseY);
     }
 
-    private void drawAspectPage(GuiGraphicsExtractor graphics, int x, int y, int mouseX, int mouseY) {
+    private void drawAspectPage(GuiGraphics graphics, int x, int y, int mouseX, int mouseY) {
         AspectList known = knownAspects();
         if (known.isEmpty()) return;
         int count = -1;
@@ -1146,80 +1025,74 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             IAspect aspect = entry.aspect().value();
             boolean rowHover = mouseInside(x, rowY, ASPECT_BACK_TILE_SIZE, ASPECT_BACK_TILE_SIZE, mouseX, mouseY);
             if (rowHover) {
-                graphics.pose().pushMatrix();
-                graphics.pose().translate(x + ASPECT_BACK_OFFSET_X, rowY + ASPECT_BACK_OFFSET_Y);
-                graphics.pose().scale(ASPECT_BACK_SCALE, ASPECT_BACK_SCALE);
+                graphics.pose().pushPose();
+                graphics.pose().translate(x + ASPECT_BACK_OFFSET_X, rowY + ASPECT_BACK_OFFSET_Y, 0);
+                graphics.pose().scale(ASPECT_BACK_SCALE, ASPECT_BACK_SCALE, 1F);
                 int alpha = ((int) (ASPECT_BACK_ALPHA * 0xFF)) << 24;
-                graphics.blit(RenderPipelines.GUI_TEXTURED, backTile,
-                        0, 0,
-                        0.0F, 0.0F,
-                        16, 16,
-                        32, 32,
-                        32, 32,
-                        alpha | 0x00FFFFFF);
-                graphics.pose().popMatrix();
+                GuiBlend.blitTinted(graphics, backTile, 0, 0, 16, 16, 0.0F, 0.0F, 32, 32, 32, 32, alpha | 0x00FFFFFF);
+                graphics.pose().popPose();
             }
-            graphics.pose().pushMatrix();
-            graphics.pose().translate(x + ASPECT_TAG_OFFSET_X, rowY + ASPECT_TAG_OFFSET_Y);
-            graphics.pose().scale(ASPECT_TAG_SCALE, ASPECT_TAG_SCALE);
+            graphics.pose().pushPose();
+            graphics.pose().translate(x + ASPECT_TAG_OFFSET_X, rowY + ASPECT_TAG_OFFSET_Y, 0);
+            graphics.pose().scale(ASPECT_TAG_SCALE, ASPECT_TAG_SCALE, 1F);
             AspectTagRenderer.render(graphics, font, 0, 0, entry.aspect(),
                     aspect.components().isEmpty() ? 0.0F : ASPECT_COMBINE_YIELD);
-            graphics.pose().popMatrix();
-            graphics.pose().pushMatrix();
-            graphics.pose().translate(x + ASPECT_NAME_OFFSET_X, rowY + ASPECT_NAME_OFFSET_Y);
-            graphics.pose().scale(ASPECT_NAME_SCALE, ASPECT_NAME_SCALE);
+            graphics.pose().popPose();
+            graphics.pose().pushPose();
+            graphics.pose().translate(x + ASPECT_NAME_OFFSET_X, rowY + ASPECT_NAME_OFFSET_Y, 0);
+            graphics.pose().scale(ASPECT_NAME_SCALE, ASPECT_NAME_SCALE, 1F);
             Component name = AspectComponents.name(entry.aspect());
             int nameW = font.width(name);
-            graphics.text(font, name, -nameW / 2, 0, ASPECT_NAME_COLOR, false);
-            graphics.pose().popMatrix();
+            graphics.drawString(font, name, -nameW / 2, 0, ASPECT_NAME_COLOR, false);
+            graphics.pose().popPose();
             List<Holder<IAspect>> components = aspect.components();
             if (!components.isEmpty() && components.size() >= 2) {
                 Holder<IAspect> left = components.get(0);
                 Holder<IAspect> right = components.get(1);
-                graphics.pose().pushMatrix();
-                graphics.pose().translate(x + ASPECT_COMPONENT_LEFT_X, rowY + ASPECT_COMPONENT_Y_OFFSET);
-                graphics.pose().scale(ASPECT_COMPONENT_SCALE, ASPECT_COMPONENT_SCALE);
+                graphics.pose().pushPose();
+                graphics.pose().translate(x + ASPECT_COMPONENT_LEFT_X, rowY + ASPECT_COMPONENT_Y_OFFSET, 0);
+                graphics.pose().scale(ASPECT_COMPONENT_SCALE, ASPECT_COMPONENT_SCALE, 1F);
                 if (knowsAspect(left)) {
                     drawAspectTag(graphics, 0, 0, left);
                 } else {
                     drawUnknownAspect(graphics, unknownTile);
                 }
-                graphics.pose().popMatrix();
-                graphics.pose().pushMatrix();
-                graphics.pose().translate(x + ASPECT_COMPONENT_RIGHT_X, rowY + ASPECT_COMPONENT_Y_OFFSET);
-                graphics.pose().scale(ASPECT_COMPONENT_SCALE, ASPECT_COMPONENT_SCALE);
+                graphics.pose().popPose();
+                graphics.pose().pushPose();
+                graphics.pose().translate(x + ASPECT_COMPONENT_RIGHT_X, rowY + ASPECT_COMPONENT_Y_OFFSET, 0);
+                graphics.pose().scale(ASPECT_COMPONENT_SCALE, ASPECT_COMPONENT_SCALE, 1F);
                 if (knowsAspect(right)) {
                     drawAspectTag(graphics, 0, 0, right);
                 } else {
                     drawUnknownAspect(graphics, unknownTile);
                 }
-                graphics.pose().popMatrix();
+                graphics.pose().popPose();
                 if (knowsAspect(left)) {
-                    graphics.pose().pushMatrix();
-                    graphics.pose().translate(x + ASPECT_COMPONENT_LEFT_NAME_X, rowY + ASPECT_NAME_OFFSET_Y);
-                    graphics.pose().scale(ASPECT_NAME_SCALE, ASPECT_NAME_SCALE);
+                    graphics.pose().pushPose();
+                    graphics.pose().translate(x + ASPECT_COMPONENT_LEFT_NAME_X, rowY + ASPECT_NAME_OFFSET_Y, 0);
+                    graphics.pose().scale(ASPECT_NAME_SCALE, ASPECT_NAME_SCALE, 1F);
                     Component leftName = AspectComponents.name(left);
                     int leftW = font.width(leftName);
-                    graphics.text(font, leftName, -leftW / 2, 0, ASPECT_NAME_COLOR, false);
-                    graphics.pose().popMatrix();
+                    graphics.drawString(font, leftName, -leftW / 2, 0, ASPECT_NAME_COLOR, false);
+                    graphics.pose().popPose();
                 }
                 if (knowsAspect(right)) {
-                    graphics.pose().pushMatrix();
-                    graphics.pose().translate(x + ASPECT_COMPONENT_RIGHT_NAME_X, rowY + ASPECT_NAME_OFFSET_Y);
-                    graphics.pose().scale(ASPECT_NAME_SCALE, ASPECT_NAME_SCALE);
+                    graphics.pose().pushPose();
+                    graphics.pose().translate(x + ASPECT_COMPONENT_RIGHT_NAME_X, rowY + ASPECT_NAME_OFFSET_Y, 0);
+                    graphics.pose().scale(ASPECT_NAME_SCALE, ASPECT_NAME_SCALE, 1F);
                     Component rightName = AspectComponents.name(right);
                     int rightW = font.width(rightName);
-                    graphics.text(font, rightName, -rightW / 2, 0, ASPECT_NAME_COLOR, false);
-                    graphics.pose().popMatrix();
+                    graphics.drawString(font, rightName, -rightW / 2, 0, ASPECT_NAME_COLOR, false);
+                    graphics.pose().popPose();
                 }
-                graphics.text(font, Component.literal("="),
+                graphics.drawString(font, Component.literal("="),
                         x + ASPECT_EQUALS_X, rowY + ASPECT_SEPARATOR_Y_OFFSET,
                         ASPECT_SEPARATOR_COLOR, false);
-                graphics.text(font, Component.literal("+"),
+                graphics.drawString(font, Component.literal("+"),
                         x + ASPECT_PLUS_X, rowY + ASPECT_SEPARATOR_Y_OFFSET,
                         ASPECT_SEPARATOR_COLOR, false);
             } else {
-                graphics.text(font, Component.translatable("tc.aspect.primal"),
+                graphics.drawString(font, Component.translatable("tc.aspect.primal"),
                         x + ASPECT_PRIMAL_X, rowY + ASPECT_SEPARATOR_Y_OFFSET,
                         ASPECT_PRIMAL_COLOR, false);
             }
@@ -1237,26 +1110,14 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         }
     }
 
-    private void drawAspectTag(GuiGraphicsExtractor graphics, int x, int y, Holder<IAspect> aspect) {
+    private void drawAspectTag(GuiGraphics graphics, int x, int y, Holder<IAspect> aspect) {
         IAspect a = aspect.value();
         int color = 0xFF000000 | (a.color() & 0x00FFFFFF);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, a.texture(),
-                x, y,
-                0.0F, 0.0F,
-                16, 16,
-                32, 32,
-                32, 32,
-                color);
+        GuiBlend.blitTinted(graphics, a.texture(), x, y, 16, 16, 0.0F, 0.0F, 32, 32, 32, 32, color);
     }
 
-    private void drawUnknownAspect(GuiGraphicsExtractor graphics, ResourceLocation unknownTile) {
-        graphics.blit(RenderPipelines.GUI_TEXTURED, unknownTile,
-                0, 0,
-                0.0F, 0.0F,
-                16, 16,
-                32, 32,
-                32, 32,
-                0xFFCCCCCC);
+    private void drawUnknownAspect(GuiGraphics graphics, ResourceLocation unknownTile) {
+        GuiBlend.blitTinted(graphics, unknownTile, 0, 0, 16, 16, 0.0F, 0.0F, 32, 32, 32, 32, 0xFFCCCCCC);
     }
 
     private boolean knowsAspect(Holder<IAspect> aspect) {
@@ -1279,19 +1140,14 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         return list;
     }
 
-    private void renderKnowledgeInsert(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    private void renderKnowledgeInsert(GuiGraphics graphics, int mouseX, int mouseY) {
         int paperX = (width - 256) / 2;
         int paperY = (height - 256) / 2;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.PAPER,
-                paperX, paperY,
-                0.0F, 0.0F,
-                INSERT_PAPER_SIZE, INSERT_PAPER_SIZE,
-                INSERT_PAPER_SIZE, INSERT_PAPER_SIZE,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+        graphics.blit(TCScreenTextures.PAPER, paperX, paperY, 0.0F, 0.0F, INSERT_PAPER_SIZE, INSERT_PAPER_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
         drawKnowledges(graphics, paperX + ASPECTS_INSERT_OFFSET_X, sh + KNOW_INPAGE_INSERT_Y_OFFSET, mouseX, mouseY, false);
         if (!hasAnyKnowledge()) {
             Component hint = Component.translatable("tc.knowledge.none");
-            graphics.text(font, hint,
+            graphics.drawString(font, hint,
                     (width - font.width(hint)) / 2, sh + KNOW_INPAGE_INSERT_Y_OFFSET,
                     KNOW_GRID_AMT_COLOR, false);
         }
@@ -1313,7 +1169,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         return false;
     }
 
-    private void drawKnowledges(GuiGraphicsExtractor graphics, int x, int y, int mouseX, int mouseY, boolean inpage) {
+    private void drawKnowledges(GuiGraphics graphics, int x, int y, int mouseX, int mouseY, boolean inpage) {
         if (minecraft == null || minecraft.player == null) return;
         IPlayerKnowledge knowledge = KnowledgeAccess.of(minecraft.player);
         HolderLookup.Provider registries = minecraft.player.registryAccess();
@@ -1343,26 +1199,16 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                     drawKnowledgeIcon(graphics, cx, cy, type, ref);
                     String amtStr = Integer.toString(amt);
                     int amtWidth = font.width(amtStr);
-                    graphics.text(font, Component.literal(amtStr),
+                    graphics.drawString(font, Component.literal(amtStr),
                             cx + KNOW_GRID_AMT_X_OFFSET - amtWidth, cy + KNOW_GRID_AMT_Y_OFFSET,
                             KNOW_GRID_AMT_COLOR, true);
                     if (par > 0 && type.progression() > 0) {
                         int l = (int) ((float) par / type.progression() * KNOW_GRID_BAR_BAR_WIDTH);
-                        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                                cx, cy + KNOW_GRID_BAR_Y_OFFSET,
-                                0.0F, (float) KNOW_GRID_BAR_FILLED_V,
-                                l, KNOW_GRID_BAR_BAR_HEIGHT,
-                                l, KNOW_GRID_BAR_BAR_HEIGHT,
-                                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
-                        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                                cx + l, cy + KNOW_GRID_BAR_Y_OFFSET,
-                                (float) l, (float) KNOW_GRID_BAR_EMPTY_V,
-                                KNOW_GRID_BAR_BAR_WIDTH - l, KNOW_GRID_BAR_BAR_HEIGHT,
-                                KNOW_GRID_BAR_BAR_WIDTH - l, KNOW_GRID_BAR_BAR_HEIGHT,
-                                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+                        graphics.blit(TCScreenTextures.RESEARCH_BOOK, cx, cy + KNOW_GRID_BAR_Y_OFFSET, 0.0F, (float) KNOW_GRID_BAR_FILLED_V, l, KNOW_GRID_BAR_BAR_HEIGHT, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+                        graphics.blit(TCScreenTextures.RESEARCH_BOOK, cx + l, cy + KNOW_GRID_BAR_Y_OFFSET, (float) l, (float) KNOW_GRID_BAR_EMPTY_V, KNOW_GRID_BAR_BAR_WIDTH - l, KNOW_GRID_BAR_BAR_HEIGHT, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
                     }
                     if (mouseInside(cx, cy, 16, 16, mouseX, mouseY)) {
-                        graphics.setTooltipForNextFrame(font, TCTooltips.knowledgeLabel(type, categoryKey), mouseX, mouseY);
+                        DeferredTooltip.set(TCTooltips.knowledgeLabel(type, categoryKey), mouseX, mouseY);
                     }
                     fc++;
                     rowDrawn = true;
@@ -1371,40 +1217,24 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             if (rowDrawn) tc++;
         }
         if (inpage && drewSomething) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                    x + 4, yCursor - tc * KNOW_GRID_INPAGE_ROW_STRIDE + 12,
-                    (float) DIVIDER_U, (float) DIVIDER_V,
-                    DIVIDER_WIDTH, 8,
-                    DIVIDER_WIDTH, 8,
-                    TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+            graphics.blit(TCScreenTextures.RESEARCH_BOOK, x + 4, yCursor - tc * KNOW_GRID_INPAGE_ROW_STRIDE + 12, (float) DIVIDER_U, (float) DIVIDER_V, DIVIDER_WIDTH, 8, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
         }
     }
 
-    private void drawKnowledgeIcon(GuiGraphicsExtractor graphics, int x, int y, KnowledgeType type, Holder.Reference<IResearchCategory> category) {
+    private void drawKnowledgeIcon(GuiGraphics graphics, int x, int y, KnowledgeType type, Holder.Reference<IResearchCategory> category) {
         ResourceLocation typeIcon = ResourceLocation.fromNamespaceAndPath(TCIds.MODID,
                 "textures/research/knowledge_" + type.getSerializedName() + ".png");
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(x, y);
-        graphics.pose().scale(KNOW_ICON_SCALE_INPAGE, KNOW_ICON_SCALE_INPAGE);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, typeIcon,
-                0, 0,
-                0.0F, 0.0F,
-                KNOW_ICON_TEX, KNOW_ICON_TEX,
-                KNOW_ICON_TEX, KNOW_ICON_TEX,
-                KNOW_ICON_TEX, KNOW_ICON_TEX);
-        graphics.pose().translate((float) KNOW_GRID_CATEGORY_OVERLAY_OFFSET, (float) KNOW_GRID_CATEGORY_OVERLAY_OFFSET);
-        graphics.pose().scale(KNOW_GRID_CATEGORY_OVERLAY_SCALE, KNOW_GRID_CATEGORY_OVERLAY_SCALE);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, category.value().icon(),
-                0, 0,
-                0.0F, 0.0F,
-                KNOW_ICON_TEX, KNOW_ICON_TEX,
-                KNOW_ICON_TEX, KNOW_ICON_TEX,
-                KNOW_ICON_TEX, KNOW_ICON_TEX,
-                KNOW_GRID_CATEGORY_OVERLAY_TINT);
-        graphics.pose().popMatrix();
+        graphics.pose().pushPose();
+        graphics.pose().translate(x, y, 0);
+        graphics.pose().scale(KNOW_ICON_SCALE_INPAGE, KNOW_ICON_SCALE_INPAGE, 1F);
+        graphics.blit(typeIcon, 0, 0, 0.0F, 0.0F, KNOW_ICON_TEX, KNOW_ICON_TEX, KNOW_ICON_TEX, KNOW_ICON_TEX);
+        graphics.pose().translate((float) KNOW_GRID_CATEGORY_OVERLAY_OFFSET, (float) KNOW_GRID_CATEGORY_OVERLAY_OFFSET, 0);
+        graphics.pose().scale(KNOW_GRID_CATEGORY_OVERLAY_SCALE, KNOW_GRID_CATEGORY_OVERLAY_SCALE, 1F);
+        GuiBlend.blitTinted(graphics, category.value().icon(), 0, 0, 0.0F, 0.0F, KNOW_ICON_TEX, KNOW_ICON_TEX, KNOW_ICON_TEX, KNOW_ICON_TEX, KNOW_GRID_CATEGORY_OVERLAY_TINT);
+        graphics.pose().popPose();
     }
 
-    private void drawNavigation(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    private void drawNavigation(GuiGraphics graphics, int mouseX, int mouseY) {
         int arrowY = sh + ARROW_Y_OFFSET;
         float bob = bob();
         if (currentPage > 0 && !insertOpen()) {
@@ -1420,7 +1250,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             drawTexturedRectScaled(graphics, backX, arrowY, BACK_U, BACK_V, BACK_W, BACK_H, bob);
             if (mouseInside(backX, arrowY, BACK_W, BACK_H, mouseX, mouseY)) {
                 int textColor = 0xFFFFFFFF;
-                graphics.text(font, Component.translatable("recipe.return"), mouseX, mouseY, textColor, true);
+                graphics.drawString(font, Component.translatable("recipe.return"), mouseX, mouseY, textColor, true);
             }
         }
     }
@@ -1434,20 +1264,15 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         return Mth.sin(minecraft.player.tickCount / 3.0F) * 0.2F + 0.1F;
     }
 
-    private void drawTexturedRectScaled(GuiGraphicsExtractor graphics, int x, int y, int u, int v, int w, int h, float scale) {
+    private void drawTexturedRectScaled(GuiGraphics graphics, int x, int y, int u, int v, int w, int h, float scale) {
         float cx = x + w / 2.0F;
         float cy = y + h / 2.0F;
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(cx, cy);
-        graphics.pose().scale(1.0F + scale, 1.0F + scale);
-        graphics.pose().translate(-w / 2.0F, -h / 2.0F);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TCScreenTextures.RESEARCH_BOOK,
-                0, 0,
-                (float) u, (float) v,
-                w, h,
-                w, h,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
-        graphics.pose().popMatrix();
+        graphics.pose().pushPose();
+        graphics.pose().translate(cx, cy, 0);
+        graphics.pose().scale(1.0F + scale, 1.0F + scale, 1F);
+        graphics.pose().translate(-w / 2.0F, -h / 2.0F, 0);
+        graphics.blit(TCScreenTextures.RESEARCH_BOOK, 0, 0, (float) u, (float) v, w, h, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+        graphics.pose().popPose();
     }
 
     private boolean mouseInside(int x, int y, int w, int h, int mx, int my) {
@@ -1476,10 +1301,11 @@ public final class EntryDetailScreen extends AbstractTCScreen {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0) {
-            double mx = event.x();
-            double my = event.y();
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            double mx = mouseX;
+            double my = mouseY;
+
             int arrowYBase = sh + 189;
             int leftHitX = sw + ARROW_LEFT_HIT_OFFSET_X;
             int rightHitX = sw + ARROW_RIGHT_HIT_OFFSET_X;
@@ -1554,8 +1380,8 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                 int recipeNavLeftX = sw + 38;
                 int recipeNavRightX = sw + 205;
                 int recipeNavY = sh + 192;
-                List<RecipeDisplay> displays = RecipeDisplayCache.get(shownRecipe);
-                int max = displays == null ? 0 : displays.size() - 1;
+                List<RecipeHolder<?>> displays = RecipeDisplayCache.get(shownRecipe);
+                int max = displays.size() - 1;
                 if (recipePage > 0
                         && mx >= recipeNavLeftX && mx < recipeNavLeftX + 14
                         && my >= recipeNavY && my < recipeNavY + 14) {
@@ -1609,14 +1435,14 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                 }
             }
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     private boolean handleRecipeIngredientClick(double mx, double my) {
         if (shownRecipe == null || minecraft == null || minecraft.player == null) return false;
-        List<RecipeDisplay> displays = RecipeDisplayCache.get(shownRecipe);
-        if (displays == null || displays.isEmpty()) return false;
-        RecipeDisplay current = displays.get(Math.min(recipePage, displays.size() - 1));
+        List<RecipeHolder<?>> displays = RecipeDisplayCache.get(shownRecipe);
+        if (displays.isEmpty()) return false;
+        RecipeHolder<?> current = displays.get(Math.min(recipePage, displays.size() - 1));
         int cx = width / 2;
         int cy = height / 2;
         int gridW = RecipeDisplayWidget.width();
@@ -1625,11 +1451,27 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         ItemStack hover = RecipeDisplayWidget.hoverStackForDisplay(
                 cx - gridW / 2, cy - gridH / 2, current, gameTime, (int) mx, (int) my);
         if (hover == null || hover.isEmpty()) return false;
-        ResourceLocation itemId = hover.getItem().builtInRegistryHolder()
-                .unwrapKey().map(ResourceKey::identifier).orElse(null);
-        if (itemId == null) return false;
-        PacketDistributor.sendToServer(new ServerboundRequestItemRecipePayload(itemId));
+        ResourceLocation found = findRecipeProducing(hover.getItem());
+        if (found == null) return false;
+        openRecipeFromNavigation(found);
         return true;
+    }
+
+    private @Nullable ResourceLocation findRecipeProducing(Item item) {
+        if (minecraft == null || minecraft.level == null) return null;
+        HolderLookup.Provider reg = minecraft.level.registryAccess();
+        ResourceLocation fallback = null;
+        for (RecipeHolder<?> holder : minecraft.level.getRecipeManager().getRecipes()) {
+            ItemStack result = holder.value().getResultItem(reg);
+            if (result.isEmpty() || result.getItem() != item) continue;
+            if (holder.id().getNamespace().equals(TCIds.MODID)) {
+                return holder.id();
+            }
+            if (fallback == null) {
+                fallback = holder.id();
+            }
+        }
+        return fallback;
     }
 
     public void openRecipeFromNavigation(ResourceLocation recipeId) {
@@ -1679,7 +1521,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
 
     private void playSound(SoundEvent sound, float volume, float pitch) {
         if (minecraft == null || minecraft.player == null) return;
-        minecraft.player.playSound(sound, volume, pitch);
+        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(sound, pitch, volume));
     }
 
     private int hitRecipeBookmark(double mx, double my, IResearchStage stage) {

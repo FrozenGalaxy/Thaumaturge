@@ -3,8 +3,8 @@ package com.leclowndu93150.thaumcraft.client.screen.casters;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.client.screen.AbstractTCContainerScreen;
 import com.leclowndu93150.thaumcraft.content.casters.MenuFocusPouch;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -26,12 +26,9 @@ public final class FocusPouchScreen extends AbstractTCContainerScreen<MenuFocusP
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {}
-
-    @Override
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (menu.blockedHotbarSlot >= 0) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
+            graphics.blit(TEXTURE,
                     leftPos + BLOCKED_X + menu.blockedHotbarSlot * SLOT_SIZE, topPos + BLOCKED_Y,
                     BLOCKED_U, BLOCKED_V, BLOCKED_SIZE, BLOCKED_SIZE, 256, 256);
         }

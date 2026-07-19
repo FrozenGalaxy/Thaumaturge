@@ -6,15 +6,16 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeType;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import com.leclowndu93150.thaumcraft.client.render.aspect.ParticleTextures;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
+import com.mojang.math.Axis;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.FastColor.ARGB32;
@@ -24,11 +25,10 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.gui.GuiLayer;
 import org.jspecify.annotations.Nullable;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
-public final class KnowledgeGainOverlay implements GuiLayer {
+public final class KnowledgeGainOverlay implements LayeredDraw.Layer {
     private static final ResourceLocation BOOK = TCIds.rl("textures/item/thaumonomicon.png");
     private static final ResourceLocation KNOW_OBSERVATION = TCIds.rl("textures/research/knowledge_observation.png");
     private static final ResourceLocation KNOW_THEORY = TCIds.rl("textures/research/knowledge_theory.png");
@@ -54,7 +54,7 @@ public final class KnowledgeGainOverlay implements GuiLayer {
     private static final List<GuiSpark> SPARKS = new ArrayList<>();
 
     @Override
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.options.hideGui || (bookFade <= 0.0F && SPARKS.isEmpty())) {
             return;
@@ -64,9 +64,9 @@ public final class KnowledgeGainOverlay implements GuiLayer {
         int hh = graphics.guiHeight();
 
         int bookTint = ARGB32.color(Math.round(bookFade / BOOK_FADE_MAX * 255.0F), 255, 255, 255);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, BOOK,
+        GuiBlend.blitTinted(graphics, BOOK,
                 ww - BOOK_CORNER_OFFSET, hh - BOOK_CORNER_OFFSET,
-                0.0F, 0.0F, BOOK_SIZE, BOOK_SIZE, BOOK_SIZE, BOOK_SIZE, BOOK_SIZE, BOOK_SIZE, bookTint);
+                0.0F, 0.0F, BOOK_SIZE, BOOK_SIZE, BOOK_SIZE, BOOK_SIZE, bookTint);
 
         for (Tracker current : TRACKERS) {
             Random rand = new Random(current.seed);
@@ -94,9 +94,9 @@ public final class KnowledgeGainOverlay implements GuiLayer {
             float xx = ww - 12 + rand.nextInt(8) - x;
             float yy = hh - 12 + rand.nextInt(8) - y;
 
-            graphics.pose().pushMatrix();
-            graphics.pose().translate(xx, yy);
-            graphics.pose().rotate((float) Math.toRadians(84 + rand.nextInt(12) - QUAD_INTRINSIC_ROTATION));
+            graphics.pose().pushPose();
+            graphics.pose().translate(xx, yy, 0.0F);
+            graphics.pose().mulPose(Axis.ZP.rotationDegrees(84 + rand.nextInt(12) - QUAD_INTRINSIC_ROTATION));
 
             if (current.aspect != null) {
                 drawCentered(graphics, current.aspect.value().texture(), s,
@@ -119,7 +119,7 @@ public final class KnowledgeGainOverlay implements GuiLayer {
                 drawBurst(graphics, mc, rand, wot3, 32.0F);
             }
 
-            graphics.pose().popMatrix();
+            graphics.pose().popPose();
 
             if (mc.level != null
                     && mc.level.getRandom().nextInt((int) (1.0F + (float) current.progress / current.max * 10.0F)) == 0) {
@@ -146,7 +146,7 @@ public final class KnowledgeGainOverlay implements GuiLayer {
                 Mth.nextInt(rand, 64, 255) / 255.0F));
     }
 
-    private static void renderSparks(GuiGraphicsExtractor graphics, float partial) {
+    private static void renderSparks(GuiGraphics graphics, float partial) {
         float texFrame = 1024.0F / PARTICLE_GRID;
         for (GuiSpark spark : SPARKS) {
             if (spark.delay > 0) {
@@ -164,13 +164,13 @@ public final class KnowledgeGainOverlay implements GuiLayer {
             int tint = ARGB32.colorFromFloat(alpha, 1.0F, spark.g, spark.b);
             float x = spark.xo + (spark.x - spark.xo) * partial;
             float y = spark.yo + (spark.y - spark.yo) * partial;
-            graphics.pose().pushMatrix();
-            graphics.pose().translate(x - size / 2.0F, y - size / 2.0F);
-            graphics.pose().scale(size / texFrame, size / texFrame);
-            graphics.blit(TCRenderPipelines.GUI_TEXTURED_ADDITIVE, ParticleTextures.PARTICLES,
+            graphics.pose().pushPose();
+            graphics.pose().translate(x - size / 2.0F, y - size / 2.0F, 0.0F);
+            graphics.pose().scale(size / texFrame, size / texFrame, 1.0F);
+            GuiBlend.blitAdditive(graphics, ParticleTextures.PARTICLES,
                     0, 0, frameU * texFrame, frameV * texFrame,
-                    (int) texFrame, (int) texFrame, (int) texFrame, (int) texFrame, 1024, 1024, tint);
-            graphics.pose().popMatrix();
+                    (int) texFrame, (int) texFrame, 1024, 1024, tint);
+            graphics.pose().popPose();
         }
     }
 
@@ -181,10 +181,10 @@ public final class KnowledgeGainOverlay implements GuiLayer {
         return keys[index] + (keys[index + 1] - keys[index]) * t;
     }
 
-    private static void drawBurst(GuiGraphicsExtractor graphics, Minecraft mc, Random rand, float phase, float baseSize) {
+    private static void drawBurst(GuiGraphics graphics, Minecraft mc, Random rand, float phase, float baseSize) {
         float m = (float) Math.sin(phase * Math.PI * 2.0 - (Math.PI / 2)) * 0.25F + 0.25F;
         float size = baseSize * m;
-        graphics.pose().rotate((float) Math.toRadians(-rand.nextInt(360)));
+        graphics.pose().mulPose(Axis.ZP.rotationDegrees(-rand.nextInt(360)));
         float g = Mth.nextInt(mc.level.getRandom(), 189, 255) / 255.0F;
         float b = Mth.nextInt(mc.level.getRandom(), 64, 255) / 255.0F;
         int tint = ARGB32.colorFromFloat(ICON_ALPHA / 255.0F, 1.0F, g, b);
@@ -192,22 +192,27 @@ public final class KnowledgeGainOverlay implements GuiLayer {
         int frameU = frame % PARTICLE_GRID;
         int frameV = frame / PARTICLE_GRID;
         float texFrame = 1024.0F / PARTICLE_GRID;
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(-size / 2.0F, -size / 2.0F);
-        graphics.pose().scale(size / texFrame, size / texFrame);
-        graphics.blit(TCRenderPipelines.GUI_TEXTURED_ADDITIVE, ParticleTextures.PARTICLES,
+        graphics.pose().pushPose();
+        graphics.pose().translate(-size / 2.0F, -size / 2.0F, 0.0F);
+        graphics.pose().scale(size / texFrame, size / texFrame, 1.0F);
+        GuiBlend.blitAdditive(graphics, ParticleTextures.PARTICLES,
                 0, 0, frameU * texFrame, frameV * texFrame,
-                (int) texFrame, (int) texFrame, (int) texFrame, (int) texFrame, 1024, 1024, tint);
-        graphics.pose().popMatrix();
+                (int) texFrame, (int) texFrame, 1024, 1024, tint);
+        graphics.pose().popPose();
     }
 
-    private static void drawCentered(GuiGraphicsExtractor graphics, ResourceLocation texture, float size, int tint, boolean additive) {
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(-size / 2.0F, -size / 2.0F);
-        graphics.pose().scale(size / ICON_TEX_SIZE, size / ICON_TEX_SIZE);
-        graphics.blit(additive ? TCRenderPipelines.GUI_TEXTURED_ADDITIVE : RenderPipelines.GUI_TEXTURED, texture,
-                0, 0, 0.0F, 0.0F, ICON_TEX_SIZE, ICON_TEX_SIZE, ICON_TEX_SIZE, ICON_TEX_SIZE, ICON_TEX_SIZE, ICON_TEX_SIZE, tint);
-        graphics.pose().popMatrix();
+    private static void drawCentered(GuiGraphics graphics, ResourceLocation texture, float size, int tint, boolean additive) {
+        graphics.pose().pushPose();
+        graphics.pose().translate(-size / 2.0F, -size / 2.0F, 0.0F);
+        graphics.pose().scale(size / ICON_TEX_SIZE, size / ICON_TEX_SIZE, 1.0F);
+        if (additive) {
+            GuiBlend.blitAdditive(graphics, texture, 0, 0, 0.0F, 0.0F,
+                    ICON_TEX_SIZE, ICON_TEX_SIZE, ICON_TEX_SIZE, ICON_TEX_SIZE, tint);
+        } else {
+            GuiBlend.blitTinted(graphics, texture, 0, 0, 0.0F, 0.0F,
+                    ICON_TEX_SIZE, ICON_TEX_SIZE, ICON_TEX_SIZE, ICON_TEX_SIZE, tint);
+        }
+        graphics.pose().popPose();
     }
 
     private static @Nullable ResourceLocation categoryIcon(Minecraft mc, @Nullable ResourceKey<IResearchCategory> category) {

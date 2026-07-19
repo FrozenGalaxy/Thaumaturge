@@ -2,17 +2,16 @@ package com.leclowndu93150.thaumcraft.client.render.research;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;
-import com.leclowndu93150.thaumcraft.client.fx.render.pipeline.TCRenderPipelines;
+
 import com.leclowndu93150.thaumcraft.api.casters.FocusNode;
 import com.leclowndu93150.thaumcraft.api.casters.IFocusElement;
 import com.leclowndu93150.thaumcraft.api.research.IResearchEntry;
 import com.leclowndu93150.thaumcraft.api.research.ResearchEntryMeta;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
 import com.leclowndu93150.thaumcraft.client.screen.TCScreenTextures;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
@@ -86,7 +85,7 @@ public final class EntryIconRenderer {
     }
 
     public static void render(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int iconX,
             int iconY,
             IResearchEntry entry,
@@ -101,7 +100,7 @@ public final class EntryIconRenderer {
     }
 
     public static void render(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int iconX,
             int iconY,
             IResearchEntry entry,
@@ -139,10 +138,10 @@ public final class EntryIconRenderer {
         }
     }
 
-    public static void drawResearchIcon(GuiGraphicsExtractor graphics, int iconX, int iconY, Object icon, boolean locked) {
+    public static void drawResearchIcon(GuiGraphics graphics, int iconX, int iconY, Object icon, boolean locked) {
         if (icon instanceof ItemStack stack) {
             if (stack.isEmpty()) return;
-            graphics.item(stack, iconX, iconY);
+            graphics.renderItem(stack, iconX, iconY);
             if (locked) {
                 graphics.fill(iconX, iconY, iconX + ICON_TEX_SIZE, iconY + ICON_TEX_SIZE, LOCKED_ICON_OVERLAY);
             }
@@ -159,7 +158,7 @@ public final class EntryIconRenderer {
 
     public record FocusIcon(ResourceLocation elementId) {}
 
-    public static void drawFocusIcon(GuiGraphicsExtractor graphics, int centerX, int centerY, ResourceLocation elementId, boolean locked) {
+    public static void drawFocusIcon(GuiGraphics graphics, int centerX, int centerY, ResourceLocation elementId, boolean locked) {
         IFocusElement element = FocusEngine.getElement(elementId);
         if (!(element instanceof FocusNode node)) {
             return;
@@ -177,93 +176,40 @@ public final class EntryIconRenderer {
         }
     }
 
-    private static void blitCentered(GuiGraphicsExtractor graphics, ResourceLocation texture, int cx, int cy, int size, int color) {
+    private static void blitCentered(GuiGraphics graphics, ResourceLocation texture, int cx, int cy, int size, int color) {
         int half = size / 2;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, cx - half, cy - half,
-                0.0F, 0.0F, size, size, 32, 32, 32, 32, color);
+        GuiBlend.blitTinted(graphics, texture, cx - half, cy - half,
+                size, size, 0.0F, 0.0F, 32, 32, 32, 32, color);
     }
 
-    private static void drawTextureIcon(GuiGraphicsExtractor graphics, int iconX, int iconY, ResourceLocation texture, boolean locked) {
-        Minecraft mc = Minecraft.getInstance();
-        AbstractTexture tex = mc.getTextureManager().getTexture(texture);
+    private static void drawTextureIcon(GuiGraphics graphics, int iconX, int iconY, ResourceLocation texture, boolean locked) {
         int tint = locked ? COLOR_UNKNOWN_LOCKED_ICON : COLOR_COMPLETE;
-        int w;
-        int h;
-        try {
-            w = tex.getTexture().getWidth(0);
-            h = tex.getTexture().getHeight(0);
-        } catch (IllegalStateException unInit) {
-            graphics.blit(
-                    RenderPipelines.GUI_TEXTURED,
-                    texture,
-                    iconX, iconY,
-                    0.0F, 0.0F,
-                    ICON_TEX_SIZE, ICON_TEX_SIZE,
-                    ICON_TEX_SIZE, ICON_TEX_SIZE,
-                    ICON_TEX_SIZE, ICON_TEX_SIZE,
-                    tint
-            );
-            return;
-        }
-        if (h > w && h % w == 0) {
-            int frames = h / w;
-            int frameIdx = (int) (System.currentTimeMillis() / FLIPBOOK_FRAME_MS % frames);
-            float v = (float) frameIdx * (float) w;
-            graphics.blit(
-                    RenderPipelines.GUI_TEXTURED,
-                    texture,
-                    iconX, iconY,
-                    0.0F, v,
-                    ICON_TEX_SIZE, ICON_TEX_SIZE,
-                    w, w,
-                    w, h,
-                    tint
-            );
-        } else if (w > h && w % h == 0) {
-            int frames = w / h;
-            int frameIdx = (int) (System.currentTimeMillis() / FLIPBOOK_FRAME_MS % frames);
-            float u = (float) frameIdx * (float) h;
-            graphics.blit(
-                    RenderPipelines.GUI_TEXTURED,
-                    texture,
-                    iconX, iconY,
-                    u, 0.0F,
-                    ICON_TEX_SIZE, ICON_TEX_SIZE,
-                    h, h,
-                    w, h,
-                    tint
-            );
-        } else {
-            graphics.blit(
-                    RenderPipelines.GUI_TEXTURED,
-                    texture,
-                    iconX, iconY,
-                    0.0F, 0.0F,
-                    ICON_TEX_SIZE, ICON_TEX_SIZE,
-                    w, h,
-                    w, h,
-                    tint
-            );
-        }
+        GuiBlend.blitTinted(
+                graphics,
+                texture,
+                iconX, iconY,
+                0.0F, 0.0F,
+                ICON_TEX_SIZE, ICON_TEX_SIZE,
+                ICON_TEX_SIZE, ICON_TEX_SIZE,
+                tint
+        );
     }
 
-    private static void drawBadge(GuiGraphicsExtractor graphics, int x, int y, int u) {
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(x, y);
-        graphics.pose().scale(FLAG_BADGE_SCALE, FLAG_BADGE_SCALE);
+    private static void drawBadge(GuiGraphics graphics, int x, int y, int u) {
+        graphics.pose().pushPose();
+        graphics.pose().translate(x, y, 0);
+        graphics.pose().scale(FLAG_BADGE_SCALE, FLAG_BADGE_SCALE, 1F);
         graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
                 TCScreenTextures.RESEARCH_BROWSER,
                 0, 0,
                 (float) u, (float) FLAG_BADGE_V,
                 FLAG_BADGE_SIZE, FLAG_BADGE_SIZE,
-                FLAG_BADGE_SIZE, FLAG_BADGE_SIZE,
                 TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE
         );
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 
-    public static void drawForbidden(GuiGraphicsExtractor graphics, int centerX, int centerY) {
+    public static void drawForbidden(GuiGraphics graphics, int centerX, int centerY) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         int count = mc.player.tickCount;
@@ -273,28 +219,27 @@ public final class EntryIconRenderer {
         int u = frameCol * NODE_FRAME_SIZE;
         int v = frameRow * NODE_FRAME_SIZE;
         int half = Math.round(NODE_VISIBLE_SCALE * 0.5F);
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(centerX, centerY);
-        graphics.blit(
-                TCRenderPipelines.GUI_TEXTURED_ADDITIVE,
+        graphics.pose().pushPose();
+        graphics.pose().translate(centerX, centerY, 0);
+        GuiBlend.blitAdditive(
+                graphics,
                 NODE_TEXTURE,
                 -half, -half,
-                (float) u, (float) v,
                 Math.round(NODE_VISIBLE_SCALE), Math.round(NODE_VISIBLE_SCALE),
+                (float) u, (float) v,
                 NODE_FRAME_SIZE, NODE_FRAME_SIZE,
                 NODE_TEXTURE_SIZE, NODE_TEXTURE_SIZE,
                 NODE_TINT
         );
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 
-    private static void blitFrame(GuiGraphicsExtractor graphics, int x, int y, int u, int v, int color) {
-        graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
+    private static void blitFrame(GuiGraphics graphics, int x, int y, int u, int v, int color) {
+        GuiBlend.blitTinted(
+                graphics,
                 TCScreenTextures.RESEARCH_BROWSER,
                 x, y,
                 (float) u, (float) v,
-                FRAME_SIZE, FRAME_SIZE,
                 FRAME_SIZE, FRAME_SIZE,
                 TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
                 color

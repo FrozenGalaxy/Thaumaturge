@@ -8,7 +8,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -41,12 +41,12 @@ public final class WandHandRenderer {
         event.setCanceled(true);
         WandItemSpecialRenderer.WandArg arg = WandItemSpecialRenderer.extract(stack);
         PoseStack poseStack = event.getPoseStack();
-        SubmitNodeCollector collector = event.getSubmitNodeCollector();
+        MultiBufferSource buffers = event.getMultiBufferSource();
         HumanoidArm arm = event.getHand() == InteractionHand.MAIN_HAND
                 ? player.getMainArm()
                 : player.getMainArm().getOpposite();
         float mirror = arm == HumanoidArm.RIGHT ? 1.0F : -1.0F;
-        float partial = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float partial = mc.getTimer().getGameTimeDeltaPartialTick(false);
         float equip = event.getEquipProgress();
         float swing = event.getSwingProgress();
         boolean using = player.isUsingItem() && player.getUsedItemHand() == event.getHand();
@@ -117,7 +117,7 @@ public final class WandHandRenderer {
         }
 
         WandTipTracker.capture(poseStack, WandItemSpecialRenderer.tipModelY(arg));
-        WandItemSpecialRenderer.submitParts(arg, poseStack, collector, event.getPackedLight());
+        WandItemSpecialRenderer.submitParts(arg, poseStack, buffers, event.getPackedLight());
         poseStack.popPose();
     }
 }

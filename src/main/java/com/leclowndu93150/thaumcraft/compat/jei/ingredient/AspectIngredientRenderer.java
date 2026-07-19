@@ -9,7 +9,7 @@ import java.util.List;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.TooltipFlag;
@@ -20,7 +20,7 @@ public final class AspectIngredientRenderer implements IIngredientRenderer<Aspec
     private AspectIngredientRenderer() {}
 
     @Override
-    public void render(GuiGraphicsExtractor guiGraphics, AspectInstance ingredient) {
+    public void render(GuiGraphics guiGraphics, AspectInstance ingredient) {
         if (ingredient.amount() > 1){
             AspectTagRenderer.render(guiGraphics, Minecraft.getInstance().font, 0, 0, ingredient.aspect(),ingredient.amount());
         } else {

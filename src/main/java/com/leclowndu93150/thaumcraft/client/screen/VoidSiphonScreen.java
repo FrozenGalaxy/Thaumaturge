@@ -3,7 +3,7 @@ package com.leclowndu93150.thaumcraft.client.screen;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.device.BlockEntityVoidSiphon;
 import com.leclowndu93150.thaumcraft.content.device.MenuVoidSiphon;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
@@ -21,10 +21,10 @@ public final class VoidSiphonScreen extends AbstractTCContainerScreen<MenuVoidSi
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {}
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {}
 
     @Override
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         float ratio = Math.min(1.0F, menu.progress() / (float) BlockEntityVoidSiphon.PROGRESS_REQUIRED);
         int barHeight = (int) (PORTAL_SIZE * ratio);
         if (barHeight > 0) {

@@ -5,20 +5,21 @@ import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aspect.TCAspects;
 import com.leclowndu93150.thaumcraft.api.items.IRechargable;
 import com.leclowndu93150.thaumcraft.api.items.RechargeAccess;
+import com.leclowndu93150.thaumcraft.client.render.GuiBlend;
+import com.mojang.math.Axis;
 import java.util.EnumMap;
 import java.util.Map;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.gui.GuiLayer;
 
-public final class RechargeHudOverlay implements GuiLayer {
+public final class RechargeHudOverlay implements LayeredDraw.Layer {
     private static final ResourceLocation HUD = TCIds.rl("textures/gui/hud.png");
     private static final int TEX_SIZE = 256;
 
@@ -50,7 +51,7 @@ public final class RechargeHudOverlay implements GuiLayer {
     public RechargeHudOverlay() {}
 
     @Override
-    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null || mc.options.hideGui) {
@@ -83,31 +84,30 @@ public final class RechargeHudOverlay implements GuiLayer {
         }
     }
 
-    private static void drawMeter(GuiGraphicsExtractor graphics, Minecraft mc, ItemStack stack,
+    private static void drawMeter(GuiGraphics graphics, Minecraft mc, ItemStack stack,
                                   int max, int charge, int index, boolean showAmount) {
         int y = graphics.guiHeight() - ANCHOR_BOTTOM - index * ENTRY_SPACING;
-        graphics.item(stack, ANCHOR_X, y - ITEM_SIZE);
-        graphics.pose().pushMatrix();
+        graphics.renderItem(stack, ANCHOR_X, y - ITEM_SIZE);
+        graphics.pose().pushPose();
         graphics.pose().translate(ANCHOR_X + ITEM_SIZE + BAR_GAP_X + BAR_FRAME_W * BAR_SPACE_SCALE / 2.0F,
-                y - ITEM_SIZE + BAR_FRAME_Y * BAR_SPACE_SCALE);
-        graphics.pose().scale(BAR_SPACE_SCALE, BAR_SPACE_SCALE);
+                y - ITEM_SIZE + BAR_FRAME_Y * BAR_SPACE_SCALE, 0.0F);
+        graphics.pose().scale(BAR_SPACE_SCALE, BAR_SPACE_SCALE, 1.0F);
         int loc = max > 0 ? (int) (BAR_MAX_HEIGHT * (float) charge / max) : 0;
         if (loc > 0) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
+            GuiBlend.blitTinted(graphics, HUD,
                     -BAR_FILL_W / 2, BAR_BOTTOM - loc, BAR_FILL_U, 0.0F,
-                    BAR_FILL_W, loc, BAR_FILL_W, loc, TEX_SIZE, TEX_SIZE,
+                    BAR_FILL_W, loc, TEX_SIZE, TEX_SIZE,
                     ARGB32.color(Math.round(BAR_FILL_ALPHA * 255.0F), energyColor(mc)));
         }
-        graphics.blit(RenderPipelines.GUI_TEXTURED, HUD,
-                BAR_FRAME_X, BAR_FRAME_Y, BAR_FRAME_U, 0.0F,
-                BAR_FRAME_W, BAR_FRAME_H, BAR_FRAME_W, BAR_FRAME_H, TEX_SIZE, TEX_SIZE);
+        graphics.blit(HUD, BAR_FRAME_X, BAR_FRAME_Y, BAR_FRAME_U, 0.0F,
+                BAR_FRAME_W, BAR_FRAME_H, TEX_SIZE, TEX_SIZE);
         if (showAmount) {
-            graphics.pose().pushMatrix();
-            graphics.pose().rotate((float) Math.toRadians(-90.0));
-            graphics.text(mc.font, charge + " / " + max, AMOUNT_TEXT_X, AMOUNT_TEXT_Y, WHITE, false);
-            graphics.pose().popMatrix();
+            graphics.pose().pushPose();
+            graphics.pose().mulPose(Axis.ZP.rotationDegrees(-90.0F));
+            graphics.drawString(mc.font, charge + " / " + max, AMOUNT_TEXT_X, AMOUNT_TEXT_Y, WHITE, false);
+            graphics.pose().popPose();
         }
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 
     private static int energyColor(Minecraft mc) {

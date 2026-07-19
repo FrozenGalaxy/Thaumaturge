@@ -35,7 +35,9 @@ public abstract class AbstractTCContainerScreen<T extends AbstractContainerMenu>
             int textureWidth,
             int textureHeight
     ) {
-        super(menu, inventory, title, imageWidth, imageHeight);
+        super(menu, inventory, title);
+        this.imageWidth = imageWidth;
+        this.imageHeight = imageHeight;
         this.background = background;
         this.backgroundWidth = imageWidth;
         this.backgroundHeight = imageHeight;

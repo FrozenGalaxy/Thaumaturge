@@ -2,8 +2,7 @@ package com.leclowndu93150.thaumcraft.client.screen;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.device.mirror.MenuHandMirror;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -25,11 +24,11 @@ public final class HandMirrorScreen extends AbstractTCContainerScreen<MenuHandMi
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {}
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {}
 
     @Override
-    protected void extractBackgroundOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        graphics.blit(TEXTURE,
                 leftPos + BLOCKED_X + menu.mirrorHotbarSlot * SLOT_SIZE, topPos + BLOCKED_Y,
                 BLOCKED_U, BLOCKED_V, BLOCKED_SIZE, BLOCKED_SIZE, 256, 256);
     }
