@@ -4,10 +4,7 @@
     "flip_v": true,
     "textures": {
         "body": "thaumcraft:item/scanner",
-        "pane": {
-            "sprite": "thaumcraft:item/scanscreen",
-            "force_translucent": true
-        },
+        "pane": "thaumcraft:item/scanscreen",
         "particle": "thaumcraft:item/scanner"
     },
     "display": {

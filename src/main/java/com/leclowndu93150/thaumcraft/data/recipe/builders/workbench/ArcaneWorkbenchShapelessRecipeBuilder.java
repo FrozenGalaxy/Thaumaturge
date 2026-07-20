@@ -12,7 +12,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class ArcaneWorkbenchShapelessRecipeBuilder extends ArcaneWorkbenchRecipe
     }
 
     public ArcaneWorkbenchShapelessRecipeBuilder requires(TagKey<Item> tag) {
-        return this.requires(Ingredient.of(this.items.getOrThrow(tag)));
+        return this.requires(Ingredient.of(tag));
     }
 
     public ArcaneWorkbenchShapelessRecipeBuilder requires(ItemLike item) {
@@ -58,7 +57,7 @@ public class ArcaneWorkbenchShapelessRecipeBuilder extends ArcaneWorkbenchRecipe
 
 
     @Override
-    protected ArcaneCraftingRecipe makeRecipe(Recipe.CommonInfo commonInfo, ItemStack result, AspectList aspects, Optional<ResearchGate> gate, int vis) {
-        return new ArcaneShapelessCraftingRecipe(commonInfo,vis,gate,aspects,result,ingredients);
+    protected ArcaneCraftingRecipe makeRecipe(String group, ItemStack result, AspectList aspects, Optional<ResearchGate> gate, int vis) {
+        return new ArcaneShapelessCraftingRecipe(group,vis,gate,aspects,result,ingredients);
     }
 }

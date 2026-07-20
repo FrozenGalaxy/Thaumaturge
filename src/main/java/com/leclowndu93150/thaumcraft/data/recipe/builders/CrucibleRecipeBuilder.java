@@ -8,13 +8,13 @@ import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumcraft.content.recipe.crucible.CrucibleRecipe;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -60,18 +60,18 @@ public class CrucibleRecipeBuilder extends SimpleRecipeBuilder {
     }
 
     @Override
-    public void save(RecipeOutput output, ResourceKey<Recipe<?>> key) {
+    public void save(RecipeOutput output, ResourceLocation id) {
         CrucibleRecipe recipe = new CrucibleRecipe(
                 this.catalyst,
                 this.aspects,
                 this.result,
                 Optional.ofNullable(gate));
 
-        output.accept(key, recipe, this.advancementBuilder.build(output, key, this.category));
+        output.accept(id, recipe, buildAdvancement(output, id));
     }
 
     @Override
-    public ResourceKey<Recipe<?>> defaultId() {
-        return ResourceKey.create(Registries.RECIPE, result.typeHolder().unwrapKey().orElseThrow().location().withPrefix("crucible/"));
+    protected ResourceLocation defaultId() {
+        return RecipeBuilder.getDefaultRecipeId(getResult()).withPrefix("crucible/");
     }
 }

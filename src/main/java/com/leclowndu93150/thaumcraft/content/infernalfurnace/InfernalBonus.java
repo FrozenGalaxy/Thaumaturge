@@ -7,13 +7,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.item.Item;
@@ -32,9 +30,24 @@ import java.util.stream.Stream;
 @EventBusSubscriber(modid = TCIds.MODID)
 public record InfernalBonus(HolderSet<Item> items, IntProvider count, float chance) {
 
+    private static final Codec<HolderSet<Item>> DIRECT_ITEMS_CODEC = Codec.either(
+                    BuiltInRegistries.ITEM.holderByNameCodec(),
+                    BuiltInRegistries.ITEM.holderByNameCodec().listOf())
+            .xmap(either -> either.map(HolderSet::direct, HolderSet::direct),
+                    holderSet -> holderSet.size() == 1
+                            ? Either.left(holderSet.get(0))
+                            : Either.right(holderSet.stream().toList()));
+
+    private static final Codec<HolderSet<Item>> ITEMS_CODEC = Codec.either(
+                    TagKey.hashedCodec(Registries.ITEM),
+                    DIRECT_ITEMS_CODEC)
+            .xmap(either -> either.map(BuiltInRegistries.ITEM::getOrCreateTag, holderSet -> holderSet),
+                    holderSet -> holderSet.unwrap().map(Either::left,
+                            holders -> Either.right(HolderSet.direct(holders))));
+
     private static final Codec<InfernalBonus> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    ExtraCodecs.nonEmptyHolderSet(RegistryCodecs.homogeneousList(Registries.ITEM)).fieldOf("items").forGetter(InfernalBonus::items),
+                    ITEMS_CODEC.fieldOf("items").forGetter(InfernalBonus::items),
                     IntProvider.codec(1, 64).optionalFieldOf("count", ConstantInt.of(1)).forGetter(InfernalBonus::count),
                     Codec.floatRange(0, 1).optionalFieldOf("chance", 1.0f).forGetter(InfernalBonus::chance)
             ).apply(instance, InfernalBonus::new));

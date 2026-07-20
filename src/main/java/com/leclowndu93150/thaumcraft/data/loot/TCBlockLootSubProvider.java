@@ -18,7 +18,6 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.BonusLevelTableCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
@@ -41,7 +40,7 @@ public final class TCBlockLootSubProvider extends BlockLootSubProvider {
                 .withPool(this.applyExplosionCondition(block, LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1))
                         .add(LootItem.lootTableItem(block)
-                                .apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
+                                .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
                                         .include(TCDataComponents.MIRROR_LINK.get())))));
     }
 
@@ -50,7 +49,7 @@ public final class TCBlockLootSubProvider extends BlockLootSubProvider {
                 .withPool(this.applyExplosionCondition(item, LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1))
                         .add(LootItem.lootTableItem(item)
-                                .apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)))));
+                                .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)))));
     }
 
     private LootTable.Builder lootContainerTable(Block block, int rarity) {
@@ -86,7 +85,7 @@ public final class TCBlockLootSubProvider extends BlockLootSubProvider {
                 .withPool(this.applyExplosionCondition(TCBlocks.JAR_NODE.get(), LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1))
                         .add(LootItem.lootTableItem(TCBlocks.JAR_NODE.get())
-                                .apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
+                                .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
                                         .include(TCDataComponents.NODE_DATA.get()))))));
 
         for (DyeColor dye : DyeColor.values()) {
@@ -185,7 +184,7 @@ public final class TCBlockLootSubProvider extends BlockLootSubProvider {
                         LootPool.lootPool()
                                 .setRolls(ConstantValue.exactly(1.0F))
                                 .add(LootItem.lootTableItem(block)
-                                        .apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
+                                        .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
                                                 .include(TCDataComponents.ESSENTIA_CONTENTS.get())
                                                 .include(TCDataComponents.ASPECT_FILTER.get())))
                 )

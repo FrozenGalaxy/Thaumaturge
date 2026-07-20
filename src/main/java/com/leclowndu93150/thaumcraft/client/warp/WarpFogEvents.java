@@ -32,8 +32,8 @@ public final class WarpFogEvents {
             return;
         }
         float intensity = WarpFogState.intensity();
-        FogData fog = event();
-        fog.environmentalEnd = Mth.lerp(intensity, fog.environmentalEnd, MIST_FAR_PLANE);
-        fog.environmentalStart = Mth.lerp(intensity, fog.environmentalStart, MIST_NEAR_PLANE);
+        event.setFarPlaneDistance(Mth.lerp(intensity, event.getFarPlaneDistance(), MIST_FAR_PLANE));
+        event.setNearPlaneDistance(Mth.lerp(intensity, event.getNearPlaneDistance(), MIST_NEAR_PLANE));
+        event.setCanceled(true);
     }
 }

@@ -44,7 +44,7 @@ public final class TCDataGenerators {
     private TCDataGenerators() {}
 
     @SubscribeEvent
-    public static void onGatherData(GatherDataEvent.Client event) {
+    public static void onGatherData(GatherDataEvent event) {
         RegistrySetBuilder registries = new RegistrySetBuilder()
                 .add(IAspect.REGISTRY_KEY, AspectBootstrap::bootstrap)
                 .add(IResearchCategory.REGISTRY_KEY, CategoryBootstrap::bootstrap)
@@ -61,14 +61,17 @@ public final class TCDataGenerators {
 
         event.createProvider(TCEnglishProvider::new);
         event.createProvider(TCModelProvider::new);
-        event.createProvider(TCRecipeProvider.Runner::new);
+        event.createProvider(TCRecipeProvider::new);
         event.createProvider(AuraModifierProvider::new);
         event.createProvider(EntityAspectsProvider::new);
         event.createProvider(ChampionWhitelistProvider::new);
         event.createProvider(InfernalBonusProvider::new);
-        event.createProvider(TCCurioProvider::new);
+        event.createProvider((output, lookupProvider) ->
+                new TCCurioProvider(output, event.getExistingFileHelper(), lookupProvider));
 
-        event.createBlockAndItemTags(TCBlockTagsProvider::new, TCItemTagsProvider::new);
+        event.createBlockAndItemTags(TCBlockTagsProvider::new,
+                (output, lookupProvider, blockTags) ->
+                        new TCItemTagsProvider(output, lookupProvider, blockTags, event.getExistingFileHelper()));
         event.createProvider(TCDamageTypeTagsProvider::new);
         event.createProvider(TCBiomeTagsProvider::new);
         event.createProvider(TCEntityTypeTagsProvider::new);

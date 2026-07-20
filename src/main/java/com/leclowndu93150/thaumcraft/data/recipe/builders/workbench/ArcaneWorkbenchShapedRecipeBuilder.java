@@ -15,7 +15,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.List;
@@ -37,7 +36,7 @@ public class ArcaneWorkbenchShapedRecipeBuilder extends ArcaneWorkbenchRecipeBui
     }
 
     public ArcaneWorkbenchShapedRecipeBuilder define(Character symbol, TagKey<Item> tag) {
-        return this.define(symbol, Ingredient.of(this.items.getOrThrow(tag)));
+        return this.define(symbol, Ingredient.of(tag));
     }
 
     public ArcaneWorkbenchShapedRecipeBuilder define(Character symbol, ItemLike item) {
@@ -65,8 +64,8 @@ public class ArcaneWorkbenchShapedRecipeBuilder extends ArcaneWorkbenchRecipeBui
     }
 
     @Override
-    protected ArcaneCraftingRecipe makeRecipe(Recipe.CommonInfo commonInfo,ItemStack result, AspectList aspects, Optional<ResearchGate> gate, int vis) {
+    protected ArcaneCraftingRecipe makeRecipe(String group, ItemStack result, AspectList aspects, Optional<ResearchGate> gate, int vis) {
         ArcaneShapedRecipePattern pattern = ArcaneShapedRecipePattern.of(key,rows);
-        return new ArcaneShapedCraftingRecipe(commonInfo, vis, gate, aspects, pattern, result);
+        return new ArcaneShapedCraftingRecipe(group, vis, gate, aspects, pattern, result);
     }
 }

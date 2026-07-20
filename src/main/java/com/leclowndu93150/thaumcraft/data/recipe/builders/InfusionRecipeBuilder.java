@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
 import org.jetbrains.annotations.Nullable;
 
 public class InfusionRecipeBuilder extends SimpleRecipeBuilder {
@@ -63,19 +63,18 @@ public class InfusionRecipeBuilder extends SimpleRecipeBuilder {
     }
 
     @Override
-    public void save(RecipeOutput output, ResourceKey<Recipe<?>> key) {
+    public void save(RecipeOutput output, ResourceLocation id) {
         Preconditions.checkState(!components.isEmpty(), "Infusion recipe has no components");
         InfusionRecipe recipe = catalystPatch != null
                 ? new InfusionRecipe(catalyst, components, aspects, instability, Optional.empty(),
                         Optional.of(catalystPatch), Optional.ofNullable(gate))
                 : new InfusionRecipe(catalyst, components, aspects, instability, result,
                         Optional.ofNullable(gate));
-        output.accept(key, recipe, this.advancementBuilder.build(output, key, this.category));
+        output.accept(id, recipe, buildAdvancement(output, id));
     }
 
     @Override
-    public ResourceKey<Recipe<?>> defaultId() {
-        return ResourceKey.create(Registries.RECIPE,
-                result.typeHolder().unwrapKey().orElseThrow().location().withPrefix("infusion/"));
+    protected ResourceLocation defaultId() {
+        return RecipeBuilder.getDefaultRecipeId(getResult()).withPrefix("infusion/");
     }
 }

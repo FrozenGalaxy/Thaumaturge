@@ -3,15 +3,14 @@ package com.leclowndu93150.thaumcraft.data.model;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.essentia.tube.BlockEssentiaTransport;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
-import net.minecraft.data.models.BlockModelGenerators;
-import net.minecraft.client.renderer.block.model.MultiVariant;
-import net.minecraft.client.data.models.blockstates.ConditionBuilder;
-import net.minecraft.data.models.blockstates.MultiPartGenerator;
-import net.minecraft.client.renderer.block.dispatch.Variant;
-import net.minecraft.client.renderer.block.dispatch.VariantMutator;
+import java.util.function.Consumer;
 import net.minecraft.core.Direction;
+import net.minecraft.data.models.blockstates.BlockStateGenerator;
+import net.minecraft.data.models.blockstates.Condition;
+import net.minecraft.data.models.blockstates.MultiPartGenerator;
+import net.minecraft.data.models.blockstates.Variant;
+import net.minecraft.data.models.blockstates.VariantProperties;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
@@ -25,40 +24,42 @@ public final class TubeModels {
     private static final ResourceLocation TUBE_SIDE = id("block/tube_side");
     private static final ResourceLocation TUBE_SIDE_RESTRICT = id("block/tube_side_restrict");
 
-    public static void register(BlockModelGenerators blockModels) {
-        registerTube(blockModels, TCBlocks.TUBE.get(), TUBE_CORE, TUBE_SIDE);
-        registerTube(blockModels, TCBlocks.TUBE_VALVE.get(), TUBE_CORE_VALVE, TUBE_SIDE);
-        registerTube(blockModels, TCBlocks.TUBE_RESTRICT.get(), TUBE_CORE, TUBE_SIDE_RESTRICT);
-        registerTube(blockModels, TCBlocks.TUBE_FILTER.get(), TUBE_FILTER_CORE, TUBE_SIDE);
-        registerTube(blockModels, TCBlocks.TUBE_ONEWAY.get(), TUBE_CORE, TUBE_SIDE);
-        registerTube(blockModels, TCBlocks.TUBE_BUFFER.get(), TUBE_BUFFER_CORE, TUBE_SIDE);
+    public static void register(Consumer<BlockStateGenerator> blockStateOutput) {
+        registerTube(blockStateOutput, TCBlocks.TUBE.get(), TUBE_CORE, TUBE_SIDE);
+        registerTube(blockStateOutput, TCBlocks.TUBE_VALVE.get(), TUBE_CORE_VALVE, TUBE_SIDE);
+        registerTube(blockStateOutput, TCBlocks.TUBE_RESTRICT.get(), TUBE_CORE, TUBE_SIDE_RESTRICT);
+        registerTube(blockStateOutput, TCBlocks.TUBE_FILTER.get(), TUBE_FILTER_CORE, TUBE_SIDE);
+        registerTube(blockStateOutput, TCBlocks.TUBE_ONEWAY.get(), TUBE_CORE, TUBE_SIDE);
+        registerTube(blockStateOutput, TCBlocks.TUBE_BUFFER.get(), TUBE_BUFFER_CORE, TUBE_SIDE);
     }
 
     private static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(TCIds.MODID, path);
     }
 
-    private static void registerTube(BlockModelGenerators blockModels, Block block, ResourceLocation coreModel, ResourceLocation sideModel) {
-        MultiVariant coreVariant = new MultiVariant(WeightedList.of(new Variant(coreModel)));
-        MultiPartGenerator generator = MultiPartGenerator.multiPart(block).with(coreVariant);
+    private static void registerTube(Consumer<BlockStateGenerator> blockStateOutput, Block block,
+                                     ResourceLocation coreModel, ResourceLocation sideModel) {
+        MultiPartGenerator generator = MultiPartGenerator.multiPart(block)
+                .with(Variant.variant().with(VariantProperties.MODEL, coreModel));
         for (Direction direction : Direction.values()) {
             BooleanProperty property = BlockEssentiaTransport.propertyFor(direction);
-            Variant rotated = applyRotation(new Variant(sideModel), direction);
-            MultiVariant variant = new MultiVariant(WeightedList.of(rotated));
-            generator = generator.with(new ConditionBuilder().term(property, true), variant);
+            generator = generator.with(Condition.condition().term(property, true),
+                    sideVariant(sideModel, direction));
         }
-        blockModels.blockStateOutput.accept(generator);
+        blockStateOutput.accept(generator);
     }
 
-    private static Variant applyRotation(Variant base, Direction direction) {
-        VariantMutator mutator = switch (direction) {
-            case DOWN -> BlockModelGenerators.NOP;
-            case UP -> BlockModelGenerators.X_ROT_180;
-            case NORTH -> BlockModelGenerators.X_ROT_270;
-            case SOUTH -> BlockModelGenerators.X_ROT_90;
-            case WEST -> BlockModelGenerators.X_ROT_270.then(BlockModelGenerators.Y_ROT_270);
-            case EAST -> BlockModelGenerators.X_ROT_270.then(BlockModelGenerators.Y_ROT_90);
+    private static Variant sideVariant(ResourceLocation model, Direction direction) {
+        Variant variant = Variant.variant().with(VariantProperties.MODEL, model);
+        return switch (direction) {
+            case DOWN -> variant;
+            case UP -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R180);
+            case NORTH -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270);
+            case SOUTH -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R90);
+            case WEST -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
+                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270);
+            case EAST -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
+                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
         };
-        return mutator.apply(base);
     }
 }

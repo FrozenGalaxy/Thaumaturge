@@ -1330,12 +1330,6 @@
         "amount": 5
       }
     ],
-    "minecraft:bush": [
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 4
-      }
-    ],
     "minecraft:cactus": [
       {
         "aspect": "thaumcraft:herba",
@@ -1348,16 +1342,6 @@
       {
         "aspect": "thaumcraft:aversio",
         "amount": 1
-      }
-    ],
-    "minecraft:cactus_flower": [
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 4
-      },
-      {
-        "aspect": "thaumcraft:aqua",
-        "amount": 2
       }
     ],
     "minecraft:cake": [
@@ -1534,16 +1518,6 @@
       {
         "aspect": "thaumcraft:machina",
         "amount": 10
-      }
-    ],
-    "minecraft:closed_eyeblossom": [
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 5
-      },
-      {
-        "aspect": "thaumcraft:tenebrae",
-        "amount": 3
       }
     ],
     "minecraft:coal": [
@@ -1756,24 +1730,6 @@
       {
         "aspect": "thaumcraft:fabrico",
         "amount": 20
-      }
-    ],
-    "minecraft:creaking_heart": [
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 10
-      },
-      {
-        "aspect": "thaumcraft:spiritus",
-        "amount": 10
-      },
-      {
-        "aspect": "thaumcraft:tenebrae",
-        "amount": 5
-      },
-      {
-        "aspect": "thaumcraft:victus",
-        "amount": 5
       }
     ],
     "minecraft:creeper_head": [
@@ -1992,24 +1948,6 @@
         "amount": 10
       }
     ],
-    "minecraft:dried_ghast": [
-      {
-        "aspect": "thaumcraft:exanimis",
-        "amount": 5
-      },
-      {
-        "aspect": "thaumcraft:spiritus",
-        "amount": 5
-      },
-      {
-        "aspect": "thaumcraft:perditio",
-        "amount": 3
-      },
-      {
-        "aspect": "thaumcraft:ignis",
-        "amount": 2
-      }
-    ],
     "minecraft:dried_kelp": [
       {
         "aspect": "thaumcraft:herba",
@@ -2212,20 +2150,6 @@
       {
         "aspect": "thaumcraft:perditio",
         "amount": 5
-      }
-    ],
-    "minecraft:firefly_bush": [
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 4
-      },
-      {
-        "aspect": "thaumcraft:lux",
-        "amount": 3
-      },
-      {
-        "aspect": "thaumcraft:victus",
-        "amount": 2
       }
     ],
     "minecraft:fishing_rod": [
@@ -2648,16 +2572,6 @@
         "amount": 5
       }
     ],
-    "minecraft:leaf_litter": [
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 2
-      },
-      {
-        "aspect": "thaumcraft:perditio",
-        "amount": 2
-      }
-    ],
     "minecraft:lever": [
       {
         "aspect": "thaumcraft:machina",
@@ -3038,20 +2952,6 @@
         "amount": 5
       }
     ],
-    "minecraft:open_eyeblossom": [
-      {
-        "aspect": "thaumcraft:sensus",
-        "amount": 5
-      },
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 3
-      },
-      {
-        "aspect": "thaumcraft:tenebrae",
-        "amount": 3
-      }
-    ],
     "minecraft:packed_ice": [
       {
         "aspect": "thaumcraft:gelum",
@@ -3080,30 +2980,6 @@
       {
         "aspect": "thaumcraft:fabrico",
         "amount": 5
-      }
-    ],
-    "minecraft:pale_hanging_moss": [
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 5
-      },
-      {
-        "aspect": "thaumcraft:tenebrae",
-        "amount": 3
-      },
-      {
-        "aspect": "thaumcraft:spiritus",
-        "amount": 2
-      }
-    ],
-    "minecraft:pale_moss_block": [
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 5
-      },
-      {
-        "aspect": "thaumcraft:tenebrae",
-        "amount": 3
       }
     ],
     "minecraft:paper": [
@@ -3500,20 +3376,6 @@
         "amount": 10
       }
     ],
-    "minecraft:resin_clump": [
-      {
-        "aspect": "thaumcraft:vitreus",
-        "amount": 5
-      },
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 3
-      },
-      {
-        "aspect": "thaumcraft:victus",
-        "amount": 3
-      }
-    ],
     "minecraft:rooted_dirt": [
       {
         "aspect": "thaumcraft:terra",
@@ -3682,16 +3544,6 @@
       {
         "aspect": "thaumcraft:praemunio",
         "amount": 20
-      }
-    ],
-    "minecraft:short_dry_grass": [
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 2
-      },
-      {
-        "aspect": "thaumcraft:perditio",
-        "amount": 1
       }
     ],
     "minecraft:short_grass": [
@@ -4058,16 +3910,6 @@
         "amount": 1
       }
     ],
-    "minecraft:tall_dry_grass": [
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 3
-      },
-      {
-        "aspect": "thaumcraft:perditio",
-        "amount": 1
-      }
-    ],
     "minecraft:tall_grass": [
       {
         "aspect": "thaumcraft:herba",
@@ -4378,16 +4220,6 @@
       {
         "aspect": "thaumcraft:victus",
         "amount": 1
-      }
-    ],
-    "minecraft:wildflowers": [
-      {
-        "aspect": "thaumcraft:herba",
-        "amount": 3
-      },
-      {
-        "aspect": "thaumcraft:sensus",
-        "amount": 2
       }
     ],
     "minecraft:wind_charge": [

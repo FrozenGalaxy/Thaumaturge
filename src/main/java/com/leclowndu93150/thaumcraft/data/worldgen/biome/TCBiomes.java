@@ -7,12 +7,10 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.data.worldgen.biome.OverworldBiomes;
 import net.minecraft.data.worldgen.placement.MiscOverworldPlacements;
 import net.minecraft.data.worldgen.placement.VegetationPlacements;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.FastColor.ARGB32;
-import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
@@ -40,11 +38,18 @@ public final class TCBiomes {
     private static final float ELDRITCH_TEMPERATURE = 0.8F;
     private static final int NORMAL_WATER_COLOR = 4159204;
     private static final float ELDRITCH_DOWNFALL = 0.2F;
+    private static final int DEFAULT_FOG_COLOR = 12638463;
+    private static final int DEFAULT_WATER_FOG_COLOR = 329011;
 
     private TCBiomes() {}
 
     private static ResourceKey<Biome> key(String path) {
         return ResourceKey.create(Registries.BIOME, TCIds.rl(path));
+    }
+
+    private static int calculateSkyColor(float temperature) {
+        float shifted = Mth.clamp(temperature / 3.0F, -1.0F, 1.0F);
+        return Mth.hsvToRgb(0.62222224F - shifted * 0.05F, 0.5F + shifted * 0.1F, 1.0F);
     }
 
     public static void bootstrap(BootstrapContext<Biome> context) {
@@ -68,12 +73,12 @@ public final class TCBiomes {
         MobSpawnSettings.Builder mobs = new MobSpawnSettings.Builder();
         BiomeDefaultFeatures.farmAnimals(mobs);
         BiomeDefaultFeatures.commonSpawns(mobs);
-        mobs.addSpawn(MobCategory.CREATURE, 2, new MobSpawnSettings.SpawnerData(EntityType.WOLF, 1, 3));
-        mobs.addSpawn(MobCategory.CREATURE, 2, new MobSpawnSettings.SpawnerData(EntityType.HORSE, 1, 3));
-        mobs.addSpawn(MobCategory.MONSTER, 3, new MobSpawnSettings.SpawnerData(EntityType.WITCH, 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, 3, new MobSpawnSettings.SpawnerData(EntityType.ENDERMAN, 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, 1, new MobSpawnSettings.SpawnerData(EntityType.VEX, 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, 20, new MobSpawnSettings.SpawnerData(TCEntities.WISP.get(), 1, 2));
+        mobs.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.WOLF, 2, 1, 3));
+        mobs.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.HORSE, 2, 1, 3));
+        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(EntityType.WITCH, 3, 1, 1));
+        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(EntityType.ENDERMAN, 3, 1, 1));
+        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(EntityType.VEX, 1, 1, 1));
+        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.WISP.get(), 20, 1, 2));
 
         BiomeGenerationSettings.Builder generation = new BiomeGenerationSettings.Builder(placed, carvers);
         globalGeneration(generation);
@@ -88,15 +93,17 @@ public final class TCBiomes {
         BiomeDefaultFeatures.addForestGrass(generation);
         generation.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, VegetationPlacements.PATCH_WATERLILY);
         BiomeDefaultFeatures.addDefaultMushrooms(generation);
-        BiomeDefaultFeatures.addDefaultExtraVegetation(generation, false);
+        BiomeDefaultFeatures.addDefaultExtraVegetation(generation);
 
         return new Biome.BiomeBuilder()
                 .hasPrecipitation(true)
                 .temperature(MAGICAL_FOREST_TEMPERATURE)
                 .downfall(MAGICAL_FOREST_DOWNFALL)
-                .setAttribute(EnvironmentAttributes.SKY_COLOR, OverworldBiomes.calculateSkyColor(MAGICAL_FOREST_TEMPERATURE))
                 .specialEffects(new BiomeSpecialEffects.Builder()
+                        .skyColor(calculateSkyColor(MAGICAL_FOREST_TEMPERATURE))
+                        .fogColor(DEFAULT_FOG_COLOR)
                         .waterColor(MAGICAL_FOREST_WATER)
+                        .waterFogColor(DEFAULT_WATER_FOG_COLOR)
                         .grassColorOverride(MAGICAL_FOREST_GRASS)
                         .foliageColorOverride(MAGICAL_FOREST_FOLIAGE)
                         .build())
@@ -108,19 +115,19 @@ public final class TCBiomes {
     private static Biome eerie(HolderGetter<PlacedFeature> placed, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
         MobSpawnSettings.Builder mobs = new MobSpawnSettings.Builder();
         BiomeDefaultFeatures.commonSpawns(mobs);
-        mobs.addSpawn(MobCategory.AMBIENT, 3, new MobSpawnSettings.SpawnerData(EntityType.BAT, 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, 8, new MobSpawnSettings.SpawnerData(EntityType.WITCH, 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, 4, new MobSpawnSettings.SpawnerData(EntityType.ENDERMAN, 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, 32, new MobSpawnSettings.SpawnerData(TCEntities.BRAINY_ZOMBIE.get(), 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, 8, new MobSpawnSettings.SpawnerData(TCEntities.GIANT_BRAINY_ZOMBIE.get(), 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, 3, new MobSpawnSettings.SpawnerData(TCEntities.WISP.get(), 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, 1, new MobSpawnSettings.SpawnerData(TCEntities.ELDRITCH_GUARDIAN.get(), 1, 1));
+        mobs.addSpawn(MobCategory.AMBIENT, new MobSpawnSettings.SpawnerData(EntityType.BAT, 3, 1, 1));
+        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(EntityType.WITCH, 8, 1, 1));
+        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(EntityType.ENDERMAN, 4, 1, 1));
+        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.BRAINY_ZOMBIE.get(), 32, 1, 1));
+        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.GIANT_BRAINY_ZOMBIE.get(), 8, 1, 1));
+        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.WISP.get(), 3, 1, 1));
+        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.ELDRITCH_GUARDIAN.get(), 1, 1, 1));
 
         BiomeGenerationSettings.Builder generation = new BiomeGenerationSettings.Builder(placed, carvers);
         globalGeneration(generation);
         BiomeDefaultFeatures.addDefaultOres(generation);
         BiomeDefaultFeatures.addDefaultSoftDisks(generation);
-        generation.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, VegetationPlacements.TREES_BIRCH_AND_OAK_LEAF_LITTER);
+        generation.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, VegetationPlacements.TREES_BIRCH_AND_OAK);
         BiomeDefaultFeatures.addDefaultFlowers(generation);
         generation.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, VegetationPlacements.PATCH_GRASS_PLAIN);
         BiomeDefaultFeatures.addDefaultMushrooms(generation);
@@ -129,9 +136,11 @@ public final class TCBiomes {
                 .hasPrecipitation(false)
                 .temperature(EERIE_TEMPERATURE)
                 .downfall(0.0F)
-                .setAttribute(EnvironmentAttributes.SKY_COLOR, ARGB32.opaque(EERIE_SKY))
                 .specialEffects(new BiomeSpecialEffects.Builder()
+                        .skyColor(EERIE_SKY)
+                        .fogColor(DEFAULT_FOG_COLOR)
                         .waterColor(EERIE_WATER)
+                        .waterFogColor(DEFAULT_WATER_FOG_COLOR)
                         .grassColorOverride(EERIE_GRASS)
                         .foliageColorOverride(EERIE_GRASS)
                         .build())
@@ -142,8 +151,8 @@ public final class TCBiomes {
 
     private static Biome eldritch(HolderGetter<PlacedFeature> placed, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
         MobSpawnSettings.Builder mobs = new MobSpawnSettings.Builder();
-        mobs.addSpawn(MobCategory.MONSTER, 1, new MobSpawnSettings.SpawnerData(TCEntities.INHABITED_ZOMBIE.get(), 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, 1, new MobSpawnSettings.SpawnerData(TCEntities.ELDRITCH_GUARDIAN.get(), 1, 1));
+        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.INHABITED_ZOMBIE.get(), 1, 1, 1));
+        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.ELDRITCH_GUARDIAN.get(), 1, 1, 1));
         BiomeGenerationSettings.Builder generation = new BiomeGenerationSettings.Builder(placed, carvers);
         globalGeneration(generation);
 
@@ -151,9 +160,11 @@ public final class TCBiomes {
                 .hasPrecipitation(true)
                 .temperature(ELDRITCH_TEMPERATURE)
                 .downfall(ELDRITCH_DOWNFALL)
-                .setAttribute(EnvironmentAttributes.SKY_COLOR, OverworldBiomes.calculateSkyColor(ELDRITCH_TEMPERATURE))
                 .specialEffects(new BiomeSpecialEffects.Builder()
+                        .skyColor(calculateSkyColor(ELDRITCH_TEMPERATURE))
+                        .fogColor(DEFAULT_FOG_COLOR)
                         .waterColor(NORMAL_WATER_COLOR)
+                        .waterFogColor(DEFAULT_WATER_FOG_COLOR)
                         .build())
                 .mobSpawnSettings(mobs.build())
                 .generationSettings(generation.build())

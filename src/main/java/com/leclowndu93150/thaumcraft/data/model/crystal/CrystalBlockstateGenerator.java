@@ -1,43 +1,32 @@
 package com.leclowndu93150.thaumcraft.data.model.crystal;
 
+import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
-import com.leclowndu93150.thaumcraft.client.render.crystal.CrystalUnbakedModel;
-import java.util.Map;
-import java.util.Optional;
-import net.minecraft.data.models.BlockModelGenerators;
-import net.minecraft.client.data.models.blockstates.BlockModelDefinitionGenerator;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModelDispatcher;
+import java.util.function.Consumer;
+import net.minecraft.data.models.blockstates.BlockStateGenerator;
+import net.minecraft.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.data.models.blockstates.Variant;
+import net.minecraft.data.models.blockstates.VariantProperties;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 
 public final class CrystalBlockstateGenerator {
+    private static final ResourceLocation CRYSTAL_MODEL = TCIds.rl("block/crystal");
+
     private CrystalBlockstateGenerator() {}
 
-    public static void register(BlockModelGenerators blockModels) {
-        emit(blockModels, TCBlocks.CRYSTAL_AER.get());
-        emit(blockModels, TCBlocks.CRYSTAL_IGNIS.get());
-        emit(blockModels, TCBlocks.CRYSTAL_AQUA.get());
-        emit(blockModels, TCBlocks.CRYSTAL_TERRA.get());
-        emit(blockModels, TCBlocks.CRYSTAL_ORDO.get());
-        emit(blockModels, TCBlocks.CRYSTAL_PERDITIO.get());
-        emit(blockModels, TCBlocks.CRYSTAL_VITIUM.get());
+    public static void register(Consumer<BlockStateGenerator> blockStateOutput) {
+        emit(blockStateOutput, TCBlocks.CRYSTAL_AER.get());
+        emit(blockStateOutput, TCBlocks.CRYSTAL_IGNIS.get());
+        emit(blockStateOutput, TCBlocks.CRYSTAL_AQUA.get());
+        emit(blockStateOutput, TCBlocks.CRYSTAL_TERRA.get());
+        emit(blockStateOutput, TCBlocks.CRYSTAL_ORDO.get());
+        emit(blockStateOutput, TCBlocks.CRYSTAL_PERDITIO.get());
+        emit(blockStateOutput, TCBlocks.CRYSTAL_VITIUM.get());
     }
 
-    private static void emit(BlockModelGenerators blockModels, Block block) {
-        BlockStateModelDispatcher dispatcher = new BlockStateModelDispatcher(
-                Optional.of(new BlockStateModelDispatcher.SimpleModelSelectors(
-                        Map.of("", (BlockStateModel.Unbaked) CrystalUnbakedModel.INSTANCE))),
-                Optional.empty());
-        blockModels.blockStateOutput.accept(new BlockModelDefinitionGenerator() {
-            @Override
-            public Block block() {
-                return block;
-            }
-
-            @Override
-            public BlockStateModelDispatcher create() {
-                return dispatcher;
-            }
-        });
+    private static void emit(Consumer<BlockStateGenerator> blockStateOutput, Block block) {
+        blockStateOutput.accept(MultiVariantGenerator.multiVariant(block,
+                Variant.variant().with(VariantProperties.MODEL, CRYSTAL_MODEL)));
     }
 }

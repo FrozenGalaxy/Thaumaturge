@@ -7,10 +7,10 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(AbstractFurnaceBlockEntity.class)
 public interface AbstractFurnaceBlockEntityAccessor {
 
-    @Accessor("cookingTimer")
+    @Accessor("cookingProgress")
     int thaumcraft$getCookTime();
 
-    @Accessor("cookingTimer")
+    @Accessor("cookingProgress")
     void thaumcraft$setCookTime(int cookTime);
 
     @Accessor("cookingTotalTime")

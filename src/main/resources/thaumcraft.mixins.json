@@ -5,7 +5,6 @@
   "plugin": "com.leclowndu93150.thaumcraft.TCMixinPlugin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "data.recipes.RecipeProviderAccessor",
     "server.network.ServerGamePacketListenerImplAccessor",
     "world.entity.ExperienceOrbAccessor",
     "world.entity.MobAccessor",
@@ -16,7 +15,6 @@
   ],
   "client": [
     "client.gui.GuiGraphicsAccessor",
-    "client.renderer.GameRendererInvoker",
     "client.renderer.entity.LivingEntityRendererMixin"
   ],
   "injectors": {

@@ -1,10 +1,10 @@
 package com.leclowndu93150.thaumcraft.client.warp;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import com.leclowndu93150.thaumcraft.mixin.client.renderer.GameRendererInvoker;
 import com.leclowndu93150.thaumcraft.registry.TCMobEffects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.PostChain;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -14,10 +14,10 @@ import org.jspecify.annotations.Nullable;
 
 @EventBusSubscriber(modid = TCIds.MODID, value = Dist.CLIENT)
 public final class EffectPostShaderHandler {
-    private static final ResourceLocation DEATH_GAZE_SHADER = TCIds.rl("death_gaze");
-    private static final ResourceLocation BLURRED_VISION_SHADER = TCIds.rl("blurred_vision");
-    private static final ResourceLocation UNNATURAL_HUNGER_SHADER = TCIds.rl("unnatural_hunger");
-    private static final ResourceLocation SUN_SCORNED_SHADER = TCIds.rl("sun_scorned");
+    private static final ResourceLocation DEATH_GAZE_SHADER = TCIds.rl("shaders/post/death_gaze.json");
+    private static final ResourceLocation BLURRED_VISION_SHADER = TCIds.rl("shaders/post/blurred_vision.json");
+    private static final ResourceLocation UNNATURAL_HUNGER_SHADER = TCIds.rl("shaders/post/unnatural_hunger.json");
+    private static final ResourceLocation SUN_SCORNED_SHADER = TCIds.rl("shaders/post/sun_scorned.json");
 
     private static @Nullable ResourceLocation active;
 
@@ -32,7 +32,9 @@ public final class EffectPostShaderHandler {
             return;
         }
         ResourceLocation desired = desiredShader(player);
-        if (desired == active && (desired == null || desired.equals(mc.gameRenderer.currentPostEffect()))) {
+        PostChain current = mc.gameRenderer.currentEffect();
+        if (desired == active
+                && (desired == null || (current != null && desired.toString().equals(current.getName())))) {
             return;
         }
         if (desired == null) {
@@ -41,7 +43,7 @@ public final class EffectPostShaderHandler {
             return;
         }
         active = desired;
-        ((GameRendererInvoker) mc.gameRenderer).thaumcraft$setPostEffect(desired);
+        mc.gameRenderer.loadEffect(desired);
     }
 
     private static @Nullable ResourceLocation desiredShader(LocalPlayer player) {

@@ -1,6 +1,8 @@
 package com.leclowndu93150.thaumcraft.content.infusion;
 
+import com.leclowndu93150.thaumcraft.api.aspect.AspectCapabilities;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
+import com.leclowndu93150.thaumcraft.api.aspect.IAspectContainer;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspectSource;
 import com.leclowndu93150.thaumcraft.content.fx.TCParticleDispatch;
 import java.util.ArrayList;
@@ -43,11 +45,12 @@ public final class EssentiaSources {
             sources = scan(level);
         }
         for (BlockPos sourcePos : sources) {
-            BlockEntity be = level.getBlockEntity(sourcePos);
-            if (be instanceof IAspectSource source
+            IAspectContainer container = level.getCapability(AspectCapabilities.CONTAINER, sourcePos, null);
+            if (container instanceof IAspectSource source
                     && !source.isBlocked()
                     && source.takeFromContainer(aspect, 1)) {
-                be.setChanged();
+                BlockEntity be = level.getBlockEntity(sourcePos);
+                if (be != null) be.setChanged();
                 TCParticleDispatch.spawnEssentiaStream(level,
                         Vec3.atCenterOf(sourcePos),
                         Vec3.atCenterOf(center.below()),
@@ -73,12 +76,13 @@ public final class EssentiaSources {
             sources = scan(level);
         }
         for (BlockPos sourcePos : sources) {
-            BlockEntity be = level.getBlockEntity(sourcePos);
-            if (be instanceof IAspectSource source
+            IAspectContainer container = level.getCapability(AspectCapabilities.CONTAINER, sourcePos, null);
+            if (container instanceof IAspectSource source
                     && !source.isBlocked()
                     && source.doesContainerAccept(aspect)
                     && source.addToContainer(aspect, 1) == 0) {
-                be.setChanged();
+                BlockEntity be = level.getBlockEntity(sourcePos);
+                if (be != null) be.setChanged();
                 TCParticleDispatch.spawnEssentiaStream(level,
                         Vec3.atCenterOf(center),
                         Vec3.atCenterOf(sourcePos),
@@ -106,7 +110,8 @@ public final class EssentiaSources {
                     if (!level.isLoaded(cursor)) {
                         continue;
                     }
-                    if (level.getBlockEntity(cursor) instanceof IAspectSource) {
+                    IAspectContainer container = level.getCapability(AspectCapabilities.CONTAINER, cursor, null);
+                    if (container instanceof IAspectSource) {
                         found.add(cursor.immutable());
                     }
                 }

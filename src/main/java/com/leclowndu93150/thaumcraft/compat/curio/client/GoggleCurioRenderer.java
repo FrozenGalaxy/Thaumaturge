@@ -1,7 +1,9 @@
 package com.leclowndu93150.thaumcraft.compat.curio.client;
 
+import com.leclowndu93150.thaumcraft.TCIds;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
@@ -11,6 +13,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
@@ -20,6 +23,9 @@ import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 public final class GoggleCurioRenderer implements ICurioRenderer {
 
+    private static final ResourceLocation GOGGLES_TEXTURE =
+            TCIds.rl("textures/models/armor/goggles_revealing_layer_1.png");
+
     private HumanoidModel<LivingEntity> armorModel;
 
     @Override
@@ -28,9 +34,6 @@ public final class GoggleCurioRenderer implements ICurioRenderer {
             RenderLayerParent<T, M> renderLayerParent, MultiBufferSource buffers, int light,
             float limbSwing, float limbSwingAmount, float partialTicks,
             float ageInTicks, float netHeadYaw, float headPitch) {
-        if (!(stack.getItem() instanceof ArmorItem armorItem)) {
-            return;
-        }
         if (!(renderLayerParent.getModel() instanceof HumanoidModel<?>)) {
             return;
         }
@@ -38,16 +41,25 @@ public final class GoggleCurioRenderer implements ICurioRenderer {
         if (wearer == null) {
             return;
         }
+        List<ResourceLocation> textures = stack.getItem() instanceof ArmorItem armorItem
+                ? armorTextures(armorItem)
+                : List.of(GOGGLES_TEXTURE);
         HumanoidModel<LivingEntity> model = armorModel();
         ICurioRenderer.followBodyRotations(wearer, model);
         model.setAllVisible(false);
         model.head.visible = true;
         model.hat.visible = true;
-        ArmorMaterial material = armorItem.getMaterial().value();
-        for (ArmorMaterial.Layer layer : material.layers()) {
-            VertexConsumer buffer = buffers.getBuffer(RenderType.armorCutoutNoCull(layer.texture(false)));
+        for (ResourceLocation texture : textures) {
+            VertexConsumer buffer = buffers.getBuffer(RenderType.armorCutoutNoCull(texture));
             model.renderToBuffer(poseStack, buffer, light, OverlayTexture.NO_OVERLAY, -1);
         }
+    }
+
+    private static List<ResourceLocation> armorTextures(ArmorItem armorItem) {
+        ArmorMaterial material = armorItem.getMaterial().value();
+        return material.layers().stream()
+                .map(layer -> layer.texture(false))
+                .toList();
     }
 
     private HumanoidModel<LivingEntity> armorModel() {

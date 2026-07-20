@@ -35,7 +35,6 @@ public final class AuraModifierProvider extends DataMapProvider {
         add(b, Biomes.FLOWER_FOREST, 0.5F);
         add(b, Biomes.BIRCH_FOREST, 0.5F);
         add(b, Biomes.DARK_FOREST, 0.5F);
-        add(b, Biomes.PALE_GARDEN, 0.6F);
         add(b, Biomes.OLD_GROWTH_BIRCH_FOREST, 0.5F);
         add(b, Biomes.OLD_GROWTH_PINE_TAIGA, 0.4F);
         add(b, Biomes.OLD_GROWTH_SPRUCE_TAIGA, 0.4F);
@@ -123,7 +122,6 @@ public final class AuraModifierProvider extends DataMapProvider {
         addAspects(aspects, Biomes.BIRCH_FOREST, TCAspects.TERRA);
         addAspects(aspects, Biomes.OLD_GROWTH_BIRCH_FOREST, TCAspects.TERRA);
         addAspects(aspects, Biomes.DARK_FOREST, TCAspects.TERRA);
-        addAspects(aspects, Biomes.PALE_GARDEN, TCAspects.TERRA, TCAspects.PERDITIO);
         addAspects(aspects, Biomes.CHERRY_GROVE, TCAspects.TERRA);
         addAspects(aspects, Biomes.TAIGA, TCAspects.TERRA, TCAspects.ORDO);
         addAspects(aspects, Biomes.SNOWY_TAIGA, TCAspects.TERRA, TCAspects.ORDO);

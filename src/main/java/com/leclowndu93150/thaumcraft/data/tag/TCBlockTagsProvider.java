@@ -6,6 +6,7 @@ import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
@@ -15,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 public final class TCBlockTagsProvider extends BlockTagsProvider {
     public TCBlockTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(output, lookupProvider, TCIds.MODID);
+        super(output, lookupProvider, TCIds.MODID, null);
     }
 
     @Override
@@ -147,12 +148,32 @@ public final class TCBlockTagsProvider extends BlockTagsProvider {
                 .add(Blocks.SOUL_FIRE)
                 .add(Blocks.SOUL_CAMPFIRE)
                 .add(Blocks.MAGMA_BLOCK)
-                .addAll(TCBlocks.NITORS.values().stream().map(DeferredHolder::get));
+                .add(TCBlocks.NITORS.values().stream().map(DeferredHolder::get).toArray(Block[]::new));
 
         tag(TCBlockTags.ORES_AMBER).add(TCBlocks.ORE_AMBER.get());
         tag(TCBlockTags.ORES_CINNABAR).add(TCBlocks.ORE_CINNABAR.get());
         tag(Tags.Blocks.ORES_QUARTZ).add(TCBlocks.ORE_QUARTZ.get());
         tag(Tags.Blocks.ORES).addTags(TCBlockTags.ORES_AMBER,TCBlockTags.ORES_CINNABAR);
+
+        tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                .add(TCBlocks.ORE_AMBER.get())
+                .add(TCBlocks.ORE_CINNABAR.get())
+                .add(TCBlocks.ORE_QUARTZ.get())
+                .add(TCBlocks.SMELTER_BASIC.get())
+                .add(TCBlocks.SMELTER_THAUMIUM.get())
+                .add(TCBlocks.SMELTER_VOID.get())
+                .add(TCBlocks.SMELTER_AUX.get())
+                .add(TCBlocks.SMELTER_VENT.get())
+                .add(TCBlocks.SPA.get())
+                .add(TCBlocks.ARCANE_WORKBENCH_CHARGER.get())
+                .add(TCBlocks.ALCHEMICAL_CONSTRUCT.get())
+                .add(TCBlocks.ADVANCED_ALCHEMICAL_CONSTRUCT.get());
+
+        tag(BlockTags.NEEDS_STONE_TOOL)
+                .add(TCBlocks.ORE_AMBER.get());
+
+        tag(BlockTags.NEEDS_IRON_TOOL)
+                .add(TCBlocks.ORE_CINNABAR.get());
 
         tag(TCBlockTags.PORTABLE_HOLE_BLACKLIST);
 

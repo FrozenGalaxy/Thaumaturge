@@ -128,4 +128,9 @@ public class BlockSmelter extends BaseEntityBlock {
         }
         return InteractionResult.CONSUME;
     }
+
+    @Override
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
 }

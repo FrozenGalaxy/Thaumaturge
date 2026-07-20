@@ -594,8 +594,9 @@ public final class TCItems {
 
     public static final DeferredItem<CelestialNotesItem> CELESTIAL_NOTES = ITEMS.registerItem(
             "celestial_notes",
-            CelestialNotesItem::new,
-            new Item.Properties().component(TCDataComponents.CELESTIAL_BODY.get(), CelestialBody.SUN));
+            properties -> new CelestialNotesItem(
+                    properties.component(TCDataComponents.CELESTIAL_BODY.get(), CelestialBody.SUN)),
+            new Item.Properties());
 
     // 
 

@@ -3,6 +3,7 @@ package com.leclowndu93150.thaumcraft.content.eldritch;
 import com.leclowndu93150.thaumcraft.TCIds;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -10,6 +11,7 @@ import net.minecraft.world.level.dimension.LevelStem;
 public final class OuterLands {
     public static final ResourceKey<Level> DIMENSION =
             ResourceKey.create(Registries.DIMENSION, TCIds.rl("outer_lands"));
+    public static final ResourceLocation EFFECTS = TCIds.rl("outer_lands");
     public static final ResourceKey<DimensionType> DIMENSION_TYPE =
             ResourceKey.create(Registries.DIMENSION_TYPE, TCIds.rl("outer_lands"));
     public static final ResourceKey<LevelStem> STEM =

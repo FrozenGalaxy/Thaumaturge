@@ -160,4 +160,9 @@ public class BlockInfernalFurnace extends BaseEntityBlock {
         }
         super.entityInside(state, level, pos, entity);
     }
+
+    @Override
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
 }

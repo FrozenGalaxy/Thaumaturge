@@ -11,19 +11,21 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.data.tags.ItemTagsProvider;
 import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.common.data.BlockTagCopyingItemTagProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import top.theillusivec4.curios.api.CuriosTags;
 
 import java.util.concurrent.CompletableFuture;
 
-public final class TCItemTagsProvider extends BlockTagCopyingItemTagProvider {
+public final class TCItemTagsProvider extends ItemTagsProvider {
     public TCItemTagsProvider(
             PackOutput output,
             CompletableFuture<HolderLookup.Provider> lookupProvider,
-            CompletableFuture<TagsProvider.TagLookup<Block>> blockTags
+            CompletableFuture<TagsProvider.TagLookup<Block>> blockTags,
+            ExistingFileHelper existingFileHelper
     ) {
-        super(output, lookupProvider, blockTags, TCIds.MODID);
+        super(output, lookupProvider, blockTags, TCIds.MODID, existingFileHelper);
     }
 
     @Override
@@ -78,6 +80,10 @@ public final class TCItemTagsProvider extends BlockTagCopyingItemTagProvider {
         tag(TCItemTags.RARE_EARTH_CHANCE_HIGH).addTags(Tags.Items.ORES_NETHERITE_SCRAP,Tags.Items.ORES_DIAMOND,Tags.Items.ORES_EMERALD,TCItemTags.ORES_CINNABAR,TCItemTags.ORES_AMBER);
         tag(TCItemTags.RARE_EARTH_CHANCE_NORMAL).addOptionalTag(TCItemTags.ORES_SILVER).addTags(Tags.Items.ORES_GOLD,TCItemTags.CLUSTERS);
         tag(TCItemTags.RARE_EARTH_CHANCE_LOW).addOptionalTags(TCItemTags.ORES_TIN,TCItemTags.ORES_LEAD).addTags(Tags.Items.ORES_IRON,Tags.Items.ORES_COAL,Tags.Items.ORES_COPPER,Tags.Items.ORES_LAPIS,Tags.Items.ORES_REDSTONE, Tags.Items.ORES_QUARTZ);
+
+        tag(ItemTags.DYEABLE).add(TCItems.CLOTH_CHEST.get(), TCItems.CLOTH_LEGS.get(),
+                TCItems.CLOTH_BOOTS.get(), TCItems.VOID_ROBE_HELM.get(),
+                TCItems.VOID_ROBE_CHEST.get(), TCItems.VOID_ROBE_LEGS.get());
 
         tag(CuriosTags.HEAD).add(TCItems.GOGGLES_REVEALING.get(), TCItems.CURIOSITY_BAND.get());
         tag(CuriosTags.NECKLACE).add(TCItems.AMULET_MUNDANE.get(), TCItems.AMULET_FANCY.get(),

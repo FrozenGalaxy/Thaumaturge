@@ -276,7 +276,7 @@ public final class TCBlocks {
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.NONE)
                     .strength(0.3F)
-                    .sound(TCSoundTypes.JAR.get())
+                    .sound(TCSoundTypes.JAR)
                     .noOcclusion()
     );
 
@@ -286,7 +286,7 @@ public final class TCBlocks {
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.NONE)
                     .strength(0.3F)
-                    .sound(TCSoundTypes.JAR.get())
+                    .sound(TCSoundTypes.JAR)
                     .noOcclusion()
     );
 
@@ -335,7 +335,7 @@ public final class TCBlocks {
                     .noCollission()
                     .strength(100.0F)
                     .pushReaction(PushReaction.DESTROY)
-                    .sound(TCSoundTypes.GORE.get())
+                    .sound(TCSoundTypes.GORE)
                     .noLootTable()
                     .liquid()
                     .randomTicks()
@@ -395,7 +395,7 @@ public final class TCBlocks {
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_PURPLE)
                     .strength(3.0F, 100.0F)
-                    .sound(TCSoundTypes.GORE.get())
+                    .sound(TCSoundTypes.GORE)
                     .randomTicks()
                     .ignitedByLava()
     );
@@ -406,7 +406,7 @@ public final class TCBlocks {
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_PURPLE)
                     .strength(0.1F, 0.1F)
-                    .sound(TCSoundTypes.GORE.get())
+                    .sound(TCSoundTypes.GORE)
                     .noOcclusion()
                     .lightLevel(s -> 10)
                     .pushReaction(PushReaction.DESTROY)
@@ -419,7 +419,7 @@ public final class TCBlocks {
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_PURPLE)
                     .strength(1.0F)
-                    .sound(TCSoundTypes.GORE.get())
+                    .sound(TCSoundTypes.GORE)
                     .noOcclusion()
                     .noCollission()
                     .replaceable()
@@ -462,7 +462,7 @@ public final class TCBlocks {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
                 .strength(10.0F, 100.0F)
-                .sound(TCSoundTypes.GORE.get())
+                .sound(TCSoundTypes.GORE)
                 .noOcclusion()
                 .randomTicks();
     }
@@ -604,7 +604,7 @@ public final class TCBlocks {
                 BlockBehaviour.Properties.of()
                         .mapColor(MapColor.NONE)
                         .strength(0.25F)
-                        .sound(TCSoundTypes.CRYSTAL.get())
+                        .sound(TCSoundTypes.CRYSTAL)
                         .lightLevel(state -> 1)
                         .noOcclusion()
                         .randomTicks()
@@ -821,7 +821,7 @@ public final class TCBlocks {
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.NONE)
                     .strength(0.3F)
-                    .sound(TCSoundTypes.JAR.get())
+                    .sound(TCSoundTypes.JAR)
                     .noOcclusion()
     );
 
@@ -1321,7 +1321,7 @@ public final class TCBlocks {
 
     public static final DeferredBlock<BlockJarNode> JAR_NODE = BLOCKS.registerBlock(
             "jar_node", BlockJarNode::new,
-            BlockBehaviour.Properties.of().mapColor(MapColor.NONE).strength(0.3F).sound(TCSoundTypes.JAR.get()).noOcclusion());
+            BlockBehaviour.Properties.of().mapColor(MapColor.NONE).strength(0.3F).sound(TCSoundTypes.JAR).noOcclusion());
 
     public static final DeferredBlock<BlockNodeStabilizer> NODE_STABILIZER = BLOCKS.registerBlock(
             "node_stabilizer", props -> new BlockNodeStabilizer(props, false),
@@ -1347,7 +1347,7 @@ public final class TCBlocks {
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_RED)
                     .strength(0.25F, 2.0F)
-                    .sound(TCSoundTypes.GORE.get())
+                    .sound(TCSoundTypes.GORE)
     );
 
     public static final DeferredBlock<BlockEffectShock> EFFECT_SHOCK = BLOCKS.registerBlock(
@@ -1385,20 +1385,20 @@ public final class TCBlocks {
 
     public static final DeferredBlock<Block> ELDRITCH_CRUST = BLOCKS.registerBlock(
             "eldritch_crust", Block::new,
-            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 10.0F).sound(TCSoundTypes.GORE.get()));
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 10.0F).sound(TCSoundTypes.GORE));
 
     public static final DeferredBlock<Block> ELDRITCH_CRUST_GLOWING = BLOCKS.registerBlock(
             "eldritch_crust_glowing", Block::new,
-            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 10.0F).sound(TCSoundTypes.GORE.get())
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 10.0F).sound(TCSoundTypes.GORE)
                     .lightLevel(state -> 15));
 
     public static final DeferredBlock<BlockMirror> MIRROR = BLOCKS.registerBlock(
             "mirror", props -> new BlockMirror(props, false),
-            BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(0.1F).sound(TCSoundTypes.JAR.get()).noOcclusion());
+            BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(0.1F).sound(TCSoundTypes.JAR).noOcclusion());
 
     public static final DeferredBlock<BlockMirror> MIRROR_ESSENTIA = BLOCKS.registerBlock(
             "mirror_essentia", props -> new BlockMirror(props, true),
-            BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(0.1F).sound(TCSoundTypes.JAR.get()).noOcclusion());
+            BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(0.1F).sound(TCSoundTypes.JAR).noOcclusion());
 
     public static final DeferredBlock<BlockStairsTC> STAIRS_ELDRITCH = BLOCKS.registerBlock(
             "stairs_eldritch",
@@ -1568,7 +1568,7 @@ public final class TCBlocks {
                 BlockBehaviour.Properties.of()
                         .mapColor(crate ? MapColor.WOOD : MapColor.STONE)
                         .strength(0.15F, 0.0F)
-                        .sound(crate ? SoundType.WOOD : TCSoundTypes.URN.get())
+                        .sound(crate ? SoundType.WOOD : TCSoundTypes.URN)
                         .noOcclusion());
     }
 

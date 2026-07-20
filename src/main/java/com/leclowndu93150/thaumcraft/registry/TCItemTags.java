@@ -33,6 +33,7 @@ public final class TCItemTags {
     public static final TagKey<Item> NUGGETS_QUICKSILVER = common("nuggets/quicksilver");
     public static final TagKey<Item> NUGGETS_QUARTZ = common("nuggets/quartz");
     public static final TagKey<Item> NUGGETS_TIN = common("nuggets/tin");
+    public static final TagKey<Item> NUGGETS_COPPER = common("nuggets/copper");
     public static final TagKey<Item> NUGGETS_LEAD = common("nuggets/lead");
     public static final TagKey<Item> NUGGETS_SILVER = common("nuggets/silver");
 

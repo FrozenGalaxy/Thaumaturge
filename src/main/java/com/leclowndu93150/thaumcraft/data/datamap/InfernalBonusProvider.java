@@ -11,9 +11,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.common.conditions.ICondition;
-import net.neoforged.neoforge.common.conditions.NotCondition;
-import net.neoforged.neoforge.common.conditions.TagEmptyCondition;
 import net.neoforged.neoforge.common.data.DataMapProvider;
 
 import java.util.Arrays;
@@ -31,13 +28,13 @@ public final class InfernalBonusProvider extends DataMapProvider {
         Builder<List<InfernalBonus>, Item> b = builder(InfernalBonus.DATA_MAP);
 
         add(b,Tags.Items.ORES_IRON, InfernalBonus.builder(items,Tags.Items.NUGGETS_IRON).chance(0.33F).build());
-        add(b,Tags.Items.ORES_COPPER, InfernalBonus.builder(items,Tags.Items.NUGGETS_COPPER).chance(0.33F).build());
+        add(b,Tags.Items.ORES_COPPER, InfernalBonus.builder(items,TCItemTags.NUGGETS_COPPER).chance(0.33F).build());
         add(b,Tags.Items.ORES_GOLD, InfernalBonus.builder(items,Tags.Items.NUGGETS_GOLD).chance(0.33F).build());
         add(b,Tags.Items.ORES_QUARTZ, InfernalBonus.builder(items,TCItemTags.NUGGETS_QUARTZ).chance(0.33F).build());
         add(b, TCItemTags.ORES_CINNABAR, InfernalBonus.builder(items,TCItemTags.NUGGETS_QUICKSILVER).chance(0.33F).build());
-        addConditional(b,TCItemTags.ORES_LEAD, new NotCondition(new TagEmptyCondition<>(TCItemTags.NUGGETS_LEAD)),InfernalBonus.builder(items,TCItemTags.NUGGETS_LEAD).chance(0.33F).build());
-        addConditional(b,TCItemTags.ORES_SILVER, new NotCondition(new TagEmptyCondition<>(TCItemTags.NUGGETS_SILVER)),InfernalBonus.builder(items,TCItemTags.NUGGETS_SILVER).chance(0.33F).build());
-        addConditional(b,TCItemTags.ORES_TIN, new NotCondition(new TagEmptyCondition<>(TCItemTags.NUGGETS_TIN)),InfernalBonus.builder(items,TCItemTags.NUGGETS_TIN).chance(0.33F).build());
+        add(b,TCItemTags.ORES_LEAD, InfernalBonus.builder(items,TCItemTags.NUGGETS_LEAD).chance(0.33F).build());
+        add(b,TCItemTags.ORES_SILVER, InfernalBonus.builder(items,TCItemTags.NUGGETS_SILVER).chance(0.33F).build());
+        add(b,TCItemTags.ORES_TIN, InfernalBonus.builder(items,TCItemTags.NUGGETS_TIN).chance(0.33F).build());
 
         add(b, Items.BEEF, InfernalBonus.builder(TCItems.CHUNK_BEEF).chance(0.33F).build());
         add(b, Items.CHICKEN, InfernalBonus.builder(TCItems.CHUNK_CHICKEN).chance(0.33F).build());
@@ -66,9 +63,5 @@ public final class InfernalBonusProvider extends DataMapProvider {
 
     private static void add(Builder<List<InfernalBonus>, Item> b, TagKey<Item> key, InfernalBonus... values) {
         b.add(key, Arrays.stream(values).toList(), false);
-    }
-
-    private static void addConditional(Builder<List<InfernalBonus>, Item> b, TagKey<Item> key, ICondition condition, InfernalBonus... values) {
-        b.add(key, Arrays.stream(values).toList(), false, condition);
     }
 }

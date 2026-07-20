@@ -10,7 +10,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BiomeTags;
-import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -18,6 +17,8 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.common.world.BiomeModifiers;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+
+import java.util.List;
 
 public final class TCBiomeModifiers {
     public static final ResourceKey<BiomeModifier> ADD_ORES = key("add_ores");
@@ -105,26 +106,18 @@ public final class TCBiomeModifiers {
 
         context.register(ADD_NETHER_WISPS, new BiomeModifiers.AddSpawnsBiomeModifier(
                 biomes.getOrThrow(BiomeTags.IS_NETHER),
-                WeightedList.<MobSpawnSettings.SpawnerData>builder()
-                        .add(new MobSpawnSettings.SpawnerData(TCEntities.WISP.get(), 1, 1), NETHER_WISP_WEIGHT)
-                        .build()));
+                List.of(new MobSpawnSettings.SpawnerData(TCEntities.WISP.get(), NETHER_WISP_WEIGHT, 1, 1))));
 
         context.register(ADD_NETHER_FIREBATS, new BiomeModifiers.AddSpawnsBiomeModifier(
                 biomes.getOrThrow(BiomeTags.IS_NETHER),
-                WeightedList.<MobSpawnSettings.SpawnerData>builder()
-                        .add(new MobSpawnSettings.SpawnerData(TCEntities.FIRE_BAT.get(), 1, 2), NETHER_FIREBAT_WEIGHT)
-                        .build()));
+                List.of(new MobSpawnSettings.SpawnerData(TCEntities.FIRE_BAT.get(), NETHER_FIREBAT_WEIGHT, 1, 2))));
 
         context.register(ADD_OVERWORLD_BRAINY_ZOMBIES, new BiomeModifiers.AddSpawnsBiomeModifier(
                 biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
-                WeightedList.<MobSpawnSettings.SpawnerData>builder()
-                        .add(new MobSpawnSettings.SpawnerData(TCEntities.BRAINY_ZOMBIE.get(), 1, 1), OVERWORLD_BRAINY_ZOMBIE_WEIGHT)
-                        .build()));
+                List.of(new MobSpawnSettings.SpawnerData(TCEntities.BRAINY_ZOMBIE.get(), OVERWORLD_BRAINY_ZOMBIE_WEIGHT, 1, 1))));
 
         context.register(ADD_PECHS, new BiomeModifiers.AddSpawnsBiomeModifier(
                 biomes.getOrThrow(TCBiomeTags.IS_MAGICAL),
-                WeightedList.<MobSpawnSettings.SpawnerData>builder()
-                        .add(new MobSpawnSettings.SpawnerData(TCEntities.PECH.get(), 1, 1), PECH_WEIGHT)
-                        .build()));
+                List.of(new MobSpawnSettings.SpawnerData(TCEntities.PECH.get(), PECH_WEIGHT, 1, 1))));
     }
 }

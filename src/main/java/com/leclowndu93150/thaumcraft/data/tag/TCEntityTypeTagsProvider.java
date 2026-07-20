@@ -6,12 +6,12 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.KeyTagProvider;
+import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.EntityType;
 
-public final class TCEntityTypeTagsProvider extends KeyTagProvider<EntityType<?>> {
+public final class TCEntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
     public TCEntityTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
         super(output, Registries.ENTITY_TYPE, lookupProvider);
     }

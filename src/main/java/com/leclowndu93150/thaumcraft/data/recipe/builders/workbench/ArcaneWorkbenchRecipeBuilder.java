@@ -10,13 +10,12 @@ import com.leclowndu93150.thaumcraft.content.recipe.workbench.ArcaneCraftingReci
 import com.leclowndu93150.thaumcraft.data.recipe.builders.SimpleRecipeBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -68,21 +67,21 @@ public abstract class ArcaneWorkbenchRecipeBuilder<R extends ArcaneWorkbenchReci
     }
 
     @Override
-    public void save(RecipeOutput output, ResourceKey<Recipe<?>> key) {
+    public void save(RecipeOutput output, ResourceLocation id) {
         ArcaneCraftingRecipe recipe = makeRecipe(
-                RecipeBuilder.createCraftingCommonInfo(true),
+                "",
                 this.result,
                 this.aspects,
                 Optional.ofNullable(gate),
                 vis);
 
-        output.accept(key, recipe, this.advancementBuilder.build(output, key, this.category));
+        output.accept(id, recipe, buildAdvancement(output, id));
     }
 
-    protected abstract ArcaneCraftingRecipe makeRecipe(Recipe.CommonInfo commonInfo,ItemStack result, AspectList aspects, Optional<ResearchGate> gate, int vis);
+    protected abstract ArcaneCraftingRecipe makeRecipe(String group, ItemStack result, AspectList aspects, Optional<ResearchGate> gate, int vis);
 
     @Override
-    public ResourceKey<Recipe<?>> defaultId() {
-        return ResourceKey.create(Registries.RECIPE, result.typeHolder().unwrapKey().orElseThrow().location().withPrefix("arcane_workbench/"));
+    protected ResourceLocation defaultId() {
+        return RecipeBuilder.getDefaultRecipeId(getResult()).withPrefix("arcane_workbench/");
     }
 }

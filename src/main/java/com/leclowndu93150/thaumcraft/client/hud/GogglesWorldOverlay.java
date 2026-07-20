@@ -1,6 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.hud;
 
 import com.leclowndu93150.thaumcraft.TCIds;
+import com.leclowndu93150.thaumcraft.api.aspect.AspectCapabilities;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspectContainer;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
@@ -64,7 +65,8 @@ public final class GogglesWorldOverlay {
             resetAnimation();
             return;
         }
-        if (!(be instanceof IAspectContainer container)) {
+        IAspectContainer container = mc.level.getCapability(AspectCapabilities.CONTAINER, pos, null);
+        if (container == null) {
             resetAnimation();
             return;
         }
