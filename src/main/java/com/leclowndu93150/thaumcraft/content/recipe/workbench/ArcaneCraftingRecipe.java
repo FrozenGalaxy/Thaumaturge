@@ -4,6 +4,7 @@ import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.recipe.IArcaneRecipe;
 import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
+import com.leclowndu93150.thaumcraft.content.workbench.WorkbenchPayment;
 import com.leclowndu93150.thaumcraft.registry.TCRecipeTypes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -93,6 +94,7 @@ public abstract class ArcaneCraftingRecipe implements IArcaneRecipe {
 
     @Override
     public boolean matches(ArcaneCraftingInput input, Level level) {
-        return true;
+        WorkbenchPayment.Plan plan = WorkbenchPayment.plan(this, input, input.player());
+        return plan.crystalsSatisfied();
     }
 }

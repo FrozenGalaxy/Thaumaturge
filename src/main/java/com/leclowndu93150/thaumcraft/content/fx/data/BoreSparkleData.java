@@ -10,8 +10,12 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public record BoreSparkleData(double tx, double ty, double tz, float r, float g, float b) implements ParticleOptions {
+public record BoreSparkleData(int targetEntityId, double tx, double ty, double tz,
+                              float r, float g, float b) implements ParticleOptions {
+    public static final int NO_ENTITY = -1;
+
     public static final MapCodec<BoreSparkleData> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
+            Codec.INT.fieldOf("target_entity_id").forGetter(BoreSparkleData::targetEntityId),
             Codec.DOUBLE.fieldOf("tx").forGetter(BoreSparkleData::tx),
             Codec.DOUBLE.fieldOf("ty").forGetter(BoreSparkleData::ty),
             Codec.DOUBLE.fieldOf("tz").forGetter(BoreSparkleData::tz),
@@ -20,14 +24,23 @@ public record BoreSparkleData(double tx, double ty, double tz, float r, float g,
             Codec.FLOAT.fieldOf("b").forGetter(BoreSparkleData::b)
     ).apply(inst, BoreSparkleData::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, BoreSparkleData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.DOUBLE, BoreSparkleData::tx,
-            ByteBufCodecs.DOUBLE, BoreSparkleData::ty,
-            ByteBufCodecs.DOUBLE, BoreSparkleData::tz,
-            ByteBufCodecs.FLOAT, BoreSparkleData::r,
-            ByteBufCodecs.FLOAT, BoreSparkleData::g,
-            ByteBufCodecs.FLOAT, BoreSparkleData::b,
-            BoreSparkleData::new);
+    public static final StreamCodec<RegistryFriendlyByteBuf, BoreSparkleData> STREAM_CODEC = StreamCodec.of(
+            (buffer, data) -> {
+                buffer.writeVarInt(data.targetEntityId());
+                buffer.writeDouble(data.tx());
+                buffer.writeDouble(data.ty());
+                buffer.writeDouble(data.tz());
+                buffer.writeFloat(data.r());
+                buffer.writeFloat(data.g());
+                buffer.writeFloat(data.b());
+            },
+            buffer -> new BoreSparkleData(buffer.readVarInt(),
+                    buffer.readDouble(), buffer.readDouble(), buffer.readDouble(),
+                    buffer.readFloat(), buffer.readFloat(), buffer.readFloat()));
+
+    public BoreSparkleData(double tx, double ty, double tz, float r, float g, float b) {
+        this(NO_ENTITY, tx, ty, tz, r, g, b);
+    }
 
     @Override
     public ParticleType<?> getType() {

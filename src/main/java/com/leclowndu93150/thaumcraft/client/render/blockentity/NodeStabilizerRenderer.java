@@ -30,6 +30,12 @@ public final class NodeStabilizerRenderer
 
     private static final RenderType BASE = RenderType.entityCutout(TEXTURE);
     private static final RenderType OVERLAY = RenderType.entityTranslucentEmissive(OVERLAY_TEXTURE);
+    private static final ResourceLocation TRANSDUCER_TEXTURE = TCIds.rl("textures/block/node_converter.png");
+    private static final ResourceLocation TRANSDUCER_OVERLAY_TEXTURE = TCIds.rl("textures/block/node_converter_over.png");
+    private static final RenderType TRANSDUCER_BASE = RenderType.entityCutout(TRANSDUCER_TEXTURE);
+    private static final RenderType TRANSDUCER_OVERLAY = RenderType.entityTranslucentEmissive(TRANSDUCER_OVERLAY_TEXTURE);
+    private static final float TRANSDUCER_EXTEND = 0.4F;
+    private static final float TRANSDUCER_GLOW_GAIN = 2.5F;
     private static final ResourceLocation BUBBLE_TEXTURE = TCIds.rl("textures/misc/node_bubble.png");
     private static final RenderType BUBBLE = TCRenderTypes.fxAdditive(BUBBLE_TEXTURE);
 
@@ -115,6 +121,34 @@ public final class NodeStabilizerRenderer
                 int glowLight = (glowUnit << 4) | (glowUnit << 20);
                 int tint = advanced ? ADVANCED_TINT : WHITE;
                 GolemMeshes.renderPart(mesh, piston, armPose, buffers.getBuffer(OVERLAY), glowLight, tint);
+                poseStack.popPose();
+            }
+        }
+    }
+
+    public static void submitTransducerParts(float chargeFraction, float ticks,
+                                             PoseStack poseStack, MultiBufferSource buffers, int light) {
+        MeshModel mesh = GolemMeshes.get(MODEL);
+        MeshPart lock = findPart(mesh, PART_LOCK);
+        MeshPart piston = findPart(mesh, PART_PISTON);
+        if (lock != null) {
+            PoseStack.Pose lockPose = poseStack.last();
+            GolemMeshes.renderPart(mesh, lock, lockPose, buffers.getBuffer(TRANSDUCER_BASE), light, WHITE);
+            float pulse = Mth.sin(ticks / 3.0F) * 0.1F + 0.9F;
+            int glow = OVERLAY_LIGHT_BASE
+                    + (int) (OVERLAY_LIGHT_RANGE * Math.min(1.0F, chargeFraction * TRANSDUCER_GLOW_GAIN * pulse));
+            int glowUnit = Mth.clamp(glow / 16, 0, 15);
+            int glowLight = (glowUnit << 4) | (glowUnit << 20);
+            GolemMeshes.renderPart(mesh, lock, lockPose, buffers.getBuffer(TRANSDUCER_OVERLAY), glowLight, WHITE);
+        }
+        if (piston != null) {
+            for (int arm = 0; arm < ARM_COUNT; arm++) {
+                poseStack.pushPose();
+                poseStack.mulPose(Axis.ZP.rotationDegrees(ARM_ANGLE_STEP * arm));
+                poseStack.mulPose(Axis.YP.rotationDegrees(ARM_TWIST));
+                float armPulse = Mth.sin((ticks + arm * 5) / 3.0F) * 0.1F + 0.9F;
+                poseStack.translate(0.0F, 0.0F, chargeFraction * armPulse * TRANSDUCER_EXTEND);
+                GolemMeshes.renderPart(mesh, piston, poseStack.last(), buffers.getBuffer(TRANSDUCER_BASE), light, WHITE);
                 poseStack.popPose();
             }
         }

@@ -48,16 +48,16 @@ public final class EldritchObeliskRenderer implements BlockEntityRenderer<BlockE
 
         VertexConsumer surface = buffers.getBuffer(EldritchPortalSurface.SURFACE);
         PoseStack.Pose surfacePose = poseStack.last();
-        EldritchPortalSurface.quad(surfacePose, surface,
+        EldritchPortalSurface.quad(surfacePose, surface, obelisk.getBlockPos(),
                 0.0F, base, PLANE_INSET, 0.0F, top, PLANE_INSET,
                 1.0F, top, PLANE_INSET, 1.0F, base, PLANE_INSET);
-        EldritchPortalSurface.quad(surfacePose, surface,
+        EldritchPortalSurface.quad(surfacePose, surface, obelisk.getBlockPos(),
                 0.0F, base, 1.0F - PLANE_INSET, 0.0F, top, 1.0F - PLANE_INSET,
                 1.0F, top, 1.0F - PLANE_INSET, 1.0F, base, 1.0F - PLANE_INSET);
-        EldritchPortalSurface.quad(surfacePose, surface,
+        EldritchPortalSurface.quad(surfacePose, surface, obelisk.getBlockPos(),
                 PLANE_INSET, base, 0.0F, PLANE_INSET, top, 0.0F,
                 PLANE_INSET, top, 1.0F, PLANE_INSET, base, 1.0F);
-        EldritchPortalSurface.quad(surfacePose, surface,
+        EldritchPortalSurface.quad(surfacePose, surface, obelisk.getBlockPos(),
                 1.0F - PLANE_INSET, base, 0.0F, 1.0F - PLANE_INSET, top, 0.0F,
                 1.0F - PLANE_INSET, top, 1.0F, 1.0F - PLANE_INSET, base, 1.0F);
 

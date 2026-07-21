@@ -4,7 +4,7 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectChipsTooltip;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.config.ThaumcraftClientConfig;
-import com.leclowndu93150.thaumcraft.content.aspect.AspectIndexHolder;
+import com.leclowndu93150.thaumcraft.api.aspect.AspectIndexAccess;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -29,7 +29,7 @@ public final class AspectTooltipEvents {
         if (!shouldShowAspects()) {
             return;
         }
-        AspectList aspects = AspectIndexHolder.get().of(event.getItemStack());
+        AspectList aspects = AspectIndexAccess.index().of(event.getItemStack());
         if (aspects.isEmpty()) {
             return;
         }

@@ -8,6 +8,7 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
 
 public final class ArcaneBoreModel extends HierarchicalModel<EntityArcaneBore> {
@@ -15,6 +16,7 @@ public final class ArcaneBoreModel extends HierarchicalModel<EntityArcaneBore> {
     private final ModelPart base;
 
     public ArcaneBoreModel(ModelPart root) {
+        super(RenderType::entityTranslucent);
         this.root = root;
         base = root.getChild("base");
     }

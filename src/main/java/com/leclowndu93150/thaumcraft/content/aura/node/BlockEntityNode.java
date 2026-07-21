@@ -113,6 +113,7 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
     private int wait;
     private int starvation;
     private int lock;
+    protected boolean energized;
     private @Nullable UUID drainPlayer;
     private int drainColor = 0xFFFFFF;
     private int drainTicks;
@@ -233,6 +234,18 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         return list.add(aspect, amount);
     }
 
+    public boolean isEnergized() {
+        return energized;
+    }
+
+    public void setEnergized(boolean energized) {
+        this.energized = energized;
+        setChanged();
+        if (level != null) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
+
     public boolean isJarring() {
         return jarringTicks > 0;
     }
@@ -250,8 +263,25 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         }
     }
 
+    private static final int ENERGIZED_REFILL_INTERVAL = 20;
+
     public void serverTick(Level tickLevel, BlockPos pos) {
         if (!(tickLevel instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        if (energized) {
+            if (tickLevel.getGameTime() % ENERGIZED_REFILL_INTERVAL == 0) {
+                boolean changed = false;
+                for (AspectInstance entry : aspectsBase.entries()) {
+                    if (aspects.amountOf(entry.aspect()) < entry.amount()) {
+                        aspects = aspects.add(entry.aspect(), 1);
+                        changed = true;
+                    }
+                }
+                if (changed) {
+                    setChanged();
+                }
+            }
             return;
         }
         if (jarringTicks > 0) {
@@ -737,6 +767,9 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
     }
 
     public boolean drainToWand(ServerLevel serverLevel, Player player, ItemStack wandStack, int useTicks) {
+        if (energized) {
+            return false;
+        }
         if (useTicks % NODE_DRAIN_INTERVAL != 0) {
             return false;
         }
@@ -831,6 +864,9 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         }
         TCNbt.store(output, "Aspects", AspectList.CODEC, registries, aspects);
         TCNbt.store(output, "AspectsBase", AspectList.CODEC, registries, aspectsBase);
+        if (energized) {
+            output.putBoolean("Energized", true);
+        }
         if (drainPlayer != null) {
             TCNbt.store(output, "DrainPlayer", UUIDUtil.CODEC, registries, drainPlayer);
             output.putInt("DrainColor", drainColor);
@@ -844,6 +880,7 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
         nodeType = TCNbt.read(input, "Type", NodeType.CODEC, registries).orElse(NodeType.NORMAL);
+        energized = input.getBoolean("Energized");
         nodeModifier = TCNbt.read(input, "Modifier", NodeModifier.CODEC, registries).orElse(null);
         aspects = TCNbt.read(input, "Aspects", AspectList.CODEC, registries).orElse(AspectList.EMPTY);
         aspectsBase = TCNbt.read(input, "AspectsBase", AspectList.CODEC, registries).orElse(AspectList.EMPTY);

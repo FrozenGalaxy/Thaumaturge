@@ -4,9 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.leclowndu93150.thaumcraft.TCIds;
+import com.leclowndu93150.thaumcraft.content.decor.BlockObsidianTotem;
 import com.leclowndu93150.thaumcraft.content.device.BlockInlay;
 import com.leclowndu93150.thaumcraft.content.device.BlockVisBattery;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchCrabSpawner;
+import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchInset;
 import com.leclowndu93150.thaumcraft.content.essentia.smeltery.BlockSmelter;
 import com.leclowndu93150.thaumcraft.content.essentia.tube.BlockEssentiaTransport;
 import com.leclowndu93150.thaumcraft.content.item.CelestialBody;
@@ -145,7 +147,7 @@ public final class TCModelProvider implements DataProvider {
         registerConstructs();
         decorModels();
         eldritchModels();
-        blockModels.createTrivialCube(TCBlocks.AMBER_BRICK.get());
+        translucentCube(TCBlocks.AMBER_BRICK.get());
         blockModels.createTrivialCube(TCBlocks.FLESH_BLOCK.get());
         registerInvisibleBlock(TCBlocks.EFFECT_SHOCK.get());
         registerInvisibleBlock(TCBlocks.BARRIER.get());
@@ -169,8 +171,10 @@ public final class TCModelProvider implements DataProvider {
         simpleFromExisting(TCBlocks.ARCANE_WORKBENCH_CHARGER.get(), "arcane_workbench_charger");
         simpleFromExisting(TCBlocks.NODE_STABILIZER.get(), "node_stabilizer");
         simpleFromExisting(TCBlocks.NODE_STABILIZER_ADVANCED.get(), "node_stabilizer_advanced");
+        simpleFromExisting(TCBlocks.NODE_TRANSDUCER.get(), "node_transducer");
         delegateItem(TCBlocks.NODE_STABILIZER.get().asItem(), TCIds.rl("item/node_stabilizer_base"));
         delegateItem(TCBlocks.NODE_STABILIZER_ADVANCED.get().asItem(), TCIds.rl("item/node_stabilizer_base"));
+        delegateItem(TCBlocks.NODE_TRANSDUCER.get().asItem(), TCIds.rl("item/node_stabilizer_base"));
         simpleBlock(TCBlocks.JAR_NODE.get(), TCIds.rl("block/jar_normal"));
         delegateItem(TCBlocks.JAR_NODE.get().asItem(), BEWLR_BLOCK_PARENT);
         horizontalBlock(TCBlocks.INFERNAL_FURNACE.get(), "infernal_furnace");
@@ -184,6 +188,10 @@ public final class TCModelProvider implements DataProvider {
         horizontalBlock(TCBlocks.SMELTER_AUX.get(), "smelter_aux");
         horizontalBlock(TCBlocks.SMELTER_VENT.get(), "smelter_vent");
         flatItem(TCItems.THAUMONOMICON.get());
+        flatItem(TCItems.THAUMONOMICON_CHEAT.get());
+        flatItem(TCItems.THAUMONOMICON_SHARING.get());
+        flatItem(TCItems.THAUMONOMICON_LINKING.get());
+        flatItem(TCItems.CREATIVE_NODE_PLACER.get());
         flatItem(TCItems.SALIS_MUNDUS.get());
         registerWandItem();
         flatItem(TCItems.WAND_CAP_IRON.get());
@@ -251,6 +259,11 @@ public final class TCModelProvider implements DataProvider {
         flatItem(TCItems.CULTIST_KNIGHT_SPAWN_EGG.get());
         flatItem(TCItems.CULTIST_CLERIC_SPAWN_EGG.get());
         flatItem(TCItems.CULTIST_PORTAL_LESSER_SPAWN_EGG.get());
+        flatItem(TCItems.CULTIST_LEADER_SPAWN_EGG.get());
+        flatItem(TCItems.CULTIST_PORTAL_GREATER_SPAWN_EGG.get());
+        flatItem(TCItems.ELDRITCH_WARDEN_SPAWN_EGG.get());
+        flatItem(TCItems.ELDRITCH_GOLEM_SPAWN_EGG.get());
+        flatItem(TCItems.TAINTACLE_GIANT_SPAWN_EGG.get());
         flatItem(TCItems.LOOT_BAG_COMMON.get());
         flatItem(TCItems.LOOT_BAG_UNCOMMON.get());
         flatItem(TCItems.LOOT_BAG_RARE.get());
@@ -291,7 +304,7 @@ public final class TCModelProvider implements DataProvider {
         blockModels.createTrivialCube(TCBlocks.METAL_BRASS_BLOCK.get());
         blockModels.createTrivialCube(TCBlocks.METAL_THAUMIUM_BLOCK.get());
         blockModels.createTrivialCube(TCBlocks.METAL_VOID_BLOCK.get());
-        blockModels.createTrivialCube(TCBlocks.AMBER_BLOCK.get());
+        translucentCube(TCBlocks.AMBER_BLOCK.get());
 
         flatItem(TCItems.INGOT_THAUMIUM.get());
         flatItem(TCItems.INGOT_BRASS.get());
@@ -384,6 +397,16 @@ public final class TCModelProvider implements DataProvider {
 
     private void simpleBlock(Block block, ResourceLocation model) {
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(block, v(model)));
+    }
+
+    private void translucentCube(Block block) {
+        ResourceLocation model = ModelTemplates.CUBE_ALL.create(block, TextureMapping.cube(block),
+                (id, json) -> modelOutput.accept(id, () -> {
+                    JsonElement element = json.get();
+                    element.getAsJsonObject().addProperty("render_type", "minecraft:translucent");
+                    return element;
+                }));
+        simpleBlock(block, model);
     }
 
     private void simpleFromExisting(Block block, String modelName) {
@@ -1330,14 +1353,15 @@ public final class TCModelProvider implements DataProvider {
 
     private void eldritchModels() {
         cube(TCBlocks.OBSIDIAN_TILE.get(), "obsidian_tile");
+        obsidianTotem();
         cube(TCBlocks.ELDRITCH_STONE.get(), "eldritch_stone");
         cube(TCBlocks.ELDRITCH_STONE_INERT.get(), "eldritch_stone");
         cube(TCBlocks.ELDRITCH_ROCK.get(), "eldritch_rock");
         cube(TCBlocks.ELDRITCH_CRUST.get(), "eldritch_crust");
-        cube(TCBlocks.ELDRITCH_CRUST_GLOWING.get(), "eldritch_crust_glowing");
+        insetBlock(TCBlocks.ELDRITCH_CRUST_GLOWING.get(), "eldritch_crust_glowing");
         cube(TCBlocks.ELDRITCH_DOOR.get(), "eldritch_door");
-        cube(TCBlocks.ELDRITCH_STONE_CRYSTAL.get(), "eldritch_stone_crystal");
-        cube(TCBlocks.ELDRITCH_LOCK.get(), "eldritch_deco");
+        insetBlock(TCBlocks.ELDRITCH_STONE_CRYSTAL.get(), "eldritch_stone_crystal");
+        eldritchLock();
         crabSpawner();
         column(TCBlocks.ELDRITCH_PEDESTAL.get(), "eldritch_pedestal_side", "eldritch_stone");
         invisibleWithCubeItem(TCBlocks.ELDRITCH_ALTAR.get(), "eldritch_altar");
@@ -1357,12 +1381,127 @@ public final class TCModelProvider implements DataProvider {
         delegateItem(block.asItem(), model);
     }
 
+    private void eldritchLock() {
+        ResourceLocation model = ModelTemplates.CUBE_ORIENTABLE.create(TCBlocks.ELDRITCH_LOCK.get(),
+                new TextureMapping()
+                        .put(TextureSlot.FRONT, blockTexture("eldritch_lock_face"))
+                        .put(TextureSlot.SIDE, blockTexture("eldritch_lock_side"))
+                        .put(TextureSlot.TOP, blockTexture("eldritch_lock_side")),
+                modelOutput);
+        blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.ELDRITCH_LOCK.get(), v(model))
+                .with(PropertyDispatch.property(BlockStateProperties.FACING)
+                        .select(Direction.DOWN, Variant.variant()
+                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
+                        .select(Direction.UP, Variant.variant()
+                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
+                        .select(Direction.NORTH, Variant.variant())
+                        .select(Direction.SOUTH, Variant.variant()
+                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
+                        .select(Direction.WEST, Variant.variant()
+                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
+                        .select(Direction.EAST, Variant.variant()
+                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))));
+        delegateItem(TCBlocks.ELDRITCH_LOCK.get().asItem(), model);
+    }
+
+    private static final int INSET_DEPTH = 2;
+    private static final int INSET_ALL_EXPOSED = 63;
+
+    private void insetBlock(Block block, String textureName) {
+        ResourceLocation texture = TCIds.rl("block/" + textureName);
+        MultiPartGenerator generator = MultiPartGenerator.multiPart(block);
+        for (int mask = 0; mask <= INSET_ALL_EXPOSED; mask++) {
+            ResourceLocation model = TCIds.rl("block/" + textureName + "_inset_" + mask);
+            int finalMask = mask;
+            modelOutput.accept(model, () -> insetModel(texture, finalMask));
+            Condition.TerminalCondition condition = Condition.condition();
+            for (Direction dir : Direction.values()) {
+                condition = condition.term(BlockEldritchInset.EXPOSED.get(dir), insetExposed(mask, dir));
+            }
+            generator = generator.with(condition, v(model));
+        }
+        blockStateOutput.accept(generator);
+        delegateItem(block.asItem(), TCIds.rl("block/" + textureName + "_inset_" + INSET_ALL_EXPOSED));
+    }
+
+    private static boolean insetExposed(int mask, Direction dir) {
+        return (mask & (1 << dir.get3DDataValue())) != 0;
+    }
+
+    private static JsonElement insetModel(ResourceLocation texture, int mask) {
+        JsonObject root = new JsonObject();
+        JsonObject textures = new JsonObject();
+        textures.addProperty("particle", texture.toString());
+        textures.addProperty("all", texture.toString());
+        root.add("textures", textures);
+        JsonObject element = new JsonObject();
+        element.add("from", insetCoords(
+                insetExposed(mask, Direction.WEST) ? INSET_DEPTH : 0,
+                insetExposed(mask, Direction.DOWN) ? INSET_DEPTH : 0,
+                insetExposed(mask, Direction.NORTH) ? INSET_DEPTH : 0));
+        element.add("to", insetCoords(
+                insetExposed(mask, Direction.EAST) ? 16 - INSET_DEPTH : 16,
+                insetExposed(mask, Direction.UP) ? 16 - INSET_DEPTH : 16,
+                insetExposed(mask, Direction.SOUTH) ? 16 - INSET_DEPTH : 16));
+        JsonObject faces = new JsonObject();
+        for (Direction dir : Direction.values()) {
+            JsonObject face = new JsonObject();
+            face.addProperty("texture", "#all");
+            if (!insetExposed(mask, dir)) {
+                face.addProperty("cullface", dir.getSerializedName());
+            }
+            faces.add(dir.getSerializedName(), face);
+        }
+        element.add("faces", faces);
+        JsonArray elements = new JsonArray();
+        elements.add(element);
+        root.add("elements", elements);
+        return root;
+    }
+
+    private static JsonArray insetCoords(int x, int y, int z) {
+        JsonArray coords = new JsonArray();
+        coords.add(x);
+        coords.add(y);
+        coords.add(z);
+        return coords;
+    }
+
     private void column(Block block, String side, String end) {
         ResourceLocation model = ModelTemplates.CUBE_COLUMN.create(block,
                 new TextureMapping().put(TextureSlot.SIDE, blockTexture(side)).put(TextureSlot.END, blockTexture(end)),
                 modelOutput);
         simpleBlock(block, model);
         delegateItem(block.asItem(), model);
+    }
+
+    private void obsidianTotem() {
+        Block block = TCBlocks.OBSIDIAN_TOTEM.get();
+        ResourceLocation baseModel = ModelTemplates.CUBE_COLUMN.createWithSuffix(block, "_base",
+                new TextureMapping().put(TextureSlot.SIDE, blockTexture("obsidian_totem_base"))
+                        .put(TextureSlot.END, blockTexture("obsidian_tile")), modelOutput);
+        ResourceLocation shadedModel = ModelTemplates.CUBE_COLUMN.createWithSuffix(block, "_shaded",
+                new TextureMapping().put(TextureSlot.SIDE, blockTexture("obsidian_totem_base_shaded"))
+                        .put(TextureSlot.END, blockTexture("obsidian_tile")), modelOutput);
+        List<Variant> carved = new ArrayList<>();
+        for (int i = 1; i <= 4; i++) {
+            ResourceLocation model = ModelTemplates.CUBE_COLUMN.createWithSuffix(block, "_carved_" + i,
+                    new TextureMapping().put(TextureSlot.SIDE, blockTexture("obsidian_totem_" + i))
+                            .put(TextureSlot.END, blockTexture("obsidian_tile")), modelOutput);
+            carved.add(v(model));
+            carved.add(v(model).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90));
+            carved.add(v(model).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180));
+            carved.add(v(model).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270));
+        }
+        for (Block totem : List.of(block, TCBlocks.OBSIDIAN_TOTEM_CHARGED.get())) {
+            blockStateOutput.accept(MultiVariantGenerator.multiVariant(totem)
+                    .with(PropertyDispatch.properties(BlockObsidianTotem.UP, BlockObsidianTotem.DOWN)
+                            .select(true, true, v(shadedModel))
+                            .select(true, false, v(shadedModel))
+                            .select(false, true, carved)
+                            .select(false, false, v(baseModel))));
+        }
+        delegateItem(block.asItem(), baseModel);
     }
 
     private void trap() {

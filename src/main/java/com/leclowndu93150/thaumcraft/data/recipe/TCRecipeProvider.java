@@ -40,6 +40,7 @@ import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
+import net.minecraft.data.recipes.SingleItemRecipeBuilder;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.resources.ResourceLocation;
@@ -250,6 +251,20 @@ public final class TCRecipeProvider extends RecipeProvider {
                     .save(output, TCIds.MODID + ":candle_" + dye.getName() + "_from_dye");
         }
 
+        new InfusionRecipeBuilder(registries.lookupOrThrow(IAspect.REGISTRY_KEY), RecipeCategory.MISC,
+                new ItemStack(TCItems.THAUMONOMICON_LINKING.get()), Ingredient.of(TCItems.THAUMONOMICON_SHARING.get()))
+                .aspect(TCAspects.COGNITIO, 40)
+                .aspect(TCAspects.SENSUS, 20)
+                .aspect(TCAspects.ALIENIS, 10)
+                .component(Ingredient.of(TCItems.VOID_SEED.get()))
+                .component(Ingredient.of(TCItems.BRAIN.get()))
+                .component(Ingredient.of(TCItems.VOID_SEED.get()))
+                .component(Ingredient.of(Items.ENDER_EYE))
+                .instability(2)
+                .gate(gate("link_book", 1))
+                .unlockedBy("has", has(TCItems.THAUMONOMICON_SHARING))
+                .save(output);
+
     }
 
     private void block3x3(ItemLike block, TagKey<Item> baseTag, ItemLike baseItem, TagKey<Item> blockTag){
@@ -371,6 +386,19 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .requires(TCItems.FLESH_BLOCK)
                 .unlockedBy("has", has(TCItems.FLESH_BLOCK))
                 .save(output, TCIds.MODID + ":rotten_flesh_from_flesh_block");
+
+        SingleItemRecipeBuilder.stonecutting(Ingredient.of(Items.OBSIDIAN), RecipeCategory.BUILDING_BLOCKS,
+                        TCItems.OBSIDIAN_TILE)
+                .unlockedBy("has", has(Items.OBSIDIAN))
+                .save(output, TCIds.MODID + ":obsidian_tile_from_obsidian_stonecutting");
+        SingleItemRecipeBuilder.stonecutting(Ingredient.of(Items.OBSIDIAN), RecipeCategory.BUILDING_BLOCKS,
+                        TCItems.OBSIDIAN_TOTEM)
+                .unlockedBy("has", has(Items.OBSIDIAN))
+                .save(output, TCIds.MODID + ":obsidian_totem_from_obsidian_stonecutting");
+        SingleItemRecipeBuilder.stonecutting(Ingredient.of(TCItems.OBSIDIAN_TILE), RecipeCategory.BUILDING_BLOCKS,
+                        TCItems.OBSIDIAN_TOTEM)
+                .unlockedBy("has", has(TCItems.OBSIDIAN_TILE))
+                .save(output, TCIds.MODID + ":obsidian_totem_from_obsidian_tile_stonecutting");
 
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCItems.AMBER_BRICK, 4)
                 .pattern("##")
@@ -1510,6 +1538,18 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .gate(gate("bellows"))
                 .unlockedBy("has",has(Tags.Items.LEATHERS))
                 .save(output);
+
+        arcaneShaped(new ItemStack(TCItems.THAUMONOMICON_SHARING.get()), 500)
+                .allAspects()
+                .pattern(" B ")
+                .pattern("MQM")
+                .pattern(" B ")
+                .define('B', TCItems.BRAIN)
+                .define('M', TCItems.MIRROR)
+                .define('Q', Items.WRITABLE_BOOK)
+                .gate(gate("share_book", 1))
+                .unlockedBy("has", has(TCItems.BRAIN))
+                .save(output);
     }
 
     private Holder<IAspect> getAspect(ResourceKey<IAspect> key) {
@@ -2388,6 +2428,19 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .gate(gate("node_stabilizer"))
                 .unlockedBy("has", has(TCItemTags.NITORS))
                 .save(output, TCIds.MODID + ":node_stabilizer");
+
+        arcaneShaped(new ItemStack(TCItems.NODE_TRANSDUCER.get()), NODE_STABILIZER_VIS)
+                .pattern("RCR")
+                .pattern("ISI")
+                .pattern("RAR")
+                .define('R', Blocks.REDSTONE_BLOCK)
+                .define('C', Items.COMPARATOR)
+                .define('I', Tags.Items.INGOTS_IRON)
+                .define('S', TCItems.NODE_STABILIZER)
+                .define('A', TCItemTags.NITORS)
+                .gate(gate("node_transducer"))
+                .unlockedBy("has", has(TCItems.NODE_STABILIZER))
+                .save(output, TCIds.MODID + ":node_transducer");
 
         new InfusionRecipeBuilder(aspects, RecipeCategory.MISC,
                 new ItemStack(TCItems.NODE_STABILIZER_ADVANCED.get()),

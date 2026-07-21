@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
 
 /**
  * An immutable, ordered list of aspect quantities.
@@ -136,6 +138,20 @@ public final class AspectList {
     public int amountOf(Holder<IAspect> aspect) {
         int index = indexOf(aspect);
         return index < 0 ? 0 : entries.get(index).amount();
+    }
+
+    /**
+     * The amount of the given aspect contained in this list, resolving the key against the given
+     * registry view. Convenience for callers that hold a {@link ResourceKey} rather than a
+     * {@link Holder}.
+     *
+     * @param key        the aspect key, compared after resolution against {@code registries}
+     * @param registries the registry view used to resolve the key
+     * @return the amount, or zero when the key is absent or cannot be resolved
+     */
+    public int amountOf(ResourceKey<IAspect> key, HolderLookup.Provider registries) {
+        Holder<IAspect> holder = Aspects.resolve(registries, key);
+        return holder == null ? 0 : amountOf(holder);
     }
 
     /**

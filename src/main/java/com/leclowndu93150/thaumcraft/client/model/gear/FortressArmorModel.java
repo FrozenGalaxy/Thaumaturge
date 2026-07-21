@@ -1,15 +1,13 @@
 package com.leclowndu93150.thaumcraft.client.model.gear;
 
-import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.world.entity.LivingEntity;
 
-public final class FortressArmorModel extends HumanoidModel<LivingEntity> {
+public final class FortressArmorModel extends AbstractTCArmorModel {
     private static final int TEX_WIDTH = 128;
     private static final int TEX_HEIGHT = 64;
     private static final float SIXTH_PI = (float) (Math.PI / 6);

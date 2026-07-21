@@ -14,12 +14,15 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-public record BoreParticlesData(BlockState state, double tx, double ty, double tz, double sx, double sy, double sz) implements ParticleOptions {
+public record BoreParticlesData(BlockState state, int targetEntityId, double tx, double ty, double tz,
+                                double sx, double sy, double sz) implements ParticleOptions {
+    public static final int NO_ENTITY = -1;
     private static final Codec<BlockState> BLOCK_STATE_CODEC = Codec.withAlternative(
             BlockState.CODEC, BuiltInRegistries.BLOCK.byNameCodec(), Block::defaultBlockState);
 
     public static final MapCodec<BoreParticlesData> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
             BLOCK_STATE_CODEC.fieldOf("block_state").forGetter(BoreParticlesData::state),
+            Codec.INT.fieldOf("target_entity_id").forGetter(BoreParticlesData::targetEntityId),
             Codec.DOUBLE.fieldOf("tx").forGetter(BoreParticlesData::tx),
             Codec.DOUBLE.fieldOf("ty").forGetter(BoreParticlesData::ty),
             Codec.DOUBLE.fieldOf("tz").forGetter(BoreParticlesData::tz),
@@ -34,6 +37,7 @@ public record BoreParticlesData(BlockState state, double tx, double ty, double t
     public static final StreamCodec<RegistryFriendlyByteBuf, BoreParticlesData> STREAM_CODEC = StreamCodec.of(
             (buffer, data) -> {
                 STATE_STREAM_CODEC.encode(buffer, data.state());
+                buffer.writeVarInt(data.targetEntityId());
                 buffer.writeDouble(data.tx());
                 buffer.writeDouble(data.ty());
                 buffer.writeDouble(data.tz());
@@ -41,9 +45,13 @@ public record BoreParticlesData(BlockState state, double tx, double ty, double t
                 buffer.writeDouble(data.sy());
                 buffer.writeDouble(data.sz());
             },
-            buffer -> new BoreParticlesData(STATE_STREAM_CODEC.decode(buffer),
+            buffer -> new BoreParticlesData(STATE_STREAM_CODEC.decode(buffer), buffer.readVarInt(),
                     buffer.readDouble(), buffer.readDouble(), buffer.readDouble(),
                     buffer.readDouble(), buffer.readDouble(), buffer.readDouble()));
+
+    public BoreParticlesData(BlockState state, double tx, double ty, double tz, double sx, double sy, double sz) {
+        this(state, NO_ENTITY, tx, ty, tz, sx, sy, sz);
+    }
 
     @Override
     public ParticleType<?> getType() {

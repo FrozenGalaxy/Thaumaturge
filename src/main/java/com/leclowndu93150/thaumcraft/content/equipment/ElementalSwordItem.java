@@ -1,10 +1,14 @@
 package com.leclowndu93150.thaumcraft.content.equipment;
 
 import com.leclowndu93150.thaumcraft.client.fx.FXClient;
+import com.leclowndu93150.thaumcraft.content.misc.TCActionBar;
 import com.leclowndu93150.thaumcraft.mixin.server.network.ServerGamePacketListenerImplAccessor;
+import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.List;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -17,6 +21,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -32,6 +37,12 @@ public final class ElementalSwordItem extends SwordItem {
     }
 
     @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(Component.translatable("tooltip.thaumcraft.elemental_sword.toggle")
+                .withStyle(ChatFormatting.DARK_GRAY));
+    }
+
+    @Override
     public UseAnim getUseAnimation(ItemStack stack) {
         return UseAnim.NONE;
     }
@@ -43,8 +54,24 @@ public final class ElementalSwordItem extends SwordItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (player.isSecondaryUseActive()) {
+            boolean disabled = !stack.getOrDefault(TCDataComponents.WHIRLWIND_DISABLED.get(), false);
+            stack.set(TCDataComponents.WHIRLWIND_DISABLED.get(), disabled);
+            if (!level.isClientSide()) {
+                TCActionBar.sendPurple(player, disabled
+                        ? "tc.elemental_sword.whirlwind_off"
+                        : "tc.elemental_sword.whirlwind_on");
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), TCSounds.KEY.get(),
+                        SoundSource.PLAYERS, 0.5F, disabled ? 0.8F : 1.2F);
+            }
+            return InteractionResultHolder.success(stack);
+        }
+        if (stack.getOrDefault(TCDataComponents.WHIRLWIND_DISABLED.get(), false)) {
+            return InteractionResultHolder.pass(stack);
+        }
         player.startUsingItem(hand);
-        return InteractionResultHolder.consume(player.getItemInHand(hand));
+        return InteractionResultHolder.consume(stack);
     }
 
     @Override

@@ -108,7 +108,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
     private static final int SEARCH_BOX_WIDTH = 89;
     private static final int SEARCH_BOX_HEIGHT = 12;
     private static final int SEARCH_RESULT_TEXT_X = 32;
-    private static final int SEARCH_RESULT_TEXT_Y_START = 32;
+    private static final int SEARCH_RESULT_TEXT_Y_START = 33;
     private static final int SEARCH_RESULT_ROW_HEIGHT = 10;
     private static final int SEARCH_RESULT_OVERFLOW_Y_OFFSET = 2;
     private static final int SEARCH_RESULT_HIT_LEFT_X = 22;
@@ -208,7 +208,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         searchField = new EditBox(font, SEARCH_BOX_X, SEARCH_BOX_Y, SEARCH_BOX_WIDTH, SEARCH_BOX_HEIGHT, Component.translatable("tc.search"));
         searchField.setBordered(true);
         searchField.setMaxLength(15);
-        searchField.setTextColor(0xFFFFFF);
+        searchField.setTextColor(0xFFFFFFFF);
         searchField.setResponder(this::onSearchChanged);
         searchField.setVisible(false);
         addRenderableWidget(searchField);
@@ -395,7 +395,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
                 searchResults.add(SearchResult.entry(entryName, node));
             }
             int stage = knowledge.researchStage(known);
-            int sIdx = node.entry.stages().size() - 1 < stage + 1 ? node.entry.stages().size() - 1 : stage + 1;
+            int sIdx = node.entry.stages().size() - 1 < stage + 2 ? node.entry.stages().size() - 1 : stage + 2;
             if (sIdx >= 0 && sIdx < node.entry.stages().size()) {
                 IResearchStage st = node.entry.stages().get(sIdx);
                 for (ResearchRequirement req : st.craft()) {
@@ -706,19 +706,29 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
                     && mouseY >= textY
                     && mouseY < textY + 8;
             int color = sr.color(hover);
+            graphics.pose().pushPose();
+            graphics.pose().scale(SEARCH_RESULT_ICON_SCALE, SEARCH_RESULT_ICON_SCALE, 1F);
+            int iconScreenX = (SEARCH_RESULT_ICON_X * 2);
+            int iconScreenY = textY * 2;
             if (sr.recipeIcon()) {
-                graphics.pose().pushPose();
-                graphics.pose().scale(SEARCH_RESULT_ICON_SCALE, SEARCH_RESULT_ICON_SCALE, 1F);
-                int iconScreenX = (SEARCH_RESULT_ICON_X * 2);
-                int iconScreenY = textY * 2;
                 graphics.blit(
                         TCScreenTextures.RESEARCH_BROWSER,
                         iconScreenX, iconScreenY,
                         (float) SEARCH_RESULT_ICON_U, (float) SEARCH_RESULT_ICON_V,
                         SEARCH_RESULT_ICON_W, SEARCH_RESULT_ICON_W,
                         TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
-                graphics.pose().popPose();
+            } else if (sr.entryNode != null) {
+                Object icon = resolveDisplayIcon(sr.entryNode);
+                EntryIconRenderer.drawResearchIcon(graphics, iconScreenX, iconScreenY, icon, false);
+            } else if (sr.categoryRef != null && sr.categoryRef.isBound()) {
+                GuiBlend.blitTinted(graphics, sr.categoryRef.value().icon(),
+                        iconScreenX, iconScreenY,
+                        0.0F, 0.0F,
+                        CATEGORY_ICON_SIZE, CATEGORY_ICON_SIZE,
+                        CATEGORY_ICON_SIZE, CATEGORY_ICON_SIZE,
+                        CATEGORY_TAB_INACTIVE_ICON_TINT);
             }
+            graphics.pose().popPose();
             graphics.drawString(font, sr.displayName(), SEARCH_RESULT_TEXT_X, textY, color, false);
             q++;
             if (SEARCH_RESULT_TEXT_Y_START + (q + 1) * SEARCH_RESULT_ROW_HEIGHT > screenY) {
@@ -926,10 +936,10 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         if (canUnlock) {
             if (!knowledge.isResearchComplete(node.id) && !node.entry.stages().isEmpty()) {
                 int stage = knowledge.researchStage(node.id);
-                if (stage > 0) {
+                if (stage >= 0) {
                     MutableComponent stageLine = Component.literal("@@")
                             .append(Component.literal(ChatFormatting.AQUA + Component.translatable("tc.research.stage").getString()
-                                    + " " + stage + "/" + node.entry.stages().size() + ChatFormatting.RESET));
+                                    + " " + (stage + 1) + "/" + node.entry.stages().size() + ChatFormatting.RESET));
                     lines.add(stageLine);
                 } else {
                     MutableComponent begin = Component.literal("@@")
@@ -954,6 +964,9 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         }
         if (knowledge.hasResearchFlag(node.id, ResearchFlag.PAGE)) {
             lines.add(Component.literal("@@").append(Component.translatable("tc.research.newpage")));
+        }
+        if (minecraft.options.advancedItemTooltips) {
+            lines.add(Component.literal(ChatFormatting.DARK_GRAY + node.id.toString()));
         }
         TCTooltipRenderer.render(graphics, font, lines, mouseX, mouseY);
     }
@@ -1040,7 +1053,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
             PacketDistributor.sendToServer(new ServerboundClearResearchFlagsPayload(
                     hl.id, List.of(ResearchFlag.RESEARCH, ResearchFlag.PAGE)));
             int stage = knowledge.researchStage(hl.id);
-            if (stage > 1 && stage >= hl.entry.stages().size()) {
+            if (stage > 0 && stage >= hl.entry.stages().size() - 1) {
                 PacketDistributor.sendToServer(new ServerboundUnlockResearchPayload(hl.id));
             }
             persistState();
@@ -1153,7 +1166,8 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
             toggleSearch();
             return true;
         }
-        if (minecraft != null && minecraft.options.keyInventory.matches(keyCode, scanCode)) {
+        if (minecraft != null && minecraft.options.keyInventory.matches(keyCode, scanCode)
+                && (searchField == null || !searchField.isFocused())) {
             onClose();
             return true;
         }

@@ -41,6 +41,10 @@ public final class TCCreativeTabs {
                     .icon(() -> new ItemStack(TCItems.THAUMONOMICON.get()))
                     .displayItems((parameters, output) -> {
                         output.accept(TCItems.THAUMONOMICON.get());
+                        output.accept(TCItems.THAUMONOMICON_CHEAT.get());
+                        output.accept(TCItems.THAUMONOMICON_SHARING.get());
+                        output.accept(TCItems.THAUMONOMICON_LINKING.get());
+                        output.accept(TCItems.CREATIVE_NODE_PLACER.get());
                         output.accept(TCItems.SALIS_MUNDUS.get());
                         output.accept(TCItems.THAUMOMETER.get());
                         output.accept(TCItems.SCRIBING_TOOLS.get());
@@ -83,6 +87,7 @@ public final class TCCreativeTabs {
                         output.accept(TCItems.PRIMAL_CHARM.get());
                         output.accept(TCItems.NODE_STABILIZER.get());
                         output.accept(TCItems.NODE_STABILIZER_ADVANCED.get());
+                        output.accept(TCItems.NODE_TRANSDUCER.get());
                         output.accept(TCItems.FOCUS_1.get());
                         output.accept(TCItems.FOCUS_2.get());
                         output.accept(TCItems.FOCUS_3.get());
@@ -314,6 +319,7 @@ public final class TCCreativeTabs {
                         output.accept(TCItems.AMBER_BRICK.get());
                         output.accept(TCItems.FLESH_BLOCK.get());
                         output.accept(TCItems.OBSIDIAN_TILE.get());
+                        output.accept(TCItems.OBSIDIAN_TOTEM.get());
                         output.accept(TCItems.ELDRITCH_STONE.get());
                         output.accept(TCItems.ELDRITCH_ROCK.get());
                         output.accept(TCItems.ELDRITCH_CRUST.get());
@@ -444,6 +450,11 @@ public final class TCCreativeTabs {
                         output.accept(TCItems.CULTIST_KNIGHT_SPAWN_EGG.get());
                         output.accept(TCItems.CULTIST_CLERIC_SPAWN_EGG.get());
                         output.accept(TCItems.CULTIST_PORTAL_LESSER_SPAWN_EGG.get());
+                        output.accept(TCItems.CULTIST_LEADER_SPAWN_EGG.get());
+                        output.accept(TCItems.CULTIST_PORTAL_GREATER_SPAWN_EGG.get());
+                        output.accept(TCItems.ELDRITCH_WARDEN_SPAWN_EGG.get());
+                        output.accept(TCItems.ELDRITCH_GOLEM_SPAWN_EGG.get());
+                        output.accept(TCItems.TAINTACLE_GIANT_SPAWN_EGG.get());
                     })
                     .build()
     );

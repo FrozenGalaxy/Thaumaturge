@@ -8,7 +8,7 @@ import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aspect.TCAspects;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
-import com.leclowndu93150.thaumcraft.content.aspect.AspectIndexHolder;
+import com.leclowndu93150.thaumcraft.api.aspect.AspectIndexAccess;
 import com.leclowndu93150.thaumcraft.content.essentia.BellowsHelper;
 import com.leclowndu93150.thaumcraft.content.fx.FX;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
@@ -233,7 +233,7 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
     private void smeltItem() {
         if (!this.canSmelt()) return;
         int flux = 0;
-        AspectList aspects = AspectIndexHolder.get().of(inventory.getStackInSlot(0).copy());
+        AspectList aspects = AspectIndexAccess.index().of(inventory.getStackInSlot(0).copy());
         for (AspectInstance instance : aspects.entries()){
             if (getEfficiency() < 1.0F){
                 int amount = instance.amount();
@@ -308,7 +308,7 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
     private boolean canSmelt(){
         if (inventory.getStackInSlot(0).getCount() <= 0) return false;
         this.vis = aspects.totalAmount();
-        AspectList aspects = AspectIndexHolder.get().of(inventory.getStackInSlot(0).copy());
+        AspectList aspects = AspectIndexAccess.index().of(inventory.getStackInSlot(0).copy());
         if (!aspects.isEmpty()){
             int total = aspects.totalAmount();
             if (total > MAX_VIS - vis)
@@ -383,7 +383,7 @@ public class BlockEntitySmelter extends BlockEntity implements MenuProvider {
         @Override
         public boolean isItemValid(int index, ItemStack resource) {
             return switch (index) {
-                case 0 -> !AspectIndexHolder.get().of(resource.copy()).isEmpty();
+                case 0 -> !AspectIndexAccess.index().of(resource.copy()).isEmpty();
                 case 1 -> resource.copy().getBurnTime(RecipeType.SMELTING) > 0;
                 default -> false;
             };

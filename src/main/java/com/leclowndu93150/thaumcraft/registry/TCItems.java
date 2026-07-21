@@ -4,7 +4,9 @@ import com.leclowndu93150.thaumcraft.content.research.note.ItemResearchNote;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.essentia.jar.JarBraceItem;
 import com.leclowndu93150.thaumcraft.content.essentia.jar.JarItem;
+import com.leclowndu93150.thaumcraft.content.infernalfurnace.ItemInfernalFurnace;
 import com.leclowndu93150.thaumcraft.content.casters.ItemFocus;
+import com.leclowndu93150.thaumcraft.content.aura.node.CreativeNodePlacerItem;
 import com.leclowndu93150.thaumcraft.content.aura.node.JarNodeItem;
 import com.leclowndu93150.thaumcraft.content.wands.ItemPrimalCharm;
 import com.leclowndu93150.thaumcraft.content.wands.ItemWand;
@@ -30,6 +32,9 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
+import com.leclowndu93150.thaumcraft.content.research.book.CheatThaumonomiconItem;
+import com.leclowndu93150.thaumcraft.content.research.book.LinkingThaumonomiconItem;
+import com.leclowndu93150.thaumcraft.content.research.book.SharingThaumonomiconItem;
 import com.leclowndu93150.thaumcraft.content.research.book.ThaumonomiconItem;
 import com.leclowndu93150.thaumcraft.content.essentia.jar.JarBrainItem;
 import com.leclowndu93150.thaumcraft.content.taint.item.ItemBottleTaint;
@@ -71,6 +76,7 @@ import com.leclowndu93150.thaumcraft.content.essentia.ItemResonator;
 import com.leclowndu93150.thaumcraft.content.equipment.CrimsonBladeItem;
 import com.leclowndu93150.thaumcraft.content.pech.PechWandItem;
 import com.leclowndu93150.thaumcraft.content.world.mound.LootBagItem;
+import com.leclowndu93150.thaumcraft.content.equipment.CultistPlateItem;
 import com.leclowndu93150.thaumcraft.content.equipment.CultistRobeItem;
 import com.leclowndu93150.thaumcraft.content.equipment.ElementalAxeItem;
 import com.leclowndu93150.thaumcraft.content.golem.ItemGolemAccessory;
@@ -126,7 +132,8 @@ public final class TCItems {
 
     public static final DeferredItem<BlockItem> SMELTER_VENT = ITEMS.registerSimpleBlockItem(TCBlocks.SMELTER_VENT);
 
-    public static final DeferredItem<BlockItem> INFERNAL_FURNACE = ITEMS.registerSimpleBlockItem(TCBlocks.INFERNAL_FURNACE);
+    public static final DeferredItem<BlockItem> INFERNAL_FURNACE =
+            registerSimpleBlockItem(TCBlocks.INFERNAL_FURNACE, ItemInfernalFurnace::new);
 
     public static final DeferredItem<BlockItem> JAR_NORMAL = registerSimpleBlockItem(TCBlocks.JAR_NORMAL, JarItem::new);
 
@@ -166,6 +173,26 @@ public final class TCItems {
             "thaumonomicon",
             ThaumonomiconItem::new,
             new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON));
+
+    public static final DeferredItem<CheatThaumonomiconItem> THAUMONOMICON_CHEAT = ITEMS.registerItem(
+            "thaumonomicon_cheat",
+            CheatThaumonomiconItem::new,
+            new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
+
+    public static final DeferredItem<SharingThaumonomiconItem> THAUMONOMICON_SHARING = ITEMS.registerItem(
+            "thaumonomicon_sharing",
+            SharingThaumonomiconItem::new,
+            new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON));
+
+    public static final DeferredItem<LinkingThaumonomiconItem> THAUMONOMICON_LINKING = ITEMS.registerItem(
+            "thaumonomicon_linking",
+            LinkingThaumonomiconItem::new,
+            new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
+
+    public static final DeferredItem<CreativeNodePlacerItem> CREATIVE_NODE_PLACER = ITEMS.registerItem(
+            "creative_node_placer",
+            CreativeNodePlacerItem::new,
+            new Item.Properties().rarity(Rarity.EPIC));
 
     public static final DeferredItem<SalisMundusItem> SALIS_MUNDUS = ITEMS.registerItem(
             "salis_mundus",
@@ -267,11 +294,11 @@ public final class TCItems {
     public static final DeferredItem<CrimsonBladeItem> CRIMSON_BLADE = ITEMS.registerItem("crimson_blade",
             props -> new CrimsonBladeItem(props.attributes(SwordItem.createAttributes(TCMaterials.TOOL_CRIMSON_VOID, 3.0F, -2.4F)).rarity(Rarity.EPIC)));
     public static final DeferredItem<Item> CRIMSON_PLATE_HELM = ITEMS.registerItem("crimson_plate_helm",
-            props -> new ArmorItem(TCMaterials.ARMOR_CULTIST_PLATE, ArmorItem.Type.HELMET, props.durability(ArmorItem.Type.HELMET.getDurability(TCMaterials.DURABILITY_CULTIST_PLATE)).rarity(Rarity.UNCOMMON)));
+            props -> new CultistPlateItem(TCMaterials.ARMOR_CULTIST_PLATE, ArmorItem.Type.HELMET, props.durability(ArmorItem.Type.HELMET.getDurability(TCMaterials.DURABILITY_CULTIST_PLATE)).rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<Item> CRIMSON_PLATE_CHEST = ITEMS.registerItem("crimson_plate_chest",
-            props -> new ArmorItem(TCMaterials.ARMOR_CULTIST_PLATE, ArmorItem.Type.CHESTPLATE, props.durability(ArmorItem.Type.CHESTPLATE.getDurability(TCMaterials.DURABILITY_CULTIST_PLATE)).rarity(Rarity.UNCOMMON)));
+            props -> new CultistPlateItem(TCMaterials.ARMOR_CULTIST_PLATE, ArmorItem.Type.CHESTPLATE, props.durability(ArmorItem.Type.CHESTPLATE.getDurability(TCMaterials.DURABILITY_CULTIST_PLATE)).rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<Item> CRIMSON_PLATE_LEGS = ITEMS.registerItem("crimson_plate_legs",
-            props -> new ArmorItem(TCMaterials.ARMOR_CULTIST_PLATE, ArmorItem.Type.LEGGINGS, props.durability(ArmorItem.Type.LEGGINGS.getDurability(TCMaterials.DURABILITY_CULTIST_PLATE)).rarity(Rarity.UNCOMMON)));
+            props -> new CultistPlateItem(TCMaterials.ARMOR_CULTIST_PLATE, ArmorItem.Type.LEGGINGS, props.durability(ArmorItem.Type.LEGGINGS.getDurability(TCMaterials.DURABILITY_CULTIST_PLATE)).rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<CultistRobeItem> CRIMSON_BOOTS = ITEMS.registerItem("crimson_boots",
             props -> new CultistRobeItem(TCMaterials.ARMOR_CULTIST_BOOTS, ArmorItem.Type.BOOTS, props.durability(ArmorItem.Type.BOOTS.getDurability(TCMaterials.DURABILITY_CULTIST_BOOTS)).rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<CultistRobeItem> CRIMSON_ROBE_HELM = ITEMS.registerItem("crimson_robe_helm",
@@ -370,6 +397,16 @@ public final class TCItems {
             registerSpawnEgg("taintacle_spawn_egg", TCEntities.TAINTACLE);
     public static final DeferredItem<SpawnEggItem> TAINT_SWARM_SPAWN_EGG =
             registerSpawnEgg("taint_swarm_spawn_egg", TCEntities.TAINT_SWARM);
+    public static final DeferredItem<SpawnEggItem> ELDRITCH_WARDEN_SPAWN_EGG =
+            registerSpawnEgg("eldritch_warden_spawn_egg", TCEntities.ELDRITCH_WARDEN);
+    public static final DeferredItem<SpawnEggItem> ELDRITCH_GOLEM_SPAWN_EGG =
+            registerSpawnEgg("eldritch_golem_spawn_egg", TCEntities.ELDRITCH_GOLEM);
+    public static final DeferredItem<SpawnEggItem> CULTIST_LEADER_SPAWN_EGG =
+            registerSpawnEgg("cultist_leader_spawn_egg", TCEntities.CULTIST_LEADER);
+    public static final DeferredItem<SpawnEggItem> CULTIST_PORTAL_GREATER_SPAWN_EGG =
+            registerSpawnEgg("cultist_portal_greater_spawn_egg", TCEntities.CULTIST_PORTAL_GREATER);
+    public static final DeferredItem<SpawnEggItem> TAINTACLE_GIANT_SPAWN_EGG =
+            registerSpawnEgg("taintacle_giant_spawn_egg", TCEntities.TAINTACLE_GIANT);
     public static final DeferredItem<SpawnEggItem> TAINT_SEED_SPAWN_EGG =
             registerSpawnEgg("taint_seed_spawn_egg", TCEntities.TAINT_SEED);
     public static final DeferredItem<SpawnEggItem> TAINT_SEED_PRIME_SPAWN_EGG =
@@ -711,6 +748,7 @@ public final class TCItems {
 
     public static final DeferredItem<BlockItem> NODE_STABILIZER = ITEMS.registerSimpleBlockItem(TCBlocks.NODE_STABILIZER);
     public static final DeferredItem<BlockItem> NODE_STABILIZER_ADVANCED = ITEMS.registerSimpleBlockItem(TCBlocks.NODE_STABILIZER_ADVANCED);
+    public static final DeferredItem<BlockItem> NODE_TRANSDUCER = ITEMS.registerSimpleBlockItem(TCBlocks.NODE_TRANSDUCER);
     public static final DeferredItem<JarNodeItem> JAR_NODE = ITEMS.registerItem(
             "jar_node", props -> new JarNodeItem(TCBlocks.JAR_NODE.get(), props));
 
@@ -835,6 +873,7 @@ public final class TCItems {
             "focus_pouch", FocusPouchItem::new, new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON));
     public static final DeferredItem<BlockItem> ACTIVATOR_RAIL = ITEMS.registerSimpleBlockItem(TCBlocks.ACTIVATOR_RAIL);
     public static final DeferredItem<BlockItem> OBSIDIAN_TILE = ITEMS.registerSimpleBlockItem(TCBlocks.OBSIDIAN_TILE);
+    public static final DeferredItem<BlockItem> OBSIDIAN_TOTEM = ITEMS.registerSimpleBlockItem(TCBlocks.OBSIDIAN_TOTEM);
     public static final DeferredItem<BlockItem> ELDRITCH_STONE = ITEMS.registerSimpleBlockItem(TCBlocks.ELDRITCH_STONE);
     public static final DeferredItem<BlockItem> ELDRITCH_STONE_INERT = ITEMS.registerSimpleBlockItem(TCBlocks.ELDRITCH_STONE_INERT);
     public static final DeferredItem<BlockItem> ELDRITCH_ROCK = ITEMS.registerSimpleBlockItem(TCBlocks.ELDRITCH_ROCK);

@@ -3,7 +3,7 @@ package com.leclowndu93150.thaumcraft.content.research.decon;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
-import com.leclowndu93150.thaumcraft.content.aspect.AspectIndexHolder;
+import com.leclowndu93150.thaumcraft.api.aspect.AspectIndexAccess;
 import com.leclowndu93150.thaumcraft.content.research.pool.AspectPools;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import java.util.List;
@@ -95,7 +95,7 @@ public final class BlockEntityDeconstructionTable extends BlockEntity implements
             return false;
         }
         ItemStack input = inventory.getStackInSlot(SLOT_INPUT);
-        return !input.isEmpty() && !AspectIndexHolder.get().of(input).isEmpty();
+        return !input.isEmpty() && !AspectIndexAccess.index().of(input).isEmpty();
     }
 
     private void breakItem(Level level, BlockPos pos) {
@@ -103,7 +103,7 @@ public final class BlockEntityDeconstructionTable extends BlockEntity implements
         if (input.isEmpty()) {
             return;
         }
-        AspectList primals = AspectPrimals.reduce(AspectIndexHolder.get().of(input.copyWithCount(1)));
+        AspectList primals = AspectPrimals.reduce(AspectIndexAccess.index().of(input.copyWithCount(1)));
         if (!primals.isEmpty() && level.getRandom().nextInt(YIELD_ROLL) < primals.totalAmount()) {
             List<Holder<IAspect>> types = List.copyOf(primals.aspects());
             Holder<IAspect> picked = types.get(level.getRandom().nextInt(types.size()));
@@ -192,7 +192,7 @@ public final class BlockEntityDeconstructionTable extends BlockEntity implements
 
         @Override
         public boolean isItemValid(int index, ItemStack resource) {
-            return !AspectIndexHolder.get().of(resource).isEmpty();
+            return !AspectIndexAccess.index().of(resource).isEmpty();
         }
     }
 }

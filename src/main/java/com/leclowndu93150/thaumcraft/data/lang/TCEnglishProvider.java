@@ -81,6 +81,7 @@ public final class TCEnglishProvider extends LanguageProvider {
         card("experimentation", "Experimentation",
                 "Sometimes the best way forward is to simply try things. You gain progress in a random category and a small Thaumaturgy bonus.");
 
+        add("resourcePack.thaumcraft.programmer_art.name", "Thaumcraft Programmer Art");
         add("knowledge_type.thaumcraft.theory", "Theory");
         add("knowledge_type.thaumcraft.observation", "Observation");
         add("tc.knowledge.tooltip", "%1$s: %2$s");
@@ -195,6 +196,22 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("block.thaumcraft.jar_normal", "Warded Jar");
         add("block.thaumcraft.jar_void", "Void Jar");
         add("item.thaumcraft.thaumonomicon", "Thaumonomicon");
+        add("item.thaumcraft.thaumonomicon_cheat", "Cheater's Thaumonomicon");
+        add("item.thaumcraft.thaumonomicon_sharing", "Thaumonomicon of Sharing");
+        add("item.thaumcraft.thaumonomicon_linking", "Thaumonomicon of Binding");
+        add("item.thaumcraft.creative_node_placer", "Creative Node Placer");
+        add("block.thaumcraft.node_transducer", "Node Transducer");
+        add("tooltip.thaumcraft.creative_only", "Creative only");
+        add("tooltip.thaumcraft.sharing.bound", "Attuned to %s");
+        add("tooltip.thaumcraft.sharing.hint", "Use once to attune, then have your research partner use it");
+        add("tc.thaumonomicon.cheat.granted", "The book whispers %s secrets into your mind");
+        add("tc.thaumonomicon.sharing.bound", "The book attunes to your mind - hand it to your research partner");
+        add("tc.thaumonomicon.sharing.self", "The book is already attuned to you - it needs another's touch");
+        add("tc.thaumonomicon.sharing.linked", "Your knowledge now flows freely between you and %s");
+        add("tc.thaumonomicon.sharing.used", "%s has transmitted you all their knowledge");
+        add("tc.elemental_sword.whirlwind_on", "The blade's winds stir once more");
+        add("tc.elemental_sword.whirlwind_off", "The blade's winds fall still");
+        add("tooltip.thaumcraft.elemental_sword.toggle", "Sneak + right-click to toggle the whirlwind");
         add("item.thaumcraft.jar_brace", "Brass Lid Brace");
         add("item.thaumcraft.label", "Label");
         add("item.thaumcraft.salis_mundus", "Salis Mundus");
@@ -492,6 +509,7 @@ public final class TCEnglishProvider extends LanguageProvider {
 
         add("item.thaumcraft.phial.empty", "Glass Phial");
         add("item.thaumcraft.phial.filled", "Phial of %1$s Essentia");
+        add("item.thaumcraft.phial.unknown", "Phial of Unknown Essentia");
         add("item.thaumcraft.primordial_pearl.pearl", "Primordial Pearl");
         add("item.thaumcraft.primordial_pearl.nodule", "Primordial Nodule");
         add("item.thaumcraft.primordial_pearl.mote", "Primordial Mote");
@@ -1185,6 +1203,8 @@ public final class TCEnglishProvider extends LanguageProvider {
 
     private void langOuterLands() {
         add("block.thaumcraft.obsidian_tile", "Obsidian Tile");
+        add("block.thaumcraft.obsidian_totem", "Obsidian Totem");
+        add("block.thaumcraft.obsidian_totem_charged", "Charged Obsidian Totem");
         add("block.thaumcraft.eldritch_stone", "Eldritch Stone");
         add("block.thaumcraft.eldritch_stone_inert", "Inert Eldritch Stone");
         add("block.thaumcraft.eldritch_rock", "Eldritch Rock");
@@ -1232,6 +1252,11 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("item.thaumcraft.cultist_knight_spawn_egg", "Crimson Knight Spawn Egg");
         add("item.thaumcraft.cultist_cleric_spawn_egg", "Crimson Cleric Spawn Egg");
         add("item.thaumcraft.cultist_portal_lesser_spawn_egg", "Lesser Crimson Portal Spawn Egg");
+        add("item.thaumcraft.cultist_leader_spawn_egg", "Cultist Leader Spawn Egg");
+        add("item.thaumcraft.cultist_portal_greater_spawn_egg", "Greater Crimson Portal Spawn Egg");
+        add("item.thaumcraft.eldritch_warden_spawn_egg", "Eldritch Warden Spawn Egg");
+        add("item.thaumcraft.eldritch_golem_spawn_egg", "Eldritch Golem Spawn Egg");
+        add("item.thaumcraft.taintacle_giant_spawn_egg", "Giant Taintacle Spawn Egg");
         add("item.thaumcraft.pech_wand", "Pech Wand");
         add("item.thaumcraft.crimson_blade", "Crimson Blade");
         add("item.thaumcraft.crimson_boots", "Crimson Cult Boots");

@@ -37,6 +37,7 @@ public final class TCItemRenderExtensions {
         register(event, WandItemSpecialRenderer::new, TCItems.WAND);
         register(event, () -> new NodeStabilizerItemSpecialRenderer(false), TCItems.NODE_STABILIZER);
         register(event, () -> new NodeStabilizerItemSpecialRenderer(true), TCItems.NODE_STABILIZER_ADVANCED);
+        register(event, () -> new NodeStabilizerItemSpecialRenderer(false, true), TCItems.NODE_TRANSDUCER);
         register(event, HungryChestItemSpecialRenderer::new, TCItems.HUNGRY_CHEST);
     }
 

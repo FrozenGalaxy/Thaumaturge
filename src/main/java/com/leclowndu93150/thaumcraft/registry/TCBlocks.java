@@ -10,7 +10,10 @@ import com.leclowndu93150.thaumcraft.content.infusion.BlockInfusionMatrix;
 import com.leclowndu93150.thaumcraft.content.infusion.BlockPedestal;
 import com.leclowndu93150.thaumcraft.content.aura.BlockRechargePedestal;
 import com.leclowndu93150.thaumcraft.content.infusion.BlockPillar;
+import com.leclowndu93150.thaumcraft.content.decor.BlockAmber;
 import com.leclowndu93150.thaumcraft.content.decor.BlockCandle;
+import com.leclowndu93150.thaumcraft.content.decor.BlockObsidianTotem;
+import com.leclowndu93150.thaumcraft.content.decor.BlockObsidianTotemCharged;
 import com.leclowndu93150.thaumcraft.content.decor.banner.BannerStandingBlock;
 import com.leclowndu93150.thaumcraft.content.decor.banner.BannerWallBlock;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
@@ -23,6 +26,7 @@ import com.leclowndu93150.thaumcraft.content.decor.BlockTable;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchAltar;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchCap;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchCrabSpawner;
+import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchInset;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchLock;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchNothing;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchObelisk;
@@ -34,6 +38,7 @@ import com.leclowndu93150.thaumcraft.content.decor.BlockEffectShock;
 import com.leclowndu93150.thaumcraft.content.aura.node.BlockJarNode;
 import com.leclowndu93150.thaumcraft.content.aura.node.BlockNode;
 import com.leclowndu93150.thaumcraft.content.aura.node.BlockNodeStabilizer;
+import com.leclowndu93150.thaumcraft.content.aura.node.BlockNodeTransducer;
 import com.leclowndu93150.thaumcraft.content.decor.BlockBarrier;
 import com.leclowndu93150.thaumcraft.content.decor.BlockPavingStone;
 import com.leclowndu93150.thaumcraft.content.equipment.BlockEffectGlimmer;
@@ -98,7 +103,7 @@ import com.leclowndu93150.thaumcraft.content.world.plant.BlockGrassAmbient;
 import com.leclowndu93150.thaumcraft.content.world.plant.BlockPlantCinderpearl;
 import com.leclowndu93150.thaumcraft.content.world.plant.BlockPlantShimmerleaf;
 import com.leclowndu93150.thaumcraft.content.world.plant.BlockPlantVishroom;
-import com.leclowndu93150.thaumcraft.content.world.tree.BlockLeavesTC;
+import net.minecraft.world.level.block.LeavesBlock;
 import com.leclowndu93150.thaumcraft.content.world.tree.BlockSaplingTC;
 import com.leclowndu93150.thaumcraft.content.world.tree.TCTreeGrowers;
 
@@ -109,6 +114,8 @@ import java.util.Optional;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.PoweredRailBlock;
@@ -456,6 +463,18 @@ public final class TCBlocks {
                 .sound(SoundType.STONE)
                 .noOcclusion()
                 .requiresCorrectToolForDrops();
+    }
+
+    private static BlockBehaviour.Properties amberProps() {
+        return BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_ORANGE)
+                .strength(0.5F)
+                .sound(SoundType.STONE)
+                .noOcclusion()
+                .isValidSpawn((state, level, pos, entityType) -> false)
+                .isRedstoneConductor((state, level, pos) -> false)
+                .isSuffocating((state, level, pos) -> false)
+                .isViewBlocking((state, level, pos) -> false);
     }
 
     private static BlockBehaviour.Properties taintBlockProps() {
@@ -1099,15 +1118,15 @@ public final class TCBlocks {
                     .ignitedByLava()
     );
 
-    public static final DeferredBlock<BlockLeavesTC> LEAVES_GREATWOOD = BLOCKS.registerBlock(
+    public static final DeferredBlock<LeavesBlock> LEAVES_GREATWOOD = BLOCKS.registerBlock(
             "leaves_greatwood",
-            props -> new BlockLeavesTC(0.01F, props),
+            LeavesBlock::new,
             leavesProps()
     );
 
-    public static final DeferredBlock<BlockLeavesTC> LEAVES_SILVERWOOD = BLOCKS.registerBlock(
+    public static final DeferredBlock<LeavesBlock> LEAVES_SILVERWOOD = BLOCKS.registerBlock(
             "leaves_silverwood",
-            props -> new BlockLeavesTC(0.01F, props),
+            LeavesBlock::new,
             leavesProps().mapColor(MapColor.COLOR_LIGHT_BLUE)
     );
 
@@ -1331,14 +1350,14 @@ public final class TCBlocks {
             "node_stabilizer_advanced", props -> new BlockNodeStabilizer(props, true),
             BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(2.0F, 10.0F).noOcclusion());
 
-    public static final DeferredBlock<Block> AMBER_BRICK = BLOCKS.registerBlock(
+    public static final DeferredBlock<BlockNodeTransducer> NODE_TRANSDUCER = BLOCKS.registerBlock(
+            "node_transducer", BlockNodeTransducer::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(2.0F, 10.0F).noOcclusion());
+
+    public static final DeferredBlock<BlockAmber> AMBER_BRICK = BLOCKS.registerBlock(
             "amber_brick",
-            Block::new,
-            BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.METAL)
-                    .strength(4.0F, 10.0F)
-                    .sound(SoundType.METAL)
-                    .requiresCorrectToolForDrops()
+            BlockAmber::new,
+            amberProps()
     );
 
     public static final DeferredBlock<Block> FLESH_BLOCK = BLOCKS.registerBlock(
@@ -1370,6 +1389,14 @@ public final class TCBlocks {
             "obsidian_tile", Block::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 10.0F).sound(SoundType.STONE).requiresCorrectToolForDrops());
 
+    public static final DeferredBlock<BlockObsidianTotem> OBSIDIAN_TOTEM = BLOCKS.registerBlock(
+            "obsidian_totem", BlockObsidianTotem::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 10.0F).sound(SoundType.STONE).requiresCorrectToolForDrops());
+
+    public static final DeferredBlock<BlockObsidianTotemCharged> OBSIDIAN_TOTEM_CHARGED = BLOCKS.registerBlock(
+            "obsidian_totem_charged", BlockObsidianTotemCharged::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 10.0F).sound(SoundType.STONE).requiresCorrectToolForDrops());
+
     public static final DeferredBlock<Block> ELDRITCH_STONE = BLOCKS.registerBlock(
             "eldritch_stone", Block::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 10.0F).sound(SoundType.STONE).requiresCorrectToolForDrops());
@@ -1387,10 +1414,10 @@ public final class TCBlocks {
             "eldritch_crust", Block::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 10.0F).sound(TCSoundTypes.GORE));
 
-    public static final DeferredBlock<Block> ELDRITCH_CRUST_GLOWING = BLOCKS.registerBlock(
-            "eldritch_crust_glowing", Block::new,
-            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 10.0F).sound(TCSoundTypes.GORE)
-                    .lightLevel(state -> 15));
+    public static final DeferredBlock<BlockEldritchInset> ELDRITCH_CRUST_GLOWING = BLOCKS.registerBlock(
+            "eldritch_crust_glowing", props -> new BlockEldritchInset(ConstantInt.of(0), props),
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 30.0F).sound(SoundType.STONE)
+                    .lightLevel(state -> 12).noOcclusion());
 
     public static final DeferredBlock<BlockMirror> MIRROR = BLOCKS.registerBlock(
             "mirror", props -> new BlockMirror(props, false),
@@ -1414,10 +1441,10 @@ public final class TCBlocks {
             "eldritch_pedestal", Block::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 10.0F).sound(SoundType.STONE).requiresCorrectToolForDrops());
 
-    public static final DeferredBlock<Block> ELDRITCH_STONE_CRYSTAL = BLOCKS.registerBlock(
-            "eldritch_stone_crystal", Block::new,
+    public static final DeferredBlock<BlockEldritchInset> ELDRITCH_STONE_CRYSTAL = BLOCKS.registerBlock(
+            "eldritch_stone_crystal", props -> new BlockEldritchInset(UniformInt.of(1, 4), props),
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F, 30.0F).sound(SoundType.STONE)
-                    .lightLevel(state -> 12));
+                    .lightLevel(state -> 12).noOcclusion());
 
     public static final DeferredBlock<BlockEldritchNothing> ELDRITCH_NOTHING = BLOCKS.registerBlock(
             "eldritch_nothing", BlockEldritchNothing::new,
@@ -1463,14 +1490,10 @@ public final class TCBlocks {
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 200000.0F)
                     .lightLevel(state -> 15).noOcclusion().noLootTable().noCollission());
 
-    public static final DeferredBlock<Block> AMBER_BLOCK = BLOCKS.registerBlock(
+    public static final DeferredBlock<BlockAmber> AMBER_BLOCK = BLOCKS.registerBlock(
             "amber_block",
-            Block::new,
-            BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.METAL)
-                    .strength(4.0F, 10.0F)
-                    .sound(SoundType.METAL)
-                    .requiresCorrectToolForDrops()
+            BlockAmber::new,
+            amberProps()
     );
 
     public static final DeferredBlock<BlockPlaceholder> OBSIDIAN_PLACEHOLDER = BLOCKS.registerBlock(

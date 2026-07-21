@@ -18,7 +18,8 @@ import com.leclowndu93150.thaumcraft.compat.jei.ingredient.AspectIngredientHelpe
 import com.leclowndu93150.thaumcraft.compat.jei.ingredient.AspectIngredientRenderer;
 import com.leclowndu93150.thaumcraft.compat.jei.ingredient.AspectIngredientType;
 import com.leclowndu93150.thaumcraft.config.ThaumcraftClientConfig;
-import com.leclowndu93150.thaumcraft.content.aspect.AspectIndexHolder;
+import com.leclowndu93150.thaumcraft.api.aspect.AspectIndexAccess;
+import com.leclowndu93150.thaumcraft.content.recipe.SalisMundusRecipe;
 import com.leclowndu93150.thaumcraft.content.recipe.crucible.CrucibleRecipe;
 import com.leclowndu93150.thaumcraft.content.recipe.dust.DustTriggerMultiblockRecipe;
 import com.leclowndu93150.thaumcraft.content.recipe.dust.DustTriggerSimpleRecipe;
@@ -48,8 +49,6 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.*;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
-import com.leclowndu93150.thaumcraft.content.research.pool.AspectPools;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -140,11 +139,8 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
             return;
         }
         Registry<IAspect> registry = registryOpt.get();
-        Player player = Minecraft.getInstance().player;
         List<Holder<IAspect>> all = new ArrayList<>(registry.size());
-        registry.holders()
-                .filter(ref -> player != null && AspectPools.isDiscovered(player, ref))
-                .forEach(all::add);
+        registry.holders().forEach(all::add);
         registration.register(
                 AspectIngredientType.INSTANCE,
                 all.stream().sorted(Comparator.comparingInt(e->registry.getId(e.value()))).sorted(Comparator.comparing(h->!h.value().isPrimal())).map(aspect->new AspectInstance(aspect,1)).toList(),
@@ -172,6 +168,11 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
         categories.add(new AspectFromStacksCategory(helpers.getGuiHelper()));
         categories.add(new MultiblockCategory(helpers.getGuiHelper()));
         registration.addRecipeCategories(categories.toArray(new IRecipeCategory<?>[0]));
+    }
+
+    @Override
+    public void registerVanillaCategoryExtensions(IVanillaCategoryExtensionRegistration registration) {
+        registration.getCraftingCategory().addExtension(SalisMundusRecipe.class, SalisMundusCraftingExtension.INSTANCE);
     }
 
     @Override
@@ -270,7 +271,7 @@ public final class ThaumcraftJEIPlugin implements IModPlugin {
         registration.getIngredientManager()
                 .getAllIngredients(VanillaTypes.ITEM_STACK)
                 .forEach(stack -> {
-                    AspectList aspectList = AspectIndexHolder.get().of(stack);
+                    AspectList aspectList = AspectIndexAccess.index().of(stack);
                     index.put(stack,aspectList);
                     aspectList.entries().forEach(instance -> {
                         invertedIndex

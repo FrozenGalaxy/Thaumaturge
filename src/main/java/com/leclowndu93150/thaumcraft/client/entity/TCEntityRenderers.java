@@ -25,7 +25,6 @@ import com.leclowndu93150.thaumcraft.client.model.entity.TaintSeedModel;
 import com.leclowndu93150.thaumcraft.client.model.entity.TaintacleModel;
 import com.leclowndu93150.thaumcraft.registry.TCEntities;
 import net.minecraft.client.renderer.entity.ItemEntityRenderer;
-import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -81,7 +80,7 @@ public final class TCEntityRenderers {
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(TCEntities.WISP.get(), WispRenderer::new);
         event.registerEntityRenderer(TCEntities.FLUX_RIFT.get(), FluxRiftRenderer::new);
-        event.registerEntityRenderer(TCEntities.CAUSALITY_COLLAPSER.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(TCEntities.CAUSALITY_COLLAPSER.get(), NoModelRenderer::new);
         event.registerEntityRenderer(TCEntities.BRAINY_ZOMBIE.get(), BrainyZombieRenderer::new);
         event.registerEntityRenderer(TCEntities.GIANT_BRAINY_ZOMBIE.get(), BrainyZombieRenderer::new);
         event.registerEntityRenderer(TCEntities.FIRE_BAT.get(), FireBatRenderer::new);
@@ -122,7 +121,7 @@ public final class TCEntityRenderers {
                 context -> new TaintacleRenderer(context, TCModelLayers.TAINTACLE_GIANT,
                         TAINTACLE_GIANT_LENGTH, TAINTACLE_GIANT_SHADOW));
         event.registerEntityRenderer(TCEntities.CULTIST_KNIGHT.get(), CultistRenderer::new);
-        event.registerEntityRenderer(TCEntities.CULTIST_CLERIC.get(), CultistRenderer::new);
+        event.registerEntityRenderer(TCEntities.CULTIST_CLERIC.get(), CultistClericRenderer::new);
         event.registerEntityRenderer(TCEntities.CULTIST_PORTAL_LESSER.get(), CultistPortalRenderer::new);
         event.registerEntityRenderer(TCEntities.ELDRITCH_ORB.get(), EldritchOrbRenderer::new);
         event.registerEntityRenderer(TCEntities.GOLEM_ORB.get(), GolemOrbRenderer::new);

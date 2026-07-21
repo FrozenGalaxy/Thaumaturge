@@ -8,6 +8,7 @@ import com.leclowndu93150.thaumcraft.client.network.AspectIndexClientHandler;
 import com.leclowndu93150.thaumcraft.client.network.AuraSnapshotClientHandler;
 import com.leclowndu93150.thaumcraft.client.network.KnowledgeGainClientHandler;
 import com.leclowndu93150.thaumcraft.client.network.WispZapClientHandler;
+import com.leclowndu93150.thaumcraft.client.fx.network.BoreDigClientHandler;
 import com.leclowndu93150.thaumcraft.client.fx.network.FXStreamClientHandler;
 import com.leclowndu93150.thaumcraft.client.fx.network.FocusImpactClientHandler;
 import com.leclowndu93150.thaumcraft.client.fx.network.InfusionSourceClientHandler;
@@ -17,6 +18,7 @@ import com.leclowndu93150.thaumcraft.client.golem.SealClientHandler;
 import com.leclowndu93150.thaumcraft.client.network.OpenThaumonomiconHandler;
 import com.leclowndu93150.thaumcraft.client.network.TubeEventClientHandler;
 import com.leclowndu93150.thaumcraft.client.warp.WarpFXClientHandler;
+import com.leclowndu93150.thaumcraft.network.fx.ClientboundBoreDigPayload;
 import com.leclowndu93150.thaumcraft.network.fx.ClientboundFXStreamPayload;
 import com.leclowndu93150.thaumcraft.network.fx.ClientboundFocusImpactPayload;
 import com.leclowndu93150.thaumcraft.network.fx.ClientboundInfusionSourcePayload;
@@ -83,6 +85,16 @@ public final class TCPayloads {
                 ClientboundAspectGainPayload.STREAM_CODEC,
                 (payload, context) -> AspectGainClientHandler.handle(payload, context)
         );
+        registrar.playToClient(
+                ClientboundUpdateJEIAspectListPayload.TYPE,
+                ClientboundUpdateJEIAspectListPayload.STREAM_CODEC,
+                (payload, context) -> AspectGainClientHandler.handleJEISync(payload, context)
+        );
+        registrar.playToServer(
+                ServerboundRequestSyncAspectPoolPayload.TYPE,
+                ServerboundRequestSyncAspectPoolPayload.STREAM_CODEC,
+                ServerboundRequestSyncAspectPoolPayload::handle
+        );
         registrar.playToServer(
                 ServerboundObtainNotePayload.TYPE,
                 ServerboundObtainNotePayload.STREAM_CODEC,
@@ -122,6 +134,11 @@ public final class TCPayloads {
                 ClientboundSpawnParticlePayload.TYPE,
                 ClientboundSpawnParticlePayload.STREAM_CODEC,
                 (payload, context) -> SpawnParticleClientHandler.handle(payload, context)
+        );
+        registrar.playToClient(
+                ClientboundBoreDigPayload.TYPE,
+                ClientboundBoreDigPayload.STREAM_CODEC,
+                (payload, context) -> BoreDigClientHandler.handle(payload, context)
         );
         registrar.playToClient(
                 ClientboundTubeVentPayload.TYPE,

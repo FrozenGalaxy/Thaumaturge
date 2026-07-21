@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.wands;
 
+import com.leclowndu93150.thaumcraft.api.wands.WandVis;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aspect.TCAspects;
 import com.leclowndu93150.thaumcraft.content.casters.CasterManager;
@@ -102,7 +103,7 @@ public final class WandVisHelper {
     }
 
     public static boolean consumeAllVisRaw(ItemStack stack, Map<ResourceKey<IAspect>, Integer> centivisCosts,
-                                           boolean doit) {
+                                           boolean simulate) {
         if (centivisCosts.isEmpty()) {
             return false;
         }
@@ -111,7 +112,7 @@ public final class WandVisHelper {
                 return false;
             }
         }
-        if (doit) {
+        if (!simulate) {
             for (Map.Entry<ResourceKey<IAspect>, Integer> entry : centivisCosts.entrySet()) {
                 storeVis(stack, entry.getKey(), getVis(stack, entry.getKey()) - entry.getValue());
             }

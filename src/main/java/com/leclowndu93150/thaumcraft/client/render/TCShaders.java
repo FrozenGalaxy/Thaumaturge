@@ -35,7 +35,7 @@ public final class TCShaders {
                 new ShaderInstance(event.getResourceProvider(), TCIds.rl("tc_ender"), DefaultVertexFormat.POSITION),
                 shader -> ender = shader);
         event.registerShader(
-                new ShaderInstance(event.getResourceProvider(), TCIds.rl("tc_portal"), DefaultVertexFormat.POSITION),
+                new ShaderInstance(event.getResourceProvider(), TCIds.rl("tc_portal"), DefaultVertexFormat.POSITION_TEX),
                 shader -> portal = shader);
         event.registerShader(
                 new ShaderInstance(event.getResourceProvider(), TCIds.rl("void_stream"), DefaultVertexFormat.POSITION_TEX_COLOR),

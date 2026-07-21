@@ -9,7 +9,7 @@ import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspectContainer;
 import com.leclowndu93150.thaumcraft.api.aspect.TCAspects;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
-import com.leclowndu93150.thaumcraft.content.aspect.AspectIndexHolder;
+import com.leclowndu93150.thaumcraft.api.aspect.AspectIndexAccess;
 import com.leclowndu93150.thaumcraft.content.entity.EntitySpecialItem;
 import com.leclowndu93150.thaumcraft.content.fx.FX;
 import com.leclowndu93150.thaumcraft.content.recipe.ThaumcraftCraftingManager;
@@ -373,7 +373,7 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
                 count--;
                 this.counter = -250L;
             } else {
-                AspectList aspects = AspectIndexHolder.get().of(stack);
+                AspectList aspects = AspectIndexAccess.index().of(stack);
                 if (!aspects.isEmpty()){
                     for (AspectInstance aspect : aspects.entries()){
                         this.aspects = this.aspects.add(aspect);

@@ -116,6 +116,10 @@ public final class BlockEntityEldritchAltar extends BlockEntity {
         if (!level.getBlockState(spawnPos.below()).isSolidRender(level, spawnPos.below())) {
             return;
         }
+        if (!level.getEntitiesOfClass(EntityEldritchGuardian.class,
+                new AABB(spawnPos).inflate(32.0, 16.0, 32.0)).isEmpty()) {
+            return;
+        }
         guardian.moveTo(x + 0.5, y, z + 0.5, 0.0F, 0.0F);
         if (level.noCollision(guardian) && !level.containsAnyLiquid(guardian.getBoundingBox())) {
             guardian.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos), MobSpawnType.EVENT, null);

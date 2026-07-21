@@ -376,7 +376,7 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
     }
 
     private void drawHelperTag(GuiGraphics graphics, Holder<IAspect> aspect, int x, int y, int mouseX, int mouseY) {
-        if (pool().isDiscovered(AspectPools.idOf(aspect))) {
+        if (AspectPools.isDiscovered(minecraft.player, aspect)) {
             AspectTagRenderer.render(graphics, font, (double) x, (double) y, aspect, 0, 0, 0.0,
                     AspectTagRenderer.BlendMode.ALPHA, 1.0F, false);
             if (inRect(mouseX, mouseY, x, y, 16, 16)) {
@@ -417,7 +417,7 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
             }
             Holder<IAspect> aspect = cell.aspectOrNull();
             if (aspect != null) {
-                if (!pool().isDiscovered(AspectPools.idOf(aspect))) {
+                if (!AspectPools.isDiscovered(minecraft.player, aspect)) {
                     GuiBlend.blitTinted(graphics, UNKNOWN_ASPECT, cx + ORB_OFFSET, cy + ORB_OFFSET,
                             16, 16, 0.0F, 0.0F, 32, 32, 32, 32, ARGB32.color(128, 0x000000));
                     if (cell.hex().equals(hoveredHex)) {
@@ -451,7 +451,7 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
                     continue;
                 }
                 if (NoteRules.connects(cell.aspectOrNull(), other.aspectOrNull(),
-                        a -> pool().isDiscovered(AspectPools.idOf(a)))) {
+                        a -> AspectPools.isDiscovered(minecraft.player, a))) {
                     int x1 = leftPos + HEX_ORIGIN_X + Math.round(cell.hex().pixelX(HEX_SIZE));
                     int y1 = topPos + HEX_ORIGIN_Y + Math.round(cell.hex().pixelY(HEX_SIZE));
                     int x2 = leftPos + HEX_ORIGIN_X + Math.round(neighbour.pixelX(HEX_SIZE));

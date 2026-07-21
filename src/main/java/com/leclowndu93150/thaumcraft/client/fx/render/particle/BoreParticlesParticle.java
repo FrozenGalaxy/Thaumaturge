@@ -7,8 +7,6 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 public final class BoreParticlesParticle extends HomingParticleBase {
@@ -17,28 +15,14 @@ public final class BoreParticlesParticle extends HomingParticleBase {
     private final float vo;
 
     private BoreParticlesParticle(ClientLevel level, double x, double y, double z, BoreParticlesData data, TextureAtlasSprite sprite) {
-        super(level, x, y, z, data.tx(), data.ty(), data.tz(), 0.005F);
+        super(level, x, y, z, data.targetEntityId(), data.tx(), data.ty(), data.tz(),
+                data.sx(), data.sy(), data.sz(), 0.4F, 0.3F, 0.01F, 0.005F);
         this.sprite = sprite;
         this.uo = this.random.nextFloat() * 3.0F;
         this.vo = this.random.nextFloat() * 3.0F;
-        this.gravity = 0.01F;
         this.rCol = 0.6F;
         this.gCol = 0.6F;
         this.bCol = 0.6F;
-        this.quadSize = this.random.nextFloat() * 0.3F + 0.4F;
-        this.xd = data.sx() + this.random.nextGaussian() * 0.01;
-        this.yd = data.sy() + this.random.nextGaussian() * 0.01;
-        this.zd = data.sz() + this.random.nextGaussian() * 0.01;
-        BlockPos pos = BlockPos.containing(x, y, z);
-        applyTint(data.state(), level, pos);
-    }
-
-    private void applyTint(BlockState state, ClientLevel level, BlockPos pos) {
-        int col = Minecraft.getInstance().getBlockColors().getColor(state, level, pos, 0);
-        if (col == -1) return;
-        this.rCol *= (col >> 16 & 0xFF) / 255.0F;
-        this.gCol *= (col >> 8 & 0xFF) / 255.0F;
-        this.bCol *= (col & 0xFF) / 255.0F;
     }
 
     @Override

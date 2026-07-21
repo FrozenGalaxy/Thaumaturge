@@ -2,6 +2,7 @@ package com.leclowndu93150.thaumcraft.content.research.pool;
 
 import net.neoforged.neoforge.network.PacketDistributor;
 import com.leclowndu93150.thaumcraft.network.ClientboundAspectGainPayload;
+import com.leclowndu93150.thaumcraft.network.ClientboundUpdateJEIAspectListPayload;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectComponents;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
@@ -39,6 +40,7 @@ public final class AspectPools {
 
     public static void sync(ServerPlayer player) {
         player.syncData(TCAttachments.ASPECT_POOL);
+        PacketDistributor.sendToPlayer(player, new ClientboundUpdateJEIAspectListPayload());
     }
 
     public static void seedIfNew(ServerPlayer player) {
@@ -53,7 +55,7 @@ public final class AspectPools {
     }
 
     public static boolean isDiscovered(Player player, Holder<IAspect> aspect) {
-        return data(player).isDiscovered(idOf(aspect));
+        return aspect.value().isPrimal() || data(player).isDiscovered(idOf(aspect));
     }
 
     public static int amount(Player player, Holder<IAspect> aspect) {
