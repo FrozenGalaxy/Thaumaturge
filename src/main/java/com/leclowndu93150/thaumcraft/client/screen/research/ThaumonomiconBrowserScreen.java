@@ -19,6 +19,7 @@ import com.leclowndu93150.thaumcraft.client.screen.TCScreenTextures;
 import com.leclowndu93150.thaumcraft.client.screen.tooltip.TCTooltipRenderer;
 import com.leclowndu93150.thaumcraft.network.ServerboundClearResearchFlagsPayload;
 import com.leclowndu93150.thaumcraft.network.ServerboundUnlockResearchPayload;
+import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -525,6 +526,9 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         }
     }
 
+    private static final int NEBULA_BACKGROUND_SIZE = 1024;
+    private static final int NEBULA_OVERLAY_SIZE = 512;
+
     private void renderBackgroundLayers(GuiGraphics graphics, int locX, int locY) {
         if (activeCategory == null) return;
         IResearchCategory cat = activeCategory.value();
@@ -532,17 +536,26 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         int y = (int) ((START_Y - 2) * screenZoom);
         int w = (int) ((screenX + 4) * screenZoom);
         int h = (int) ((screenY + 4) * screenZoom);
-        graphics.blit(
-                cat.background(),
-                x, y,
-                (float) (locX / 2.0), (float) (locY / 2.0),
-                w, h, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE);
+        blitTiled(graphics, cat.background(), x, y, w, h,
+                (float) (locX / 2.0), (float) (locY / 2.0), NEBULA_BACKGROUND_SIZE, screenZoom);
         cat.overlayBackground().ifPresent(overlay ->
-                graphics.blit(
-                        overlay,
-                        x, y,
-                        (float) (locX / 1.5), (float) (locY / 1.5),
-                        w, h, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE));
+                blitTiled(graphics, overlay, x, y, w, h,
+                        (float) (locX / 1.5), (float) (locY / 1.5), NEBULA_OVERLAY_SIZE, screenZoom));
+    }
+
+    private static void blitTiled(GuiGraphics graphics, ResourceLocation texture, int x, int y, int w, int h,
+                                  float offsetU, float offsetV, int size, float screenZoom) {
+        float startU = Mth.positiveModulo(offsetU, (float) size);
+        float startV = Mth.positiveModulo(offsetV, (float) size);
+        RenderSystem.enableBlend();
+        graphics.enableScissor((int) (x / screenZoom), (int) (y / screenZoom),
+                (int) ((x + w) / screenZoom), (int) ((y + h) / screenZoom));
+        for (float ty = y - startV; ty < y + h; ty += size) {
+            for (float tx = x - startU; tx < x + w; tx += size) {
+                graphics.blit(texture, (int) tx, (int) ty, 0.0F, 0.0F, size, size, size, size);
+            }
+        }
+        graphics.disableScissor();
     }
 
     private void renderConnectors(GuiGraphics graphics, int locX, int locY) {

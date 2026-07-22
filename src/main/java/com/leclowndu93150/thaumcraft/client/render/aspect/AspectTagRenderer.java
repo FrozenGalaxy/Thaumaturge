@@ -51,8 +51,9 @@ public final class AspectTagRenderer {
         int color = aspect != null && aspect.value() != null
                 ? (tint & 0xFF000000) | (aspect.value().color() & 0x00FFFFFF)
                 : tint;
-        GuiBlend.blitTinted(graphics, UNKNOWN_TEXTURE, x, y, 0.0F, 0.0F,
-                TAG_SIZE, TAG_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, color);
+        GuiBlend.blitTinted(graphics, UNKNOWN_TEXTURE, x, y,
+                TAG_SIZE, TAG_SIZE, 0.0F, 0.0F,
+                TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, color);
     }
 
     public static void render(GuiGraphics graphics, Font font, int x, int y, Holder<IAspect> aspect, float amount) {
@@ -148,11 +149,13 @@ public final class AspectTagRenderer {
         IAspect value = aspect.value();
         int color = colorOf(value, alpha, bw);
         if (blend == BlendMode.ADDITIVE) {
-            GuiBlend.blitAdditive(graphics, value.texture(), (int) x, (int) y, 0.0F, 0.0F,
-                    TAG_SIZE, TAG_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, color);
+            GuiBlend.blitAdditive(graphics, value.texture(), (int) x, (int) y,
+                    TAG_SIZE, TAG_SIZE, 0.0F, 0.0F,
+                    TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, color);
         } else {
-            GuiBlend.blitTinted(graphics, value.texture(), (int) x, (int) y, 0.0F, 0.0F,
-                    TAG_SIZE, TAG_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, color);
+            GuiBlend.blitTinted(graphics, value.texture(), (int) x, (int) y,
+                    TAG_SIZE, TAG_SIZE, 0.0F, 0.0F,
+                    TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, color);
         }
     }
 

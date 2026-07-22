@@ -236,12 +236,14 @@ public final class RecipeDisplayWidget {
         graphics.pose().pushPose();
         graphics.pose().translate(cx, cy, 0);
         graphics.pose().scale(PANEL_SCALE, PANEL_SCALE, 1F);
-        graphics.blit(
+        GuiBlend.blitTinted(
+                graphics,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
                 WORKBENCH_PANEL_OFFSET_X, WORKBENCH_PANEL_OFFSET_Y,
                 (float) WORKBENCH_PANEL_U, (float) WORKBENCH_PANEL_V,
                 WORKBENCH_PANEL_W, WORKBENCH_PANEL_H,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE
+                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
+                0xFFFFFFFF
         );
         graphics.pose().popPose();
     }
@@ -250,12 +252,14 @@ public final class RecipeDisplayWidget {
         graphics.pose().pushPose();
         graphics.pose().translate(cx, cy, 0);
         graphics.pose().scale(PANEL_SCALE, PANEL_SCALE, 1F);
-        graphics.blit(
+        GuiBlend.blitTinted(
+                graphics,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
                 ARCANE_PANEL_OFFSET_X, ARCANE_PANEL_OFFSET_Y,
                 (float) ARCANE_PANEL_U, (float) ARCANE_PANEL_V,
                 ARCANE_PANEL_W, ARCANE_PANEL_H,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE
+                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
+                0xFFFFFFFF
         );
         graphics.pose().popPose();
     }
@@ -264,12 +268,14 @@ public final class RecipeDisplayWidget {
         graphics.pose().pushPose();
         graphics.pose().translate(cx, cy, 0);
         graphics.pose().scale(PANEL_SCALE, PANEL_SCALE, 1F);
-        graphics.blit(
+        GuiBlend.blitTinted(
+                graphics,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
                 SLOT_FRAME_OFFSET_X, SLOT_FRAME_OFFSET_Y,
                 (float) SLOT_FRAME_U, (float) SLOT_FRAME_V,
                 SLOT_FRAME_W, SLOT_FRAME_H,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE
+                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
+                0xFFFFFFFF
         );
         graphics.pose().popPose();
     }
@@ -646,12 +652,14 @@ public final class RecipeDisplayWidget {
     }
 
     private static void blitOverlay(GuiGraphics graphics, int ox, int oy, int u, int v, int w, int h) {
-        graphics.blit(
+        GuiBlend.blitTinted(
+                graphics,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
                 ox, oy,
                 (float) u, (float) v,
                 w, h,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE
+                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
+                0xFFFFFFFF
         );
     }
 

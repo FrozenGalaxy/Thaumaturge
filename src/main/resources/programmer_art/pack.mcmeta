@@ -1,7 +1,6 @@
 {
   "pack": {
     "description": "The classic look of Thaumcraft",
-    "min_format": 34,
-    "max_format": 34
+    "pack_format": 34
   }
 }

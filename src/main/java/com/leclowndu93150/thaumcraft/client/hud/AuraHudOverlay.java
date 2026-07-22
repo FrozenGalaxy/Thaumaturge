@@ -137,12 +137,12 @@ public final class AuraHudOverlay implements LeftHudStack.Gauge {
             }
         }
 
-        graphics.blit(HUD, HUD_X + FRAME_X, FRAME_Y, FRAME_U, FRAME_V,
-                FRAME_W, FRAME_H, TEX_SIZE, TEX_SIZE);
+        GuiBlend.blitTinted(graphics, HUD, HUD_X + FRAME_X, FRAME_Y, (float) FRAME_U, (float) FRAME_V,
+                FRAME_W, FRAME_H, TEX_SIZE, TEX_SIZE, 0xFFFFFFFF);
 
         float needleStart = NEEDLE_TOP + (1.0F - base) * BAR_RANGE;
-        graphics.blit(HUD, HUD_X + NEEDLE_X, Math.round(needleStart), NEEDLE_U, NEEDLE_V,
-                NEEDLE_W, NEEDLE_H, TEX_SIZE, TEX_SIZE);
+        GuiBlend.blitTinted(graphics, HUD, HUD_X + NEEDLE_X, Math.round(needleStart), (float) NEEDLE_U, (float) NEEDLE_V,
+                NEEDLE_W, NEEDLE_H, TEX_SIZE, TEX_SIZE, 0xFFFFFFFF);
     }
 
     private static void drawAmount(GuiGraphics graphics, String text, float y, int color) {
