@@ -36,7 +36,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-public class EntityCultistCleric extends EntityCultist implements RangedAttackMob {
+public class EntityCultistCleric extends EntityCultist implements RangedAttackMob, ISidedHurt {
     private static final EntityDataAccessor<Boolean> DATA_RITUALIST =
             SynchedEntityData.defineId(EntityCultistCleric.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<BlockPos> DATA_RITUAL_ANCHOR =
@@ -149,11 +149,20 @@ public class EntityCultistCleric extends EntityCultist implements RangedAttackMo
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, damage);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (this.isInvulnerableTo(source)) {
             return false;
         }
         this.setRitualist(false);
+        return super.hurt(source, damage);
+    }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float damage) {
         return super.hurt(source, damage);
     }
 

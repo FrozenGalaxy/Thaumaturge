@@ -4,23 +4,26 @@ import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
 import com.leclowndu93150.thaumcraft.api.items.InfusionEnchantment;
 import com.leclowndu93150.thaumcraft.api.items.InvHelper;
 import com.leclowndu93150.thaumcraft.content.casters.BlockBreakerEngine;
+import com.leclowndu93150.thaumcraft.content.effect.Effects;
+import com.leclowndu93150.thaumcraft.content.entity.ISidedHurt;
 import com.leclowndu93150.thaumcraft.content.equipment.InfusionEnchantmentHelper;
 import com.leclowndu93150.thaumcraft.content.equipment.RefiningResults;
-import com.leclowndu93150.thaumcraft.content.effect.Effects;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import com.leclowndu93150.thaumcraft.server.TCFakePlayer;
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -36,22 +39,20 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
 import net.neoforged.neoforge.common.util.FakePlayer;
 
-public class EntityArcaneBore extends EntityOwnedConstruct {
+public class EntityArcaneBore extends EntityOwnedConstruct implements ISidedHurt {
     private static final EntityDataAccessor<Direction> FACING =
             SynchedEntityData.defineId(EntityArcaneBore.class, EntityDataSerializers.DIRECTION);
     private static final EntityDataAccessor<Boolean> ACTIVE =
@@ -413,7 +414,11 @@ public class EntityArcaneBore extends EntityOwnedConstruct {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, amount);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         if (source.getEntity() instanceof LivingEntity living && isOwner(living)) {
             Direction face = Direction.getNearest(
                     living.getX() - getX(), living.getY() - getY(), living.getZ() - getZ());
@@ -424,6 +429,11 @@ public class EntityArcaneBore extends EntityOwnedConstruct {
         }
         setYRot((float) (getYRot() + random.nextGaussian() * 45.0));
         setXRot((float) (getXRot() + random.nextGaussian() * 20.0));
+        return super.hurt(source, amount);
+    }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float amount) {
         return super.hurt(source, amount);
     }
 

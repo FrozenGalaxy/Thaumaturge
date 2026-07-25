@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
 
-public final class EntityFallingTaint extends Entity implements IEntityWithComplexSpawn {
+public final class EntityFallingTaint extends Entity implements IEntityWithComplexSpawn, ISidedHurt {
     private static final EntityDataAccessor<Integer> SOURCE_BLOCK_ID =
             SynchedEntityData.defineId(EntityFallingTaint.class, EntityDataSerializers.INT);
 
@@ -151,7 +151,17 @@ public final class EntityFallingTaint extends Entity implements IEntityWithCompl
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, damage);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         return false;
     }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float damage) {
+        return false;
+    }
+
 }

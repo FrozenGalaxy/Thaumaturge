@@ -18,7 +18,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-public class EntityGolemOrb extends ThrowableProjectile {
+public class EntityGolemOrb extends ThrowableProjectile implements ISidedHurt {
     private static final EntityDataAccessor<Boolean> DATA_RED =
             SynchedEntityData.defineId(EntityGolemOrb.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_TARGET =
@@ -105,7 +105,11 @@ public class EntityGolemOrb extends ThrowableProjectile {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, amount);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         if (source.getEntity() != null) {
             Vec3 look = source.getEntity().getLookAngle();
             this.setDeltaMovement(look.scale(0.9));
@@ -115,4 +119,10 @@ public class EntityGolemOrb extends ThrowableProjectile {
         }
         return false;
     }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float amount) {
+        return false;
+    }
+
 }

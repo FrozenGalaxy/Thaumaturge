@@ -3,26 +3,27 @@ package com.leclowndu93150.thaumcraft.content.entity.boss;
 import com.leclowndu93150.thaumcraft.api.entity.IEldritchMob;
 import com.leclowndu93150.thaumcraft.content.entity.AbstractTaintacle;
 import com.leclowndu93150.thaumcraft.content.entity.EntitySpecialItem;
+import com.leclowndu93150.thaumcraft.content.entity.ISidedHurt;
 import com.leclowndu93150.thaumcraft.content.entity.champion.ChampionHelper;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
-import net.minecraft.util.Mth;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.player.Player;
@@ -31,7 +32,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jspecify.annotations.Nullable;
 
-public class EntityTaintacleGiant extends AbstractTaintacle implements IEldritchMob {
+public class EntityTaintacleGiant extends AbstractTaintacle implements IEldritchMob, ISidedHurt {
     private static final EntityDataAccessor<Integer> DATA_AGGRO =
             SynchedEntityData.defineId(EntityTaintacleGiant.class, EntityDataSerializers.INT);
 
@@ -118,7 +119,11 @@ public class EntityTaintacleGiant extends AbstractTaintacle implements IEldritch
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, damage);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (damage > ENRAGE_THRESHOLD) {
             if (this.getAnger() == 0) {
                 this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, ENRAGE_TICKS,
@@ -137,6 +142,11 @@ public class EntityTaintacleGiant extends AbstractTaintacle implements IEldritch
             }
             damage = ENRAGE_THRESHOLD;
         }
+        return super.hurt(source, damage);
+    }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float damage) {
         return super.hurt(source, damage);
     }
 

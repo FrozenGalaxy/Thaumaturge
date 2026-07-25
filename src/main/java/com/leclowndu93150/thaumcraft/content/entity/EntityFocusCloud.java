@@ -37,7 +37,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
 import org.jspecify.annotations.Nullable;
 
-public final class EntityFocusCloud extends Entity implements TraceableEntity, IEntityWithComplexSpawn {
+public final class EntityFocusCloud extends Entity implements TraceableEntity, IEntityWithComplexSpawn, ISidedHurt {
     private static final EntityDataAccessor<Float> DATA_RADIUS =
             SynchedEntityData.defineId(EntityFocusCloud.class, EntityDataSerializers.FLOAT);
 
@@ -127,7 +127,16 @@ public final class EntityFocusCloud extends Entity implements TraceableEntity, I
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, damage);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+        return false;
+    }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float damage) {
         return false;
     }
 

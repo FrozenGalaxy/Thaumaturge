@@ -34,7 +34,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-public final class EntityFireBat extends Monster implements IBatAnimated {
+public final class EntityFireBat extends Monster implements IBatAnimated, ISidedHurt {
     private static final int SPAWN_LIGHT_CAP = 7;
     private static final EntityDataAccessor<Boolean> DATA_HANGING =
             SynchedEntityData.defineId(EntityFireBat.class, EntityDataSerializers.BOOLEAN);
@@ -193,10 +193,19 @@ public final class EntityFireBat extends Monster implements IBatAnimated {
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, damage);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (isHanging()) {
             setHanging(false);
         }
+        return super.hurt(source, damage);
+    }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float damage) {
         return super.hurt(source, damage);
     }
 

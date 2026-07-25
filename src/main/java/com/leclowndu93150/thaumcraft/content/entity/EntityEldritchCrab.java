@@ -42,7 +42,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
-public class EntityEldritchCrab extends Monster implements IEldritchMob {
+public class EntityEldritchCrab extends Monster implements IEldritchMob, ISidedHurt {
     private static final EntityDataAccessor<Boolean> DATA_HELM =
             SynchedEntityData.defineId(EntityEldritchCrab.class, EntityDataSerializers.BOOLEAN);
 
@@ -171,7 +171,11 @@ public class EntityEldritchCrab extends Monster implements IEldritchMob {
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, damage);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         boolean result = super.hurt(source, damage);
         if (this.hasHelm() && this.getHealth() / this.getMaxHealth() <= HELM_BREAK_HEALTH_FRACTION) {
             this.setHelm(false);
@@ -181,6 +185,11 @@ public class EntityEldritchCrab extends Monster implements IEldritchMob {
                     BREAK_PARTICLES, 0.1, 0.1, 0.1, 0.05);
         }
         return result;
+    }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float damage) {
+        return super.hurt(source, damage);
     }
 
     @Override

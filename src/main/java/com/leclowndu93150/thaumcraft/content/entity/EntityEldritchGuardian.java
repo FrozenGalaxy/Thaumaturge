@@ -40,7 +40,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jspecify.annotations.Nullable;
 
-public class EntityEldritchGuardian extends Monster implements RangedAttackMob, IEldritchMob {
+public class EntityEldritchGuardian extends Monster implements RangedAttackMob, IEldritchMob, ISidedHurt {
     private static final byte ARM_LIFT_LEFT_EVENT = 15;
     private static final byte ARM_LIFT_RIGHT_EVENT = 16;
     private static final float ARM_LIFT_BLAST = 0.5F;
@@ -98,10 +98,19 @@ public class EntityEldritchGuardian extends Monster implements RangedAttackMob, 
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, damage);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (source.is(DamageTypeTags.WITCH_RESISTANT_TO)) {
             damage /= 2.0F;
         }
+        return super.hurt(source, damage);
+    }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float damage) {
         return super.hurt(source, damage);
     }
 

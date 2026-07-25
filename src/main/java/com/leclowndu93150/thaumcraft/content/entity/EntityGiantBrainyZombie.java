@@ -12,7 +12,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.LeapAtTargetGoal;
 import net.minecraft.world.level.Level;
 
-public final class EntityGiantBrainyZombie extends EntityBrainyZombie {
+public final class EntityGiantBrainyZombie extends EntityBrainyZombie implements ISidedHurt {
     private static final EntityDataAccessor<Float> DATA_ANGER =
             SynchedEntityData.defineId(EntityGiantBrainyZombie.class, EntityDataSerializers.FLOAT);
 
@@ -77,8 +77,18 @@ public final class EntityGiantBrainyZombie extends EntityBrainyZombie {
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, damage);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         setAnger(Math.min(MAX_ANGER, getAnger() + ANGER_PER_HIT));
         return super.hurt(source, damage);
     }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float damage) {
+        return super.hurt(source, damage);
+    }
+
 }

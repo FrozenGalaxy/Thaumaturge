@@ -71,7 +71,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.jspecify.annotations.Nullable;
 
-public class EntityPech extends Monster implements RangedAttackMob {
+public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
     public static final int TYPE_FORAGER = 0;
     public static final int TYPE_MAGE = 1;
     public static final int TYPE_STALKER = 2;
@@ -365,7 +365,11 @@ public class EntityPech extends Monster implements RangedAttackMob {
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, damage);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (this.isInvulnerableTo(source)) {
             return false;
         }
@@ -379,6 +383,11 @@ public class EntityPech extends Monster implements RangedAttackMob {
             }
             this.becomeAngryAt(attacker);
         }
+        return super.hurt(source, damage);
+    }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float damage) {
         return super.hurt(source, damage);
     }
 

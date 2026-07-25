@@ -1,17 +1,18 @@
 package com.leclowndu93150.thaumcraft.content.entity.boss;
 
 import com.leclowndu93150.thaumcraft.api.entity.IEldritchMob;
+import com.leclowndu93150.thaumcraft.content.effect.Effects;
 import com.leclowndu93150.thaumcraft.content.entity.EntityGolemOrb;
+import com.leclowndu93150.thaumcraft.content.entity.ISidedHurt;
 import com.leclowndu93150.thaumcraft.content.entity.ai.LongRangeAttackGoal;
 import com.leclowndu93150.thaumcraft.content.entity.champion.ChampionHelper;
 import com.leclowndu93150.thaumcraft.content.entity.champion.ChampionModifier;
-import com.leclowndu93150.thaumcraft.content.effect.Effects;
 import com.leclowndu93150.thaumcraft.content.world.mound.BlockLoot;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -23,9 +24,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -45,7 +46,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-public class EntityEldritchGolem extends EntityThaumcraftBoss implements IEldritchMob, RangedAttackMob {
+public class EntityEldritchGolem extends EntityThaumcraftBoss implements IEldritchMob, RangedAttackMob, ISidedHurt {
     private static final EntityDataAccessor<Boolean> DATA_HEADLESS =
             SynchedEntityData.defineId(EntityEldritchGolem.class, EntityDataSerializers.BOOLEAN);
 
@@ -187,7 +188,11 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements IEldrit
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, damage);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (damage > this.getHealth() && !this.isHeadless()) {
             this.setHeadless(true);
             this.spawnTimer = SPAWN_INVULN_TICKS;
@@ -198,6 +203,11 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements IEldrit
             this.makeHeadless();
             return false;
         }
+        return super.hurtServer(level, source, damage);
+    }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float damage) {
         return super.hurt(source, damage);
     }
 

@@ -3,18 +3,19 @@ package com.leclowndu93150.thaumcraft.content.entity.boss;
 import com.leclowndu93150.thaumcraft.api.entity.IEldritchMob;
 import com.leclowndu93150.thaumcraft.api.warp.WarpHelper;
 import com.leclowndu93150.thaumcraft.api.warp.WarpType;
+import com.leclowndu93150.thaumcraft.content.effect.Effects;
 import com.leclowndu93150.thaumcraft.content.entity.EntityCultist;
 import com.leclowndu93150.thaumcraft.content.entity.EntityEldritchGuardian;
 import com.leclowndu93150.thaumcraft.content.entity.EntityEldritchOrb;
+import com.leclowndu93150.thaumcraft.content.entity.ISidedHurt;
 import com.leclowndu93150.thaumcraft.content.entity.ai.LongRangeAttackGoal;
 import com.leclowndu93150.thaumcraft.content.entity.champion.ChampionHelper;
 import com.leclowndu93150.thaumcraft.content.entity.champion.ChampionModifier;
-import com.leclowndu93150.thaumcraft.content.effect.Effects;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -32,9 +33,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -54,7 +55,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-public class EntityEldritchWarden extends EntityThaumcraftBoss implements RangedAttackMob, IEldritchMob {
+public class EntityEldritchWarden extends EntityThaumcraftBoss implements RangedAttackMob, IEldritchMob, ISidedHurt {
     private static final EntityDataAccessor<Byte> DATA_TITLE =
             SynchedEntityData.defineId(EntityEldritchWarden.class, EntityDataSerializers.BYTE);
 
@@ -310,17 +311,26 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements Ranged
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, damage);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (source.is(DamageTypes.DROWN) || source.is(DamageTypes.WITHER)
                 || source.is(DamageTypeTags.WITHER_IMMUNE_TO)) {
             return false;
         }
-        boolean hurt = super.hurt(source, damage);
+        boolean hurt = super.hurtServer(level, source, damage);
         if (hurt && !this.fieldFrenzy && this.getAbsorptionAmount() <= 0.0F) {
             this.fieldFrenzy = true;
             this.fieldFrenzyCounter = FRENZY_TICKS;
         }
         return hurt;
+    }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float damage) {
+        return super.hurt(source, damage);
     }
 
     @Override

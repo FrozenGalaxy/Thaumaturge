@@ -42,7 +42,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-public final class EntityFluxRift extends Entity {
+public final class EntityFluxRift extends Entity implements ISidedHurt {
     private static final EntityDataAccessor<Integer> DATA_SEED =
             SynchedEntityData.defineId(EntityFluxRift.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_SIZE =
@@ -182,7 +182,16 @@ public final class EntityFluxRift extends Entity {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, amount);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        return false;
+    }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float amount) {
         return false;
     }
 

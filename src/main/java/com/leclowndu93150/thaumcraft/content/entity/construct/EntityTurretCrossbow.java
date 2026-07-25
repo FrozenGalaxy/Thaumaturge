@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.entity.construct;
 
+import com.leclowndu93150.thaumcraft.content.entity.ISidedHurt;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
@@ -35,7 +36,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 
-public class EntityTurretCrossbow extends EntityOwnedConstruct implements RangedAttackMob {
+public class EntityTurretCrossbow extends EntityOwnedConstruct implements RangedAttackMob, ISidedHurt {
     private static final int HEAL_INTERVAL = 80;
     private static final int SWING_TICKS = 6;
     private static final int LOAD_TICKS = 10;
@@ -221,9 +222,18 @@ public class EntityTurretCrossbow extends EntityOwnedConstruct implements Ranged
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        ServerLevel level = (ServerLevel) level();
+        return hurtSided(level(), source, amount);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         setYRot((float) (getYRot() + random.nextGaussian() * 45.0));
         setXRot((float) (getXRot() + random.nextGaussian() * 20.0));
+        return super.hurt(source, amount);
+    }
+
+    @Override
+    public boolean hurtClient(DamageSource source, float amount) {
         return super.hurt(source, amount);
     }
 
