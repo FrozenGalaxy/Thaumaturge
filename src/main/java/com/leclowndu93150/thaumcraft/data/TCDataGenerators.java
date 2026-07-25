@@ -2,13 +2,21 @@ package com.leclowndu93150.thaumcraft.data;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
+import com.leclowndu93150.thaumcraft.api.recipe.Blueprint;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
+import com.leclowndu93150.thaumcraft.api.research.scan.ScanEntry;
+import com.leclowndu93150.thaumcraft.content.pech.PechTradeTable;
+import com.leclowndu93150.thaumcraft.data.worldgen.blueprint.BlueprintBootstrap;
+import com.leclowndu93150.thaumcraft.data.worldgen.pech.PechTradeBootstrap;
+import com.leclowndu93150.thaumcraft.data.worldgen.scan.ScanEntryBootstrap;
 import com.leclowndu93150.thaumcraft.compat.curio.data.TCCurioProvider;
 import com.leclowndu93150.thaumcraft.data.damagetype.TCDamageTypeBootstrap;
 import com.leclowndu93150.thaumcraft.data.datamap.AuraModifierProvider;
 import com.leclowndu93150.thaumcraft.data.datamap.ChampionWhitelistProvider;
 import com.leclowndu93150.thaumcraft.data.datamap.EntityAspectsProvider;
+import com.leclowndu93150.thaumcraft.data.datamap.FuelValuesProvider;
 import com.leclowndu93150.thaumcraft.data.datamap.InfernalBonusProvider;
+import com.leclowndu93150.thaumcraft.data.datamap.StrippingProvider;
 import com.leclowndu93150.thaumcraft.data.lang.TCEnglishProvider;
 import com.leclowndu93150.thaumcraft.data.loot.TCBlockLootSubProvider;
 import com.leclowndu93150.thaumcraft.data.loot.TCEntityLootSubProvider;
@@ -49,6 +57,9 @@ public final class TCDataGenerators {
         RegistrySetBuilder registries = new RegistrySetBuilder()
                 .add(IAspect.REGISTRY_KEY, AspectBootstrap::bootstrap)
                 .add(IResearchCategory.REGISTRY_KEY, CategoryBootstrap::bootstrap)
+                .add(ScanEntry.REGISTRY_KEY, ScanEntryBootstrap::bootstrap)
+                .add(PechTradeTable.REGISTRY_KEY, PechTradeBootstrap::bootstrap)
+                .add(Blueprint.REGISTRY_KEY, BlueprintBootstrap::bootstrap)
                 .add(Registries.DAMAGE_TYPE, TCDamageTypeBootstrap::bootstrap)
                 .add(Registries.CONFIGURED_FEATURE, TCConfiguredFeatures::bootstrap)
                 .add(Registries.PLACED_FEATURE, TCPlacedFeatures::bootstrap)
@@ -67,10 +78,14 @@ public final class TCDataGenerators {
         event.createProvider(EntityAspectsProvider::new);
         event.createProvider(ChampionWhitelistProvider::new);
         event.createProvider(InfernalBonusProvider::new);
+        event.createProvider(StrippingProvider::new);
+        event.createProvider(FuelValuesProvider::new);
         event.createProvider((output, lookupProvider) ->
                 new TCCurioProvider(output, event.getExistingFileHelper(), lookupProvider));
 
-        event.createBlockAndItemTags(TCBlockTagsProvider::new,
+        event.createBlockAndItemTags(
+                (output, lookupProvider) ->
+                        new TCBlockTagsProvider(output, lookupProvider, event.getExistingFileHelper()),
                 (output, lookupProvider, blockTags) ->
                         new TCItemTagsProvider(output, lookupProvider, blockTags, event.getExistingFileHelper()));
         event.createProvider(TCDamageTypeTagsProvider::new);

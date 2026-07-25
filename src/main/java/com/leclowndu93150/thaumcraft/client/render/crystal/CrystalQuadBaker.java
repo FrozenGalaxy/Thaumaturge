@@ -1,8 +1,8 @@
 package com.leclowndu93150.thaumcraft.client.render.crystal;
 
-import com.leclowndu93150.thaumcraft.client.model.obj.MeshModel;
-import com.leclowndu93150.thaumcraft.client.model.obj.MeshPart;
-import com.leclowndu93150.thaumcraft.client.model.obj.MeshQuadBaker;
+import com.leclowndu93150.thaumcraft.client.model.mesh.TCMesh;
+import com.leclowndu93150.thaumcraft.client.model.mesh.TCMeshPart;
+import com.leclowndu93150.thaumcraft.client.model.mesh.TCMeshQuadBaker;
 import java.util.List;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -13,8 +13,8 @@ public final class CrystalQuadBaker {
 
     private CrystalQuadBaker() {}
 
-    public static void bakePart(MeshModel mesh, MeshPart part, TextureAtlasSprite sprite, int tintIndex,
+    public static void bakePart(TCMeshPart part, TextureAtlasSprite sprite, int tintIndex,
                                 Matrix4f transform, List<BakedQuad> output) {
-        MeshQuadBaker.bakePart(mesh, part, sprite, tintIndex, transform, false, FULLBRIGHT, FULLBRIGHT, output);
+        TCMeshQuadBaker.bakePart(part, sprite, tintIndex, transform, false, FULLBRIGHT, FULLBRIGHT, output);
     }
 }

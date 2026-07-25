@@ -2,8 +2,8 @@ package com.leclowndu93150.thaumcraft.client.render.blockentity;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.client.golem.GolemMeshes;
-import com.leclowndu93150.thaumcraft.client.model.obj.MeshModel;
-import com.leclowndu93150.thaumcraft.client.model.obj.MeshPart;
+import com.leclowndu93150.thaumcraft.client.model.mesh.TCMesh;
+import com.leclowndu93150.thaumcraft.client.model.mesh.TCMeshPart;
 import com.leclowndu93150.thaumcraft.content.golem.press.BlockEntityGolemBuilder;
 import com.leclowndu93150.thaumcraft.content.golem.press.BlockGolemBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -23,7 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 
 public final class GolemBuilderRenderer implements BlockEntityRenderer<BlockEntityGolemBuilder> {
-    public static final ResourceLocation MODEL = TCIds.rl("models/obj/golembuilder.obj");
+    public static final ResourceLocation MODEL = TCIds.rl("models/mesh/golembuilder.tcmesh");
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/golembuilder.png");
     private static final Material LAVA_MATERIAL = new Material(TextureAtlas.LOCATION_BLOCKS,
             ResourceLocation.withDefaultNamespace("block/lava_still"));
@@ -55,18 +55,18 @@ public final class GolemBuilderRenderer implements BlockEntityRenderer<BlockEnti
     }
 
     public static void submitParts(int press, PoseStack poseStack, MultiBufferSource buffers, int light) {
-        MeshModel mesh = GolemMeshes.get(MODEL);
+        TCMesh mesh = GolemMeshes.get(MODEL);
         VertexConsumer buffer = buffers.getBuffer(RenderType.entityCutout(TEXTURE));
-        for (MeshPart part : mesh.parts()) {
+        for (TCMeshPart part : mesh.parts()) {
             if (!PRESS_PART.equals(part.name())) {
-                GolemMeshes.renderPart(mesh, part, poseStack.last(), buffer, light, -1);
+                GolemMeshes.renderPart(part, poseStack.last(), buffer, light, -1);
             }
         }
         poseStack.pushPose();
         poseStack.translate(0.0F, (float) (-Math.sin(Math.toRadians(press)) * PRESS_DROP), 0.0F);
-        for (MeshPart part : mesh.parts()) {
+        for (TCMeshPart part : mesh.parts()) {
             if (PRESS_PART.equals(part.name())) {
-                GolemMeshes.renderPart(mesh, part, poseStack.last(), buffer, light, -1);
+                GolemMeshes.renderPart(part, poseStack.last(), buffer, light, -1);
             }
         }
         poseStack.popPose();

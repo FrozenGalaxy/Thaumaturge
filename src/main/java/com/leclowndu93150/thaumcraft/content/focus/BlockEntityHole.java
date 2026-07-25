@@ -1,9 +1,9 @@
 package com.leclowndu93150.thaumcraft.content.focus;
+import net.minecraft.util.FastColor.ARGB32;
 
 import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.content.focus.effect.FocusEffectRift;
-import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
-import com.leclowndu93150.thaumcraft.content.fx.helper.Sprites;
+import com.leclowndu93150.thaumcraft.content.particle.SparkleParticleOptions;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -133,16 +133,9 @@ public final class BlockEntityHole extends BlockEntity {
         if (rand.nextInt(6) >= 4) {
             return;
         }
-        FXGenericData data = FXGenericData.builder()
-                .color(SPARKLE_RED, SPARKLE_GREEN, SPARKLE_BLUE)
-                .alpha(SPARKLE_ALPHA)
-                .scale(0.6F + rand.nextFloat() * 0.2F)
-                .grid(Sprites.SPARKLE_LOOP.grid())
-                .particles(Sprites.SPARKLE_LOOP.start(), Sprites.SPARKLE_LOOP.num(), Sprites.SPARKLE_LOOP.inc())
-                .loop(true)
-                .maxAge(6 + rand.nextInt(4))
-                .layer(0)
-                .build();
+        SparkleParticleOptions data = new SparkleParticleOptions(
+                ARGB32.colorFromFloat(1.0F, SPARKLE_RED, SPARKLE_GREEN, SPARKLE_BLUE),
+                0.6F + rand.nextFloat() * 0.2F, 0, 1.0F, 0.0F, 2, false);
         level.addParticle(data, x, y, z, 0.0, 0.0, 0.0);
     }
 

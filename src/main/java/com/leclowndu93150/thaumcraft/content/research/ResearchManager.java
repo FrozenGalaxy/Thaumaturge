@@ -35,6 +35,9 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentType;
+import java.util.Map;
 
 public final class ResearchManager {
     private static final int STAGE_XP_REWARD = 5;
@@ -207,11 +210,23 @@ public final class ResearchManager {
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stack = inv.getItem(i);
             if (stack.isEmpty()) continue;
-            if (req.items().contains(stack.getItem().builtInRegistryHolder())) {
+            if (req.items().contains(stack.getItem().builtInRegistryHolder())
+                    && testComponents(req.components(), stack)) {
                 total += stack.getCount();
             }
         }
         return total;
+    }
+
+    private static boolean testComponents(DataComponentPatch components, ItemStack stack) {
+        for (Map.Entry<DataComponentType<?>, Optional<?>> entry : components.entrySet()) {
+            DataComponentType<?> type = entry.getKey();
+            Optional<?> value = entry.getValue();
+            if (value.isEmpty() ? stack.has(type) : !value.get().equals(stack.get(type))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static void consumeStageRequirements(ServerPlayer player, PlayerKnowledge knowledge, IResearchEntry entry, IResearchStage stage) {
@@ -221,7 +236,8 @@ public final class ResearchManager {
             for (int i = 0; i < inv.getContainerSize() && remaining > 0; i++) {
                 ItemStack stack = inv.getItem(i);
                 if (stack.isEmpty()) continue;
-                if (req.items().contains(stack.getItem().builtInRegistryHolder())) {
+                if (req.items().contains(stack.getItem().builtInRegistryHolder())
+                        && testComponents(req.components(), stack)) {
                     int take = Math.min(remaining, stack.getCount());
                     stack.shrink(take);
                     remaining -= take;

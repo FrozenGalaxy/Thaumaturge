@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.entity;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import com.leclowndu93150.thaumcraft.client.fx.render.rendertype.BeamRenderType;
+import com.leclowndu93150.thaumcraft.client.effect.rendertype.BeamRenderType;
 import com.leclowndu93150.thaumcraft.client.model.entity.ArcaneBoreModel;
 import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumcraft.content.entity.construct.EntityArcaneBore;

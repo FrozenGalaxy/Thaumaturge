@@ -75,7 +75,8 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
 
     private static final int ARROW_PREV_X = 27;
     private static final int ARROW_NEXT_X = 51;
-    private static final int ARROW_Y = 121;
+    private static final int ARROW_Y = 119;
+    private static final float PALETTE_TAG_SCALE = 0.8F;
     private static final int ARROW_W = 24;
     private static final int ARROW_H = 8;
     private static final int ARROW_PREV_U = 184;
@@ -220,9 +221,13 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
             int x = leftPos + PALETTE_X + (drawn / PALETTE_ROWS) * PALETTE_CELL;
             int y = topPos + PALETTE_Y + (drawn % PALETTE_ROWS) * PALETTE_CELL;
             float alpha = availableOf(aspect) > 0 ? 1.0F : 0.33F;
-            AspectTagRenderer.render(graphics, font, (double) x, (double) y, aspect,
+            graphics.pose().pushPose();
+            graphics.pose().translate(x, y, 0);
+            graphics.pose().scale(PALETTE_TAG_SCALE, PALETTE_TAG_SCALE, 1F);
+            AspectTagRenderer.render(graphics, font, 1.0, 1.0, aspect,
                     pool().amount(AspectPools.idOf(aspect)), 0, 0.0,
                     AspectTagRenderer.BlendMode.ALPHA, alpha, false);
+            graphics.pose().popPose();
             if (mouseX >= x && mouseX < x + PALETTE_CELL && mouseY >= y && mouseY < y + PALETTE_CELL) {
                 hovered = aspect;
             }
@@ -321,10 +326,22 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
     }
 
     private void drawHelperButton(GuiGraphics graphics, int mouseX, int mouseY) {
+        if (duplicateButtonShown()) {
+            return;
+        }
         graphics.renderItem(new ItemStack(TCItems.THAUMONOMICON.get()), leftPos + HELPER_X, topPos + HELPER_Y);
         if (inRect(mouseX, mouseY, leftPos + HELPER_X, topPos + HELPER_Y, HELPER_SIZE, HELPER_SIZE)) {
             DeferredTooltip.set(Component.translatable("tc.table.helper"), mouseX, mouseY);
         }
+    }
+
+    private boolean duplicateButtonShown() {
+        if (minecraft == null || minecraft.player == null || table() == null) {
+            return false;
+        }
+        ResearchNoteData data = noteData();
+        return data != null && data.complete()
+                && KnowledgeAccess.of(minecraft.player).isResearchComplete(BlockEntityResearchTable.RESEARCH_DUPLICATION);
     }
 
     private List<Holder<IAspect>> discoveredCompounds() {
@@ -530,13 +547,15 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
         double mx = mouseX;
         double my = mouseY;
         if (button == 0) {
-            if (inRect(mx, my, leftPos + HELPER_X, topPos + HELPER_Y, HELPER_SIZE, HELPER_SIZE)) {
-                helperOpen = !helperOpen;
-                playSound(TCSounds.KEY.get(), 0.3F, 1.0F);
-                return true;
-            }
-            if (helperOpen && handleHelperArrows(mx, my)) {
-                return true;
+            if (!duplicateButtonShown()) {
+                if (inRect(mx, my, leftPos + HELPER_X, topPos + HELPER_Y, HELPER_SIZE, HELPER_SIZE)) {
+                    helperOpen = !helperOpen;
+                    playSound(TCSounds.KEY.get(), 0.3F, 1.0F);
+                    return true;
+                }
+                if (helperOpen && handleHelperArrows(mx, my)) {
+                    return true;
+                }
             }
             if (handleArrows(mx, my) || handleCombineButton(mx, my)
                     || handleSelectRemove(mx, my) || handleDuplicate(mx, my)) {

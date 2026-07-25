@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft;
 
+import com.leclowndu93150.thaumcraft.registry.TCParticles;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectIndexAccess;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;

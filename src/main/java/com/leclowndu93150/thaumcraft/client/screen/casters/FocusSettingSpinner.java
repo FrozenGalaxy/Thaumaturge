@@ -1,13 +1,15 @@
 package com.leclowndu93150.thaumcraft.client.screen.casters;
 
-import com.leclowndu93150.thaumcraft.api.casters.NodeSetting;
+import com.leclowndu93150.thaumcraft.api.casters.SettingDefinition;
 import com.leclowndu93150.thaumcraft.client.screen.TCScreenTextures;
+import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
 public final class FocusSettingSpinner extends AbstractWidget {
     private static final int ARROW_SIZE = 10;
@@ -17,43 +19,53 @@ public final class FocusSettingSpinner extends AbstractWidget {
     private static final int ATLAS = 256;
     private static final int TEXT_COLOR = 0xFFFFFFFF;
 
-    private final NodeSetting setting;
+    private final SettingDefinition definition;
+    private final Map<String, Integer> values;
     private final Runnable onChange;
+    private int index;
 
-    public FocusSettingSpinner(int x, int y, int width, NodeSetting setting, Runnable onChange) {
+    public FocusSettingSpinner(int x, int y, int width, SettingDefinition definition,
+            Map<String, Integer> values, Runnable onChange) {
         super(x, y, width + ARROW_SIZE, ARROW_SIZE, Component.empty());
-        this.setting = setting;
+        this.definition = definition;
+        this.values = values;
         this.onChange = onChange;
-        setTooltip(Tooltip.create(setting.getName()));
+        this.index = definition.values().indexOf(
+                values.getOrDefault(definition.key(), definition.defaultValue()));
+        setTooltip(Tooltip.create(Component.translatable(definition.nameKey())));
+    }
+
+    @Override
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        int bodyWidth = this.width - ARROW_SIZE;
+        graphics.blit(TCScreenTextures.GUI_BASE,
+                getX(), getY(), U_MINUS, V_ARROWS, ARROW_SIZE, ARROW_SIZE, ATLAS, ATLAS);
+        graphics.blit(TCScreenTextures.GUI_BASE,
+                getX() + bodyWidth, getY(), U_PLUS, V_ARROWS, ARROW_SIZE, ARROW_SIZE, ATLAS, ATLAS);
+        Component value = definition.values().labelAt(index);
+        var font = Minecraft.getInstance().font;
+        graphics.drawString(font, value,
+                getX() + (bodyWidth + ARROW_SIZE) / 2 - font.width(value) / 2,
+                getY() + 1, TEXT_COLOR, true);
     }
 
     @Override
     public void onClick(double mouseX, double mouseY, int button) {
         int bodyWidth = this.width - ARROW_SIZE;
         if (mouseX < getX() + ARROW_SIZE) {
-            setting.decrement();
-            onChange.run();
+            step(-1);
         } else if (mouseX >= getX() + bodyWidth) {
-            setting.increment();
-            onChange.run();
+            step(1);
         }
     }
 
-	@Override
-	protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-		int bodyWidth = this.width - ARROW_SIZE;
-		graphics.blit(TCScreenTextures.GUI_BASE,
-				getX(), getY(), U_MINUS, V_ARROWS, ARROW_SIZE, ARROW_SIZE, ATLAS, ATLAS);
-		graphics.blit(TCScreenTextures.GUI_BASE,
-				getX() + bodyWidth, getY(), U_PLUS, V_ARROWS, ARROW_SIZE, ARROW_SIZE, ATLAS, ATLAS);
-		Component value = setting.getValueText();
-		var font = Minecraft.getInstance().font;
-		graphics.drawString(font, value,
-				getX() + (bodyWidth + ARROW_SIZE) / 2 - font.width(value) / 2,
-				getY() + 1, TEXT_COLOR, true);
-	}
+    private void step(int delta) {
+        index = Mth.clamp(index + delta, 0, definition.values().count() - 1);
+        values.put(definition.key(), definition.values().valueAt(index));
+        onChange.run();
+    }
 
-	@Override
+    @Override
     protected void updateWidgetNarration(NarrationElementOutput output) {
         defaultButtonNarrationText(output);
     }

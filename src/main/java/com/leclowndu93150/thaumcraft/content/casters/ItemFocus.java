@@ -1,19 +1,18 @@
 package com.leclowndu93150.thaumcraft.content.casters;
 
-import com.leclowndu93150.thaumcraft.api.casters.FocusEffect;
+import com.leclowndu93150.thaumcraft.api.casters.FocusElement;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;
-import com.leclowndu93150.thaumcraft.api.casters.FocusMediumRoot;
-import com.leclowndu93150.thaumcraft.api.casters.FocusModSplit;
-import com.leclowndu93150.thaumcraft.api.casters.FocusNode;
 import com.leclowndu93150.thaumcraft.api.casters.FocusPackage;
-import com.leclowndu93150.thaumcraft.api.casters.IFocusElement;
-import com.leclowndu93150.thaumcraft.api.casters.NodeSetting;
+import com.leclowndu93150.thaumcraft.api.casters.FocusSettings;
+import com.leclowndu93150.thaumcraft.api.casters.FocusUnit;
+import com.leclowndu93150.thaumcraft.api.casters.SettingDefinition;
+import com.leclowndu93150.thaumcraft.content.focus.medium.FocusMediumRoot;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import java.util.List;
-import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -61,15 +60,15 @@ public class ItemFocus extends Item {
         if (core == null) {
             return WHITE;
         }
-        List<FocusEffect> effects = core.getFocusEffects();
+        List<ResourceLocation> effects = FocusEngine.effectIds(core);
         if (effects.isEmpty()) {
             return WHITE;
         }
         int r = 0;
         int g = 0;
         int b = 0;
-        for (FocusEffect effect : effects) {
-            int color = FocusEngine.getElementColor(effect.getKey());
+        for (ResourceLocation effectId : effects) {
+            int color = FocusEngine.color(effectId);
             r += (color >> 16) & 0xFF;
             g += (color >> 8) & 0xFF;
             b += color & 0xFF;
@@ -85,12 +84,12 @@ public class ItemFocus extends Item {
         if (core == null) {
             return null;
         }
-        return focusStack.getHoverName().getString() + core.getSortingHelper();
+        return focusStack.getHoverName().getString() + core.sortingHash();
     }
 
     public float getVisCost(ItemStack focusStack) {
         FocusPackage core = getPackage(focusStack);
-        return core == null ? 0.0F : (float) core.getComplexity() / VIS_COST_DIVISOR;
+        return core == null ? 0.0F : (float) core.complexity() / VIS_COST_DIVISOR;
     }
 
     public int getActivationTime(ItemStack focusStack) {
@@ -98,7 +97,7 @@ public class ItemFocus extends Item {
         if (core == null) {
             return 0;
         }
-        int complexity = core.getComplexity();
+        int complexity = core.complexity();
         return Math.max(MIN_ACTIVATION_TICKS, complexity / ACTIVATION_COST_DIVISOR * (complexity / ACTIVATION_SCALE_DIVISOR));
     }
 
@@ -125,41 +124,41 @@ public class ItemFocus extends Item {
             return;
         }
         builder.add(Component.translatable("tooltip.thaumcraft.focus.vis_cost", formatVis(getVisCost(focusStack))));
-        for (IFocusElement element : core.getNodes()) {
-            if (element instanceof FocusNode node && !(node instanceof FocusMediumRoot)) {
-                buildInfo(builder, node, 0);
-            }
-        }
+        buildInfo(builder, core, 0);
     }
 
-    private void buildInfo(List<Component> builder, FocusNode node, int depth) {
-        MutableComponent line = Component.literal(INDENT.repeat(depth));
-        line.append(Component.translatable(node.getNameKey()).withStyle(ChatFormatting.DARK_PURPLE));
-        if (!node.getSettingList().isEmpty()) {
-            MutableComponent settings = Component.literal(" [");
-            boolean following = false;
-            for (String settingKey : node.getSettingList()) {
-                NodeSetting setting = node.getSetting(settingKey);
-                if (setting == null) {
-                    continue;
-                }
-                if (following) {
-                    settings.append(", ");
-                }
-                settings.append(setting.getName()).append(" ").append(setting.getValueText());
-                following = true;
+    private void buildInfo(List<Component> builder, FocusPackage pack, int depth) {
+        for (FocusUnit unit : pack.units()) {
+            if (unit.element().equals(FocusMediumRoot.KEY)) {
+                continue;
             }
-            settings.append("]");
-            line.append(settings.withStyle(ChatFormatting.DARK_AQUA));
-        }
-        builder.add(line);
-        if (node instanceof FocusModSplit split) {
-            for (FocusPackage branch : split.getSplitPackages()) {
-                for (IFocusElement element : branch.getNodes()) {
-                    if (element instanceof FocusNode child && !(child instanceof FocusMediumRoot)) {
-                        buildInfo(builder, child, depth + 1);
+            FocusElement element = FocusEngine.element(unit.element());
+            if (element == null) {
+                continue;
+            }
+            MutableComponent line = Component.literal(INDENT.repeat(depth));
+            line.append(Component.translatable(element.nameKey()).withStyle(ChatFormatting.DARK_PURPLE));
+            List<SettingDefinition> definitions = element.settings();
+            if (!definitions.isEmpty()) {
+                FocusSettings settings = FocusSettings.of(element, unit.settings());
+                MutableComponent values = Component.literal(" [");
+                boolean following = false;
+                for (SettingDefinition definition : definitions) {
+                    if (following) {
+                        values.append(", ");
                     }
+                    int value = settings.value(definition.key());
+                    values.append(Component.translatable(definition.nameKey()))
+                            .append(" ")
+                            .append(definition.values().labelAt(definition.values().indexOf(value)));
+                    following = true;
                 }
+                values.append("]");
+                line.append(values.withStyle(ChatFormatting.DARK_AQUA));
+            }
+            builder.add(line);
+            for (FocusPackage branch : unit.branches()) {
+                buildInfo(builder, branch, depth + 1);
             }
         }
     }

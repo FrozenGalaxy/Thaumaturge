@@ -1,7 +1,8 @@
 {
-    "loader": "thaumcraft:obj",
-    "model": "thaumcraft:models/obj/scanner.obj",
+    "loader": "thaumcraft:mesh",
+    "model": "thaumcraft:models/mesh/scanner.tcmesh",
     "flip_v": true,
+    "render_type": "minecraft:translucent",
     "textures": {
         "body": "thaumcraft:item/scanner",
         "pane": "thaumcraft:item/scanscreen",

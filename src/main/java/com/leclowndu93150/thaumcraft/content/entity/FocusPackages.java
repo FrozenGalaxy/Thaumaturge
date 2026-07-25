@@ -2,12 +2,13 @@ package com.leclowndu93150.thaumcraft.content.entity;
 
 import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
-import com.leclowndu93150.thaumcraft.api.casters.FocusEffect;
+import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;
 import com.leclowndu93150.thaumcraft.api.casters.FocusPackage;
 import java.util.List;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.Nullable;
 
 public final class FocusPackages {
@@ -42,7 +43,7 @@ public final class FocusPackages {
         return TCNbt.read(input, PACK_KEY, FocusPackage.CODEC, registries).orElse(null);
     }
 
-    public static List<FocusEffect> effects(@Nullable FocusPackage focusPackage) {
-        return focusPackage != null ? focusPackage.getFocusEffects() : List.of();
+    public static List<ResourceLocation> effects(@Nullable FocusPackage focusPackage) {
+        return focusPackage != null ? FocusEngine.effectIds(focusPackage) : List.of();
     }
 }

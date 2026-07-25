@@ -10,6 +10,10 @@ import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.content.item.PhialItem;
 import com.leclowndu93150.thaumcraft.api.aspect.TCAspects;
 import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
+import com.leclowndu93150.thaumcraft.content.recipe.dust.DustTriggerMultiblockRecipe;
+import com.leclowndu93150.thaumcraft.content.recipe.dust.DustTriggerSimpleRecipe;
+import com.leclowndu93150.thaumcraft.content.recipe.dust.DustTriggerTagRecipe;
+import net.minecraft.world.item.crafting.Recipe;
 import com.leclowndu93150.thaumcraft.api.items.InfusionEnchantment;
 import com.leclowndu93150.thaumcraft.content.equipment.InfusionEnchantments;
 import com.leclowndu93150.thaumcraft.data.recipe.builders.CrucibleRecipeBuilder;
@@ -107,6 +111,7 @@ public final class TCRecipeProvider extends RecipeProvider {
         this.output = recipeOutput;
         this.registries = provider;
         this.items = provider.lookupOrThrow(Registries.ITEM);
+        buildDustTriggerRecipes();
         buildSalisMundusRecipe();
         buildArcaneWorkbenchRecipes();
         buildBannerRecipes();
@@ -187,6 +192,13 @@ public final class TCRecipeProvider extends RecipeProvider {
 
         TCBlockFamilies.getAllFamilies().forEach(family ->
                 generateRecipes(output, family, FeatureFlagSet.of(FeatureFlags.VANILLA)));
+
+        planksFromLogs(output, TCItems.PLANK_GREATWOOD.get(), TCItemTags.GREATWOOD_LOGS, 4);
+        planksFromLogs(output, TCItems.PLANK_SILVERWOOD.get(), TCItemTags.SILVERWOOD_LOGS, 4);
+        woodFromLogs(output, TCItems.WOOD_GREATWOOD.get(), TCItems.LOG_GREATWOOD.get());
+        woodFromLogs(output, TCItems.STRIPPED_WOOD_GREATWOOD.get(), TCItems.STRIPPED_LOG_GREATWOOD.get());
+        woodFromLogs(output, TCItems.WOOD_SILVERWOOD.get(), TCItems.LOG_SILVERWOOD.get());
+        woodFromLogs(output, TCItems.STRIPPED_WOOD_SILVERWOOD.get(), TCItems.STRIPPED_LOG_SILVERWOOD.get());
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC,TCItems.PHIAL,8)
                 .pattern(" C ")
@@ -2279,9 +2291,9 @@ public final class TCRecipeProvider extends RecipeProvider {
 
         arcaneShaped(new ItemStack(TCItems.WAND_ROD_GREATWOOD.get()), WAND_ROD_GREATWOOD_VIS)
                 .pattern(" G").pattern("G ")
-                .define('G', TCItems.LOG_GREATWOOD)
+                .define('G', TCItemTags.GREATWOOD_LOGS)
                 .gate(gate("rod_greatwood"))
-                .unlockedBy("has", has(TCItems.LOG_GREATWOOD))
+                .unlockedBy("has", has(TCItemTags.GREATWOOD_LOGS))
                 .save(output, TCIds.MODID + ":wand/part/wand_rod_greatwood");
 
         elementalRodInfusion(aspects, TCItems.WAND_ROD_OBSIDIAN, Ingredient.of(Blocks.OBSIDIAN),
@@ -2298,14 +2310,14 @@ public final class TCRecipeProvider extends RecipeProvider {
                 TCAspects.PERDITIO, TCAspects.EXANIMIS, "rod_bone");
 
         InfusionRecipeBuilder silverwoodRod = new InfusionRecipeBuilder(aspects, RecipeCategory.MISC,
-                new ItemStack(TCItems.WAND_ROD_SILVERWOOD.get()), Ingredient.of(TCItems.LOG_SILVERWOOD.get()))
+                new ItemStack(TCItems.WAND_ROD_SILVERWOOD.get()), Ingredient.of(TCItemTags.SILVERWOOD_LOGS))
                 .component(Ingredient.of(TCItems.SALIS_MUNDUS.get()));
         for (ResourceKey<IAspect> primal : TCAspects.PRIMALS) {
             silverwoodRod.component(crystal(primal)).aspect(primal, 9);
         }
         silverwoodRod.aspect(TCAspects.PRAECANTATIO, 9)
                 .instability(5).gate(gate("rod_silverwood"))
-                .unlockedBy("has", has(TCItems.LOG_SILVERWOOD.get()))
+                .unlockedBy("has", has(TCItemTags.SILVERWOOD_LOGS))
                 .save(output);
 
         staffCoreRecipe(TCItems.STAFF_ROD_GREATWOOD, TCItems.WAND_ROD_GREATWOOD, STAFF_GREATWOOD_VIS);
@@ -2739,6 +2751,49 @@ public final class TCRecipeProvider extends RecipeProvider {
     private Ingredient potion(Holder<Potion> potion) {
         return DataComponentIngredient.of(false, DataComponents.POTION_CONTENTS,
                 new PotionContents(potion), Items.POTION);
+    }
+
+    private void buildDustTriggerRecipes() {
+        dustTrigger("bookshelf_to_thaumonomicon", new DustTriggerTagRecipe(
+                Tags.Blocks.BOOKSHELVES,
+                new ItemStack(TCItems.THAUMONOMICON.get()),
+                Optional.of(gate("gotdream"))));
+        dustTrigger("crafting_tables_to_arcane_workbench", new DustTriggerTagRecipe(
+                Tags.Blocks.PLAYER_WORKSTATIONS_CRAFTING_TABLES,
+                new ItemStack(TCBlocks.ARCANE_WORKBENCH.get().asItem()),
+                Optional.of(gate("first_steps", 0))));
+        dustTrigger("cauldron_to_crucible", new DustTriggerSimpleRecipe(
+                Blocks.CAULDRON,
+                new ItemStack(TCBlocks.CRUCIBLE.get().asItem()),
+                Optional.of(gate("unlock_alchemy", 0))));
+        dustTrigger("golem_press", new DustTriggerMultiblockRecipe(
+                TCIds.rl("golem_press"),
+                new ItemStack(TCBlocks.GOLEM_BUILDER.get().asItem()),
+                Optional.of(gate("mind_clockwork"))));
+        dustTrigger("infernal_furnace", new DustTriggerMultiblockRecipe(
+                TCIds.rl("infernal_furnace"),
+                new ItemStack(TCBlocks.INFERNAL_FURNACE.get().asItem()),
+                Optional.of(gate("infernal_furnace"))));
+        dustTrigger("infusion_altar", new DustTriggerMultiblockRecipe(
+                TCIds.rl("infusion_altar"),
+                new ItemStack(TCBlocks.INFUSION_MATRIX.get().asItem()),
+                Optional.of(gate("infusion"))));
+        dustTrigger("infusion_altar_ancient", new DustTriggerMultiblockRecipe(
+                TCIds.rl("infusion_altar_ancient"),
+                new ItemStack(TCBlocks.INFUSION_MATRIX.get().asItem()),
+                Optional.of(gate("infusion_ancient"))));
+        dustTrigger("infusion_altar_eldritch", new DustTriggerMultiblockRecipe(
+                TCIds.rl("infusion_altar_eldritch"),
+                new ItemStack(TCBlocks.INFUSION_MATRIX.get().asItem()),
+                Optional.of(gate("infusion_eldritch"))));
+        dustTrigger("thaumatorium", new DustTriggerMultiblockRecipe(
+                TCIds.rl("thaumatorium"),
+                new ItemStack(TCBlocks.THAUMATORIUM.get().asItem()),
+                Optional.of(gate("thaumatorium"))));
+    }
+
+    private void dustTrigger(String name, Recipe<?> recipe) {
+        output.accept(TCIds.rl("dust_trigger/" + name), recipe, null);
     }
 
     private void buildSalisMundusRecipe() {

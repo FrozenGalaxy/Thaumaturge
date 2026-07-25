@@ -14,13 +14,13 @@ import com.leclowndu93150.thaumcraft.api.taint.TaintApi;
 import com.leclowndu93150.thaumcraft.content.aspect.EntityAspects;
 import com.leclowndu93150.thaumcraft.data.worldgen.biome.TCBiomes;
 import com.leclowndu93150.thaumcraft.content.entity.EntityBrainyZombie;
-import com.leclowndu93150.thaumcraft.content.fx.FX;
-import com.leclowndu93150.thaumcraft.content.fx.TCParticleDispatch;
+import com.leclowndu93150.thaumcraft.content.effect.Effects;
+import com.leclowndu93150.thaumcraft.content.effect.EffectDispatch;
 import com.leclowndu93150.thaumcraft.content.wands.EntityAspectOrb;
 import com.leclowndu93150.thaumcraft.content.wands.WandChargingEvents;
 import com.leclowndu93150.thaumcraft.content.wands.WandParts;
 import com.leclowndu93150.thaumcraft.content.wands.WandVisHelper;
-import com.leclowndu93150.thaumcraft.registry.TCBlocks;
+import com.leclowndu93150.thaumcraft.registry.TCBlockTags;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import com.leclowndu93150.thaumcraft.registry.TCEntities;
 import com.leclowndu93150.thaumcraft.registry.TCWandParts;
@@ -530,7 +530,7 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
             other.wait = other.regeneration / 2;
             other.setChanged();
             serverLevel.sendBlockUpdated(otherPos, other.getBlockState(), other.getBlockState(), 3);
-            FX.arcBolt(serverLevel, Vec3.atCenterOf(otherPos))
+            Effects.arcBolt(serverLevel, Vec3.atCenterOf(otherPos))
                     .to(Vec3.atCenterOf(pos))
                     .width(ZAP_WIDTH)
                     .send();
@@ -596,7 +596,7 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
             for (int dy = -1; dy <= 1; dy++) {
                 for (int dz = -1; dz <= 1; dz++) {
                     cursor.setWithOffset(pos, dx, dy, dz);
-                    if (serverLevel.getBlockState(cursor).is(TCBlocks.LOG_SILVERWOOD.get())) {
+                    if (serverLevel.getBlockState(cursor).is(TCBlockTags.SILVERWOOD_LOGS)) {
                         return true;
                     }
                 }

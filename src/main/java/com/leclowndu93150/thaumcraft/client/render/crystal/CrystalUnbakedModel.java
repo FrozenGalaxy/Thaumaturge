@@ -4,8 +4,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.leclowndu93150.thaumcraft.TCIds;
-import com.leclowndu93150.thaumcraft.client.model.obj.MeshModel;
-import com.leclowndu93150.thaumcraft.client.model.obj.TCObjLoader;
+import com.leclowndu93150.thaumcraft.client.model.mesh.TCMesh;
+import com.leclowndu93150.thaumcraft.client.model.mesh.TCMeshLoader;
 import java.io.IOException;
 import java.util.function.Function;
 import net.minecraft.client.Minecraft;
@@ -21,7 +21,7 @@ import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
 
 public final class CrystalUnbakedModel implements IUnbakedGeometry<CrystalUnbakedModel> {
-    public static final ResourceLocation MODEL_LOCATION = TCIds.rl("models/obj/crystal.obj");
+    public static final ResourceLocation MODEL_LOCATION = TCIds.rl("models/mesh/crystal.tcmesh");
     private static final String PARTICLE_SLOT = "particle";
 
     private CrystalUnbakedModel() {}
@@ -30,14 +30,14 @@ public final class CrystalUnbakedModel implements IUnbakedGeometry<CrystalUnbake
     public BakedModel bake(IGeometryBakingContext context, ModelBaker baker,
                            Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState,
                            ItemOverrides overrides) {
-        MeshModel mesh = loadMesh();
+        TCMesh mesh = loadMesh();
         TextureAtlasSprite particle = spriteGetter.apply(context.getMaterial(PARTICLE_SLOT));
         return new CrystalBakedModel(mesh, particle);
     }
 
-    private static MeshModel loadMesh() {
+    private static TCMesh loadMesh() {
         try {
-            return TCObjLoader.load(Minecraft.getInstance().getResourceManager(), MODEL_LOCATION);
+            return TCMeshLoader.load(Minecraft.getInstance().getResourceManager(), MODEL_LOCATION);
         } catch (IOException e) {
             throw new RuntimeException("Could not load crystal OBJ at " + MODEL_LOCATION, e);
         }

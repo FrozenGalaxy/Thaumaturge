@@ -11,6 +11,8 @@ import com.leclowndu93150.thaumcraft.api.research.IResearchEntry;
 import com.leclowndu93150.thaumcraft.api.research.IResearchStage;
 import com.leclowndu93150.thaumcraft.api.research.KnowledgeReward;
 import com.leclowndu93150.thaumcraft.content.research.PlayerKnowledge;
+import com.leclowndu93150.thaumcraft.content.research.table.BlockEntityResearchTable;
+import com.leclowndu93150.thaumcraft.content.research.table.MenuResearchTable;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
@@ -113,7 +115,7 @@ public final class ResearchNotes {
         if (knowledge.isResearchKnown(learnKey) || hasNoteFor(player, learnKey)) {
             return false;
         }
-        if (!consumeInk(player, true) || !hasItem(player, Items.PAPER)) {
+        if ((!consumeInk(player, true) || !hasItem(player, Items.PAPER)) && !player.getAbilities().instabuild) {
             player.sendSystemMessage(Component.translatable("tc.researchnote.missing")
                     .withStyle(ChatFormatting.DARK_PURPLE));
             return false;
@@ -127,7 +129,7 @@ public final class ResearchNotes {
         if (!player.getInventory().add(note)) {
             player.drop(note, false);
         }
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+        player.level().playSound(null, player,
                 TCSounds.WRITE.get(), SoundSource.PLAYERS, 0.5F, 1.0F);
         return true;
     }
@@ -141,6 +143,12 @@ public final class ResearchNotes {
                     stack.setDamageValue(stack.getDamageValue() + 1);
                 }
                 return true;
+            }
+        }
+        if (player.containerMenu instanceof MenuResearchTable table) {
+            BlockEntityResearchTable be = table.blockEntity();
+            if (be != null && be.hasInkReady()) {
+                return simulate || be.consumeInk();
             }
         }
         return false;

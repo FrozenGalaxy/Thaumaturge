@@ -23,12 +23,15 @@ public final class TravellerBootsItem extends ArmorItem implements IRechargable 
     private static final int ENERGY_PER_CHARGE = 60;
     private static final int ENERGY_INTERVAL_TICKS = 20;
     private static final float GROUND_BOOST = 0.05F;
-    private static final float AIR_BOOST = 0.03F;
+    private static final float JUMP_BOOST = 0.275F;
     private static final float WATER_AIR_BOOST = 0.025F;
     private static final float STEP_HEIGHT_BONUS = 0.4F;
     private static final AttributeModifier STEP_MODIFIER = new AttributeModifier(
             ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "traveller_step"),
             STEP_HEIGHT_BONUS, AttributeModifier.Operation.ADD_VALUE);
+    private static final AttributeModifier JUMP_MODIFIER = new AttributeModifier(
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "traveller_jump"),
+            JUMP_BOOST, AttributeModifier.Operation.ADD_VALUE);
 
     public TravellerBootsItem(Properties properties) {
         super(TCMaterials.ARMOR_TRAVELLER, ArmorItem.Type.BOOTS, properties);
@@ -55,11 +58,19 @@ public final class TravellerBootsItem extends ArmorItem implements IRechargable 
                 && player.getKnownMovement().horizontalDistanceSqr() > 0.0
                 && !player.isShiftKeyDown();
         AttributeInstance stepHeight = player.getAttribute(Attributes.STEP_HEIGHT);
+        AttributeInstance jumpHeight = player.getAttribute(Attributes.JUMP_STRENGTH);
         if (stepHeight != null) {
             if (active && !stepHeight.hasModifier(STEP_MODIFIER.id())) {
                 stepHeight.addTransientModifier(STEP_MODIFIER);
             } else if (!active && stepHeight.hasModifier(STEP_MODIFIER.id())) {
                 stepHeight.removeModifier(STEP_MODIFIER.id());
+            }
+        }
+        if (jumpHeight != null) {
+            if (active && !jumpHeight.hasModifier(JUMP_MODIFIER.id())) {
+                jumpHeight.addTransientModifier(JUMP_MODIFIER);
+            } else if (!active && jumpHeight.hasModifier(JUMP_MODIFIER.id())) {
+                jumpHeight.removeModifier(JUMP_MODIFIER.id());
             }
         }
     }
@@ -76,8 +87,6 @@ public final class TravellerBootsItem extends ArmorItem implements IRechargable 
             player.moveRelative(bonus, FORWARD);
         } else if (player.isInWater()) {
             player.moveRelative(WATER_AIR_BOOST, FORWARD);
-        } else {
-            player.moveRelative(AIR_BOOST, FORWARD);
         }
     }
 

@@ -4,7 +4,7 @@ import com.leclowndu93150.thaumcraft.api.aspect.AspectCapabilities;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspectContainer;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspectSource;
-import com.leclowndu93150.thaumcraft.content.fx.TCParticleDispatch;
+import com.leclowndu93150.thaumcraft.content.effect.EffectDispatch;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
@@ -20,6 +20,7 @@ public final class EssentiaSources {
 
     private final BlockPos center;
     private final int range;
+    private @Nullable Vec3 drainEffectTarget;
     private @Nullable List<BlockPos> sources;
     private long retryAt;
 
@@ -37,6 +38,11 @@ public final class EssentiaSources {
         this.retryAt = 0L;
     }
 
+    public EssentiaSources drainEffectTarget(Vec3 target) {
+        this.drainEffectTarget = target;
+        return this;
+    }
+
     public boolean drain(ServerLevel level, Holder<IAspect> aspect, int fxExtendTicks) {
         if (level.getGameTime() < retryAt) {
             return false;
@@ -51,9 +57,9 @@ public final class EssentiaSources {
                     && source.takeFromContainer(aspect, 1)) {
                 BlockEntity be = level.getBlockEntity(sourcePos);
                 if (be != null) be.setChanged();
-                TCParticleDispatch.spawnEssentiaStream(level,
+                EffectDispatch.spawnEssentiaStream(level,
                         Vec3.atCenterOf(sourcePos),
-                        Vec3.atCenterOf(center.below()),
+                        drainEffectTarget != null ? drainEffectTarget : Vec3.atCenterOf(center.below()),
                         aspect.value().color(),
                         0,
                         level.getRandom().nextInt(8),
@@ -83,7 +89,7 @@ public final class EssentiaSources {
                     && source.addToContainer(aspect, 1) == 0) {
                 BlockEntity be = level.getBlockEntity(sourcePos);
                 if (be != null) be.setChanged();
-                TCParticleDispatch.spawnEssentiaStream(level,
+                EffectDispatch.spawnEssentiaStream(level,
                         Vec3.atCenterOf(center),
                         Vec3.atCenterOf(sourcePos),
                         aspect.value().color(),

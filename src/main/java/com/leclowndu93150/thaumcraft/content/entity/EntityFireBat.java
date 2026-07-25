@@ -19,6 +19,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,7 +34,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-public final class EntityFireBat extends Monster {
+public final class EntityFireBat extends Monster implements IBatAnimated {
     private static final int SPAWN_LIGHT_CAP = 7;
     private static final EntityDataAccessor<Boolean> DATA_HANGING =
             SynchedEntityData.defineId(EntityFireBat.class, EntityDataSerializers.BOOLEAN);
@@ -46,12 +47,21 @@ public final class EntityFireBat extends Monster {
     private static final float FLYING_FRICTION_IMPULSE = 0.02F;
     private static final float BAT_VOLUME = 0.1F;
     private static final float BAT_PITCH_FACTOR = 0.95F;
+    private static final float TICKS_PER_FLAP = 10.0F;
+
+    public final AnimationState flyAnimationState = new AnimationState();
+    public final AnimationState restAnimationState = new AnimationState();
 
     public @Nullable LivingEntity owner;
     public int damBonus;
     private int summonLife;
 
     private static final int SUMMON_LIFESPAN_TICKS = 600;
+
+    @Override
+    public boolean isFlapping() {
+        return !isHanging() && this.tickCount % TICKS_PER_FLAP == 0.0F;
+    }
 
     public void summon(@Nullable LivingEntity summoner, @Nullable LivingEntity target, int bonus) {
         this.owner = summoner;
@@ -111,6 +121,21 @@ public final class EntityFireBat extends Monster {
 
     public void setHanging(boolean hanging) {
         this.entityData.set(DATA_HANGING, hanging);
+    }
+
+    @Override
+    public AnimationState flyAnimation() {
+        return this.flyAnimationState;
+    }
+
+    @Override
+    public AnimationState restAnimation() {
+        return this.restAnimationState;
+    }
+
+    @Override
+    public boolean isResting() {
+        return isHanging();
     }
 
     @Override
@@ -189,6 +214,17 @@ public final class EntityFireBat extends Monster {
         } else {
             Vec3 movement = this.getDeltaMovement();
             this.setDeltaMovement(movement.x, movement.y * VERTICAL_DRAG, movement.z);
+        }
+        this.setupAnimationStates();
+    }
+
+    private void setupAnimationStates() {
+        if (isHanging()) {
+            this.flyAnimationState.stop();
+            this.restAnimationState.startIfStopped(this.tickCount);
+        } else {
+            this.restAnimationState.stop();
+            this.flyAnimationState.startIfStopped(this.tickCount);
         }
     }
 

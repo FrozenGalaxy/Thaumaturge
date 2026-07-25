@@ -2,7 +2,7 @@ package com.leclowndu93150.thaumcraft.content.aura.node;
 
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
-import com.leclowndu93150.thaumcraft.content.fx.FX;
+import com.leclowndu93150.thaumcraft.content.effect.Effects;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import java.util.List;
 import net.minecraft.core.BlockPos;
@@ -93,7 +93,7 @@ public final class BlockEntityNodeTransducer extends BlockEntity {
         if (level instanceof ServerLevel serverLevel && count > REVERT_THRESHOLD && count < CHARGE_TARGET
                 && level.getGameTime() % BOLT_INTERVAL == 0) {
             if (level.getRandom().nextBoolean()) {
-                FX.arcBolt(serverLevel, new Vec3(
+                Effects.arcBolt(serverLevel, new Vec3(
                                 pos.getX() + 0.25 + level.getRandom().nextFloat() * 0.5,
                                 pos.getY() + 0.5,
                                 pos.getZ() + 0.25 + level.getRandom().nextFloat() * 0.5))
@@ -102,7 +102,7 @@ public final class BlockEntityNodeTransducer extends BlockEntity {
                         .send();
             }
             if (level.getRandom().nextBoolean() && hasStabilizer(level, pos)) {
-                FX.arcBolt(serverLevel, new Vec3(
+                Effects.arcBolt(serverLevel, new Vec3(
                                 pos.getX() + 0.25 + level.getRandom().nextFloat() * 0.5,
                                 pos.getY() - 1.5,
                                 pos.getZ() + 0.25 + level.getRandom().nextFloat() * 0.5))

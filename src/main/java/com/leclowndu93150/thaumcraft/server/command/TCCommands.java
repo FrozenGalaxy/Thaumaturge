@@ -9,17 +9,18 @@ import com.leclowndu93150.thaumcraft.content.aura.node.NodeGenerator;
 import net.minecraft.core.HolderLookup;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
+import com.leclowndu93150.thaumcraft.api.casters.FocusElement;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;
-import com.leclowndu93150.thaumcraft.api.casters.FocusNode;
 import com.leclowndu93150.thaumcraft.api.casters.FocusPackage;
+import com.leclowndu93150.thaumcraft.api.casters.FocusSettings;
 import com.leclowndu93150.thaumcraft.api.casters.ICaster;
-import com.leclowndu93150.thaumcraft.api.casters.IFocusElement;
 import com.leclowndu93150.thaumcraft.content.casters.ItemFocus;
 import com.leclowndu93150.thaumcraft.registry.TCFocusElements;
 import com.leclowndu93150.thaumcraft.api.warp.IPlayerWarp;
 import com.leclowndu93150.thaumcraft.api.warp.WarpHelper;
 import com.leclowndu93150.thaumcraft.api.warp.WarpType;
 import com.leclowndu93150.thaumcraft.content.warp.WarpEvents;
+import com.leclowndu93150.thaumcraft.content.effect.StreamPathfinder;
 import com.leclowndu93150.thaumcraft.content.entity.EntityFluxRift;
 import com.leclowndu93150.thaumcraft.content.entity.champion.ChampionHelper;
 import com.leclowndu93150.thaumcraft.content.entity.champion.ChampionModifier;
@@ -32,6 +33,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import com.leclowndu93150.thaumcraft.registry.TCAttachments;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeType;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
@@ -43,7 +45,6 @@ import com.leclowndu93150.thaumcraft.api.taint.TaintApi;
 import com.leclowndu93150.thaumcraft.content.research.PlayerKnowledge;
 import com.leclowndu93150.thaumcraft.content.research.ResearchGrants;
 import com.leclowndu93150.thaumcraft.content.research.ResearchManager;
-import com.leclowndu93150.thaumcraft.content.research.ResearchRegistration;
 import com.leclowndu93150.thaumcraft.content.research.link.ResearchLinkData;
 import com.leclowndu93150.thaumcraft.data.worldgen.feature.TCConfiguredFeatures;
 import com.leclowndu93150.thaumcraft.content.entity.ThaumicSlime;
@@ -69,6 +70,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.ResourceKeyArgument;
+import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -161,6 +163,10 @@ public final class TCCommands {
                                                 ResourceArgument.resource(event.getBuildContext(), Registries.ENTITY_TYPE))
                                         .executes(ctx -> spawnChampion(ctx,
                                                 ResourceArgument.getResource(ctx, "entity", Registries.ENTITY_TYPE))))))
+                .then(Commands.literal("streampath").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .then(Commands.argument("from", Vec3Argument.vec3())
+                                .then(Commands.argument("to", Vec3Argument.vec3())
+                                        .executes(TCCommands::traceStreamPath))))
                 .then(Commands.literal("rift").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .executes(ctx -> spawnRift(ctx, DEFAULT_RIFT_SIZE))
                         .then(Commands.argument("size", IntegerArgumentType.integer(1, COMMAND_MAX_RIFT_SIZE))
@@ -537,6 +543,41 @@ public final class TCCommands {
         }
     }
 
+    private static int traceStreamPath(CommandContext<CommandSourceStack> ctx) {
+        ServerLevel level = ctx.getSource().getLevel();
+        Vec3 from = Vec3Argument.getVec3(ctx, "from");
+        Vec3 to = Vec3Argument.getVec3(ctx, "to");
+        StreamPathfinder.Result result = StreamPathfinder.explore(level, from, to);
+        if (result.directSight()) {
+            ctx.getSource().sendSuccess(() -> Component.literal("LOS direct=true waypoints=0"), false);
+            return Command.SINGLE_SUCCESS;
+        }
+        List<Vec3> waypoints = result.waypoints();
+        if (waypoints == null) {
+            ctx.getSource().sendSuccess(() -> Component.literal("NOPATH expanded=" + result.expanded()), false);
+            return 0;
+        }
+        StringBuilder report = new StringBuilder("ROUTE n=").append(waypoints.size())
+                .append(" expanded=").append(result.expanded());
+        Vec3 cursor = from;
+        boolean clean = true;
+        for (int i = 0; i <= waypoints.size(); i++) {
+            Vec3 next = i < waypoints.size() ? waypoints.get(i) : to;
+            if (!StreamPathfinder.hasLineOfSight(level, cursor, next)) {
+                report.append(" SEGMENT_BLOCKED=").append(i);
+                clean = false;
+            }
+            cursor = next;
+        }
+        report.append(clean ? " SEGMENTS_OK" : " SEGMENTS_BAD");
+        for (Vec3 wp : waypoints) {
+            report.append(String.format(Locale.ROOT, " (%.1f,%.1f,%.1f)", wp.x, wp.y, wp.z));
+        }
+        String text = report.toString();
+        ctx.getSource().sendSuccess(() -> Component.literal(text), false);
+        return Command.SINGLE_SUCCESS;
+    }
+
     private static int spawnRift(CommandContext<CommandSourceStack> ctx, int size) {
         try {
             ServerPlayer player = ctx.getSource().getPlayerOrException();
@@ -646,30 +687,28 @@ public final class TCCommands {
             ServerPlayer player = ctx.getSource().getPlayerOrException();
             int tier = IntegerArgumentType.getInteger(ctx, "tier");
             String[] tokens = StringArgumentType.getString(ctx, "elements").trim().split("\\s+");
-            FocusPackage core = new FocusPackage(player);
+            FocusPackage.Builder core = FocusPackage.builder().caster(player);
             int complexity = 0;
             for (String token : tokens) {
                 ResourceLocation id = token.contains(":")
                         ? ResourceLocation.parse(token)
                         : ResourceLocation.fromNamespaceAndPath(TCIds.MODID, token);
-                IFocusElement element = FocusEngine.getElement(id);
+                FocusElement element = FocusEngine.element(id);
                 if (element == null) {
                     ctx.getSource().sendFailure(Component.literal("Unknown focus element: " + id));
                     return 0;
                 }
-                if (element instanceof FocusNode node) {
-                    complexity += node.getComplexity();
-                }
-                core.addNode(element);
+                complexity += element.complexity(FocusSettings.defaults(element));
+                core.add(id);
             }
-            core.setComplexity(complexity);
+            core.complexity(complexity);
             ItemFocus focusItem = switch (tier) {
                 case 1 -> TCItems.FOCUS_1.get();
                 case 2 -> TCItems.FOCUS_2.get();
                 default -> TCItems.FOCUS_3.get();
             };
             ItemStack focusStack = new ItemStack(focusItem);
-            ItemFocus.setPackage(focusStack, core);
+            ItemFocus.setPackage(focusStack, core.build());
             int finalComplexity = complexity;
             if (complexity > focusItem.getMaxComplexity()) {
                 ctx.getSource().sendSuccess(() -> Component.literal("Warning: complexity " + finalComplexity

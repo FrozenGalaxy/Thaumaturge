@@ -96,6 +96,10 @@ neoForge {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+jar {
+    exclude("com/leclowndu93150/thaumcraft/debug/**")
+}
+
 
 dependencies {
     compileOnly "org.jspecify:jspecify:1.0.0"

@@ -10,13 +10,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.concurrent.CompletableFuture;
 
 public final class TCBlockTagsProvider extends BlockTagsProvider {
-    public TCBlockTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(output, lookupProvider, TCIds.MODID, null);
+    public TCBlockTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider,
+                               ExistingFileHelper existingFileHelper) {
+        super(output, lookupProvider, TCIds.MODID, existingFileHelper);
     }
 
     @Override
@@ -118,8 +120,8 @@ public final class TCBlockTagsProvider extends BlockTagsProvider {
                 .add(TCBlocks.METAL_VOID_BLOCK.get());
 
         tag(BlockTags.LOGS_THAT_BURN)
-                .add(TCBlocks.LOG_GREATWOOD.get())
-                .add(TCBlocks.LOG_SILVERWOOD.get());
+                .addTag(TCBlockTags.GREATWOOD_LOGS)
+                .addTag(TCBlockTags.SILVERWOOD_LOGS);
 
         tag(BlockTags.LEAVES)
                 .add(TCBlocks.LEAVES_GREATWOOD.get())
@@ -130,12 +132,6 @@ public final class TCBlockTagsProvider extends BlockTagsProvider {
                 .add(TCBlocks.SAPLING_SILVERWOOD.get());
 
         tag(BlockTags.PLANKS)
-                .add(TCBlocks.PLANK_GREATWOOD.get())
-                .add(TCBlocks.PLANK_SILVERWOOD.get());
-
-        tag(BlockTags.MINEABLE_WITH_AXE)
-                .add(TCBlocks.LOG_GREATWOOD.get())
-                .add(TCBlocks.LOG_SILVERWOOD.get())
                 .add(TCBlocks.PLANK_GREATWOOD.get())
                 .add(TCBlocks.PLANK_SILVERWOOD.get());
 
@@ -151,6 +147,10 @@ public final class TCBlockTagsProvider extends BlockTagsProvider {
                 .add(Blocks.SOUL_CAMPFIRE)
                 .add(Blocks.MAGMA_BLOCK)
                 .add(TCBlocks.NITORS.values().stream().map(DeferredHolder::get).toArray(Block[]::new));
+
+        tag(TCBlockTags.SCAN_CLAY)
+                .add(Blocks.CLAY)
+                .addTag(BlockTags.TERRACOTTA);
 
         tag(TCBlockTags.ORES_AMBER).add(TCBlocks.ORE_AMBER.get());
         tag(TCBlockTags.ORES_CINNABAR).add(TCBlocks.ORE_CINNABAR.get());
@@ -184,6 +184,34 @@ public final class TCBlockTagsProvider extends BlockTagsProvider {
         tag(TCBlockTags.STORAGE_BLOCKS_THAUMIUM).add(TCBlocks.METAL_THAUMIUM_BLOCK.get());
         tag(TCBlockTags.STORAGE_BLOCKS_VOID_METAL).add(TCBlocks.METAL_VOID_BLOCK.get());
         tag(Tags.Blocks.STORAGE_BLOCKS).addTags(TCBlockTags.STORAGE_BLOCKS_AMBER,TCBlockTags.STORAGE_BLOCKS_BRASS,TCBlockTags.STORAGE_BLOCKS_THAUMIUM,TCBlockTags.STORAGE_BLOCKS_VOID_METAL);
+
+        tag(TCBlockTags.GREATWOOD_LOGS)
+                .add(TCBlocks.LOG_GREATWOOD.get())
+                .add(TCBlocks.WOOD_GREATWOOD.get())
+                .add(TCBlocks.STRIPPED_LOG_GREATWOOD.get())
+                .add(TCBlocks.STRIPPED_WOOD_GREATWOOD.get());
+
+        tag(TCBlockTags.SILVERWOOD_LOGS)
+                .add(TCBlocks.LOG_SILVERWOOD.get())
+                .add(TCBlocks.WOOD_SILVERWOOD.get())
+                .add(TCBlocks.STRIPPED_LOG_SILVERWOOD.get())
+                .add(TCBlocks.STRIPPED_WOOD_SILVERWOOD.get());
+
+        tag(BlockTags.OVERWORLD_NATURAL_LOGS)
+                .add(TCBlocks.LOG_GREATWOOD.get())
+                .add(TCBlocks.LOG_SILVERWOOD.get());
+
+        tag(BlockTags.SNAPS_GOAT_HORN)
+                .add(TCBlocks.LOG_GREATWOOD.get())
+                .add(TCBlocks.LOG_SILVERWOOD.get());
+
+        tag(Tags.Blocks.STRIPPED_LOGS)
+                .add(TCBlocks.STRIPPED_LOG_GREATWOOD.get())
+                .add(TCBlocks.STRIPPED_LOG_SILVERWOOD.get());
+
+        tag(Tags.Blocks.STRIPPED_WOODS)
+                .add(TCBlocks.STRIPPED_WOOD_GREATWOOD.get())
+                .add(TCBlocks.STRIPPED_WOOD_SILVERWOOD.get());
 
     }
 }

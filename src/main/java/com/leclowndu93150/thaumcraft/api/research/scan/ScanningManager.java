@@ -8,6 +8,7 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -128,6 +129,11 @@ public final class ScanningManager {
             found = true;
             thing.onSuccess(player, target);
         }
+        for (ScanEntry entry : scanEntries(player)) {
+            if (entry.matches(player, target) && bindingOrThrow().progressResearch(player, entry.key())) {
+                found = true;
+            }
+        }
         if (failure != null) {
             player.displayClientMessage(failure.copy()
                     .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC), true);
@@ -179,7 +185,18 @@ public final class ScanningManager {
                 return true;
             }
         }
+        for (ScanEntry entry : scanEntries(player)) {
+            if (entry.matches(player, target) && !KnowledgeAccess.of(player).isResearchKnown(entry.key())) {
+                return true;
+            }
+        }
         return false;
+    }
+
+    private static Iterable<ScanEntry> scanEntries(Player player) {
+        return player.level().registryAccess().registry(ScanEntry.REGISTRY_KEY)
+                .<Iterable<ScanEntry>>map(registry -> registry.holders().map(Holder.Reference::value).toList())
+                .orElse(List.of());
     }
 
     /**

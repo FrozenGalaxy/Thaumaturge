@@ -144,6 +144,7 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("tc.researchnote.table", "Complete these notes at a research table");
         add("tc.researchnote.use", "Right-click to learn this theory");
         add("tc.researchnote.learned", "You have completed your research on %s!");
+        add("tc.researchnote.missing", "You need scribing tools and paper to get this research note!");
         add("tc.addaspectdiscovery", "You have discovered the aspect %s!");
         add("tc.discoveryerror", "To understand this you need to study %1$s.");
         add("tc.aspectcost", "Required research points:");
@@ -474,8 +475,14 @@ public final class TCEnglishProvider extends LanguageProvider {
 
         add("block.thaumcraft.sapling_greatwood", "Greatwood Sapling");
         add("block.thaumcraft.sapling_silverwood", "Silverwood Sapling");
-        add("block.thaumcraft.log_greatwood", "Greatwood");
-        add("block.thaumcraft.log_silverwood", "Silverwood");
+        add("block.thaumcraft.log_greatwood", "Greatwood Log");
+        add("block.thaumcraft.log_silverwood", "Silverwood Log");
+        add("block.thaumcraft.greatwood", "Greatwood");
+        add("block.thaumcraft.silverwood", "Silverwood");
+        add("block.thaumcraft.stripped_log_greatwood", "Stripped Greatwood Log");
+        add("block.thaumcraft.stripped_log_silverwood", "Stripped Silverwood Log");
+        add("block.thaumcraft.stripped_greatwood", "Stripped Greatwood");
+        add("block.thaumcraft.stripped_silverwood", "Stripped Silverwood");
         add("block.thaumcraft.leaves_greatwood", "Greatwood Leaves");
         add("block.thaumcraft.leaves_silverwood", "Silverwood Leaves");
         add("block.thaumcraft.plank_greatwood", "Greatwood Planks");

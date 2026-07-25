@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.model;
 
 import com.leclowndu93150.thaumcraft.TCIds;
-import com.leclowndu93150.thaumcraft.client.model.obj.TCObjGeometry;
+import com.leclowndu93150.thaumcraft.client.model.mesh.TCMeshGeometry;
 import com.leclowndu93150.thaumcraft.client.render.crystal.CrystalUnbakedModel;
 import com.leclowndu93150.thaumcraft.content.item.CelestialBody;
 import com.leclowndu93150.thaumcraft.content.wands.WandVisHelper;
@@ -26,14 +26,14 @@ public final class TCModelsHandlers {
     public static final ResourceLocation FILLED_PROPERTY_ID = TCIds.rl("filled");
     public static final ResourceLocation VERDANT_TYPE_PROPERTY_ID = TCIds.rl("verdant_type");
     public static final ResourceLocation CELESTIAL_BODY_PROPERTY_ID = TCIds.rl("celestial_body");
-    public static final ResourceLocation OBJ_LOADER_ID = TCIds.rl("obj");
+    public static final ResourceLocation MESH_LOADER_ID = TCIds.rl("mesh");
     public static final ResourceLocation CRYSTAL_LOADER_ID = TCIds.rl("crystal");
 
     private TCModelsHandlers() {}
 
     @SubscribeEvent
     public static void onRegisterGeometryLoaders(ModelEvent.RegisterGeometryLoaders event) {
-        event.register(OBJ_LOADER_ID, TCObjGeometry.Loader.INSTANCE);
+        event.register(MESH_LOADER_ID, TCMeshGeometry.Loader.INSTANCE);
         event.register(CRYSTAL_LOADER_ID, CrystalUnbakedModel.Loader.INSTANCE);
     }
 

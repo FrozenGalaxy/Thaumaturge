@@ -179,6 +179,12 @@ public final class TCBlockLootSubProvider extends BlockLootSubProvider {
         dropSelf(TCBlocks.SAPLING_SILVERWOOD.get());
         dropSelf(TCBlocks.LOG_GREATWOOD.get());
         dropSelf(TCBlocks.LOG_SILVERWOOD.get());
+        dropSelf(TCBlocks.WOOD_GREATWOOD.get());
+        dropSelf(TCBlocks.WOOD_SILVERWOOD.get());
+        dropSelf(TCBlocks.STRIPPED_LOG_GREATWOOD.get());
+        dropSelf(TCBlocks.STRIPPED_LOG_SILVERWOOD.get());
+        dropSelf(TCBlocks.STRIPPED_WOOD_GREATWOOD.get());
+        dropSelf(TCBlocks.STRIPPED_WOOD_SILVERWOOD.get());
         dropSelf(TCBlocks.PLANK_GREATWOOD.get());
         dropSelf(TCBlocks.PLANK_SILVERWOOD.get());
         add(TCBlocks.LEAVES_GREATWOOD.get(),

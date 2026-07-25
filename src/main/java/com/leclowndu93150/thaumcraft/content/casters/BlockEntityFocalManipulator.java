@@ -1,21 +1,25 @@
 package com.leclowndu93150.thaumcraft.content.casters;
 
-import com.leclowndu93150.thaumcraft.serialization.TCNbt;
 import com.leclowndu93150.thaumcraft.Thaumcraft;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
-import com.leclowndu93150.thaumcraft.api.casters.FocusModSplit;
+import com.leclowndu93150.thaumcraft.api.casters.FocusElement;
+import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;
 import com.leclowndu93150.thaumcraft.api.casters.FocusPackage;
-import com.leclowndu93150.thaumcraft.content.fx.TCParticleDispatch;
-import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
+import com.leclowndu93150.thaumcraft.api.casters.FocusSplit;
+import com.leclowndu93150.thaumcraft.api.casters.FocusUnit;
+import com.leclowndu93150.thaumcraft.content.effect.EffectDispatch;
+import com.leclowndu93150.thaumcraft.content.particle.ShieldSparkParticleOptions;
 import com.leclowndu93150.thaumcraft.content.research.ResearchManager;
 import com.leclowndu93150.thaumcraft.content.taint.item.EssentiaCrystalFactory;
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
+import com.leclowndu93150.thaumcraft.serialization.TCNbt;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,8 +37,10 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +48,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jspecify.annotations.Nullable;
 
@@ -111,7 +116,7 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
                     worldPosition.getX() + rand.nextInt(3) - rand.nextInt(3),
                     worldPosition.getY() + rand.nextInt(3),
                     worldPosition.getZ() + rand.nextInt(3) - rand.nextInt(3));
-            TCParticleDispatch.spawnVisSparkle(level, origin,
+            EffectDispatch.spawnVisSparkle(level, origin,
                     new Vec3(worldPosition.getX(), worldPosition.getY() + 1, worldPosition.getZ()));
             vis -= amount;
             setChanged();
@@ -127,14 +132,9 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
             return;
         }
         RandomSource rand = level.getRandom();
-        FXGenericData fx = FXGenericData.builder()
-                .maxAge(6 + rand.nextInt(5))
-                .color(0.5F + rand.nextFloat() * 0.4F, 1.0F - rand.nextFloat() * 0.4F, 1.0F - rand.nextFloat() * 0.4F)
-                .alpha(0.8F)
-                .particles(448, 9, 1)
-                .scale(0.3F + rand.nextFloat() * 0.3F)
-                .layer(0)
-                .build();
+        ShieldSparkParticleOptions fx = new ShieldSparkParticleOptions(
+                ARGB32.colorFromFloat(1.0F, 0.5F + rand.nextFloat() * 0.4F, 1.0F - rand.nextFloat() * 0.4F, 1.0F - rand.nextFloat() * 0.4F),
+                0.8F, 0.3F + rand.nextFloat() * 0.3F, 6 + rand.nextInt(5), true);
         level.addParticle(fx,
                 worldPosition.getX() + 0.5 + (rand.nextFloat() - rand.nextFloat()) * 0.3F,
                 worldPosition.getY() + 1.4 + (rand.nextFloat() - rand.nextFloat()) * 0.3F,
@@ -169,18 +169,19 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
         int totalComplexity = 0;
         HashMap<String, Integer> compCount = new HashMap<>();
         for (FocusElementNode node : data.values()) {
-            if (node.node == null) {
+            FocusElement element = node.resolve();
+            if (element == null) {
                 return false;
             }
-            if (!ResearchManager.doesPassGate(player, node.node.getResearch())) {
+            if (!ResearchManager.doesPassGate(player, element.research())) {
                 return false;
             }
-            int a = compCount.getOrDefault(node.node.getKey().toString(), 0);
+            int a = compCount.getOrDefault(node.element.toString(), 0);
             node.complexityMultiplier = 0.5F * (++a + 1);
-            compCount.put(node.node.getKey().toString(), a);
-            totalComplexity = (int) (totalComplexity + node.node.getComplexity() * node.complexityMultiplier);
-            if (node.node.getAspect() != null) {
-                crystals = crystals.add(resolveAspect(node.node.getAspect()), 1);
+            compCount.put(node.element.toString(), a);
+            totalComplexity = (int) (totalComplexity + element.complexity(node.resolvedSettings()) * node.complexityMultiplier);
+            if (element.aspect() != null) {
+                crystals = crystals.add(resolveAspect(element.aspect()), 1);
             }
         }
         vis = totalComplexity * 10 + maxComplexity / 5.0F;
@@ -272,40 +273,36 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
         if (data.isEmpty()) {
             return null;
         }
-        FocusPackage core = new FocusPackage();
         int totalComplexity = 0;
         HashMap<String, Integer> compCount = new HashMap<>();
         for (FocusElementNode node : data.values()) {
-            if (node.node != null) {
-                int a = compCount.getOrDefault(node.node.getKey().toString(), 0);
+            FocusElement element = node.resolve();
+            if (element != null) {
+                int a = compCount.getOrDefault(node.element.toString(), 0);
                 node.complexityMultiplier = 0.5F * (++a + 1);
-                compCount.put(node.node.getKey().toString(), a);
-                totalComplexity = (int) (totalComplexity + node.node.getComplexity() * node.complexityMultiplier);
+                compCount.put(node.element.toString(), a);
+                totalComplexity = (int) (totalComplexity + element.complexity(node.resolvedSettings()) * node.complexityMultiplier);
             }
         }
-        core.setComplexity(totalComplexity);
-        FocusElementNode root = data.get(0);
-        traverseChildren(core, root);
-        return core;
+        FocusPackage.Builder core = FocusPackage.builder().complexity(totalComplexity);
+        appendChain(core, data.get(0));
+        return core.build();
     }
 
-    private void traverseChildren(@Nullable FocusPackage currentPackage, @Nullable FocusElementNode currentNode) {
-        if (currentPackage == null || currentNode == null) {
-            return;
-        }
-        currentPackage.addNode(currentNode.node);
-        if (currentNode.children.length == 0) {
-            return;
-        }
-        if (currentNode.children.length == 1) {
-            traverseChildren(currentPackage, data.get(currentNode.children[0]));
-        } else if (currentNode.node instanceof FocusModSplit splitNode) {
-            splitNode.getSplitPackages().clear();
-            for (int c : currentNode.children) {
-                FocusPackage splitPackage = new FocusPackage();
-                traverseChildren(splitPackage, data.get(c));
-                splitNode.getSplitPackages().add(splitPackage);
+    private void appendChain(FocusPackage.Builder builder, @Nullable FocusElementNode node) {
+        while (node != null && node.element != null) {
+            if (node.children.length > 1 && FocusEngine.element(node.element) instanceof FocusSplit) {
+                List<FocusPackage> branches = new ArrayList<>(node.children.length);
+                for (int c : node.children) {
+                    FocusPackage.Builder branch = FocusPackage.builder();
+                    appendChain(branch, data.get(c));
+                    branches.add(branch.build());
+                }
+                builder.add(new FocusUnit(node.element, node.settings, branches));
+                return;
             }
+            builder.add(FocusUnit.of(node.element, node.settings));
+            node = node.children.length == 1 ? data.get(node.children[0]) : null;
         }
     }
 

@@ -4,8 +4,8 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import com.leclowndu93150.thaumcraft.api.golems.ISealDisplayer;
 import com.leclowndu93150.thaumcraft.api.golems.parts.GolemPartModel;
-import com.leclowndu93150.thaumcraft.client.model.obj.MeshModel;
-import com.leclowndu93150.thaumcraft.client.model.obj.MeshPart;
+import com.leclowndu93150.thaumcraft.client.model.mesh.TCMesh;
+import com.leclowndu93150.thaumcraft.client.model.mesh.TCMeshPart;
 import com.leclowndu93150.thaumcraft.client.render.ItemRenderHelper;
 import com.leclowndu93150.thaumcraft.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumcraft.content.golem.EntityThaumcraftGolem;
@@ -31,7 +31,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem> {
-    private static final ResourceLocation BASE_MODEL = TCIds.rl("models/obj/golem_base.obj");
+    private static final ResourceLocation BASE_MODEL = TCIds.rl("models/mesh/golem_base.tcmesh");
     private static final ResourceLocation FALLBACK_TEXTURE = TCIds.rl("textures/models/golem_decoration.png");
     private static final float GHOST_ALPHA = 0.15F;
     private static final int XRAY_COLOR = ARGB32.colorFromFloat(0.25F, 0.25F, 0.25F, 0.25F);
@@ -155,7 +155,7 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem> {
         float lean = rolling ? 75.0F : 25.0F;
         poseStack.mulPose(Axis.XN.rotationDegrees((float) (state.speedSq * lean)));
         poseStack.mulPose(Axis.ZN.rotationDegrees((float) (state.speedSq * lean * 0.06 * state.yawDelta)));
-        MeshModel base = GolemMeshes.get(BASE_MODEL);
+        TCMesh base = GolemMeshes.get(BASE_MODEL);
 
         poseStack.pushPose();
         poseStack.translate(0.0, 0.5, 0.0);
@@ -275,9 +275,9 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem> {
     private void renderPartModel(GolemRenderState state, GolemPartModel part, GolemPartModel.LimbSide side,
                                  PoseStack poseStack, MultiBufferSource buffers, ResourceLocation matTexture,
                                  boolean xray, int color) {
-        MeshModel mesh = GolemMeshes.get(part.objModel());
+        TCMesh mesh = GolemMeshes.get(part.objModel());
         GolemPartRenderHook hook = GolemPartRenderHooks.hookFor(part);
-        for (MeshPart objectPart : mesh.parts()) {
+        for (TCMeshPart objectPart : mesh.parts()) {
             poseStack.pushPose();
             ResourceLocation texture = part.useMaterialTextureForObjectPart(objectPart.name()) || part.texture() == null
                     ? matTexture : part.texture();
@@ -288,20 +288,20 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem> {
         }
     }
 
-    private static void renderNamedPart(MeshModel mesh, String name, PoseStack poseStack, MultiBufferSource buffers,
+    private static void renderNamedPart(TCMesh mesh, String name, PoseStack poseStack, MultiBufferSource buffers,
                                         ResourceLocation texture, boolean xray, int color, GolemRenderState state) {
-        for (MeshPart part : mesh.parts()) {
+        for (TCMeshPart part : mesh.parts()) {
             if (name.equals(part.name())) {
                 renderMeshPart(mesh, part, poseStack, buffers, texture, xray, color, state);
             }
         }
     }
 
-    private static void renderMeshPart(MeshModel mesh, MeshPart part, PoseStack poseStack, MultiBufferSource buffers,
+    private static void renderMeshPart(TCMesh mesh, TCMeshPart part, PoseStack poseStack, MultiBufferSource buffers,
                                        ResourceLocation texture, boolean xray, int color, GolemRenderState state) {
         RenderType type = xray ? TCRenderTypes.entityTranslucentNoDepth(texture)
                 : ARGB32.alpha(color) < 255 ? RenderType.entityTranslucent(texture) : RenderType.entityCutout(texture);
         VertexConsumer buffer = buffers.getBuffer(type);
-        GolemMeshes.renderPart(mesh, part, poseStack.last(), buffer, state.lightCoords, color);
+        GolemMeshes.renderPart(part, poseStack.last(), buffer, state.lightCoords, color);
     }
 }

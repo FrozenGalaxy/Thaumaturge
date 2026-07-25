@@ -34,6 +34,10 @@ public final class TCItemTagsProvider extends ItemTagsProvider {
         copy(BlockTags.LEAVES, ItemTags.LEAVES);
         copy(BlockTags.SAPLINGS, ItemTags.SAPLINGS);
         copy(BlockTags.PLANKS, ItemTags.PLANKS);
+        copy(TCBlockTags.GREATWOOD_LOGS, TCItemTags.GREATWOOD_LOGS);
+        copy(TCBlockTags.SILVERWOOD_LOGS, TCItemTags.SILVERWOOD_LOGS);
+        copy(Tags.Blocks.STRIPPED_LOGS, Tags.Items.STRIPPED_LOGS);
+        copy(Tags.Blocks.STRIPPED_WOODS, Tags.Items.STRIPPED_WOODS);
 
         for (DyeColor dye : DyeColor.values()) {
             tag(TCItemTags.CANDLES).add(TCItems.CANDLES.get(dye).get());
@@ -48,6 +52,7 @@ public final class TCItemTagsProvider extends ItemTagsProvider {
         copy(TCBlockTags.ORES_CINNABAR, TCItemTags.ORES_CINNABAR);
         tag(Tags.Items.ORES_QUARTZ).add(TCItems.ORE_QUARTZ.get());
         tag(Tags.Items.ORES).addTags(TCItemTags.ORES_AMBER,TCItemTags.ORES_CINNABAR);
+        tag(TCItemTags.SCAN_IRON).addTags(Tags.Items.ORES_IRON, Tags.Items.INGOTS_IRON, Tags.Items.STORAGE_BLOCKS_IRON);
 
         copy(TCBlockTags.STORAGE_BLOCKS_AMBER, TCItemTags.STORAGE_BLOCKS_AMBER);
         copy(TCBlockTags.STORAGE_BLOCKS_BRASS, TCItemTags.STORAGE_BLOCKS_BRASS);

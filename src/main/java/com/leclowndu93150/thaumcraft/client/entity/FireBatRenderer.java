@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 public final class FireBatRenderer extends MobRenderer<EntityFireBat, FireBatModel<EntityFireBat>> {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/firebat.png");
     private static final float SHADOW = 0.25F;
-    private static final float SCALE = 0.35F;
+    private static final float SCALE = 1.0F;
     private static final int FULLBRIGHT_BLOCK_LIGHT = 15;
 
     public FireBatRenderer(EntityRendererProvider.Context context) {

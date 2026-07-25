@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.entity;
 
+import com.leclowndu93150.thaumcraft.api.casters.CastStreams;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEffect;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;
 import com.leclowndu93150.thaumcraft.api.casters.FocusPackage;
@@ -10,6 +11,7 @@ import java.util.Deque;
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -39,7 +41,7 @@ public final class EntityFocusMine extends ThrowableProjectile implements IEntit
     private @Nullable FocusPackage focusPackage;
     private boolean friendly;
     private int counter = ARM_DELAY_TICKS;
-    private @Nullable List<FocusEffect> effects;
+    private @Nullable List<ResourceLocation> effects;
     private final Deque<PendingStrike> pendingStrikes = new ArrayDeque<>();
     private boolean detonated;
 
@@ -47,11 +49,11 @@ public final class EntityFocusMine extends ThrowableProjectile implements IEntit
         super(type, level);
     }
 
-    public EntityFocusMine(FocusPackage pack, Trajectory trajectory, boolean friendly) {
-        super(TCEntities.FOCUS_MINE.get(), pack.getCaster().level());
+    public EntityFocusMine(FocusPackage pack, LivingEntity caster, Trajectory trajectory, boolean friendly) {
+        super(TCEntities.FOCUS_MINE.get(), caster.level());
         this.focusPackage = pack;
         this.friendly = friendly;
-        this.setOwner(pack.getCaster());
+        this.setOwner(caster);
         this.setPos(trajectory.source().x, trajectory.source().y, trajectory.source().z);
         this.shoot(trajectory.direction().x, trajectory.direction().y, trajectory.direction().z, 0.0F, 0.0F);
     }
@@ -156,18 +158,20 @@ public final class EntityFocusMine extends ThrowableProjectile implements IEntit
         if (this.effects.isEmpty()) {
             return;
         }
-        FocusEffect effect = this.effects.get(this.random.nextInt(this.effects.size()));
-        effect.renderParticleFX(this.level(),
-                this.getX() + this.random.nextGaussian() * EFFECT_FX_SPREAD,
-                this.getY() + this.random.nextGaussian() * EFFECT_FX_SPREAD,
-                this.getZ() + this.random.nextGaussian() * EFFECT_FX_SPREAD,
-                this.random.nextGaussian() * EFFECT_FX_MOTION,
-                this.random.nextGaussian() * EFFECT_FX_MOTION,
-                this.random.nextGaussian() * EFFECT_FX_MOTION);
+        ResourceLocation effectId = this.effects.get(this.random.nextInt(this.effects.size()));
+        if (FocusEngine.element(effectId) instanceof FocusEffect effect) {
+            effect.impactParticles(this.level(),
+                    new Vec3(this.getX() + this.random.nextGaussian() * EFFECT_FX_SPREAD,
+                            this.getY() + this.random.nextGaussian() * EFFECT_FX_SPREAD,
+                            this.getZ() + this.random.nextGaussian() * EFFECT_FX_SPREAD),
+                    new Vec3(this.random.nextGaussian() * EFFECT_FX_MOTION,
+                            this.random.nextGaussian() * EFFECT_FX_MOTION,
+                            this.random.nextGaussian() * EFFECT_FX_MOTION));
+        }
     }
 
     private void trigger() {
-        LivingEntity caster = this.focusPackage != null ? this.focusPackage.getCaster() : null;
+        LivingEntity caster = this.getOwner() instanceof LivingEntity living ? living : null;
         for (LivingEntity candidate : FocusTargeting.livingInRange(
                 this.level(), this.getX(), this.getY(), this.getZ(), this, TRIGGER_RANGE)) {
             if (candidate.isAlive()
@@ -193,10 +197,10 @@ public final class EntityFocusMine extends ThrowableProjectile implements IEntit
         }
         EntityHitResult ray = new EntityHitResult(pending.target(),
                 pending.target().position().add(0.0, pending.target().getBbHeight() / 2.0F, 0.0));
-        FocusEngine.runFocusPackage(this.focusPackage.copy(livingOwner),
+        FocusEngine.run(this.level(), this.focusPackage, livingOwner, new CastStreams(
                 new Trajectory[]{new Trajectory(this.position(),
                         pending.point().subtract(this.position()).normalize())},
-                new HitResult[]{ray});
+                new HitResult[]{ray}));
     }
 
     private record PendingStrike(LivingEntity target, Vec3 point) {

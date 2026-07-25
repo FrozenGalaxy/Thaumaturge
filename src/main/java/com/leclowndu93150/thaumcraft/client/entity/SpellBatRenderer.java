@@ -16,7 +16,7 @@ import net.minecraft.util.FastColor.ARGB32;
 public final class SpellBatRenderer extends MobRenderer<EntitySpellBat, FireBatModel<EntitySpellBat>> {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/spellbat.png");
     private static final float SHADOW = 0.25F;
-    private static final float SCALE = 0.35F;
+    private static final float SCALE = 1.0F;
     private static final float Y_OFFSET = -0.1F;
     private static final int TINT_ALPHA = 128;
     private static final int FULLBRIGHT_BLOCK_LIGHT = 15;

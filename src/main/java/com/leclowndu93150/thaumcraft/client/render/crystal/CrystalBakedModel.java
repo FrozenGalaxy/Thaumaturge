@@ -1,7 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.render.crystal;
 
-import com.leclowndu93150.thaumcraft.client.model.obj.MeshModel;
-import com.leclowndu93150.thaumcraft.client.model.obj.MeshPart;
+import com.leclowndu93150.thaumcraft.client.model.mesh.TCMesh;
+import com.leclowndu93150.thaumcraft.client.model.mesh.TCMeshPart;
 import com.leclowndu93150.thaumcraft.content.world.crystal.BlockCrystal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,11 +31,11 @@ public final class CrystalBakedModel implements IDynamicBakedModel {
     private static final Direction[] FACES = Direction.values();
     private static final int PART_COUNT = 8;
 
-    private final MeshModel mesh;
+    private final TCMesh mesh;
     private final TextureAtlasSprite particle;
     private final ChunkRenderTypeSet renderTypes;
 
-    public CrystalBakedModel(MeshModel mesh, TextureAtlasSprite particle) {
+    public CrystalBakedModel(TCMesh mesh, TextureAtlasSprite particle) {
         this.mesh = mesh;
         this.particle = particle;
         this.renderTypes = ChunkRenderTypeSet.of(RenderType.cutout());
@@ -74,16 +74,16 @@ public final class CrystalBakedModel implements IDynamicBakedModel {
             List<Integer> shuffled = new ArrayList<>(PART_INDICES);
             Collections.shuffle(shuffled, new Random(seed + CrystalFaceTransforms.seedOffset(face)));
             for (int i = 0; i < partsPerFace; i++) {
-                MeshPart part = mesh.parts().get(shuffled.get(i));
-                CrystalQuadBaker.bakePart(mesh, part, particle, 0, transform, quads);
+                TCMeshPart part = mesh.parts().get(shuffled.get(i));
+                CrystalQuadBaker.bakePart(part, particle, 0, transform, quads);
                 any = true;
             }
         }
         if (!any) {
             int unsupportedSeed = (int)(seed & 0x7);
             Matrix4f transform = CrystalFaceTransforms.forFace(Direction.DOWN);
-            MeshPart part = mesh.parts().get(unsupportedSeed % PART_COUNT);
-            CrystalQuadBaker.bakePart(mesh, part, particle, 0, transform, quads);
+            TCMeshPart part = mesh.parts().get(unsupportedSeed % PART_COUNT);
+            CrystalQuadBaker.bakePart(part, particle, 0, transform, quads);
         }
         return quads;
     }

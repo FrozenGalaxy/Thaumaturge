@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 
@@ -15,13 +16,16 @@ import net.minecraft.world.item.Item;
  * matching items, counted in aggregate across the matched set.
  *
  * @param items items that satisfy this requirement
+ * @param components component patch every matching stack must carry, empty to accept any stack
  * @param amount the minimum aggregate count, must be positive
  * @since 1.0.0
  */
-public record ResearchRequirement(HolderSet<Item> items, int amount) {
+public record ResearchRequirement(HolderSet<Item> items, DataComponentPatch components, int amount) {
     /** Codec for datapack serialization. */
     public static final Codec<ResearchRequirement> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             RegistryCodecs.homogeneousList(Registries.ITEM).fieldOf("items").forGetter(ResearchRequirement::items),
+            DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY)
+                    .forGetter(ResearchRequirement::components),
             Codec.INT.fieldOf("amount").forGetter(ResearchRequirement::amount)
     ).apply(instance, ResearchRequirement::new));
 }

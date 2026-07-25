@@ -3,105 +3,90 @@ package com.leclowndu93150.thaumcraft.content.focus.effect;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aspect.TCAspects;
-import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
+import com.leclowndu93150.thaumcraft.api.casters.CastContext;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEffect;
-import com.leclowndu93150.thaumcraft.api.casters.NodeSetting;
-import com.leclowndu93150.thaumcraft.api.casters.NodeSettingIntRange;
+import com.leclowndu93150.thaumcraft.api.casters.FocusSettings;
+import com.leclowndu93150.thaumcraft.api.casters.SettingDefinition;
 import com.leclowndu93150.thaumcraft.api.casters.Trajectory;
+import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumcraft.content.focus.FocusFX;
-import com.leclowndu93150.thaumcraft.content.fx.data.FXGenericData;
+import com.leclowndu93150.thaumcraft.registry.TCParticles;
+import java.util.List;
 import java.util.Optional;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-public final class FocusEffectHeal extends FocusEffect {
+public final class FocusEffectHeal implements FocusEffect {
     private static final ResourceLocation KEY = TCIds.rl("heal");
 
     private static final int POWER_COMPLEXITY_FACTOR = 4;
     private static final float UNDEAD_DAMAGE_FACTOR = 1.5F;
 
     @Override
-    public ResourceLocation getKey() {
+    public ResourceLocation id() {
         return KEY;
     }
 
     @Override
-    public ResearchGate getResearch() {
+    public ResearchGate research() {
         return new ResearchGate(TCIds.rl("focus_heal"), Optional.empty(), false);
     }
 
     @Override
-    public ResourceKey<IAspect> getAspect() {
+    public ResourceKey<IAspect> aspect() {
         return TCAspects.VICTUS;
     }
 
     @Override
-    public int getComplexity() {
-        return getSettingValue("power") * POWER_COMPLEXITY_FACTOR;
+    public int complexity(FocusSettings settings) {
+        return settings.value("power") * POWER_COMPLEXITY_FACTOR;
     }
 
     @Override
-    public float getDamageForDisplay(float finalPower) {
-        return -getSettingValue("power") * finalPower;
+    public float damageForDisplay(FocusSettings settings, float power) {
+        return -settings.value("power") * power;
     }
 
     @Override
-    public boolean execute(HitResult target, @Nullable Trajectory trajectory, float finalPower, int num) {
-        if (!(getPackage().getLevel() instanceof ServerLevel level)) {
+    public boolean apply(CastContext ctx, FocusSettings settings, HitResult target,
+            @Nullable Trajectory trajectory, int index) {
+        if (!(ctx.level() instanceof ServerLevel level)) {
             return false;
         }
-        FocusFX.impact(level, target.getLocation(), getKey());
+        FocusFX.impact(level, target.getLocation(), id());
         if (target instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof LivingEntity living) {
             if (living.isInvertedHealAndHarm()) {
-                living.hurt(level.damageSources().indirectMagic(getPackage().getCaster(), getPackage().getCaster()),
-                        getSettingValue("power") * finalPower * UNDEAD_DAMAGE_FACTOR);
+                living.hurt(level.damageSources().indirectMagic(ctx.caster(), ctx.caster()),
+                        settings.value("power") * ctx.power() * UNDEAD_DAMAGE_FACTOR);
             } else {
-                living.heal(getSettingValue("power") * finalPower);
+                living.heal(settings.value("power") * ctx.power());
             }
         }
         return false;
     }
 
     @Override
-    public NodeSetting[] createSettings() {
-        return new NodeSetting[]{new NodeSetting("power", "focus.heal.power", new NodeSettingIntRange(1, 5))};
+    public List<SettingDefinition> settings() {
+        return List.of(new SettingDefinition("power", "focus.heal.power", new SettingDefinition.IntRange(1, 5)));
     }
 
     @Override
-    public void onCast(Entity caster) {
+    public void onCast(LivingEntity caster) {
         caster.level().playSound(null, caster.blockPosition().above(), SoundEvents.CHORUS_FLOWER_GROW,
                 SoundSource.PLAYERS, 2.0F, 2.0F + (float) (caster.level().getRandom().nextGaussian() * 0.1F));
     }
 
     @Override
-    public void renderParticleFX(Level level, double x, double y, double z, double mx, double my, double mz,
-            double dx, double dy, double dz) {
-        FXGenericData data = FXGenericData.builder()
-                .motion(mx + level.getRandom().nextGaussian() * 0.01,
-                        my + level.getRandom().nextGaussian() * 0.01,
-                        mz + level.getRandom().nextGaussian() * 0.01)
-                .drift(dx, dy, dz)
-                .maxAge((int) (10.0F + 10.0F * level.getRandom().nextFloat()))
-                .color(1.0F, 1.0F, 1.0F)
-                .alpha(0.0F, 0.7F, 0.7F, 0.0F)
-                .grid(64)
-                .particles(0, 1, 1)
-                .scale(level.getRandom().nextFloat() * 2.0F, level.getRandom().nextFloat())
-                .slowDown(0.8)
-                .gravity((float) (level.getRandom().nextGaussian() * 0.1F))
-                .random(0.0125F, 0.0125F, 0.0125F)
-                .rotation((float) level.getRandom().nextGaussian())
-                .delay(level.getRandom().nextInt(4))
-                .build();
-        level.addParticle(data, x, y, z, 0.0, 0.0, 0.0);
+    public void impactParticles(Level level, Vec3 pos, Vec3 motion, Vec3 drift) {
+        level.addParticle(TCParticles.HEAL_FLASH.get(), pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
     }
 }

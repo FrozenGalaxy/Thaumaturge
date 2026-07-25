@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.client.screen.research;
 
+import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.capability.IPlayerKnowledge;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
@@ -21,6 +22,7 @@ import com.leclowndu93150.thaumcraft.network.ServerboundClearResearchFlagsPayloa
 import com.leclowndu93150.thaumcraft.network.ServerboundUnlockResearchPayload;
 import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -191,8 +193,6 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
     private @Nullable EditBox searchField;
     private boolean searching;
     private @Nullable EntryNode currentHighlight;
-    private long popupTimeMs;
-    private @Nullable Component popupMessage;
     private int tickCount;
 
     public ThaumonomiconBrowserScreen() {
@@ -272,12 +272,13 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         allEntries.clear();
         minecraft.player.registryAccess().lookup(IResearchCategory.REGISTRY_KEY).ifPresent(lookup ->
                 lookup.listElements().forEach(ref -> ref.unwrapKey().ifPresent(key -> {
-                    if (key.location().getNamespace().equals("thaumcraft")) {
+                    if (key.location().getNamespace().equals(TCIds.MODID)) {
                         categoriesTC.add(ref);
                     } else {
                         categoriesOther.add(ref);
                     }
                 })));
+        categoriesTC.sort(Comparator.comparingInt(ref -> ref.value().index()));
         minecraft.player.registryAccess().lookup(IResearchEntry.REGISTRY_KEY).ifPresent(lookup ->
                 lookup.listElements().forEach(holder -> holder.unwrapKey().ifPresent(key -> {
                     IResearchEntry entry = holder.value();
@@ -376,6 +377,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         IPlayerKnowledge knowledge = KnowledgeAccess.of(minecraft.player);
         String needle = query.toLowerCase(Locale.ROOT);
         for (Holder.Reference<IResearchCategory> ref : categoriesTC) {
+            if (!isCategoryUnlocked(knowledge, ref)) continue;
             String name = categoryDisplayName(ref).getString();
             if (name.toLowerCase(Locale.ROOT).contains(needle)) {
                 searchResults.add(SearchResult.category(name, ref));
@@ -460,9 +462,6 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         renderCategoryButtons(graphics, mouseX, mouseY);
         renderSearchButton(graphics, mouseX, mouseY);
         renderScrollButtons(graphics, mouseX, mouseY);
-        if (popupMessage != null && popupTimeMs > System.currentTimeMillis()) {
-            graphics.renderComponentTooltip(font, List.of(popupMessage), POPUP_X, POPUP_Y);
-        }
         if (currentHighlight != null && minecraft != null && minecraft.player != null) {
             IPlayerKnowledge knowledge = KnowledgeAccess.of(minecraft.player);
             renderEntryTooltip(graphics, knowledge, currentHighlight, mouseX + TOOLTIP_OFFSET_X, mouseY + TOOLTIP_OFFSET_Y);
@@ -790,11 +789,13 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
     private void renderCategoryButtons(GuiGraphics graphics, int mouseX, int mouseY) {
         if (minecraft == null || minecraft.player == null) return;
         IPlayerKnowledge knowledge = KnowledgeAccess.of(minecraft.player);
-        for (int i = 0; i < categoriesTC.size(); i++) {
-            Holder.Reference<IResearchCategory> ref = categoriesTC.get(i);
+        int tcYIndex = 0;
+        for (Holder.Reference<IResearchCategory> ref : categoriesTC) {
+            if (!isCategoryUnlocked(knowledge, ref)) continue;
             int x = CATEGORY_BUTTON_X_LEFT;
-            int y = CATEGORY_BUTTON_FIRST_Y_OFFSET + (i + 1) * CATEGORY_BUTTON_STRIDE_Y;
+            int y = CATEGORY_BUTTON_FIRST_Y_OFFSET + (tcYIndex + 1) * CATEGORY_BUTTON_STRIDE_Y;
             drawCategoryButton(graphics, knowledge, ref, x, y, mouseX, mouseY, false, 0);
+            tcYIndex++;
         }
         for (int i = 0; i < categoriesOtherVisible.size(); i++) {
             Holder.Reference<IResearchCategory> ref = categoriesOtherVisible.get(i);
@@ -1008,7 +1009,6 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        popupTimeMs = System.currentTimeMillis() - 1L;
         if (button != 0) return super.mouseClicked(mouseX, mouseY, button);
         int mx = (int) mouseX;
         int my = (int) mouseY;
@@ -1053,8 +1053,6 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
             EntryNode hl = currentHighlight;
             updateResearch();
             PacketDistributor.sendToServer(new ServerboundUnlockResearchPayload(hl.id));
-            popupTimeMs = System.currentTimeMillis() + POPUP_DURATION_MS;
-            popupMessage = Component.translatable("tc.research.popup", Component.translatable(hl.entry.nameKey()).getString());
             persistState();
             playPageOpen();
             minecraft.setScreen(new EntryDetailScreen(hl.holder, hl.id, this));
@@ -1135,12 +1133,17 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
     }
 
     private Holder.@Nullable Reference<IResearchCategory> hitCategoryButton(int mx, int my) {
-        for (int i = 0; i < categoriesTC.size(); i++) {
+        if (minecraft == null || minecraft.player == null) return null;
+        IPlayerKnowledge knowledge = KnowledgeAccess.of(minecraft.player);
+        int tcYIndex = 0;
+        for (Holder.Reference<IResearchCategory> ref : categoriesTC) {
+            if (!isCategoryUnlocked(knowledge, ref)) continue;
             int x = CATEGORY_BUTTON_X_LEFT;
-            int y = CATEGORY_BUTTON_FIRST_Y_OFFSET + (i + 1) * CATEGORY_BUTTON_STRIDE_Y;
+            int y = CATEGORY_BUTTON_FIRST_Y_OFFSET + (tcYIndex + 1) * CATEGORY_BUTTON_STRIDE_Y;
             if (mx >= x && mx < x + CATEGORY_ICON_SIZE && my >= y && my < y + CATEGORY_ICON_SIZE) {
-                return categoriesTC.get(i);
+                return ref;
             }
+            tcYIndex++;
         }
         for (int i = 0; i < categoriesOtherVisible.size(); i++) {
             int x = width - CATEGORY_BUTTON_X_RIGHT_MARGIN;

@@ -68,6 +68,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jspecify.annotations.Nullable;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentType;
+import java.util.Map;
 
 public final class EntryDetailScreen extends AbstractTCScreen {
     private static final int PANE_W = 256;
@@ -547,25 +550,25 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         if (!stage.requiredResearch().isEmpty()) {
             reqY -= REQ_ROW_STEP;
             hasAny = true;
-            renderRowLabel(graphics, x, reqY, LABEL_RESEARCH_V);
+            renderRowLabel(graphics, x, reqY, LABEL_RESEARCH_V, mouseX, mouseY);
             renderResearchPrereqs(graphics, stage.requiredResearch(), knowledge, x, reqY, mouseX, mouseY, researchSatisfied);
         }
         if (!stage.obtain().isEmpty()) {
             reqY -= REQ_ROW_STEP;
             hasAny = true;
-            renderRowLabel(graphics, x, reqY, LABEL_OBTAIN_V);
+            renderRowLabel(graphics, x, reqY, LABEL_OBTAIN_V, mouseX, mouseY);
             renderItemRow(graphics, stage.obtain(), x, reqY, gameTime, mouseX, mouseY, true, obtainSatisfied);
         }
         if (!stage.craft().isEmpty()) {
             reqY -= REQ_ROW_STEP;
             hasAny = true;
-            renderRowLabel(graphics, x, reqY, LABEL_CRAFT_V);
+            renderRowLabel(graphics, x, reqY, LABEL_CRAFT_V, mouseX, mouseY);
             renderItemRow(graphics, stage.craft(), x, reqY, gameTime, mouseX, mouseY, false, craftSatisfied);
         }
         if (!stage.requiredKnowledge().isEmpty()) {
             reqY -= REQ_ROW_STEP;
             hasAny = true;
-            renderRowLabel(graphics, x, reqY, LABEL_KNOW_V);
+            renderRowLabel(graphics, x, reqY, LABEL_KNOW_V, mouseX, mouseY);
             renderKnowledgeRow(graphics, stage.requiredKnowledge(), knowledge, x, reqY, mouseX, mouseY, knowSatisfied);
         }
         if (hasAny) {
@@ -597,6 +600,8 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                             COMPLETE_LABEL_COLOR, true);
                 }
             }
+        } else {
+            PacketDistributor.sendToServer(new ServerboundAdvanceStagePayload(entryId));
         }
     }
 
@@ -640,8 +645,17 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         GuiBlend.blitTinted(graphics, nodeTex, centerX - half, centerY - half, FORBIDDEN_NODE_DRAW_SIZE, FORBIDDEN_NODE_DRAW_SIZE, (float) u, (float) v, FORBIDDEN_NODE_CELL_PX, FORBIDDEN_NODE_CELL_PX, FORBIDDEN_NODE_SHEET, FORBIDDEN_NODE_SHEET, FORBIDDEN_NODE_TINT);
     }
 
-    private void renderRowLabel(GuiGraphics graphics, int x, int y, int v) {
+    private void renderRowLabel(GuiGraphics graphics, int x, int y, int v, int mouseX, int mouseY) {
         GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BOOK, x + LABEL_OFFSET_X, y - 1, (float) REQUIREMENT_LABEL_U, (float) v, LABEL_WIDTH, LABEL_HEIGHT, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE, LABEL_TINT);
+        if (mouseInside(x + LABEL_OFFSET_X, y, LABEL_WIDTH / 4, LABEL_HEIGHT, mouseX, mouseY)) {
+            switch (v) {
+                case LABEL_KNOW_V -> DeferredTooltip.set(Component.translatable("tc.need.know"), mouseX, mouseY);
+                case LABEL_CRAFT_V -> DeferredTooltip.set(Component.translatable("tc.need.craft"), mouseX, mouseY);
+                case LABEL_OBTAIN_V -> DeferredTooltip.set(Component.translatable("tc.need.obtain"), mouseX, mouseY);
+                case LABEL_RESEARCH_V -> DeferredTooltip.set(Component.translatable("tc.need.research"), mouseX, mouseY);
+                default -> { }
+            }
+        }
     }
 
     private void renderItemRow(GuiGraphics graphics, List<ResearchRequirement> reqs, int x, int y, long gameTime, int mouseX, int mouseY, boolean obtain, boolean[] satisfied) {
@@ -726,6 +740,9 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                     }
                     DeferredTooltip.set(lines, mouseX, mouseY);
                 }
+                if (met) {
+                    GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BOOK, slotX + CHECKMARK_OFFSET_X, y, (float) CHECKMARK_U, (float) CHECKMARK_V, CHECKMARK_SIZE, CHECKMARK_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE, 0xFFFFFFFF);
+                }
             } else {
                 met = observationAfford;
                 satisfied[i] = met;
@@ -754,6 +771,9 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                                     .withStyle(have >= instance.amount() ? ChatFormatting.GREEN : ChatFormatting.RED));
                             DeferredTooltip.set(lines, mouseX, mouseY);
                         }
+                        if (have >= instance.amount()) {
+                            GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BOOK, chipX + CHECKMARK_OFFSET_X, y, (float) CHECKMARK_U, (float) CHECKMARK_V, CHECKMARK_SIZE, CHECKMARK_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE, 0xFFFFFFFF);
+                        }
                     } else {
                         GuiBlend.blitTinted(graphics, UNKNOWN_ASPECT_TEXTURE, chipX, y, 16, 16, 0.0F, 0.0F, 32, 32, 32, 32, UNKNOWN_ASPECT_TINT);
                         if (mouseInside(chipX, y, SLOT_HIT_SIZE, SLOT_HIT_SIZE, mouseX, mouseY)) {
@@ -772,9 +792,6 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                 }
             }
             satisfied[i] = met;
-            if (met) {
-                GuiBlend.blitTinted(graphics, TCScreenTextures.RESEARCH_BOOK, slotX + CHECKMARK_OFFSET_X, y, (float) CHECKMARK_U, (float) CHECKMARK_V, CHECKMARK_SIZE, CHECKMARK_SIZE, TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE, 0xFFFFFFFF);
-            }
             if (reward.type() == KnowledgeType.THEORY
                     && mouseInside(slotX, y, SLOT_HIT_SIZE, SLOT_HIT_SIZE, mouseX, mouseY)) {
                 reward.category().unwrapKey().ifPresent(k ->
@@ -1046,8 +1063,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
             graphics.pose().pushPose();
             graphics.pose().translate(x + ASPECT_TAG_OFFSET_X, rowY + ASPECT_TAG_OFFSET_Y, 0);
             graphics.pose().scale(ASPECT_TAG_SCALE, ASPECT_TAG_SCALE, 1F);
-            AspectTagRenderer.render(graphics, font, 0, 0, entry.aspect(),
-                    aspect.components().isEmpty() ? 0.0F : ASPECT_COMBINE_YIELD);
+            drawAspectTag(graphics, 0, 0, entry.aspect());
             graphics.pose().popPose();
             graphics.pose().pushPose();
             graphics.pose().translate(x + ASPECT_NAME_OFFSET_X, rowY + ASPECT_NAME_OFFSET_Y, 0);
@@ -1145,7 +1161,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         AspectList list = AspectList.EMPTY;
         for (Holder.Reference<IAspect> ref : lookup.listElements().toList()) {
             if (AspectPools.isDiscovered(minecraft.player, ref)) {
-                list = list.add(ref, AspectPools.amount(minecraft.player, ref));
+                list = list.add(ref, 1);
             }
         }
         return list;
@@ -1295,7 +1311,7 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         if (size == 0) return ItemStack.EMPTY;
         int index = (int) ((slotIndex + System.currentTimeMillis() / 1000L) % size);
         if (index < 0) index += size;
-        return new ItemStack(req.items().get(index), Math.max(1, req.amount()));
+        return new ItemStack(req.items().get(index), Math.max(1, req.amount()), req.components());
     }
 
     private int countMatching(Player player, ResearchRequirement req) {
@@ -1304,11 +1320,23 @@ public final class EntryDetailScreen extends AbstractTCScreen {
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stack = inv.getItem(i);
             if (stack.isEmpty()) continue;
-            if (req.items().contains(stack.getItem().builtInRegistryHolder())) {
+            if (req.items().contains(stack.getItem().builtInRegistryHolder())
+                    && testComponents(req.components(), stack)) {
                 total += stack.getCount();
             }
         }
         return total;
+    }
+
+    private static boolean testComponents(DataComponentPatch components, ItemStack stack) {
+        for (Map.Entry<DataComponentType<?>, Optional<?>> entry : components.entrySet()) {
+            DataComponentType<?> type = entry.getKey();
+            Optional<?> value = entry.getValue();
+            if (value.isEmpty() ? stack.has(type) : !value.get().equals(stack.get(type))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -1600,7 +1628,6 @@ public final class EntryDetailScreen extends AbstractTCScreen {
                 return false;
             }
             PacketDistributor.sendToServer(new ServerboundObtainNotePayload(entryId, ordinal));
-            playSound(TCSounds.WRITE.get(), 0.5F, 1.0F);
             return true;
         }
         return false;

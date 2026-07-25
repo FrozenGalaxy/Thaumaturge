@@ -121,7 +121,7 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private static final Set<String> CHECKED_IN_ITEM_MODELS = Set.of(
-            "bellows", "leaves_greatwood", "leaves_silverwood", "log_greatwood", "log_silverwood",
+            "bellows", "leaves_greatwood", "leaves_silverwood",
             "plank_greatwood", "plank_silverwood", "thaumometer");
 
     private void autoBlockItems() {
@@ -1145,17 +1145,32 @@ public final class TCModelProvider implements DataProvider {
         simpleFromExisting(TCBlocks.PLANK_SILVERWOOD.get(), "plank_silverwood");
         simpleFromExisting(TCBlocks.LEAVES_GREATWOOD.get(), "leaves_greatwood");
         simpleFromExisting(TCBlocks.LEAVES_SILVERWOOD.get(), "leaves_silverwood");
-        log(TCBlocks.LOG_GREATWOOD.get(), "log_greatwood", "log_greatwood_horizontal");
-        log(TCBlocks.LOG_SILVERWOOD.get(), "log_silverwood", "log_silverwood_horizontal");
+        log(TCBlocks.LOG_GREATWOOD.get(), TCBlocks.WOOD_GREATWOOD.get());
+        log(TCBlocks.LOG_SILVERWOOD.get(), TCBlocks.WOOD_SILVERWOOD.get());
+        log(TCBlocks.STRIPPED_LOG_GREATWOOD.get(), TCBlocks.STRIPPED_WOOD_GREATWOOD.get());
+        log(TCBlocks.STRIPPED_LOG_SILVERWOOD.get(), TCBlocks.STRIPPED_WOOD_SILVERWOOD.get());
     }
 
-    private void log(Block block, String verticalName, String horizontalName) {
+    private void log(Block log, Block wood) {
+        TextureMapping logMapping = TextureMapping.logColumn(log);
+        ResourceLocation vertical = ModelTemplates.CUBE_COLUMN.create(log, logMapping, modelOutput);
+        ResourceLocation horizontal = ModelTemplates.CUBE_COLUMN_HORIZONTAL.create(log, logMapping, modelOutput);
+        axisPillar(log, vertical, horizontal);
+        delegateItem(log.asItem(), vertical);
+
+        TextureMapping woodMapping = logMapping.copyAndUpdate(TextureSlot.END, logMapping.get(TextureSlot.SIDE));
+        ResourceLocation woodModel = ModelTemplates.CUBE_COLUMN.create(wood, woodMapping, modelOutput);
+        axisPillar(wood, woodModel, woodModel);
+        delegateItem(wood.asItem(), woodModel);
+    }
+
+    private void axisPillar(Block block, ResourceLocation vertical, ResourceLocation horizontal) {
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(block)
                 .with(PropertyDispatch.property(BlockStateProperties.AXIS)
-                        .select(Direction.Axis.Y, vName(verticalName))
-                        .select(Direction.Axis.Z, vName(horizontalName)
+                        .select(Direction.Axis.Y, v(vertical))
+                        .select(Direction.Axis.Z, v(horizontal)
                                 .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-                        .select(Direction.Axis.X, vName(horizontalName)
+                        .select(Direction.Axis.X, v(horizontal)
                                 .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
                                 .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))));
     }
