@@ -7,7 +7,7 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
  *
  * <p>Injected into the tooltip element list by Thaumaturge's tooltip handler when an item has
  * known aspects and the player meets the visibility conditions (Shift modifier and a container
- * screen open by default). The client-side renderer is registered separately and draws
+ * screen open by default).
  *
  * @param aspects the aspect list to display
  * @since 1.0.0

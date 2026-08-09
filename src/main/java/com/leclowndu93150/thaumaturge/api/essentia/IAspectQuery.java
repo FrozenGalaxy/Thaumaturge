@@ -14,7 +14,7 @@ public interface IAspectQuery {
     /**
      * The aspect intent advertised by this block, or {@link AspectList#EMPTY} when none.
      *
-     * {@code -1} to signal an intent rather than a quantity; the modern {@link AspectList} type
+     * <p>The amount on this surface signals an intent rather than a quantity. {@link AspectList}
      * forbids non-positive amounts, so the entry is reported as {@code 1}. Consumers must treat
      * amounts on this surface as untyped markers and never as a storage quantity.
      *

@@ -204,7 +204,7 @@ public final class AuraHelper {
 
     /**
      * Adds flux to the chunk, optionally broadcasting a small visual cue at {@code pos}.
-     * surface so addon recipes that need a localised pollution effect compile unchanged.
+     * Equivalent to {@link #addFlux} when {@code showEffect} is false.
      *
      * @param level      the level
      * @param pos        block position resolving to the chunk; doubles as the visual effect anchor

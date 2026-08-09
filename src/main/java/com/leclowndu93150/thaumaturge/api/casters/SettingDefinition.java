@@ -10,7 +10,8 @@ import org.jspecify.annotations.Nullable;
  * effect potency. Definitions describe the selectable values; the chosen value itself is an
  * integer stored in {@link FocusUnit#settings()}.
  *
- * element, values live in the spell data, and nothing is shared between casts and screens.
+ * <p>The schema lives on the element, values live in the spell data, and nothing is shared
+ * between casts and screens.
  *
  * @param key      the setting id, unique within its element
  * @param nameKey  the translation key for the setting's display name

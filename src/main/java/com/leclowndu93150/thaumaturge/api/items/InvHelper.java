@@ -21,8 +21,8 @@ import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Inventory access and filter matching used by golem seals and provisioning. Replaces the
- * {@code InventoryUtils}, built on the NeoForge item handler capability.
+ * Inventory access and filter matching used by golem seals and provisioning, built on the
+ * NeoForge item handler capability.
  *
  * @since 1.0.0
  */

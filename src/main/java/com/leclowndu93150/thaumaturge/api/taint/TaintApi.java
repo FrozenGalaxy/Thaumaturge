@@ -5,7 +5,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
 /**
- * {@code TaintHelper} so addons can seed, query, and drive taint without touching internals.
+ * Static facade over the taint spread engine, letting addons seed, query, and drive taint
+ * without touching internals.
  *
  * <p>All mutating calls are server side; passing a client level is a no-op for queries and
  * ignored for mutators.

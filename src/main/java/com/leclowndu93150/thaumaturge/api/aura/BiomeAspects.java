@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.resources.ResourceKey;
 
 /**
+ * Data map value listing the aspects associated with a biome
  * BiomeDictionary aspect table. Worldgen uses it to bias vis crystal cluster types toward the
  * biome's character; other systems may sample it for biome-flavoured effects.
  *
