@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.client.golem;
 
+import com.leclowndu93150.thaumcraft.registry.TCGolemTraits;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import com.leclowndu93150.thaumcraft.api.golems.ISealDisplayer;
@@ -116,7 +117,7 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumcraftGolem> {
         GolemProperties props = state.props;
         ResourceLocation matTexture = props.getMaterial().texture();
         boolean holding = state.holdingItem;
-        boolean rolling = props.hasTrait(GolemTrait.WHEELED) || props.hasTrait(GolemTrait.FLYER);
+        boolean rolling = props.hasTrait(TCGolemTraits.WHEELED.get()) || props.hasTrait(TCGolemTraits.FLYER.get());
         float bry = 0.0F;
         float rx = (float) Math.toDegrees(Mth.sin(state.ageInTicks * 0.067F) * 0.03F);
         float rz = (float) Math.toDegrees(Mth.cos(state.ageInTicks * 0.09F) * 0.05F + 0.05F);

@@ -29,6 +29,7 @@ import com.leclowndu93150.thaumcraft.data.tag.TCEntityTypeTagsProvider;
 import com.leclowndu93150.thaumcraft.data.tag.TCBlockTagsProvider;
 import com.leclowndu93150.thaumcraft.data.tag.TCDamageTypeTagsProvider;
 import com.leclowndu93150.thaumcraft.data.tag.TCItemTagsProvider;
+import com.leclowndu93150.thaumcraft.data.tag.TCMobEffectTagsProvider;
 import com.leclowndu93150.thaumcraft.data.worldgen.aspect.AspectBootstrap;
 import com.leclowndu93150.thaumcraft.data.worldgen.biome.TCBiomeModifiers;
 import com.leclowndu93150.thaumcraft.data.worldgen.biome.TCBiomes;
@@ -91,6 +92,7 @@ public final class TCDataGenerators {
         event.createProvider(TCDamageTypeTagsProvider::new);
         event.createProvider(TCBiomeTagsProvider::new);
         event.createProvider(TCEntityTypeTagsProvider::new);
+        event.createProvider(TCMobEffectTagsProvider::new);
 
         event.createProvider((output, lookupProvider) -> new LootTableProvider(
                 output,

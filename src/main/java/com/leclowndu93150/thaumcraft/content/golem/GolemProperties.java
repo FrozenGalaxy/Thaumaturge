@@ -1,4 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.golem;
+import net.minecraft.core.Holder;
+import com.leclowndu93150.thaumcraft.registry.TCGolemTraits;
 
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import com.leclowndu93150.thaumcraft.api.golems.IGolemProperties;
@@ -13,7 +15,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
-import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -83,7 +85,7 @@ public final class GolemProperties implements IGolemProperties {
     @Override
     public Set<GolemTrait> getTraits() {
         if (traitCache == null) {
-            traitCache = EnumSet.noneOf(GolemTrait.class);
+            traitCache = new LinkedHashSet<>();
             material.traits().forEach(this::addTraitSmart);
             head.traits().forEach(this::addTraitSmart);
             arms.traits().forEach(this::addTraitSmart);
@@ -93,11 +95,15 @@ public final class GolemProperties implements IGolemProperties {
         return traitCache;
     }
 
-    private void addTraitSmart(GolemTrait trait) {
-        if (trait.opposite() != null && traitCache.contains(trait.opposite())) {
-            traitCache.remove(trait.opposite());
+    private void addTraitSmart(Holder<GolemTrait> trait) {
+        GolemTrait value = trait.value();
+        GolemTrait opposite = value.opposite() == null
+                ? null
+                : TCGolemTraits.registry().get(value.opposite());
+        if (opposite != null && traitCache.contains(opposite)) {
+            traitCache.remove(opposite);
         } else {
-            traitCache.add(trait);
+            traitCache.add(value);
         }
     }
 

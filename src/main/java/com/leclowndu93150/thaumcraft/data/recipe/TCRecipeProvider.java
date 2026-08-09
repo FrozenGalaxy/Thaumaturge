@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
+import com.leclowndu93150.thaumcraft.content.infusion.InfusionRunicAugmentRecipe;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.content.item.PhialItem;
 import com.leclowndu93150.thaumcraft.api.aspect.TCAspects;
@@ -36,6 +37,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -118,6 +120,7 @@ public final class TCRecipeProvider extends RecipeProvider {
         buildGearRecipes();
         buildInfusionAltarRecipes();
         buildInfusionEnchantmentRecipes();
+        buildRunicAugmentRecipe();
         buildElementalToolRecipes();
         buildTravellerBootsRecipe();
         buildRechargePedestalRecipe();
@@ -751,6 +754,22 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .set(TCDataComponents.INFUSION_ENCHANTMENTS.get(), new InfusionEnchantments(enchantments))
                 .build();
         return new ItemStack(item.builtInRegistryHolder(), 1, patch);
+    }
+
+    private void buildRunicAugmentRecipe() {
+        HolderGetter<IAspect> aspects = registries.lookupOrThrow(IAspect.REGISTRY_KEY);
+        AspectList baseAspects = AspectList.of(
+                new AspectInstance(aspects.getOrThrow(TCAspects.PRAEMUNIO), 40),
+                new AspectInstance(aspects.getOrThrow(TCAspects.VITREUS), 20),
+                new AspectInstance(aspects.getOrThrow(TCAspects.POTENTIA), 20));
+        Ingredient amber = Ingredient.of(TCItemTags.GEMS_AMBER);
+        InfusionRunicAugmentRecipe recipe = new InfusionRunicAugmentRecipe(
+                List.of(Ingredient.of(TCItems.SALIS_MUNDUS.get()), amber),
+                amber,
+                baseAspects,
+                Ingredient.of(Items.IRON_CHESTPLATE),
+                Optional.of(gate("runic_shielding")));
+        output.accept(TCIds.rl("runic_augment/runic_shielding"), recipe, null);
     }
 
     private void buildInfusionEnchantmentRecipes() {
@@ -2181,19 +2200,6 @@ public final class TCRecipeProvider extends RecipeProvider {
     private static final int STAFF_SILVERWOOD_VIS = 24;
     private static final int PRIMAL_CHARM_VIS = 150;
 
-    private static String rodGate(String rodName) {
-        if ("wood".equals(rodName)) {
-            return "unlock_auromancy";
-        }
-        if ("primal_staff".equals(rodName)) {
-            return "staff_primal";
-        }
-        if (rodName.endsWith("_staff")) {
-            return "staves";
-        }
-        return "rod_" + rodName;
-    }
-
     private ItemStack wandResult(WandCap cap, WandRod rod, boolean sceptre) {
         DataComponentPatch patch = DataComponentPatch.builder()
                 .set(TCDataComponents.WAND_PARTS.get(), new WandParts(cap, rod, sceptre))
@@ -2361,66 +2367,6 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .unlockedBy("has", has(TCItems.SALIS_MUNDUS))
                 .save(output, TCIds.MODID + ":wand/part/primal_charm");
 
-        Map<DeferredHolder<WandCap, WandCap>, ItemLike> capItems = new LinkedHashMap<>();
-        capItems.put(TCWandParts.CAP_IRON, TCItems.WAND_CAP_IRON);
-        capItems.put(TCWandParts.CAP_COPPER, TCItems.WAND_CAP_COPPER);
-        capItems.put(TCWandParts.CAP_GOLD, TCItems.WAND_CAP_GOLD);
-        capItems.put(TCWandParts.CAP_SILVER, TCItems.WAND_CAP_SILVER);
-        capItems.put(TCWandParts.CAP_THAUMIUM, TCItems.WAND_CAP_THAUMIUM);
-        capItems.put(TCWandParts.CAP_VOID, TCItems.WAND_CAP_VOID);
-
-        Map<DeferredHolder<WandRod, WandRod>, ItemLike> rodItems = new LinkedHashMap<>();
-        rodItems.put(TCWandParts.ROD_WOOD, Items.STICK);
-        rodItems.put(TCWandParts.ROD_GREATWOOD, TCItems.WAND_ROD_GREATWOOD);
-        rodItems.put(TCWandParts.ROD_OBSIDIAN, TCItems.WAND_ROD_OBSIDIAN);
-        rodItems.put(TCWandParts.ROD_BLAZE, TCItems.WAND_ROD_BLAZE);
-        rodItems.put(TCWandParts.ROD_ICE, TCItems.WAND_ROD_ICE);
-        rodItems.put(TCWandParts.ROD_QUARTZ, TCItems.WAND_ROD_QUARTZ);
-        rodItems.put(TCWandParts.ROD_BONE, TCItems.WAND_ROD_BONE);
-        rodItems.put(TCWandParts.ROD_REED, TCItems.WAND_ROD_REED);
-        rodItems.put(TCWandParts.ROD_SILVERWOOD, TCItems.WAND_ROD_SILVERWOOD);
-        rodItems.put(TCWandParts.STAFF_GREATWOOD, TCItems.STAFF_ROD_GREATWOOD);
-        rodItems.put(TCWandParts.STAFF_OBSIDIAN, TCItems.STAFF_ROD_OBSIDIAN);
-        rodItems.put(TCWandParts.STAFF_BLAZE, TCItems.STAFF_ROD_BLAZE);
-        rodItems.put(TCWandParts.STAFF_ICE, TCItems.STAFF_ROD_ICE);
-        rodItems.put(TCWandParts.STAFF_QUARTZ, TCItems.STAFF_ROD_QUARTZ);
-        rodItems.put(TCWandParts.STAFF_BONE, TCItems.STAFF_ROD_BONE);
-        rodItems.put(TCWandParts.STAFF_REED, TCItems.STAFF_ROD_REED);
-        rodItems.put(TCWandParts.STAFF_SILVERWOOD, TCItems.STAFF_ROD_SILVERWOOD);
-        rodItems.put(TCWandParts.STAFF_PRIMAL, TCItems.STAFF_ROD_PRIMAL);
-
-        for (Map.Entry<DeferredHolder<WandCap, WandCap>, ItemLike> capEntry : capItems.entrySet()) {
-            WandCap cap = capEntry.getKey().get();
-            String capName = TCWandParts.caps().getKey(cap).getPath();
-            for (Map.Entry<DeferredHolder<WandRod, WandRod>, ItemLike> rodEntry : rodItems.entrySet()) {
-                WandRod rod = rodEntry.getKey().get();
-                String rodName = TCWandParts.rods().getKey(rod).getPath();
-                boolean starterCombo = capEntry.getKey() == TCWandParts.CAP_IRON
-                        && rodEntry.getKey() == TCWandParts.ROD_WOOD;
-                if (!starterCombo) {
-                    arcaneShaped(wandResult(cap, rod, false),
-                            WandEconomy.PRIMAL_COUNT * cap.craftCost() * rod.craftCost())
-                            .pattern("  C").pattern(" R ").pattern("C  ")
-                            .define('C', capEntry.getValue())
-                            .define('R', rodEntry.getValue())
-                            .gate(gate(rodGate(rodName)))
-                            .unlockedBy("has", has(capEntry.getValue()))
-                            .save(output, TCIds.MODID + ":wand/assembly/" + capName + "_" + rodName);
-                }
-                if (!rod.staff()) {
-                    int sceptreVis = WandEconomy.PRIMAL_COUNT
-                            * (int) (cap.craftCost() * rod.craftCost() * WandEconomy.SCEPTRE_CRAFT_COST_FACTOR);
-                    arcaneShaped(wandResult(cap, rod, true), sceptreVis)
-                            .pattern(" CP").pattern(" RC").pattern("C  ")
-                            .define('C', capEntry.getValue())
-                            .define('R', rodEntry.getValue())
-                            .define('P', TCItems.PRIMAL_CHARM)
-                            .gate(gate("sceptre"))
-                            .unlockedBy("has", has(TCItems.PRIMAL_CHARM))
-                            .save(output, TCIds.MODID + ":wand/sceptre/" + capName + "_" + rodName);
-                }
-            }
-        }
     }
 
     private static final int NODE_STABILIZER_VIS = 96;
@@ -2453,6 +2399,18 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .gate(gate("node_transducer"))
                 .unlockedBy("has", has(TCItems.NODE_STABILIZER))
                 .save(output, TCIds.MODID + ":node_transducer");
+
+        arcaneShaped(new ItemStack(TCItems.VIS_RELAY.get()), NODE_STABILIZER_VIS)
+                .pattern(" A ")
+                .pattern("GNG")
+                .pattern(" S ")
+                .define('A', Items.AMETHYST_SHARD)
+                .define('G', Tags.Items.INGOTS_GOLD)
+                .define('N', TCItemTags.NITORS)
+                .define('S', TCItems.STONE_ARCANE)
+                .gate(gate("vis_relay"))
+                .unlockedBy("has", has(TCItemTags.NITORS))
+                .save(output, TCIds.MODID + ":vis_relay");
 
         new InfusionRecipeBuilder(aspects, RecipeCategory.MISC,
                 new ItemStack(TCItems.NODE_STABILIZER_ADVANCED.get()),

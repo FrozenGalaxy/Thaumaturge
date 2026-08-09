@@ -89,6 +89,7 @@ import com.leclowndu93150.thaumcraft.content.equipment.ElementalShovelItem;
 import com.leclowndu93150.thaumcraft.content.equipment.ElementalSwordItem;
 import com.leclowndu93150.thaumcraft.content.equipment.PrimalCrusherItem;
 import com.leclowndu93150.thaumcraft.content.equipment.RobeArmorItem;
+import com.leclowndu93150.thaumcraft.content.manabean.ItemManaBean;
 import com.leclowndu93150.thaumcraft.content.equipment.TCMaterials;
 import com.leclowndu93150.thaumcraft.content.equipment.TravellerBootsItem;
 import com.leclowndu93150.thaumcraft.content.equipment.VoidGearItem;
@@ -367,6 +368,16 @@ public final class TCItems {
             props -> new RobeArmorItem(3, ArmorItem.Type.LEGGINGS, props.durability(ArmorItem.Type.LEGGINGS.getDurability(TCMaterials.DURABILITY_ROBES))));
     public static final DeferredItem<RobeArmorItem> CLOTH_BOOTS = ITEMS.registerItem("cloth_boots",
             props -> new RobeArmorItem(2, ArmorItem.Type.BOOTS, props.durability(ArmorItem.Type.BOOTS.getDurability(TCMaterials.DURABILITY_ROBES))));
+
+    public static final DeferredItem<ItemManaBean> MANA_BEAN = ITEMS.registerItem(
+            "mana_bean",
+            ItemManaBean::new,
+            new Item.Properties().food(new FoodProperties.Builder()
+                    .nutrition(1)
+                    .saturationModifier(0.5F)
+                    .alwaysEdible()
+                    .fast()
+                    .build()));
 
     public static final DeferredItem<Item> BRAIN = ITEMS.registerItem(
             "brain",
@@ -752,6 +763,7 @@ public final class TCItems {
             ItemPrimalCharm::new,
             new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON));
 
+    public static final DeferredItem<BlockItem> VIS_RELAY = ITEMS.registerSimpleBlockItem(TCBlocks.VIS_RELAY);
     public static final DeferredItem<BlockItem> NODE_STABILIZER = ITEMS.registerSimpleBlockItem(TCBlocks.NODE_STABILIZER);
     public static final DeferredItem<BlockItem> NODE_STABILIZER_ADVANCED = ITEMS.registerSimpleBlockItem(TCBlocks.NODE_STABILIZER_ADVANCED);
     public static final DeferredItem<BlockItem> NODE_TRANSDUCER = ITEMS.registerSimpleBlockItem(TCBlocks.NODE_TRANSDUCER);

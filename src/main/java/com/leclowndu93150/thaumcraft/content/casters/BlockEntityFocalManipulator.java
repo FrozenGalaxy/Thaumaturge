@@ -311,6 +311,7 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
         data.putAll(nodes);
         focusName = name;
         setChanged();
+        syncToClient();
     }
 
     @Override

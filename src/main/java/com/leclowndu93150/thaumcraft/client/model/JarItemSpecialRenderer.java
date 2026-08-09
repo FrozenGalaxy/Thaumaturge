@@ -1,6 +1,7 @@
 package com.leclowndu93150.thaumcraft.client.model;
 
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
+import com.leclowndu93150.thaumcraft.api.essentia.IEssentiaJar;
 import com.leclowndu93150.thaumcraft.client.render.blockentity.JarRenderer;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -27,7 +28,10 @@ public final class JarItemSpecialRenderer extends BlockEntityWithoutLevelRendere
                 blockItem.getBlock().defaultBlockState(), poseStack, buffers, light, overlay);
         AspectInstance contents = extractContents(stack);
         if (contents != null) {
-            JarRenderer.submitFluid(contents.amount(), contents.aspect().value().color(), light,
+            int capacity = blockItem.getBlock() instanceof IEssentiaJar jar
+                    ? jar.jarCapacity()
+                    : IEssentiaJar.DEFAULT_CAPACITY;
+            JarRenderer.submitFluid(contents.amount(), capacity, contents.aspect().value().color(), light,
                     JarRenderer.ANIMATED_GLOW_MATERIAL.sprite(), poseStack, buffers);
         }
     }

@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.api.golems.parts;
 
+import net.minecraft.core.Holder;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import java.util.List;
 import net.minecraft.core.Registry;
@@ -28,7 +29,7 @@ public final class GolemLeg extends GolemPart {
      * @param traits     traits granted by these legs
      */
     public GolemLeg(List<ResourceLocation> research, ResourceLocation icon, @Nullable GolemPartModel model,
-                    List<GolemComponent> components, @Nullable ILegFunction function, List<GolemTrait> traits) {
+                    List<GolemComponent> components, @Nullable ILegFunction function, List<Holder<GolemTrait>> traits) {
         super(research, icon, components, traits, model);
         this.function = function;
     }

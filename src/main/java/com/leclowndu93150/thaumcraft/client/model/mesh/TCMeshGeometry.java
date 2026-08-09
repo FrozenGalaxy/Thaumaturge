@@ -3,6 +3,7 @@ package com.leclowndu93150.thaumcraft.client.model.mesh;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mojang.math.Transformation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ import net.neoforged.neoforge.client.model.IModelBuilder;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
+import net.neoforged.neoforge.client.model.geometry.UnbakedGeometryHelper;
 import org.joml.Matrix4f;
 
 public final class TCMeshGeometry implements IUnbakedGeometry<TCMeshGeometry> {
@@ -47,6 +49,10 @@ public final class TCMeshGeometry implements IUnbakedGeometry<TCMeshGeometry> {
     public BakedModel bake(IGeometryBakingContext context, ModelBaker baker,
                            Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState,
                            ItemOverrides overrides) {
+        Transformation rootTransform = context.getRootTransform();
+        if (!rootTransform.isIdentity()) {
+            modelState = UnbakedGeometryHelper.composeRootTransformIntoModelState(modelState, rootTransform);
+        }
         TCMesh mesh = loadMesh();
         Matrix4f transform = new Matrix4f()
                 .translate(CENTER_OFFSET, CENTER_OFFSET, CENTER_OFFSET)

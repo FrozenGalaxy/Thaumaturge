@@ -1,0 +1,8 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "thaumcraft:entity/obelisk_cap_altar"
+    }
+  ]
+}

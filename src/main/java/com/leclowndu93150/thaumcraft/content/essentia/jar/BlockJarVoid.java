@@ -1,6 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.essentia.jar;
 
 import com.leclowndu93150.thaumcraft.registry.TCBlockEntities;
+import net.minecraft.resources.ResourceLocation;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -12,6 +13,21 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 public final class BlockJarVoid extends BlockJar {
+    private static final ResourceLocation SIDE_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("thaumcraft", "block/jar_side_void");
+    private static final ResourceLocation TOP_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("thaumcraft", "block/jar_top_void");
+
+    @Override
+    public ResourceLocation jarSideTexture() {
+        return SIDE_TEXTURE;
+    }
+
+    @Override
+    public ResourceLocation jarTopTexture() {
+        return TOP_TEXTURE;
+    }
+
     public static final MapCodec<BlockJarVoid> CODEC = simpleCodec(BlockJarVoid::new);
 
     public BlockJarVoid(BlockBehaviour.Properties properties) {

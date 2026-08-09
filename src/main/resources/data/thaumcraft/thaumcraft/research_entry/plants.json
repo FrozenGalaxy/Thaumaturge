@@ -46,6 +46,12 @@
       "required_research": [
         "thaumcraft:scanned/plantvishroom"
       ]
+    },
+    {
+      "text": "research.thaumcraft.plants.addendum_5",
+      "required_research": [
+        "thaumcraft:scanned/manapod"
+      ]
     }
   ],
   "note_aspects": [

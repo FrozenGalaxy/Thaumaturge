@@ -7,6 +7,7 @@ import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
 import com.leclowndu93150.thaumcraft.api.research.TCResearchCategories;
 import com.leclowndu93150.thaumcraft.api.warp.WarpHelper;
 import com.leclowndu93150.thaumcraft.api.warp.WarpType;
+import com.leclowndu93150.thaumcraft.content.research.ResearchGrants;
 import com.leclowndu93150.thaumcraft.content.research.ResearchManager;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.List;
@@ -74,9 +75,9 @@ public final class ItemCurio extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), TCSounds.LEARN.get(),
-                SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
         if (player instanceof ServerPlayer serverPlayer) {
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), TCSounds.LEARN.get(),
+                    SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
             if (variant.rites && WarpHelper.getActualWarp(player) <= RITES_WARP_THRESHOLD) {
                 player.sendSystemMessage(Component.translatable("fail.crimsonrites")
                         .withStyle(ChatFormatting.DARK_PURPLE));
@@ -85,7 +86,7 @@ public final class ItemCurio extends Item {
             if (variant.rites && !KnowledgeAccess.of(player).isResearchKnown(CRIMSON_RITES_RESEARCH)) {
                 ResearchManager.complete(serverPlayer, CRIMSON_RITES_RESEARCH);
             }
-            grantKnowledge(serverPlayer, categoryHolder(serverPlayer, variant.category));
+            grantKnowledge(serverPlayer);
             if (variant.warping) {
                 WarpHelper.addWarp(serverPlayer, NORMAL_WARP, WarpType.NORMAL);
                 WarpHelper.addWarp(serverPlayer, TEMPORARY_WARP, WarpType.TEMPORARY);
@@ -94,10 +95,10 @@ public final class ItemCurio extends Item {
                 }
             }
             RandomSource random = serverPlayer.getRandom();
-            ResearchManager.gainKnowledge(serverPlayer, KnowledgeType.OBSERVATION, randomCategory(serverPlayer),
+            ResearchGrants.grantConvertedKnowledge(serverPlayer, KnowledgeType.OBSERVATION,
                     Mth.randomBetweenInclusive(random, KnowledgeType.OBSERVATION.progression() / 2,
                             KnowledgeType.OBSERVATION.progression()));
-            ResearchManager.gainKnowledge(serverPlayer, KnowledgeType.THEORY, randomCategory(serverPlayer),
+            ResearchGrants.grantConvertedKnowledge(serverPlayer, KnowledgeType.THEORY,
                     Mth.randomBetweenInclusive(random, KnowledgeType.THEORY.progression() / 3,
                             KnowledgeType.THEORY.progression() / 2));
             if (!player.getAbilities().instabuild) {
@@ -110,23 +111,13 @@ public final class ItemCurio extends Item {
         return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
 
-    private static void grantKnowledge(ServerPlayer player, Holder<IResearchCategory> category) {
+    private static void grantKnowledge(ServerPlayer player) {
         RandomSource random = player.getRandom();
         int observation = KnowledgeType.OBSERVATION.progression();
         int theory = KnowledgeType.THEORY.progression();
-        ResearchManager.gainKnowledge(player, KnowledgeType.OBSERVATION, category,
+        ResearchGrants.grantConvertedKnowledge(player, KnowledgeType.OBSERVATION,
                 Mth.randomBetweenInclusive(random, observation / 2, observation));
-        ResearchManager.gainKnowledge(player, KnowledgeType.THEORY, category,
+        ResearchGrants.grantConvertedKnowledge(player, KnowledgeType.THEORY,
                 Mth.randomBetweenInclusive(random, theory / 3, theory / 2));
-    }
-
-    private static Holder<IResearchCategory> categoryHolder(ServerPlayer player, ResourceKey<IResearchCategory> key) {
-        return player.registryAccess().lookupOrThrow(IResearchCategory.REGISTRY_KEY).getOrThrow(key);
-    }
-
-    private static Holder<IResearchCategory> randomCategory(ServerPlayer player) {
-        List<Holder.Reference<IResearchCategory>> categories = player.registryAccess()
-                .lookupOrThrow(IResearchCategory.REGISTRY_KEY).listElements().toList();
-        return categories.get(player.getRandom().nextInt(categories.size()));
     }
 }

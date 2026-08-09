@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.content.decor.BlockObsidianTotem;
 import com.leclowndu93150.thaumcraft.content.device.BlockInlay;
+import com.leclowndu93150.thaumcraft.content.manabean.BlockManaPod;
 import com.leclowndu93150.thaumcraft.content.device.BlockVisBattery;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchCrabSpawner;
 import com.leclowndu93150.thaumcraft.content.eldritch.block.BlockEldritchInset;
@@ -172,6 +173,8 @@ public final class TCModelProvider implements DataProvider {
         simpleFromExisting(TCBlocks.NODE_STABILIZER.get(), "node_stabilizer");
         simpleFromExisting(TCBlocks.NODE_STABILIZER_ADVANCED.get(), "node_stabilizer_advanced");
         simpleFromExisting(TCBlocks.NODE_TRANSDUCER.get(), "node_transducer");
+        simpleFromExisting(TCBlocks.VIS_RELAY.get(), "vis_relay");
+        delegateItem(TCBlocks.VIS_RELAY.get().asItem(), TCIds.rl("block/vis_relay"));
         delegateItem(TCBlocks.NODE_STABILIZER.get().asItem(), TCIds.rl("item/node_stabilizer_base"));
         delegateItem(TCBlocks.NODE_STABILIZER_ADVANCED.get().asItem(), TCIds.rl("item/node_stabilizer_base"));
         delegateItem(TCBlocks.NODE_TRANSDUCER.get().asItem(), TCIds.rl("item/node_stabilizer_base"));
@@ -380,11 +383,34 @@ public final class TCModelProvider implements DataProvider {
         CrystalBlockstateGenerator.register(blockStateOutput);
         CrystalItemModelGenerator.register(modelOutput);
         EssentiaCrystalModelGenerator.register(modelOutput);
+        registerManaPod();
         stoneAndStairModels();
         treeModels();
         plantModels();
         taintModels();
         containerItemModels();
+    }
+
+    private void registerManaPod() {
+        Block pod = TCBlocks.MANA_POD.get();
+        ResourceLocation[] stems = new ResourceLocation[3];
+        for (int i = 0; i < 3; i++) {
+            stems[i] = ModelTemplates.CROSS.createWithSuffix(pod, "_stage" + i,
+                    TextureMapping.cross(TextureMapping.getBlockTexture(pod, "_stem_" + i)), modelOutput);
+        }
+        PropertyDispatch ages = PropertyDispatch.property(BlockManaPod.AGE)
+                .select(0, v(stems[0]))
+                .select(1, v(stems[1]))
+                .select(2, v(stems[2]))
+                .select(3, v(stems[2]))
+                .select(4, v(stems[2]))
+                .select(5, v(stems[2]))
+                .select(6, v(stems[2]))
+                .select(7, v(stems[2]));
+        blockStateOutput.accept(MultiVariantGenerator.multiVariant(pod).with(ages));
+
+        ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(TCItems.MANA_BEAN.get()),
+                TextureMapping.layer0(TCIds.rl("item/mana_bean")), modelOutput);
     }
 
     private static Variant v(ResourceLocation model) {
@@ -1379,7 +1405,7 @@ public final class TCModelProvider implements DataProvider {
         eldritchLock();
         crabSpawner();
         column(TCBlocks.ELDRITCH_PEDESTAL.get(), "eldritch_pedestal_side", "eldritch_stone");
-        invisibleWithCubeItem(TCBlocks.ELDRITCH_ALTAR.get(), "eldritch_altar");
+        invisibleWithMeshItem(TCBlocks.ELDRITCH_ALTAR.get(), "eldritch_altar", "eldritch_altar_item");
         invisibleWithCubeItem(TCBlocks.ELDRITCH_OBELISK.get(), "eldritch_deco");
         invisibleWithCubeItem(TCBlocks.ELDRITCH_PILLAR.get(), "eldritch_deco");
         invisibleWithCubeItem(TCBlocks.ELDRITCH_CAPSTONE.get(), "eldritch_deco");
@@ -1557,6 +1583,13 @@ public final class TCModelProvider implements DataProvider {
         ResourceLocation itemModel = ModelTemplates.CUBE_ALL.createWithSuffix(block, "_inventory",
                 new TextureMapping().put(TextureSlot.ALL, blockTexture(textureName)), modelOutput);
         delegateItem(block.asItem(), itemModel);
+        ResourceLocation model = ModelTemplates.PARTICLE_ONLY.create(block,
+                TextureMapping.particle(blockTexture(textureName)), modelOutput);
+        simpleBlock(block, model);
+    }
+
+    private void invisibleWithMeshItem(Block block, String textureName, String itemModelName) {
+        delegateItem(block.asItem(), TCIds.rl("block/" + itemModelName));
         ResourceLocation model = ModelTemplates.PARTICLE_ONLY.create(block,
                 TextureMapping.particle(blockTexture(textureName)), modelOutput);
         simpleBlock(block, model);

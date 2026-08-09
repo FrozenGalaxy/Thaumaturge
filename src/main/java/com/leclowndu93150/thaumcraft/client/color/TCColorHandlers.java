@@ -29,6 +29,7 @@ public final class TCColorHandlers {
     @SubscribeEvent
     public static void onRegisterItemColors(RegisterColorHandlersEvent.Item event) {
         event.register(new CrystalAspectTint(), TCItems.ESSENTIA_CRYSTAL.get());
+        event.register(new CrystalAspectTint(), TCItems.MANA_BEAN.get());
         event.register(new AspectColorTint(), TCItems.PHIAL.get());
         event.register(new NoteColorTint(), TCItems.RESEARCH_NOTE.get());
         event.register(new GolemMaterialTint(), TCItems.GOLEM_PLACER.get());

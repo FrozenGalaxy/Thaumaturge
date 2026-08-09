@@ -1,5 +1,7 @@
 package com.leclowndu93150.thaumcraft.content.golem;
 
+import com.leclowndu93150.thaumcraft.registry.TCGolemTraits;
+import com.leclowndu93150.thaumcraft.api.golems.parts.GolemMaterial;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import com.leclowndu93150.thaumcraft.api.golems.ISealDisplayer;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
@@ -32,7 +34,7 @@ public final class ItemGolemPlacer extends Item implements ISealDisplayer {
         if (props == null) {
             return;
         }
-        if (props.hasTrait(GolemTrait.SMART)) {
+        if (props.hasTrait(TCGolemTraits.SMART.get())) {
             if (props.getRank() >= EntityThaumcraftGolem.MAX_RANK) {
                 tooltip.add(Component.translatable("golem.rank")
                         .append(" " + props.getRank()).withStyle(ChatFormatting.GOLD));
@@ -46,12 +48,12 @@ public final class ItemGolemPlacer extends Item implements ISealDisplayer {
         }
         ResourceLocation materialKey = TCGolemParts.materials().getKey(props.getMaterial());
         if (materialKey != null) {
-            tooltip.add(Component.translatable("golem.material." + materialKey.getPath())
+            tooltip.add(Component.translatable(GolemMaterial.nameKey(materialKey))
                     .withStyle(ChatFormatting.GREEN));
         }
         for (GolemTrait trait : props.getTraits()) {
             tooltip.add(Component.literal("-")
-                    .append(Component.translatable("golem.trait." + trait.getSerializedName()))
+                    .append(Component.translatable(GolemTrait.nameKey(TCGolemTraits.registry().getKey(trait))))
                     .withStyle(ChatFormatting.BLUE));
         }
     }

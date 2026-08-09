@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.golem.seals;
 
+import com.leclowndu93150.thaumcraft.registry.TCGolemTraits;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import com.leclowndu93150.thaumcraft.api.golems.seals.ISealConfigToggles;
@@ -33,6 +34,6 @@ public class SealGuardAdvanced extends SealGuard implements ISealConfigToggles {
 
     @Override
     public GolemTrait[] getRequiredTags() {
-        return new GolemTrait[]{GolemTrait.FIGHTER, GolemTrait.SMART};
+        return new GolemTrait[]{TCGolemTraits.FIGHTER.get(), TCGolemTraits.SMART.get()};
     }
 }

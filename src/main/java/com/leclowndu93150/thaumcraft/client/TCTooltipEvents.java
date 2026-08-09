@@ -8,6 +8,7 @@ import com.leclowndu93150.thaumcraft.api.items.InfusionEnchantment;
 import com.leclowndu93150.thaumcraft.api.items.RechargeAccess;
 import com.leclowndu93150.thaumcraft.api.warp.WarpHelper;
 import com.leclowndu93150.thaumcraft.content.equipment.InfusionEnchantmentHelper;
+import com.leclowndu93150.thaumcraft.content.infusion.InfusionRunicAugmentRecipe;
 import com.leclowndu93150.thaumcraft.registry.TCBlockTags;
 import java.util.Map;
 import net.minecraft.ChatFormatting;
@@ -39,6 +40,11 @@ public final class TCTooltipEvents {
                         .append(" ").append(Component.translatable("enchantment.level." + entry.getValue()));
             }
             event.getToolTip().add(1, line.copy().withStyle(ChatFormatting.GOLD));
+        }
+        int runic = InfusionRunicAugmentRecipe.charge(event.getItemStack());
+        if (runic > 0) {
+            event.getToolTip().add(1, Component.translatable("tooltip.thaumcraft.runic_charge", runic)
+                    .withStyle(ChatFormatting.GOLD));
         }
         int warp = WarpHelper.getFinalWarp(event.getItemStack(), event.getEntity());
         if (warp > 0) {

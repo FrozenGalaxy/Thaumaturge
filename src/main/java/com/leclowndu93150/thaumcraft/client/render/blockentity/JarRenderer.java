@@ -80,7 +80,7 @@ public final class JarRenderer implements BlockEntityRenderer<BlockEntityJar> {
         }
 
         if (amount > 0 && aspectColor != -1) {
-            submitFluid(amount, aspectColor, light, ANIMATED_GLOW_MATERIAL.sprite(), poseStack, buffers);
+            submitFluid(amount, jar.capacity(), aspectColor, light, ANIMATED_GLOW_MATERIAL.sprite(), poseStack, buffers);
         }
         if (hasFilter && filterTexture != null) {
             submitFilterLabel(facing, filterTexture, filterColor, jar.getBlockPos(), poseStack, buffers, light);
@@ -93,8 +93,8 @@ public final class JarRenderer implements BlockEntityRenderer<BlockEntityJar> {
         }
     }
 
-    public static void submitFluid(float amount, int aspectColor, int lightCoords, TextureAtlasSprite sprite, PoseStack poseStack, MultiBufferSource buffers) {
-        float ratio = Math.min(1.0F, amount / (float) BlockEntityJar.CAPACITY);
+    public static void submitFluid(float amount, int capacity, int aspectColor, int lightCoords, TextureAtlasSprite sprite, PoseStack poseStack, MultiBufferSource buffers) {
+        float ratio = Math.min(1.0F, amount / (float) capacity);
         float height = FLUID_BASE_Y + ratio * FLUID_MAX_HEIGHT;
         VertexConsumer wrapped = sprite.wrap(buffers.getBuffer(Sheets.translucentCullBlockSheet()));
         PoseStack.Pose pose = poseStack.last();

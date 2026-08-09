@@ -139,9 +139,9 @@ public final class ResearchManager {
         boolean changed = knowledge.addKnowledge(type, key, amount);
         if (changed) knowledge.sync(player);
         int pointsGained = knowledge.knowledge(type, key) - pointsBefore;
-        for (int point = 0; point < pointsGained; point++) {
+        if (pointsGained > 0) {
             PacketDistributor.sendToPlayer(player,
-                    new ClientboundKnowledgeGainPayload(type, Optional.ofNullable(key)));
+                    new ClientboundKnowledgeGainPayload(type, Optional.ofNullable(key), pointsGained));
         }
         return changed;
     }

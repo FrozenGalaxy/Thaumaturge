@@ -163,13 +163,8 @@ public final class ResearchProgressionEvents {
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        if (player.tickCount == 0 || player.tickCount % MILESTONE_CHECK_INTERVAL != 0) return;
+        if (player.tickCount == 0) return;
         PlayerKnowledge knowledge = (PlayerKnowledge) KnowledgeAccess.of(player);
-        Holder<Biome> biome = player.level().getBiome(player.blockPosition());
-        milestone(player, knowledge, TCIds.rl("m_hellandback"), "got.hellandback",
-                biome.is(BiomeTags.IS_NETHER));
-        milestone(player, knowledge, TCIds.rl("m_endoftheworld"), "got.endoftheworld",
-                biome.is(BiomeTags.IS_END));
         boolean auromancyInProgress = knowledge.isResearchKnown(UNLOCK_AUROMANCY)
                 && !knowledge.isResearchKnown(UNLOCK_AUROMANCY, 1)
                 && !knowledge.isResearchComplete(UNLOCK_AUROMANCY);
@@ -179,6 +174,12 @@ public final class ResearchProgressionEvents {
             milestone(player, knowledge, TCIds.rl("m_uphigh"), "got.uphigh",
                     player.getY() > player.level().getMaxBuildHeight() * UP_HIGH_FRACTION);
         }
+        if (player.tickCount % MILESTONE_CHECK_INTERVAL != 0) return;
+        Holder<Biome> biome = player.level().getBiome(player.blockPosition());
+        milestone(player, knowledge, TCIds.rl("m_hellandback"), "got.hellandback",
+                biome.is(BiomeTags.IS_NETHER));
+        milestone(player, knowledge, TCIds.rl("m_endoftheworld"), "got.endoftheworld",
+                biome.is(BiomeTags.IS_END));
         milestone(player, knowledge, TCIds.rl("m_walker"), null,
                 player.getStats().getValue(Stats.CUSTOM.get(Stats.WALK_ONE_CM)) > WALK_MILESTONE_CM);
         milestone(player, knowledge, TCIds.rl("m_runner"), null,

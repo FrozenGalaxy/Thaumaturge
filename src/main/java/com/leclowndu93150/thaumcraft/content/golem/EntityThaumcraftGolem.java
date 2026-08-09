@@ -1,4 +1,5 @@
 package com.leclowndu93150.thaumcraft.content.golem;
+import com.leclowndu93150.thaumcraft.registry.TCGolemTraits;
 
 import net.minecraft.world.item.DyeItem;
 import com.leclowndu93150.thaumcraft.serialization.TCNbt;
@@ -273,26 +274,26 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
             speedFactor *= accessory.speedFactor();
         }
         int maxHealth = 10 + props.getMaterial().healthMod();
-        if (props.hasTrait(GolemTrait.FRAGILE)) {
+        if (props.hasTrait(TCGolemTraits.FRAGILE.get())) {
             maxHealth = (int) (maxHealth * 0.75);
         }
         maxHealth += props.getRank() + accessoryHealth;
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHealth);
-        getAttribute(Attributes.STEP_HEIGHT).setBaseValue(props.hasTrait(GolemTrait.WHEELED) ? 0.5 : 0.6);
+        getAttribute(Attributes.STEP_HEIGHT).setBaseValue(props.hasTrait(TCGolemTraits.WHEELED.get()) ? 0.5 : 0.6);
         getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(BASE_MOVEMENT_SPEED * speedFactor);
-        int homeRange = props.hasTrait(GolemTrait.SCOUT) ? HOME_RANGE_SCOUT : HOME_RANGE;
+        int homeRange = props.hasTrait(TCGolemTraits.SCOUT.get()) ? HOME_RANGE_SCOUT : HOME_RANGE;
         restrictTo(getRestrictCenter().equals(BlockPos.ZERO) ? blockPosition() : getRestrictCenter(),
                 (int) (homeRange * rangeFactor));
         getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(
-                (props.hasTrait(GolemTrait.SCOUT) ? 56.0 : 40.0) * rangeFactor);
+                (props.hasTrait(TCGolemTraits.SCOUT.get()) ? 56.0 : 40.0) * rangeFactor);
         getAttribute(Attributes.ARMOR).setBaseValue(computeArmor(props) + accessoryArmor);
         this.navigation = createGolemNavigation();
-        if (props.hasTrait(GolemTrait.FLYER)) {
+        if (props.hasTrait(TCGolemTraits.FLYER.get())) {
             this.moveControl = new GolemFlyingMoveControl(this);
         }
-        if (props.hasTrait(GolemTrait.FIGHTER)) {
+        if (props.hasTrait(TCGolemTraits.FIGHTER.get())) {
             double damage = props.getMaterial().damage();
-            if (props.hasTrait(GolemTrait.BRUTAL)) {
+            if (props.hasTrait(TCGolemTraits.BRUTAL.get())) {
                 damage = Math.max(damage * 1.5, damage + 1.0);
             }
             damage += props.getRank() * 0.25;
@@ -305,10 +306,10 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
 
     private static int computeArmor(GolemProperties props) {
         int armor = props.getMaterial().armor();
-        if (props.hasTrait(GolemTrait.ARMORED)) {
+        if (props.hasTrait(TCGolemTraits.ARMORED.get())) {
             armor = (int) Math.max(armor * 1.5, armor + 1);
         }
-        if (props.hasTrait(GolemTrait.FRAGILE)) {
+        if (props.hasTrait(TCGolemTraits.FRAGILE.get())) {
             armor = (int) (armor * 0.75);
         }
         return armor;
@@ -326,11 +327,11 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
         }
         goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
         goalSelector.addGoal(9, new RandomLookAroundGoal(this));
-        if (props().hasTrait(GolemTrait.FIGHTER)) {
+        if (props().hasTrait(TCGolemTraits.FIGHTER.get())) {
             if (navigation instanceof GroundPathNavigation) {
                 goalSelector.addGoal(0, new FloatGoal(this));
             }
-            if (props().hasTrait(GolemTrait.RANGED) && props().getArms().function() != null) {
+            if (props().hasTrait(TCGolemTraits.RANGED.get()) && props().getArms().function() != null) {
                 Goal rangedGoal = props().getArms().function().createRangedAttackGoal(this);
                 if (rangedGoal != null) {
                     goalSelector.addGoal(1, rangedGoal);
@@ -346,12 +347,12 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
     }
 
     private PathNavigation createGolemNavigation() {
-        if (props().hasTrait(GolemTrait.FLYER)) {
+        if (props().hasTrait(TCGolemTraits.FLYER.get())) {
             FlyingPathNavigation nav = new FlyingPathNavigation(this, level());
             nav.setCanFloat(true);
             return nav;
         }
-        if (props().hasTrait(GolemTrait.CLIMBER)) {
+        if (props().hasTrait(TCGolemTraits.CLIMBER.get())) {
             return new WallClimberNavigation(this, level());
         }
         return new GroundPathNavigation(this, level());
@@ -361,10 +362,10 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
         GolemProperties props = props();
         return 1.0F
                 + props.getRank() * 0.025F
-                + (props.hasTrait(GolemTrait.LIGHT) ? 0.2F : 0.0F)
-                + (props.hasTrait(GolemTrait.HEAVY) ? -0.175F : 0.0F)
-                + (props.hasTrait(GolemTrait.FLYER) ? -0.33F : 0.0F)
-                + (props.hasTrait(GolemTrait.WHEELED) ? 0.25F : 0.0F);
+                + (props.hasTrait(TCGolemTraits.LIGHT.get()) ? 0.2F : 0.0F)
+                + (props.hasTrait(TCGolemTraits.HEAVY.get()) ? -0.175F : 0.0F)
+                + (props.hasTrait(TCGolemTraits.FLYER.get()) ? -0.33F : 0.0F)
+                + (props.hasTrait(TCGolemTraits.WHEELED.get()) ? 0.25F : 0.0F);
     }
 
     @Override
@@ -391,14 +392,14 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
 
     @Override
     protected Entity.MovementEmission getMovementEmission() {
-        return props().hasTrait(GolemTrait.HEAVY) && !props().hasTrait(GolemTrait.FLYER)
+        return props().hasTrait(TCGolemTraits.HEAVY.get()) && !props().hasTrait(TCGolemTraits.FLYER.get())
                 ? Entity.MovementEmission.ALL
                 : Entity.MovementEmission.NONE;
     }
 
     @Override
     public boolean causeFallDamage(float fallDistance, float damageMultiplier, DamageSource source) {
-        if (props().hasTrait(GolemTrait.FLYER) || props().hasTrait(GolemTrait.CLIMBER)) {
+        if (props().hasTrait(TCGolemTraits.FLYER.get()) || props().hasTrait(TCGolemTraits.CLIMBER.get())) {
             return false;
         }
         return super.causeFallDamage(fallDistance, damageMultiplier, source);
@@ -408,7 +409,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
     public void tick() {
         super.tick();
         GolemProperties props = props();
-        if (props.hasTrait(GolemTrait.FLYER)) {
+        if (props.hasTrait(TCGolemTraits.FLYER.get())) {
             setNoGravity(true);
         }
         if (!level().isClientSide()) {
@@ -424,7 +425,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
             if (getTarget() != null && !getTarget().isAlive()) {
                 setTarget(null);
             }
-            if (getTarget() != null && props.hasTrait(GolemTrait.RANGED)
+            if (getTarget() != null && props.hasTrait(TCGolemTraits.RANGED.get())
                     && distanceToSqr(getTarget()) > RANGED_TARGET_FORGET_DIST_SQR) {
                 setTarget(null);
             }
@@ -432,18 +433,18 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
                     && getTarget() instanceof Player) {
                 setTarget(null);
             }
-            int healInterval = (int) ((props.hasTrait(GolemTrait.REPAIR) ? 40 : 100) * accessoryRegenFactor());
+            int healInterval = (int) ((props.hasTrait(TCGolemTraits.REPAIR.get()) ? 40 : 100) * accessoryRegenFactor());
             if (tickCount % Math.max(1, healInterval) == 0) {
                 heal(1.0F);
             }
-            if (props.hasTrait(GolemTrait.CLIMBER)) {
+            if (props.hasTrait(TCGolemTraits.CLIMBER.get())) {
                 setBesideClimbableBlock(horizontalCollision);
             }
         } else {
             if (tickCount < 20 || tickCount % 20 == 0) {
                 redrawParts = true;
             }
-            if (props.hasTrait(GolemTrait.WHEELED)) {
+            if (props.hasTrait(TCGolemTraits.WHEELED.get())) {
                 updateWheelRotation();
             }
         }
@@ -506,10 +507,10 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
     @Override
     protected void actuallyHurt(DamageSource source, float damage) {
         GolemProperties props = props();
-        if (source.is(DamageTypeTags.IS_FIRE) && props.hasTrait(GolemTrait.FIREPROOF)) {
+        if (source.is(DamageTypeTags.IS_FIRE) && props.hasTrait(TCGolemTraits.FIREPROOF.get())) {
             return;
         }
-        if (source.is(DamageTypeTags.IS_EXPLOSION) && props.hasTrait(GolemTrait.BLASTPROOF)) {
+        if (source.is(DamageTypeTags.IS_EXPLOSION) && props.hasTrait(TCGolemTraits.BLASTPROOF.get())) {
             damage = Math.min(getMaxHealth() / 2.0F, damage * 0.3F);
         }
         if (source.is(DamageTypes.CACTUS)) {
@@ -588,7 +589,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
             if (ThaumcraftCommonConfig.SHOW_GOLEM_EMOTES.get()) {
                 level().broadcastEntityEvent(this, (byte) EVENT_EMOTE_STAY);
             }
-            restrictTo(blockPosition(), props().hasTrait(GolemTrait.SCOUT) ? HOME_RANGE_SCOUT : HOME_RANGE);
+            restrictTo(blockPosition(), props().hasTrait(TCGolemTraits.SCOUT.get()) ? HOME_RANGE_SCOUT : HOME_RANGE);
         }
         updateEntityAttributes();
         player.swing(hand, true);
@@ -649,7 +650,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
         boolean hurt = target.hurt(damageSources().mobAttack(this), damage);
         if (hurt) {
             if (target instanceof LivingEntity living
-                    && (props().hasTrait(GolemTrait.DEFT) || hasKillCreditAccessory())
+                    && (props().hasTrait(TCGolemTraits.DEFT.get()) || hasKillCreditAccessory())
                     && getOwner() instanceof Player ownerPlayer) {
                 living.setLastHurtByPlayer(ownerPlayer);
             }
@@ -688,7 +689,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
 
     @Override
     public void addRankXp(int xp) {
-        if (!props().hasTrait(GolemTrait.SMART) || level().isClientSide()) {
+        if (!props().hasTrait(TCGolemTraits.SMART.get()) || level().isClientSide()) {
             return;
         }
         int rank = props().getRank();
@@ -714,7 +715,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
         if (stack == null || stack.isEmpty()) {
             return stack;
         }
-        int slots = props().hasTrait(GolemTrait.HAULER) ? 2 : 1;
+        int slots = props().hasTrait(TCGolemTraits.HAULER.get()) ? 2 : 1;
         for (int i = 0; i < slots; i++) {
             EquipmentSlot slot = i == 0 ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
             ItemStack held = getItemBySlot(slot);
@@ -737,7 +738,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
     @Override
     public ItemStack dropItem(ItemStack stack) {
         ItemStack out = ItemStack.EMPTY;
-        int slots = props().hasTrait(GolemTrait.HAULER) ? 2 : 1;
+        int slots = props().hasTrait(TCGolemTraits.HAULER.get()) ? 2 : 1;
         for (int i = 0; i < slots; i++) {
             EquipmentSlot slot = i == 0 ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
             ItemStack held = getItemBySlot(slot);
@@ -761,7 +762,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
                 break;
             }
         }
-        if (props().hasTrait(GolemTrait.HAULER)
+        if (props().hasTrait(TCGolemTraits.HAULER.get())
                 && getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()
                 && !getItemBySlot(EquipmentSlot.OFFHAND).isEmpty()) {
             setItemSlot(EquipmentSlot.MAINHAND, getItemBySlot(EquipmentSlot.OFFHAND).copy());
@@ -773,7 +774,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
     @Override
     public int canCarryAmount(ItemStack stack) {
         int space = 0;
-        int slots = props().hasTrait(GolemTrait.HAULER) ? 2 : 1;
+        int slots = props().hasTrait(TCGolemTraits.HAULER.get()) ? 2 : 1;
         for (int i = 0; i < slots; i++) {
             EquipmentSlot slot = i == 0 ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
             ItemStack held = getItemBySlot(slot);
@@ -797,7 +798,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
         if (stack == null || stack.isEmpty()) {
             return false;
         }
-        int slots = props().hasTrait(GolemTrait.HAULER) ? 2 : 1;
+        int slots = props().hasTrait(TCGolemTraits.HAULER.get()) ? 2 : 1;
         for (int i = 0; i < slots; i++) {
             EquipmentSlot slot = i == 0 ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
             ItemStack held = getItemBySlot(slot);
@@ -810,7 +811,7 @@ public class EntityThaumcraftGolem extends EntityOwnedConstruct implements IGole
 
     @Override
     public List<ItemStack> getCarrying() {
-        if (props().hasTrait(GolemTrait.HAULER)) {
+        if (props().hasTrait(TCGolemTraits.HAULER.get())) {
             return List.of(getItemBySlot(EquipmentSlot.MAINHAND), getItemBySlot(EquipmentSlot.OFFHAND));
         }
         return List.of(getItemBySlot(EquipmentSlot.MAINHAND));

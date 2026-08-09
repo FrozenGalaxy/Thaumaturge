@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.api.golems.parts;
 
+import net.minecraft.core.Holder;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import java.util.List;
 import java.util.function.Supplier;
@@ -28,7 +29,7 @@ public final class GolemMaterial {
     private final int damage;
     private final Supplier<ItemStack> componentBase;
     private final Supplier<ItemStack> componentMechanism;
-    private final List<GolemTrait> traits;
+    private final List<Holder<GolemTrait>> traits;
 
     /**
      * @param research           research entries gating this material in the golem press;
@@ -44,7 +45,7 @@ public final class GolemMaterial {
      */
     public GolemMaterial(List<ResourceLocation> research, ResourceLocation texture, int itemColor, int healthMod, int armor,
                          int damage, Supplier<ItemStack> componentBase, Supplier<ItemStack> componentMechanism,
-                         List<GolemTrait> traits) {
+                         List<Holder<GolemTrait>> traits) {
         this.research = List.copyOf(research);
         this.texture = texture;
         this.itemColor = itemColor;
@@ -115,7 +116,27 @@ public final class GolemMaterial {
     /**
      * @return traits granted by the material
      */
-    public List<GolemTrait> traits() {
+    public List<Holder<GolemTrait>> traits() {
         return traits;
+    }
+
+    /**
+     * The translation key for a material's display name in golem UIs.
+     *
+     * @param id the material id
+     * @return {@code golem.material.<namespace>.<path>}
+     */
+    public static String nameKey(ResourceLocation id) {
+        return "golem.material." + id.getNamespace() + "." + id.getPath();
+    }
+
+    /**
+     * The translation key for a material's descriptive text in golem UIs.
+     *
+     * @param id the material id
+     * @return {@code golem.material.text.<namespace>.<path>}
+     */
+    public static String descriptionKey(ResourceLocation id) {
+        return "golem.material.text." + id.getNamespace() + "." + id.getPath();
     }
 }

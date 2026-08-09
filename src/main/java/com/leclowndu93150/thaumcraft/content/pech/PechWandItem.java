@@ -4,6 +4,7 @@ import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeAccess;
 import com.leclowndu93150.thaumcraft.api.capability.KnowledgeType;
 import com.leclowndu93150.thaumcraft.api.research.IResearchCategory;
+import com.leclowndu93150.thaumcraft.content.research.ResearchGrants;
 import com.leclowndu93150.thaumcraft.content.research.ResearchManager;
 import com.leclowndu93150.thaumcraft.registry.TCSounds;
 import java.util.List;
@@ -49,27 +50,21 @@ public final class PechWandItem extends Item {
         if (!player.getAbilities().instabuild) {
             player.getItemInHand(hand).shrink(1);
         }
-        level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                TCSounds.LEARN.get(), SoundSource.NEUTRAL, 0.5F,
-                0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
         if (player instanceof ServerPlayer serverPlayer) {
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    TCSounds.LEARN.get(), SoundSource.NEUTRAL, 0.5F,
+                    0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
             serverPlayer.sendSystemMessage(Component.translatable("got.pechwand")
                     .withStyle(ChatFormatting.DARK_PURPLE));
             if (!KnowledgeAccess.of(serverPlayer).isResearchKnown(FOCUS_PECH)) {
                 ResearchManager.complete(serverPlayer, FOCUS_PECH);
             }
-            List<Holder.Reference<IResearchCategory>> categories = serverPlayer.registryAccess()
-                    .lookupOrThrow(IResearchCategory.REGISTRY_KEY).listElements().toList();
-            if (!categories.isEmpty()) {
-                int oProg = KnowledgeType.OBSERVATION.progression();
-                ResearchManager.gainKnowledge(serverPlayer, KnowledgeType.OBSERVATION,
-                        categories.get(serverPlayer.getRandom().nextInt(categories.size())),
-                        Mth.nextInt(serverPlayer.getRandom(), oProg / 3, oProg / 2));
-                int tProg = KnowledgeType.THEORY.progression();
-                ResearchManager.gainKnowledge(serverPlayer, KnowledgeType.THEORY,
-                        categories.get(serverPlayer.getRandom().nextInt(categories.size())),
-                        Mth.nextInt(serverPlayer.getRandom(), tProg / 5, tProg / 4));
-            }
+            int oProg = KnowledgeType.OBSERVATION.progression();
+            ResearchGrants.grantConvertedKnowledge(serverPlayer, KnowledgeType.OBSERVATION,
+                    Mth.nextInt(serverPlayer.getRandom(), oProg / 3, oProg / 2));
+            int tProg = KnowledgeType.THEORY.progression();
+            ResearchGrants.grantConvertedKnowledge(serverPlayer, KnowledgeType.THEORY,
+                    Mth.nextInt(serverPlayer.getRandom(), tProg / 5, tProg / 4));
         }
         return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }

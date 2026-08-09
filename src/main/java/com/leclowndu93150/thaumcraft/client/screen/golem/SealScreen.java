@@ -1,4 +1,5 @@
 package com.leclowndu93150.thaumcraft.client.screen.golem;
+import com.leclowndu93150.thaumcraft.registry.TCGolemTraits;
 
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import com.leclowndu93150.thaumcraft.api.golems.seals.ISealConfigArea;
@@ -196,8 +197,8 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
             TCHoverButton button = new TCHoverButton(
                     leftPos + middleX + p * 18 - (tags.length - 1) * 9, topPos + middleY + yOffset, 16, 16,
                     new TCButtonIcon.TextureIcon(tag.icon()),
-                    Component.translatable("golem.trait." + tag.getSerializedName()), () -> {});
-            button.setDescription(Component.translatable("golem.trait.text." + tag.getSerializedName()));
+                    Component.translatable(GolemTrait.nameKey(TCGolemTraits.registry().getKey(tag))), () -> {});
+            button.setDescription(Component.translatable(GolemTrait.descriptionKey(TCGolemTraits.registry().getKey(tag))));
             addRenderableWidget(button);
         }
     }

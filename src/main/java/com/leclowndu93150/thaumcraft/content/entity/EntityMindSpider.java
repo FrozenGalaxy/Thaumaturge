@@ -1,17 +1,23 @@
 package com.leclowndu93150.thaumcraft.content.entity;
 
 import com.leclowndu93150.thaumcraft.api.entity.IEldritchMob;
+import java.util.List;
+import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 public final class EntityMindSpider extends Spider implements IEldritchMob {
     private static final EntityDataAccessor<Boolean> DATA_HARMLESS =
@@ -60,6 +66,17 @@ public final class EntityMindSpider extends Spider implements IEldritchMob {
             this.lifeSpan = HARMLESS_LIFESPAN_TICKS;
         }
         this.entityData.set(DATA_HARMLESS, harmless);
+    }
+
+    @Override
+    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+                                                  MobSpawnType reason, @Nullable SpawnGroupData groupData) {
+        SpawnGroupData result = super.finalizeSpawn(level, difficulty, reason, groupData);
+        for (Entity passenger : List.copyOf(this.getPassengers())) {
+            passenger.stopRiding();
+            passenger.discard();
+        }
+        return result;
     }
 
     @Override

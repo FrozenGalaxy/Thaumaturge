@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.golem.seals;
 
+import com.leclowndu93150.thaumcraft.registry.TCGolemTraits;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
 import com.leclowndu93150.thaumcraft.api.golems.IGolemAPI;
@@ -136,7 +137,7 @@ public class SealEmpty extends SealFiltered {
 
     @Override
     public GolemTrait[] getForbiddenTags() {
-        return new GolemTrait[]{GolemTrait.CLUMSY};
+        return new GolemTrait[]{TCGolemTraits.CLUMSY.get()};
     }
 
     @Override

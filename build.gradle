@@ -30,13 +30,28 @@ repositories {
         name = "Illusive Soulworks maven"
         url = "https://maven.theillusivec4.top/"
     }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 base {
     archivesName = mod_id+"-1.21.1-NeoForge-BETA"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withJavadocJar()
+}
+
+tasks.withType(Javadoc).configureEach {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    failOnError = false
+}
 
 tasks.named('compileJava') {
     options.compilerArgs << '-Xmaxerrs' << '2000'
@@ -96,6 +111,21 @@ neoForge {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+tasks.register('generateData', Exec) {
+    workingDir projectDir
+    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+        commandLine 'cmd', '/c', new File(projectDir, 'gradlew.bat').absolutePath, 'runData', '-PdatagenPass=true'
+    } else {
+        commandLine new File(projectDir, 'gradlew').absolutePath, 'runData', '-PdatagenPass=true'
+    }
+}
+
+if (!project.hasProperty('datagenPass')) {
+    tasks.named('processResources') {
+        dependsOn 'generateData'
+    }
+}
+
 jar {
     exclude("com/leclowndu93150/thaumcraft/debug/**")
 }
@@ -112,6 +142,9 @@ dependencies {
 
     compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}+${minecraft_version}:api"
     runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}+${minecraft_version}"
+
+    compileOnly "maven.modrinth:jade:${jade_version}"
+    runtimeOnly "maven.modrinth:jade:${jade_version}"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
@@ -145,6 +178,7 @@ idea {
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
+            artifactId = mod_id
             from components.java
         }
     }

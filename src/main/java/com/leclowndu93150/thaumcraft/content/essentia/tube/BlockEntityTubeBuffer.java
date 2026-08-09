@@ -107,6 +107,7 @@ public final class BlockEntityTubeBuffer extends BlockEntity implements IEssenti
             this.facing = Direction.orderedByNearest(placer)[0].getOpposite();
         }
         setChanged();
+        sync();
     }
 
     public boolean handleCasterClick(int subHit, boolean sneaking) {
@@ -312,6 +313,11 @@ public final class BlockEntityTubeBuffer extends BlockEntity implements IEssenti
         List<Boolean> open = List.of(openSides[0], openSides[1], openSides[2], openSides[3], openSides[4], openSides[5]);
         TCNbt.store(output, "Open", OPEN_CODEC, registries, open);
         output.putInt("Facing", facing.ordinal());
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveWithoutMetadata(registries);
     }
 
     @Override

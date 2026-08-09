@@ -2,6 +2,7 @@ package com.leclowndu93150.thaumcraft.network;
 
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.compat.curio.ThaumcraftCuriosCompat;
+import com.leclowndu93150.thaumcraft.registry.TCAttachments;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -21,6 +22,7 @@ public record ServerboundCloudJumpPayload() implements CustomPacketPayload {
         if (ModList.get().isLoaded(TCIds.CURIOS)
                 && ThaumcraftCuriosCompat.isCurioEquipped(ctx.player(), TCItems.CLOUD_RING.get())) {
             ctx.player().resetFallDistance();
+            ctx.player().setData(TCAttachments.CLOUD_JUMP_TIME, ctx.player().level().getGameTime());
         }
     }
 

@@ -12,7 +12,8 @@ import net.minecraft.resources.ResourceKey;
 
 public record ClientboundKnowledgeGainPayload(
         KnowledgeType knowledgeType,
-        Optional<ResourceKey<IResearchCategory>> category
+        Optional<ResourceKey<IResearchCategory>> category,
+        int count
 ) implements CustomPacketPayload {
     public static final Type<ClientboundKnowledgeGainPayload> TYPE = new Type<>(TCIds.rl("knowledge_gain"));
 
@@ -22,6 +23,8 @@ public record ClientboundKnowledgeGainPayload(
                     ClientboundKnowledgeGainPayload::knowledgeType,
                     ByteBufCodecs.optional(ResourceKey.streamCodec(IResearchCategory.REGISTRY_KEY)),
                     ClientboundKnowledgeGainPayload::category,
+                    ByteBufCodecs.VAR_INT,
+                    ClientboundKnowledgeGainPayload::count,
                     ClientboundKnowledgeGainPayload::new);
 
     @Override

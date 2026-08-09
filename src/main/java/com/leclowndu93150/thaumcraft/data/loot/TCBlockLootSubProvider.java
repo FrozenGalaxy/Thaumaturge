@@ -2,6 +2,8 @@ package com.leclowndu93150.thaumcraft.data.loot;
 
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
+import com.leclowndu93150.thaumcraft.content.manabean.BlockEntityManaPod;
+import com.leclowndu93150.thaumcraft.content.manabean.BlockManaPod;
 import com.leclowndu93150.thaumcraft.content.world.crystal.BlockCrystal;
 import com.leclowndu93150.thaumcraft.registry.TCBlocks;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
@@ -27,6 +29,8 @@ import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
 import net.minecraft.world.level.storage.loot.functions.SetComponentsFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.predicates.BonusLevelTableCondition;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.predicates.AnyOfCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
@@ -58,6 +62,34 @@ public final class TCBlockLootSubProvider extends BlockLootSubProvider {
                 LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))
                         .add(entry));
+    }
+
+    private static final float SECOND_BEAN_CHANCE = 0.67F;
+
+    private LootTable.Builder manaPodTable(Block block) {
+        LootItemBlockStatePropertyCondition.Builder[] grownStages =
+                new LootItemBlockStatePropertyCondition.Builder[BlockEntityManaPod.MAX_AGE - 1];
+        for (int age = 2; age <= BlockEntityManaPod.MAX_AGE; age++) {
+            grownStages[age - 2] = LootItemBlockStatePropertyCondition.hasBlockStateProperties(block)
+                    .setProperties(StatePropertiesPredicate.Builder.properties()
+                            .hasProperty(BlockManaPod.AGE, age));
+        }
+        return LootTable.lootTable()
+                .withPool(this.applyExplosionCondition(block, LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1))
+                        .when(AnyOfCondition.anyOf(grownStages))
+                        .add(LootItem.lootTableItem(TCItems.MANA_BEAN.get())
+                                .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+                                        .include(TCDataComponents.CRYSTAL_ASPECT.get())))))
+                .withPool(this.applyExplosionCondition(block, LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1))
+                        .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(block)
+                                .setProperties(StatePropertiesPredicate.Builder.properties()
+                                        .hasProperty(BlockManaPod.AGE, BlockEntityManaPod.MAX_AGE)))
+                        .when(LootItemRandomChanceCondition.randomChance(SECOND_BEAN_CHANCE))
+                        .add(LootItem.lootTableItem(TCItems.MANA_BEAN.get())
+                                .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+                                        .include(TCDataComponents.CRYSTAL_ASPECT.get())))));
     }
 
     private LootTable.Builder mirrorTable(Block block) {
@@ -107,6 +139,7 @@ public final class TCBlockLootSubProvider extends BlockLootSubProvider {
         dropSelf(TCBlocks.NODE_STABILIZER.get());
         dropSelf(TCBlocks.NODE_STABILIZER_ADVANCED.get());
         dropSelf(TCBlocks.NODE_TRANSDUCER.get());
+        dropSelf(TCBlocks.VIS_RELAY.get());
         add(TCBlocks.JAR_NODE.get(), LootTable.lootTable()
                 .withPool(this.applyExplosionCondition(TCBlocks.JAR_NODE.get(), LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1))
@@ -232,6 +265,7 @@ public final class TCBlockLootSubProvider extends BlockLootSubProvider {
                         .add(LootItem.lootTableItem(TCItems.CURIO_PRESERVED.get()))));
         add(TCBlocks.MIRROR.get(), this::mirrorTable);
         add(TCBlocks.MIRROR_ESSENTIA.get(), this::mirrorTable);
+        add(TCBlocks.MANA_POD.get(), this::manaPodTable);
         add(TCBlocks.ELDRITCH_CRAB_SPAWNER.get(), b -> LootTable.lootTable()
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1))

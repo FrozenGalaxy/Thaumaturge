@@ -1,0 +1,14 @@
+{
+    "loader": "thaumcraft:mesh",
+    "parent": "block/block",
+    "model": "thaumcraft:models/mesh/obelisk_cap.tcmesh",
+    "transform": {
+        "origin": "center",
+        "rotation": [-90, 0, 0],
+        "translation": [0, -0.5, 0]
+    },
+    "textures": {
+        "texture": "thaumcraft:entity/obelisk_cap_altar",
+        "particle": "thaumcraft:block/eldritch_altar"
+    }
+}

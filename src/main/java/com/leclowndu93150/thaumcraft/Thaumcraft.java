@@ -1,8 +1,17 @@
 package com.leclowndu93150.thaumcraft;
 
+import com.leclowndu93150.thaumcraft.api.items.GogglesAccess;
+import com.leclowndu93150.thaumcraft.api.items.RechargeAccess;
+import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
+import com.leclowndu93150.thaumcraft.api.research.pool.AspectPoolAccess;
+import com.leclowndu93150.thaumcraft.content.research.ResearchManager;
+import com.leclowndu93150.thaumcraft.content.research.pool.AspectPoolBindings;
 import com.leclowndu93150.thaumcraft.registry.TCParticles;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectIndexAccess;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
+import com.leclowndu93150.thaumcraft.api.aura.VisRelayHelper;
+import com.leclowndu93150.thaumcraft.content.aura.relay.VisRelayNetwork;
+import com.leclowndu93150.thaumcraft.content.aura.relay.VisRelayWorkbenchSource;
 import com.leclowndu93150.thaumcraft.api.casters.FocusEngine;
 import com.leclowndu93150.thaumcraft.api.recipe.ArcaneCraftCost;
 import com.leclowndu93150.thaumcraft.api.recipe.RegisterWorkbenchVisSourcesEvent;
@@ -61,6 +70,8 @@ public final class Thaumcraft {
         TCMobEffects.register(modBus);
         TCAttributes.register(modBus);
         TCChunkGenerators.register(modBus);
+        TCPlacementModifiers.register(modBus);
+        TCGolemTraits.register(modBus);
         TCFocusElements.register(modBus);
         TCGolemParts.register(modBus);
         TCWandParts.register(modBus);
@@ -78,13 +89,19 @@ public final class Thaumcraft {
         WandAccess.bind(TCDataComponents.WAND_VIS);
         ArcaneCraftCost.bind(WorkbenchPayment::cost);
         RegisterWorkbenchVisSourcesEvent visSourcesEvent = new RegisterWorkbenchVisSourcesEvent();
+        visSourcesEvent.register(new VisRelayWorkbenchSource());
         modBus.post(visSourcesEvent);
         WorkbenchPayment.registerSources(visSourcesEvent.sources());
         AuraHelper.bind(new AuraHelperBindings());
+        VisRelayHelper.bind(new VisRelayNetwork());
         TaintApi.bind(new TaintApiBindings());
         WarpHelper.bind(new WarpManager.Bindings());
         ScanningManager.bind(new ScanBindings());
         GolemHelper.bind(new GolemBindings());
+        AspectPoolAccess.bind(new AspectPoolBindings());
+        ResearchGate.bind(ResearchManager::doesPassGate);
+        RechargeAccess.bind(TCDataComponents.CHARGE);
+        GogglesAccess.bind(() -> TCAttributes.VIS_DISCOUNT);
         FocusEngine.bindRegistry(TCFocusElements.registry());
 
         if (ModList.get().isLoaded(TCIds.CURIOS))

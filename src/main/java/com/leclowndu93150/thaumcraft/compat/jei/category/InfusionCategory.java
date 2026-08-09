@@ -9,6 +9,7 @@ import com.leclowndu93150.thaumcraft.compat.jei.ingredient.AspectIngredientType;
 import com.leclowndu93150.thaumcraft.compat.jei.utils.ResearchUtils;
 import com.leclowndu93150.thaumcraft.api.recipe.IInfusionRecipe;
 import com.leclowndu93150.thaumcraft.content.infusion.InfusionEnchantmentRecipe;
+import com.leclowndu93150.thaumcraft.content.infusion.InfusionRunicAugmentRecipe;
 import com.leclowndu93150.thaumcraft.content.infusion.InfusionRecipe;
 import com.leclowndu93150.thaumcraft.content.item.PhialItem;
 import com.leclowndu93150.thaumcraft.content.taint.item.EssentiaCrystalFactory;
@@ -43,6 +44,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 public final class InfusionCategory<R extends Recipe<?> & IInfusionRecipe> implements IRecipeCategory<RecipeHolder<R>> {
     public static final RecipeType<RecipeHolder<InfusionRecipe>> RECIPE_TYPE = RecipeType.createFromVanilla(TCRecipeTypes.INFUSION.get());
     public static final RecipeType<RecipeHolder<InfusionEnchantmentRecipe>> ENCHANTMENT_RECIPE_TYPE = RecipeType.createFromVanilla(TCRecipeTypes.INFUSION_ENCHANTMENT.get());
+    public static final RecipeType<RecipeHolder<InfusionRunicAugmentRecipe>> RUNIC_RECIPE_TYPE = RecipeType.createFromVanilla(TCRecipeTypes.RUNIC_AUGMENT.get());
 
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png");

@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.recipe.workbench;
 
+import com.leclowndu93150.thaumcraft.api.recipe.IArcaneCraftingInput;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.recipe.IArcaneRecipe;
@@ -44,7 +45,7 @@ public abstract class ArcaneCraftingRecipe implements IArcaneRecipe {
         this.aspects = aspects;
     }
 
-    protected static NonNullList<ItemStack> defaultCraftingReminder(ArcaneCraftingInput input) {
+    protected static NonNullList<ItemStack> defaultCraftingReminder(IArcaneCraftingInput input) {
         NonNullList<ItemStack> result = NonNullList.withSize(input.size(), ItemStack.EMPTY);
 
         for (int slot = 0; slot < result.size(); ++slot) {
@@ -63,7 +64,7 @@ public abstract class ArcaneCraftingRecipe implements IArcaneRecipe {
     public abstract RecipeSerializer<? extends ArcaneCraftingRecipe> getSerializer();
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(ArcaneCraftingInput input) {
+    public NonNullList<ItemStack> getRemainingItems(IArcaneCraftingInput input) {
         return defaultCraftingReminder(input);
     }
 
@@ -93,7 +94,7 @@ public abstract class ArcaneCraftingRecipe implements IArcaneRecipe {
     }
 
     @Override
-    public boolean matches(ArcaneCraftingInput input, Level level) {
+    public boolean matches(IArcaneCraftingInput input, Level level) {
         WorkbenchPayment.Plan plan = WorkbenchPayment.plan(this, input, input.player());
         return plan.crystalsSatisfied();
     }

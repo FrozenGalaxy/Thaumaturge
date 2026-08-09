@@ -17,6 +17,10 @@ public final class ItemWandRod extends Item {
         this.rod = rod;
     }
 
+    public WandRod rod() {
+        return rod.get();
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> builder, TooltipFlag flag) {
         builder.add(Component.translatable("tooltip.thaumcraft.wand.capacity", rod.get().capacity())

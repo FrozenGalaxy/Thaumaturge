@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.recipe.workbench;
 
+import com.leclowndu93150.thaumcraft.api.recipe.IArcaneCraftingInput;
 import com.google.common.annotations.VisibleForTesting;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.recipe.ResearchGate;
@@ -75,12 +76,12 @@ public class ArcaneShapedCraftingRecipe extends ArcaneCraftingRecipe{
     }
 
     @Override
-    public boolean matches(ArcaneCraftingInput input, Level level) {
+    public boolean matches(IArcaneCraftingInput input, Level level) {
         return super.matches(input, level) && this.pattern.matches(input);
     }
 
     @Override
-    public ItemStack assemble(ArcaneCraftingInput input, HolderLookup.Provider registries) {
+    public ItemStack assemble(IArcaneCraftingInput input, HolderLookup.Provider registries) {
         return this.result.copy();
     }
 

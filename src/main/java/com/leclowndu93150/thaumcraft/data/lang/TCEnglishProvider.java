@@ -5,6 +5,10 @@ import org.apache.commons.lang3.StringUtils;
 import com.leclowndu93150.thaumcraft.TCIds;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
+import com.leclowndu93150.thaumcraft.api.golems.GolemTrait;
+import com.leclowndu93150.thaumcraft.api.golems.parts.GolemMaterial;
+import com.leclowndu93150.thaumcraft.api.golems.parts.GolemPart;
+import net.minecraft.resources.ResourceLocation;
 
 public final class TCEnglishProvider extends LanguageProvider {
     public TCEnglishProvider(PackOutput output) {
@@ -14,6 +18,7 @@ public final class TCEnglishProvider extends LanguageProvider {
     @Override
     protected void addTranslations() {
         add("itemGroup.thaumcraft", "Thaumcraft");
+        addJade();
 
         aspect("aer", "Aer", "Air", "air");
         aspect("terra", "Terra", "Earth", "earth");
@@ -131,6 +136,8 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("recipe.type.infusion", "Arcane Infusion");
         add("recipe.type.infusion_enchantment", "Infusion Enchantment");
         add("tooltip.thaumcraft.charge", "Vis: %s / %s");
+        add("tooltip.thaumcraft.runic_charge", "Runic shield +%s");
+        add("recipe.type.runic_augment", "Runic Augmentation");
         add("tooltip.thaumcraft.infusion_stabiliser", "Infusion Stabilizer");
         add("recipe.type.construct", "Mystical Construct");
         add("wandtable.text1", "Vis Cost");
@@ -202,6 +209,7 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("item.thaumcraft.thaumonomicon_linking", "Thaumonomicon of Binding");
         add("item.thaumcraft.creative_node_placer", "Creative Node Placer");
         add("block.thaumcraft.node_transducer", "Node Transducer");
+        add("block.thaumcraft.vis_relay", "Vis Relay");
         add("tooltip.thaumcraft.creative_only", "Creative only");
         add("tooltip.thaumcraft.sharing.bound", "Attuned to %s");
         add("tooltip.thaumcraft.sharing.hint", "Use once to attune, then have your research partner use it");
@@ -505,10 +513,6 @@ public final class TCEnglishProvider extends LanguageProvider {
     private void langMAuraHud() {
 
         add("item.thaumcraft.goggles_revealing", "Goggles of Revealing");
-        add("hud.thaumcraft.aura.title", "Aura");
-        add("hud.thaumcraft.aura.vis", "Vis: %1$s");
-        add("hud.thaumcraft.aura.flux", "Flux: %1$s");
-        add("hud.thaumcraft.aura.base", "Base: %1$s");
     
     }
 
@@ -546,6 +550,8 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("death.attack.thaumcraft.dissolve", "%1$s dissolved");
 
         add("item.thaumcraft.essentia_crystal", "%s Vis Crystal");
+        add("item.thaumcraft.mana_bean", "Mana Bean");
+        add("block.thaumcraft.mana_pod", "Mana Pod");
         add("item.thaumcraft.essentia_crystal.unknown", "Unknown Vis Crystal");
 
         add("entity.thaumcraft.thaumic_slime", "Thaumic Slime");
@@ -593,6 +599,8 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("tc.invtoolarge", "Inventory too large. Only scanning first 100 items.");
         add("tc.celestial.fail.1", "You have already studied that today.");
         add("tc.celestial.fail.2", "You are unable to take notes of your studies.");
+        add("tc.celestial.studied", "You commit your celestial observations to memory.");
+        add("jei.thaumcraft.deconstruction.info", "Place any item that carries aspects on the Deconstruction Table and it will slowly break the item down. Each work cycle has a chance to shake loose a single research point of a random primal aspect; the richer the item's aspects, the better the odds. Click the floating aspect to collect it.");
 
         add("item.thaumcraft.celestial_notes", "Celestial Notes");
         add("item.thaumcraft.celestial_notes.sun.text", "Solar");
@@ -669,7 +677,7 @@ public final class TCEnglishProvider extends LanguageProvider {
         add("research.thaumcraft.oculus.stage_0",
                 "The whispers have grown into a chorus and at last I understand what they want of me. The obelisks scattered across the world are not monuments - they are doors, and every door has a key.<BR>The strange altars where I first encountered the crimson cult hold a keystone marked with four empty sockets. Four eyes must be seated there, crafted or bargained for, and the sinister energies above the keystone must remain intact.<BR>Before I attempt something this reckless I should set my theories in order.");
         add("research.thaumcraft.oculus.stage_1",
-                "It was all so simple - I am amazed the Crimson Cultists never discovered this.<BR>Four Eldritch Eyes seated upon the keystone, then a focused discharge of vis channeled through my casting gauntlet into the altar. The local aura pays the price, and the so-called Eye is opened.<BR>Of course I have no idea what that means. No matter - only fools fear the unknown!");
+                "It was all so simple - I am amazed the Crimson Cultists never discovered this.<BR>Four Eldritch Eyes seated upon the keystone, then a focused discharge of vis channeled through my wand into the altar. The local aura pays the price, and the so-called Eye is opened.<BR>Of course I have no idea what that means. No matter - only fools fear the unknown!");
         add("research.thaumcraft.enter_outer_lands.title", "The Outer Lands");
         add("research.thaumcraft.enter_outer_lands.stage_0",
                 "You are not quite sure what you were expecting when you stepped through the Oculus, but this strange structure of crumbling stone and twisted passageways was not it.<BR>Something is not quite right here - this structure was not designed for any practical purpose you can discern... unless that purpose was for it to be a deadly maze.<BR>Strange energies abound and your magic seems to act strangely in this alien environment. Even the other denizens you encounter seem out of place here.");
@@ -810,8 +818,8 @@ public final class TCEnglishProvider extends LanguageProvider {
     private void langCasters() {
 
         add("key.category.thaumcraft.main", "Thaumcraft");
-        add("key.thaumcraft.change_focus", "Change Caster Focus");
-        add("key.thaumcraft.misc_toggle", "Misc Caster Toggle");
+        add("key.thaumcraft.change_focus", "Change Wand Focus");
+        add("key.thaumcraft.misc_toggle", "Misc Wand Toggle");
         add("item.thaumcraft.wand", "Wand");
         add("item.thaumcraft.wand.named", "%1$s %2$s Wand");
         add("item.thaumcraft.wand.sceptre", "%1$s %2$s Scepter");
@@ -1321,32 +1329,73 @@ public final class TCEnglishProvider extends LanguageProvider {
     }
 
     private void trait(String key, String name, String text) {
-        add("golem.trait." + key, name);
-        add("golem.trait.text." + key, text);
+        ResourceLocation id = TCIds.rl(key);
+        add(GolemTrait.nameKey(id), name);
+        add(GolemTrait.descriptionKey(id), text);
     }
 
     private void material(String key, String name, String text) {
-        add("golem.material." + key, name);
-        add("golem.material.text." + key, text);
+        ResourceLocation id = TCIds.rl(key);
+        add(GolemMaterial.nameKey(id), name);
+        add(GolemMaterial.descriptionKey(id), text);
+    }
+
+    private void partLang(String kind, String key, String name, String text) {
+        ResourceLocation id = TCIds.rl(key);
+        add(GolemPart.nameKey(kind, id), name);
+        add(GolemPart.descriptionKey(kind, id), text);
     }
 
     private void head(String key, String name, String text) {
-        add("golem.head." + key, name);
-        add("golem.head.text." + key, text);
+        partLang("head", key, name, text);
     }
 
     private void arm(String key, String name, String text) {
-        add("golem.arm." + key, name);
-        add("golem.arm.text." + key, text);
+        partLang("arm", key, name, text);
     }
 
     private void leg(String key, String name, String text) {
-        add("golem.leg." + key, name);
-        add("golem.leg.text." + key, text);
+        partLang("leg", key, name, text);
     }
 
     private void addon(String key, String name, String text) {
-        add("golem.addon." + key, name);
-        add("golem.addon.text." + key, text);
+        partLang("addon", key, name, text);
+    }
+
+    private void addJade() {
+        add("config.jade.plugin_thaumcraft.node", "Aura Node Info");
+        add("config.jade.plugin_thaumcraft.essentia", "Essentia Contents");
+        add("config.jade.plugin_thaumcraft.machine", "Machine Progress");
+        add("config.jade.plugin_thaumcraft.golem", "Golem Info");
+        add("jade.thaumcraft.aspect_amount", "%s x%s");
+        add("jade.thaumcraft.aspect_separator", ", ");
+        add("jade.thaumcraft.node.type.normal", "Aura Node");
+        add("jade.thaumcraft.node.type.unstable", "Unstable Node");
+        add("jade.thaumcraft.node.type.dark", "Sinister Node");
+        add("jade.thaumcraft.node.type.tainted", "Tainted Node");
+        add("jade.thaumcraft.node.type.pure", "Pure Node");
+        add("jade.thaumcraft.node.type.hungry", "Hungry Node");
+        add("jade.thaumcraft.node.modifier.bright", "Bright");
+        add("jade.thaumcraft.node.modifier.pale", "Pale");
+        add("jade.thaumcraft.node.modifier.fading", "Fading");
+        add("jade.thaumcraft.node.modified", "%s %s");
+        add("jade.thaumcraft.node.aspects", "Aspects: %s");
+        add("jade.thaumcraft.node.energized", "Energized");
+        add("jade.thaumcraft.node.feeds_aura", "Condensing raw vis from the local aura");
+        add("jade.thaumcraft.node.feeds_flux", "Devouring flux from the local aura");
+        add("jade.thaumcraft.node.reverts_to", "Reverts to: %s");
+        add("jade.thaumcraft.essentia.empty", "Empty");
+        add("jade.thaumcraft.essentia.fill", "%s: %s / %s");
+        add("jade.thaumcraft.essentia.contents", "Essentia: %s");
+        add("jade.thaumcraft.machine.progress", "Progress: %s%%");
+        add("jade.thaumcraft.machine.heat", "Heat: %s%%");
+        add("jade.thaumcraft.transducer.status.0", "No node below");
+        add("jade.thaumcraft.transducer.status.1", "Transducing");
+        add("jade.thaumcraft.transducer.status.2", "Node energized");
+        add("jade.thaumcraft.transducer.charge", "Charge: %s%%");
+        add("jade.thaumcraft.relay.linked_node", "Linked to energized node");
+        add("jade.thaumcraft.relay.linked_relay", "Linked through %s relays");
+        add("jade.thaumcraft.relay.unlinked", "No energized node in range");
+        add("jade.thaumcraft.golem.rank", "Rank %s (%s XP)");
     }
 }

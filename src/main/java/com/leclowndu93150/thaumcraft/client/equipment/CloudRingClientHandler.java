@@ -28,8 +28,11 @@ public final class CloudRingClientHandler {
     private static final float SOUND_VOLUME = 0.1F;
     private static final int POOF_COUNT = 8;
 
-    private static boolean airJumpArmed;
+    private static final int MIN_AIRBORNE_TICKS = 2;
+
+    private static boolean airJumpUsed;
     private static boolean jumpWasDown;
+    private static int airborneTicks;
 
     private CloudRingClientHandler() {}
 
@@ -38,21 +41,23 @@ public final class CloudRingClientHandler {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null || !ModList.get().isLoaded(TCIds.CURIOS)
                 || !ThaumcraftCuriosCompat.isCurioEquipped(player, TCItems.CLOUD_RING.get())) {
-            airJumpArmed = false;
+            airJumpUsed = false;
             jumpWasDown = false;
+            airborneTicks = 0;
             return;
         }
         boolean jumpDown = Minecraft.getInstance().options.keyJump.isDown();
         boolean jumpPressed = jumpDown && !jumpWasDown;
         jumpWasDown = jumpDown;
-        if (jumpPressed && !airJumpArmed) {
-            airJumpArmed = true;
-        } else if (jumpPressed && !player.onGround() && !player.isInWater() && airJumpArmed) {
-            airJump(player);
-            airJumpArmed = false;
+        if (player.onGround() || player.isInWater()) {
+            airJumpUsed = false;
+            airborneTicks = 0;
+            return;
         }
-        if (player.onGround()) {
-            airJumpArmed = false;
+        airborneTicks++;
+        if (jumpPressed && !airJumpUsed && airborneTicks >= MIN_AIRBORNE_TICKS) {
+            airJump(player);
+            airJumpUsed = true;
         }
     }
 

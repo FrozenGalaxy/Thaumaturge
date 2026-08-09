@@ -158,6 +158,7 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
             this.facing = Direction.orderedByNearest(placer)[0].getOpposite();
         }
         setChanged();
+        pushUpdate(this);
     }
 
     public boolean[] openSides() {
@@ -171,12 +172,14 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
     public void setOpenSide(Direction face, boolean open) {
         openSides[face.ordinal()] = open;
         setChanged();
+        pushUpdate(this);
     }
 
     public boolean toggleSide(Direction face) {
         if (face == null) return false;
         openSides[face.ordinal()] = !openSides[face.ordinal()];
         setChanged();
+        pushUpdate(this);
         return openSides[face.ordinal()];
     }
 
@@ -188,6 +191,7 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
             if (isSideOpen(candidate) && hasTransportNeighbour(candidate)) {
                 facing = candidate;
                 setChanged();
+                pushUpdate(this);
                 return true;
             }
         }
@@ -197,6 +201,7 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
             if (isSideOpen(candidate)) {
                 facing = candidate;
                 setChanged();
+                pushUpdate(this);
                 return true;
             }
         }
@@ -378,6 +383,11 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
             data[a] = (byte) (openSides[a] ? 1 : 0);
         }
         output.putByteArray("OpenSides", data);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveWithoutMetadata(registries);
     }
 
     @Override

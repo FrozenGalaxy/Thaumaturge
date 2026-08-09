@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.golem.seals;
 
+import com.leclowndu93150.thaumcraft.registry.TCGolemTraits;
 import com.leclowndu93150.thaumcraft.config.ThaumcraftCommonConfig;
 import com.leclowndu93150.thaumcraft.TCIds;
 import com.leclowndu93150.thaumcraft.api.golems.GolemHelper;
@@ -155,7 +156,7 @@ public class SealPickup extends SealFiltered implements ISealConfigArea {
 
     @Override
     public GolemTrait[] getForbiddenTags() {
-        return new GolemTrait[]{GolemTrait.CLUMSY};
+        return new GolemTrait[]{TCGolemTraits.CLUMSY.get()};
     }
 
     @Override

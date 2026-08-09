@@ -3,7 +3,7 @@ package com.leclowndu93150.thaumcraft.content.recipe.workbench;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumcraft.api.aspect.AspectList;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
-import com.leclowndu93150.thaumcraft.api.recipe.IArcaneWorkbench;
+import com.leclowndu93150.thaumcraft.api.recipe.IArcaneCraftingInput;
 import com.leclowndu93150.thaumcraft.registry.TCDataComponents;
 import com.leclowndu93150.thaumcraft.registry.TCItems;
 import net.minecraft.core.Holder;
@@ -16,7 +16,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArcaneCraftingInput  implements RecipeInput, IArcaneWorkbench {
+public class ArcaneCraftingInput implements IArcaneCraftingInput {
     public static final ArcaneCraftingInput EMPTY = new ArcaneCraftingInput(0, 0, List.of());
     private final int width;
     private final int height;

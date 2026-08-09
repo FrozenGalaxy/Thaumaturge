@@ -1,5 +1,6 @@
 package com.leclowndu93150.thaumcraft.content.essentia.jar;
 
+import com.leclowndu93150.thaumcraft.api.essentia.IEssentiaJar;
 import com.leclowndu93150.thaumcraft.api.aspect.IAspect;
 import com.leclowndu93150.thaumcraft.api.aura.AuraHelper;
 import com.leclowndu93150.thaumcraft.api.blocks.ILabelable;
@@ -36,7 +37,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
-public class BlockJar extends BaseEntityBlock implements ILabelable, IEssentiaStreamPort {
+public class BlockJar extends BaseEntityBlock implements ILabelable, IEssentiaStreamPort, IEssentiaJar {
     public static final MapCodec<BlockJar> CODEC = simpleCodec(BlockJar::new);
 
     private static final VoxelShape SHAPE = box(3.0, 0.0, 3.0, 13.0, 12.0, 13.0);
