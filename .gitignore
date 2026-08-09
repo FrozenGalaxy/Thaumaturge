@@ -28,4 +28,6 @@ sources/
 # Python files
 *.py
 !tools/*.py
+
+**/__pycache__/
 server-taint-test.log

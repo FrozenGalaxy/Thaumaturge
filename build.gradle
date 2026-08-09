@@ -56,10 +56,10 @@ tasks.withType(Javadoc).configureEach {
 tasks.named('compileJava') {
     options.compilerArgs << '-Xmaxerrs' << '2000'
     if (project.hasProperty('excludeClient')) {
-        exclude 'com/leclowndu93150/thaumcraft/client/**'
-        exclude 'com/leclowndu93150/thaumcraft/mixin/client/**'
-        exclude 'com/leclowndu93150/thaumcraft/compat/**'
-        exclude 'com/leclowndu93150/thaumcraft/data/**'
+        exclude 'com/leclowndu93150/thaumaturge/client/**'
+        exclude 'com/leclowndu93150/thaumaturge/mixin/client/**'
+        exclude 'com/leclowndu93150/thaumaturge/compat/**'
+        exclude 'com/leclowndu93150/thaumaturge/data/**'
     }
 }
 
@@ -127,7 +127,7 @@ if (!project.hasProperty('datagenPass')) {
 }
 
 jar {
-    exclude("com/leclowndu93150/thaumcraft/debug/**")
+    exclude("com/leclowndu93150/thaumaturge/debug/**")
 }
 
 

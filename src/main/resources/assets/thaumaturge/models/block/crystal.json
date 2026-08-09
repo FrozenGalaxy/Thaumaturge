@@ -1,0 +1,6 @@
+{
+  "loader": "thaumaturge:crystal",
+  "textures": {
+    "particle": "thaumaturge:block/crystal"
+  }
+}

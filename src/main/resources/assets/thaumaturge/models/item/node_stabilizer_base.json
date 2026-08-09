@@ -1,0 +1,6 @@
+{
+  "parent": "thaumaturge:item/bewlr_block",
+  "textures": {
+    "particle": "thaumaturge:block/node_stabilizer"
+  }
+}
