@@ -12,7 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
 public final class ThaumicSlimeRenderer extends MobRenderer<ThaumicSlime, SlimeModel<ThaumicSlime>> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/entity/thaumic_slime.png");
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/entity/thaumic_slime.png");
 
     public ThaumicSlimeRenderer(EntityRendererProvider.Context context) {
         super(context, new SlimeModel<>(context.bakeLayer(ModelLayers.SLIME)), 0.25F);

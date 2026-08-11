@@ -25,8 +25,13 @@ public final class CastContext {
     private float power;
     private int cursor;
 
-    CastContext(Level level, UUID castId, @Nullable UUID casterId, @Nullable LivingEntity caster,
-            float power, List<FocusUnit> program) {
+    CastContext(
+            Level level,
+            UUID castId,
+            @Nullable UUID casterId,
+            @Nullable LivingEntity caster,
+            float power,
+            List<FocusUnit> program) {
         this.level = level;
         this.castId = castId;
         this.casterId = casterId;
@@ -69,7 +74,9 @@ public final class CastContext {
      * @return the caster, or null when it cannot be resolved
      */
     public @Nullable LivingEntity caster() {
-        if (caster == null && casterId != null && level instanceof ServerLevel serverLevel
+        if (caster == null
+                && casterId != null
+                && level instanceof ServerLevel serverLevel
                 && serverLevel.getEntity(casterId) instanceof LivingEntity living) {
             caster = living;
         }

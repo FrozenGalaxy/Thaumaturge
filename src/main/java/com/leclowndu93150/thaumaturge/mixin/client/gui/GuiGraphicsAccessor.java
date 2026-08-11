@@ -11,6 +11,6 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(GuiGraphics.class)
 public interface GuiGraphicsAccessor {
     @Invoker("renderTooltipInternal")
-    void thaumaturge$renderTooltipInternal(Font font, List<ClientTooltipComponent> components, int x, int y,
-                                          ClientTooltipPositioner positioner);
+    void thaumaturge$renderTooltipInternal(
+            Font font, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner);
 }

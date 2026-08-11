@@ -15,24 +15,38 @@ import net.minecraft.world.item.ItemStack;
 public final class JarItemSpecialRenderer extends BlockEntityWithoutLevelRenderer {
 
     public JarItemSpecialRenderer() {
-        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+        super(
+                Minecraft.getInstance().getBlockEntityRenderDispatcher(),
+                Minecraft.getInstance().getEntityModels());
     }
 
     @Override
-    public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack,
-                             MultiBufferSource buffers, int light, int overlay) {
+    public void renderByItem(
+            ItemStack stack,
+            ItemDisplayContext displayContext,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         if (!(stack.getItem() instanceof BlockItem blockItem)) {
             return;
         }
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
-                blockItem.getBlock().defaultBlockState(), poseStack, buffers, light, overlay);
+        Minecraft.getInstance()
+                .getBlockRenderer()
+                .renderSingleBlock(blockItem.getBlock().defaultBlockState(), poseStack, buffers, light, overlay);
         AspectInstance contents = extractContents(stack);
         if (contents != null) {
             int capacity = blockItem.getBlock() instanceof IEssentiaJar jar
                     ? jar.jarCapacity()
                     : IEssentiaJar.DEFAULT_CAPACITY;
-            JarRenderer.submitFluid(contents.amount(), capacity, contents.aspect().value().color(), light,
-                    JarRenderer.ANIMATED_GLOW_MATERIAL.sprite(), poseStack, buffers);
+            JarRenderer.submitFluid(
+                    contents.amount(),
+                    capacity,
+                    contents.aspect().value().color(),
+                    light,
+                    JarRenderer.ANIMATED_GLOW_MATERIAL.sprite(),
+                    poseStack,
+                    buffers);
         }
     }
 

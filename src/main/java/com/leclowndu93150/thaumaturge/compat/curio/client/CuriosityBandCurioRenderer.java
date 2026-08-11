@@ -26,15 +26,24 @@ public final class CuriosityBandCurioRenderer implements ICurioRenderer {
 
     @Override
     public <T extends LivingEntity, M extends EntityModel<T>> void render(
-            ItemStack stack, SlotContext slotContext, PoseStack poseStack,
-            RenderLayerParent<T, M> renderLayerParent, MultiBufferSource buffers, int light,
-            float limbSwing, float limbSwingAmount, float partialTicks,
-            float ageInTicks, float netHeadYaw, float headPitch) {
+            ItemStack stack,
+            SlotContext slotContext,
+            PoseStack poseStack,
+            RenderLayerParent<T, M> renderLayerParent,
+            MultiBufferSource buffers,
+            int light,
+            float limbSwing,
+            float limbSwingAmount,
+            float partialTicks,
+            float ageInTicks,
+            float netHeadYaw,
+            float headPitch) {
         if (!(renderLayerParent.getModel() instanceof HumanoidModel<?> humanoid)) {
             return;
         }
         LivingEntity wearer = slotContext.entity();
-        boolean helmeted = wearer != null && !wearer.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
+        boolean helmeted =
+                wearer != null && !wearer.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
         poseStack.pushPose();
         humanoid.head.translateAndRotate(poseStack);
         float z = FACE_Z - (helmeted ? HELMET_LIFT : 0.0F);
@@ -47,8 +56,8 @@ public final class CuriosityBandCurioRenderer implements ICurioRenderer {
         poseStack.popPose();
     }
 
-    private static void vertex(VertexConsumer buffer, PoseStack.Pose pose,
-                               float x, float y, float z, float u, float v, int light) {
+    private static void vertex(
+            VertexConsumer buffer, PoseStack.Pose pose, float x, float y, float z, float u, float v, int light) {
         buffer.addVertex(pose, x, y, z)
                 .setColor(-1)
                 .setUv(u, v)

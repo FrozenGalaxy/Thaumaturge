@@ -50,22 +50,22 @@ public final class ResearchLinkData extends SavedData {
         }
 
         static final Codec<Link> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-                UUIDUtil.CODEC.fieldOf("first").forGetter(link -> link.first),
-                UUIDUtil.CODEC.fieldOf("second").forGetter(link -> link.second),
-                LegacyIds.IDENTIFIER_CODEC.listOf().fieldOf("union")
-                        .xmap(list -> (Set<ResourceLocation>) new LinkedHashSet<>(list), List::copyOf)
-                        .forGetter(link -> link.union)
-        ).apply(builder, Link::new));
+                        UUIDUtil.CODEC.fieldOf("first").forGetter(link -> link.first),
+                        UUIDUtil.CODEC.fieldOf("second").forGetter(link -> link.second),
+                        LegacyIds.IDENTIFIER_CODEC
+                                .listOf()
+                                .fieldOf("union")
+                                .xmap(list -> (Set<ResourceLocation>) new LinkedHashSet<>(list), List::copyOf)
+                                .forGetter(link -> link.union))
+                .apply(builder, Link::new));
     }
 
-    public static final Codec<ResearchLinkData> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            Link.CODEC.listOf().fieldOf("links").forGetter(data -> data.links)
-    ).apply(builder, ResearchLinkData::new));
+    public static final Codec<ResearchLinkData> CODEC = RecordCodecBuilder.create(
+            builder -> builder.group(Link.CODEC.listOf().fieldOf("links").forGetter(data -> data.links))
+                    .apply(builder, ResearchLinkData::new));
 
-    public static final SavedData.Factory<ResearchLinkData> FACTORY = new SavedData.Factory<>(
-            ResearchLinkData::new,
-            ResearchLinkData::load,
-            DataFixTypes.LEVEL);
+    public static final SavedData.Factory<ResearchLinkData> FACTORY =
+            new SavedData.Factory<>(ResearchLinkData::new, ResearchLinkData::load, DataFixTypes.LEVEL);
 
     private final List<Link> links;
 

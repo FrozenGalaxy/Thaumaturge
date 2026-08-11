@@ -29,7 +29,8 @@ public final class AspectFilterTint implements ItemColor {
         ResourceKey<IAspect> aspect = stack.get(TCDataComponents.ASPECT_FILTER.get());
         ClientLevel level = Minecraft.getInstance().level;
         if (aspect != null && level != null) {
-            return level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY)
+            return level.registryAccess()
+                    .lookupOrThrow(IAspect.REGISTRY_KEY)
                     .get(aspect)
                     .map(holder -> OPAQUE | holder.value().color())
                     .orElse(OPAQUE | defaultColor);

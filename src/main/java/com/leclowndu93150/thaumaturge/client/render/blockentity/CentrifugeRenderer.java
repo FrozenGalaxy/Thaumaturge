@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 
 public final class CentrifugeRenderer implements BlockEntityRenderer<BlockEntityCentrifuge> {
@@ -23,8 +22,13 @@ public final class CentrifugeRenderer implements BlockEntityRenderer<BlockEntity
     }
 
     @Override
-    public void render(BlockEntityCentrifuge centrifuge, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityCentrifuge centrifuge,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         float rotation = centrifuge.rotation + centrifuge.rotationSpeed * partialTick;
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);

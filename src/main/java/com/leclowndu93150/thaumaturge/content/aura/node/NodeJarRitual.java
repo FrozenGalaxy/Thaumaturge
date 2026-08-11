@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -45,8 +45,7 @@ public final class NodeJarRitual {
     private NodeJarRitual() {}
 
     public static boolean tryJarNode(ServerLevel level, BlockPos nodePos, Player player) {
-        if (!(level.getBlockEntity(nodePos) instanceof BlockEntityNode node)
-                || node instanceof BlockEntityJarNode) {
+        if (!(level.getBlockEntity(nodePos) instanceof BlockEntityNode node) || node instanceof BlockEntityJarNode) {
             return false;
         }
         if (node.isJarring()) {
@@ -82,8 +81,7 @@ public final class NodeJarRitual {
         for (BlockPos structurePos : structure) {
             double dist = Math.sqrt(hand.distanceToSqr(Vec3.atCenterOf(structurePos)));
             int delay = (int) (dist * DustTriggerFx.SPARKLE_TICKS_PER_BLOCK) + SHELL_BREAK_MARGIN_TICKS;
-            DustTriggerSwapQueue.enqueueClear(level, structurePos,
-                    level.getBlockState(structurePos), delay);
+            DustTriggerSwapQueue.enqueueClear(level, structurePos, level.getBlockState(structurePos), delay);
             lastBreak = Math.max(lastBreak, delay);
         }
         node.beginJarring(lastBreak + JAR_SETTLE_DELAY_TICKS);
@@ -102,8 +100,8 @@ public final class NodeJarRitual {
                 modifier = NodeModifier.FADING;
             }
         }
-        NodeData data = new NodeData(node.getNodeType(), Optional.ofNullable(modifier),
-                node.getAspects(), node.getAspectsBase());
+        NodeData data = new NodeData(
+                node.getNodeType(), Optional.ofNullable(modifier), node.getAspects(), node.getAspectsBase());
         level.removeBlockEntity(nodePos);
         level.setBlock(nodePos, TCBlocks.JAR_NODE.get().defaultBlockState(), Block.UPDATE_ALL);
         if (level.getBlockEntity(nodePos) instanceof BlockEntityJarNode jar) {

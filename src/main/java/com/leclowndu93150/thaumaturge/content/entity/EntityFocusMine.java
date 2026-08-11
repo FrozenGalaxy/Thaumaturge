@@ -11,10 +11,10 @@ import java.util.Deque;
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
@@ -165,11 +165,14 @@ public final class EntityFocusMine extends ThrowableProjectile implements IEntit
         }
         ResourceLocation effectId = this.effects.get(this.random.nextInt(this.effects.size()));
         if (FocusEngine.element(effectId) instanceof FocusEffect effect) {
-            effect.impactParticles(this.level(),
-                    new Vec3(this.getX() + this.random.nextGaussian() * EFFECT_FX_SPREAD,
+            effect.impactParticles(
+                    this.level(),
+                    new Vec3(
+                            this.getX() + this.random.nextGaussian() * EFFECT_FX_SPREAD,
                             this.getY() + this.random.nextGaussian() * EFFECT_FX_SPREAD,
                             this.getZ() + this.random.nextGaussian() * EFFECT_FX_SPREAD),
-                    new Vec3(this.random.nextGaussian() * EFFECT_FX_MOTION,
+                    new Vec3(
+                            this.random.nextGaussian() * EFFECT_FX_MOTION,
                             this.random.nextGaussian() * EFFECT_FX_MOTION,
                             this.random.nextGaussian() * EFFECT_FX_MOTION));
         }
@@ -200,14 +203,21 @@ public final class EntityFocusMine extends ThrowableProjectile implements IEntit
         if (this.focusPackage == null || !(this.getOwner() instanceof LivingEntity livingOwner)) {
             return;
         }
-        EntityHitResult ray = new EntityHitResult(pending.target(),
+        EntityHitResult ray = new EntityHitResult(
+                pending.target(),
                 pending.target().position().add(0.0, pending.target().getBbHeight() / 2.0F, 0.0));
-        FocusEngine.run(this.level(), this.focusPackage, livingOwner, new CastStreams(
-                new Trajectory[]{new Trajectory(this.position(),
-                        pending.point().subtract(this.position()).normalize())},
-                new HitResult[]{ray}));
+        FocusEngine.run(
+                this.level(),
+                this.focusPackage,
+                livingOwner,
+                new CastStreams(
+                        new Trajectory[] {
+                            new Trajectory(
+                                    this.position(),
+                                    pending.point().subtract(this.position()).normalize())
+                        },
+                        new HitResult[] {ray}));
     }
 
-    private record PendingStrike(LivingEntity target, Vec3 point) {
-    }
+    private record PendingStrike(LivingEntity target, Vec3 point) {}
 }

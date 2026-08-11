@@ -28,10 +28,12 @@ public final class TravellerBootsItem extends ArmorItem implements IRechargable 
     private static final float STEP_HEIGHT_BONUS = 0.4F;
     private static final AttributeModifier STEP_MODIFIER = new AttributeModifier(
             ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "traveller_step"),
-            STEP_HEIGHT_BONUS, AttributeModifier.Operation.ADD_VALUE);
+            STEP_HEIGHT_BONUS,
+            AttributeModifier.Operation.ADD_VALUE);
     private static final AttributeModifier JUMP_MODIFIER = new AttributeModifier(
             ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "traveller_jump"),
-            JUMP_BOOST, AttributeModifier.Operation.ADD_VALUE);
+            JUMP_BOOST,
+            AttributeModifier.Operation.ADD_VALUE);
 
     public TravellerBootsItem(Properties properties) {
         super(TCMaterials.ARMOR_TRAVELLER, ArmorItem.Type.BOOTS, properties);
@@ -40,7 +42,8 @@ public final class TravellerBootsItem extends ArmorItem implements IRechargable 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slotId, isSelected);
-        if (level.isClientSide() || !(entity instanceof ServerPlayer player)
+        if (level.isClientSide()
+                || !(entity instanceof ServerPlayer player)
                 || player.getItemBySlot(EquipmentSlot.FEET) != stack) {
             return;
         }

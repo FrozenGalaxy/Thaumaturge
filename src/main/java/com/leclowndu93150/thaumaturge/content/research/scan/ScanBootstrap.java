@@ -28,7 +28,8 @@ public final class ScanBootstrap {
             ScanningManager.addScannableThing(new ScanGeneric());
             ScanningManager.addScannableThing(new ScanNode());
             ScanningManager.addScannableThing(new ScanSky());
-            for (Holder.Reference<MobEffect> effect : BuiltInRegistries.MOB_EFFECT.holders().toList()) {
+            for (Holder.Reference<MobEffect> effect :
+                    BuiltInRegistries.MOB_EFFECT.holders().toList()) {
                 ScanningManager.addScannableThing(new ScanPotion(effect));
             }
         });
@@ -36,15 +37,22 @@ public final class ScanBootstrap {
 
     @SubscribeEvent
     public static void onTagsUpdated(TagsUpdatedEvent event) {
-        event.getRegistryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).listElements().forEach(aspect -> {
-            if (DYNAMIC_ASPECTS.add(aspect.key().location())) {
-                ScanningManager.addScannableThing(new ScanAspectDiscovery(aspect.key()));
-            }
-        });
-        event.getRegistryAccess().lookupOrThrow(Registries.ENCHANTMENT).listElements().forEach(enchantment -> {
-            if (DYNAMIC_ENCHANTMENTS.add(enchantment.key().location())) {
-                ScanningManager.addScannableThing(new ScanEnchantment(enchantment.key().location()));
-            }
-        });
+        event.getRegistryAccess()
+                .lookupOrThrow(IAspect.REGISTRY_KEY)
+                .listElements()
+                .forEach(aspect -> {
+                    if (DYNAMIC_ASPECTS.add(aspect.key().location())) {
+                        ScanningManager.addScannableThing(new ScanAspectDiscovery(aspect.key()));
+                    }
+                });
+        event.getRegistryAccess()
+                .lookupOrThrow(Registries.ENCHANTMENT)
+                .listElements()
+                .forEach(enchantment -> {
+                    if (DYNAMIC_ENCHANTMENTS.add(enchantment.key().location())) {
+                        ScanningManager.addScannableThing(
+                                new ScanEnchantment(enchantment.key().location()));
+                    }
+                });
     }
 }

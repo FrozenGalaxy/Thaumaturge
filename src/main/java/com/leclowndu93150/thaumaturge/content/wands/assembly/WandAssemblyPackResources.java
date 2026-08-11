@@ -71,22 +71,33 @@ public final class WandAssemblyPackResources implements PackResources {
             WandCap cap = TCWandParts.caps().get(capEntry.getKey());
             for (Map.Entry<ResourceLocation, ResourceLocation> rodEntry : rodItems.entrySet()) {
                 WandRod rod = TCWandParts.rods().get(rodEntry.getKey());
-                boolean starterCombo = capEntry.getKey().equals(ironCap) && rodEntry.getKey().equals(woodRod);
+                boolean starterCombo =
+                        capEntry.getKey().equals(ironCap) && rodEntry.getKey().equals(woodRod);
                 if (!starterCombo) {
                     int vis = WandEconomy.PRIMAL_COUNT * cap.craftCost() * rod.craftCost();
-                    out.put(recipeFile("assembly", capEntry.getKey(), rodEntry.getKey()),
+                    out.put(
+                            recipeFile("assembly", capEntry.getKey(), rodEntry.getKey()),
                             recipe(capEntry, rodEntry, false, vis, assemblyGate(rod)));
                 }
                 if (!rod.staff()) {
                     int vis = WandEconomy.PRIMAL_COUNT
                             * (int) (cap.craftCost() * rod.craftCost() * WandEconomy.SCEPTRE_CRAFT_COST_FACTOR);
-                    out.put(recipeFile("sceptre", capEntry.getKey(), rodEntry.getKey()),
-                            recipe(capEntry, rodEntry, true, vis, TCIds.rl("sceptre").toString()));
+                    out.put(
+                            recipeFile("sceptre", capEntry.getKey(), rodEntry.getKey()),
+                            recipe(
+                                    capEntry,
+                                    rodEntry,
+                                    true,
+                                    vis,
+                                    TCIds.rl("sceptre").toString()));
                 }
             }
         }
-        Thaumaturge.LOGGER.info("Serving {} wand assembly recipes from {} caps and {} rods",
-                out.size(), capItems.size(), rodItems.size());
+        Thaumaturge.LOGGER.info(
+                "Serving {} wand assembly recipes from {} caps and {} rods",
+                out.size(),
+                capItems.size(),
+                rodItems.size());
         return out;
     }
 
@@ -96,16 +107,20 @@ public final class WandAssemblyPackResources implements PackResources {
     }
 
     private static ResourceLocation recipeFile(String kind, ResourceLocation capId, ResourceLocation rodId) {
-        boolean modPair = capId.getNamespace().equals(TCIds.MODID) && rodId.getNamespace().equals(TCIds.MODID);
+        boolean modPair =
+                capId.getNamespace().equals(TCIds.MODID) && rodId.getNamespace().equals(TCIds.MODID);
         String name = modPair
                 ? capId.getPath() + "_" + rodId.getPath()
                 : capId.getNamespace() + "_" + capId.getPath() + "_" + rodId.getNamespace() + "_" + rodId.getPath();
         return TCIds.rl("recipe/wand/" + kind + "/" + name + ".json");
     }
 
-    private static byte[] recipe(Map.Entry<ResourceLocation, ResourceLocation> cap,
-                                 Map.Entry<ResourceLocation, ResourceLocation> rod,
-                                 boolean sceptre, int vis, String gate) {
+    private static byte[] recipe(
+            Map.Entry<ResourceLocation, ResourceLocation> cap,
+            Map.Entry<ResourceLocation, ResourceLocation> rod,
+            boolean sceptre,
+            int vis,
+            String gate) {
         JsonObject key = new JsonObject();
         key.add("C", ingredient(cap.getValue()));
         key.add("R", ingredient(rod.getValue()));
@@ -193,6 +208,5 @@ public final class WandAssemblyPackResources implements PackResources {
     }
 
     @Override
-    public void close() {
-    }
+    public void close() {}
 }

@@ -1,6 +1,5 @@
 package com.leclowndu93150.thaumaturge.content.casters;
 
-import com.leclowndu93150.thaumaturge.Thaumaturge;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
@@ -16,7 +15,6 @@ import com.leclowndu93150.thaumaturge.content.research.ResearchManager;
 import com.leclowndu93150.thaumaturge.content.taint.item.EssentiaCrystalFactory;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.leclowndu93150.thaumaturge.registry.TCBlocks;
-import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
 import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import java.util.ArrayList;
@@ -116,8 +114,8 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
                     worldPosition.getX() + rand.nextInt(3) - rand.nextInt(3),
                     worldPosition.getY() + rand.nextInt(3),
                     worldPosition.getZ() + rand.nextInt(3) - rand.nextInt(3));
-            EffectDispatch.spawnVisSparkle(level, origin,
-                    new Vec3(worldPosition.getX(), worldPosition.getY() + 1, worldPosition.getZ()));
+            EffectDispatch.spawnVisSparkle(
+                    level, origin, new Vec3(worldPosition.getX(), worldPosition.getY() + 1, worldPosition.getZ()));
             vis -= amount;
             setChanged();
             syncToClient();
@@ -133,13 +131,23 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
         }
         RandomSource rand = level.getRandom();
         ShieldSparkParticleOptions fx = new ShieldSparkParticleOptions(
-                ARGB32.colorFromFloat(1.0F, 0.5F + rand.nextFloat() * 0.4F, 1.0F - rand.nextFloat() * 0.4F, 1.0F - rand.nextFloat() * 0.4F),
-                0.8F, 0.3F + rand.nextFloat() * 0.3F, 6 + rand.nextInt(5), true);
-        level.addParticle(fx,
+                ARGB32.colorFromFloat(
+                        1.0F,
+                        0.5F + rand.nextFloat() * 0.4F,
+                        1.0F - rand.nextFloat() * 0.4F,
+                        1.0F - rand.nextFloat() * 0.4F),
+                0.8F,
+                0.3F + rand.nextFloat() * 0.3F,
+                6 + rand.nextInt(5),
+                true);
+        level.addParticle(
+                fx,
                 worldPosition.getX() + 0.5 + (rand.nextFloat() - rand.nextFloat()) * 0.3F,
                 worldPosition.getY() + 1.4 + (rand.nextFloat() - rand.nextFloat()) * 0.3F,
                 worldPosition.getZ() + 0.5 + (rand.nextFloat() - rand.nextFloat()) * 0.3F,
-                0.0, 0.0, 0.0);
+                0.0,
+                0.0,
+                0.0);
     }
 
     private float spendAura(ServerLevel level, float amount) {
@@ -179,7 +187,8 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
             int a = compCount.getOrDefault(node.element.toString(), 0);
             node.complexityMultiplier = 0.5F * (++a + 1);
             compCount.put(node.element.toString(), a);
-            totalComplexity = (int) (totalComplexity + element.complexity(node.resolvedSettings()) * node.complexityMultiplier);
+            totalComplexity =
+                    (int) (totalComplexity + element.complexity(node.resolvedSettings()) * node.complexityMultiplier);
             if (element.aspect() != null) {
                 crystals = crystals.add(resolveAspect(element.aspect()), 1);
             }
@@ -281,7 +290,8 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
                 int a = compCount.getOrDefault(node.element.toString(), 0);
                 node.complexityMultiplier = 0.5F * (++a + 1);
                 compCount.put(node.element.toString(), a);
-                totalComplexity = (int) (totalComplexity + element.complexity(node.resolvedSettings()) * node.complexityMultiplier);
+                totalComplexity = (int)
+                        (totalComplexity + element.complexity(node.resolvedSettings()) * node.complexityMultiplier);
             }
         }
         FocusPackage.Builder core = FocusPackage.builder().complexity(totalComplexity);
@@ -340,7 +350,8 @@ public final class BlockEntityFocalManipulator extends BlockEntity implements Me
         inventory.deserializeNBT(registries, input.getCompound("inventory"));
         vis = input.getFloat("Vis");
         focusName = input.getString("FocusName");
-        crystalsSync = TCNbt.read(input, "Crystals", AspectList.CODEC, registries).orElse(AspectList.EMPTY);
+        crystalsSync =
+                TCNbt.read(input, "Crystals", AspectList.CODEC, registries).orElse(AspectList.EMPTY);
         data.clear();
         TCNbt.read(input, "Nodes", FocusElementNode.CODEC.listOf(), registries).ifPresent(nodes -> {
             for (FocusElementNode node : nodes) {

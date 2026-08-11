@@ -24,7 +24,8 @@ public final class WispParticle extends SingleQuadParticle {
     private final int targetEntityId;
     private Entity target;
 
-    private WispParticle(ClientLevel level, double x, double y, double z, WispParticleOptions data, ParticleSheet sheet) {
+    private WispParticle(
+            ClientLevel level, double x, double y, double z, WispParticleOptions data, ParticleSheet sheet) {
         super(level, x, y, z, 0.0, 0.0, 0.0);
         this.sheet = sheet;
         this.targetEntityId = data.entityId();
@@ -103,7 +104,15 @@ public final class WispParticle extends SingleQuadParticle {
         private static final ParticleSheet SHEET = TCParticleSheets.sheet("wisp");
 
         @Override
-        public Particle createParticle(WispParticleOptions options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux) {
+        public Particle createParticle(
+                WispParticleOptions options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double xAux,
+                double yAux,
+                double zAux) {
             return new WispParticle(level, x, y, z, options, SHEET);
         }
     }

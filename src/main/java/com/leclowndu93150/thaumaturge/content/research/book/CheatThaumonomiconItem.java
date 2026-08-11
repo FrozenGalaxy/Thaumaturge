@@ -34,9 +34,8 @@ public final class CheatThaumonomiconItem extends ThaumonomiconItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
-            TooltipFlag flag) {
-        tooltip.add(Component.translatable("tooltip.thaumaturge.creative_only")
-                .withStyle(ChatFormatting.DARK_PURPLE));
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(Component.translatable("tooltip.thaumaturge.creative_only").withStyle(ChatFormatting.DARK_PURPLE));
     }
 }

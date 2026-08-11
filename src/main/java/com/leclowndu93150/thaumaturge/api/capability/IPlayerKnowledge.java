@@ -2,8 +2,8 @@ package com.leclowndu93150.thaumaturge.api.capability;
 
 import com.leclowndu93150.thaumaturge.api.research.IResearchCategory;
 import java.util.Set;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 /**

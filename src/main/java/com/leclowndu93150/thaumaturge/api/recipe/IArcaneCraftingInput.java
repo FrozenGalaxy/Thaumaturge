@@ -46,7 +46,8 @@ public interface IArcaneCraftingInput extends RecipeInput, IArcaneWorkbench {
      *
      * @return the crafting player, or null when the craft is not player-driven
      */
-    @Nullable Player player();
+    @Nullable
+    Player player();
 
     /**
      * The number of non-empty stacks in the crafting grid.

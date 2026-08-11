@@ -90,5 +90,4 @@ public final class EntityGiantBrainyZombie extends EntityBrainyZombie implements
     public boolean hurtClient(DamageSource source, float damage) {
         return super.hurt(source, damage);
     }
-
 }

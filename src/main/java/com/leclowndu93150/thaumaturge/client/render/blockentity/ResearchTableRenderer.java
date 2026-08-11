@@ -45,12 +45,20 @@ public final class ResearchTableRenderer implements BlockEntityRenderer<BlockEnt
     }
 
     @Override
-    public void render(BlockEntityResearchTable table, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityResearchTable table,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         Direction facing = table.getBlockState().hasProperty(BlockResearchTable.FACING)
                 ? table.getBlockState().getValue(BlockResearchTable.FACING)
                 : Direction.NORTH;
-        boolean hasTools = table.items().getStackInSlot(BlockEntityResearchTable.SLOT_SCRIBE_TOOLS).getItem() instanceof IScribeTools;
+        boolean hasTools = table.items()
+                        .getStackInSlot(BlockEntityResearchTable.SLOT_SCRIBE_TOOLS)
+                        .getItem()
+                instanceof IScribeTools;
         ItemStack note = table.items().getStackInSlot(BlockEntityResearchTable.SLOT_NOTE);
         ResearchNoteData data = ResearchNotes.dataOf(note);
         boolean hasNote = !note.isEmpty() && data != null;
@@ -59,18 +67,24 @@ public final class ResearchTableRenderer implements BlockEntityRenderer<BlockEnt
         poseStack.pushPose();
         poseStack.translate(0.5F, 1.0F, 0.5F);
         poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
-        float yaw = switch (facing) {
-            case NORTH -> 270.0F;
-            case SOUTH -> 90.0F;
-            case WEST -> 180.0F;
-            default -> 0.0F;
-        };
+        float yaw =
+                switch (facing) {
+                    case NORTH -> 270.0F;
+                    case SOUTH -> 90.0F;
+                    case WEST -> 180.0F;
+                    default -> 0.0F;
+                };
         poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
 
-        model.table.render(poseStack, buffers.getBuffer(RenderType.entityCutout(TABLE_TEXTURE)), light, OverlayTexture.NO_OVERLAY);
+        model.table.render(
+                poseStack, buffers.getBuffer(RenderType.entityCutout(TABLE_TEXTURE)), light, OverlayTexture.NO_OVERLAY);
 
         if (hasTools) {
-            model.inkwell.render(poseStack, buffers.getBuffer(RenderType.entityCutout(TABLE_TEXTURE)), light, OverlayTexture.NO_OVERLAY);
+            model.inkwell.render(
+                    poseStack,
+                    buffers.getBuffer(RenderType.entityCutout(TABLE_TEXTURE)),
+                    light,
+                    OverlayTexture.NO_OVERLAY);
             poseStack.pushPose();
             poseStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
             poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
@@ -92,11 +106,19 @@ public final class ResearchTableRenderer implements BlockEntityRenderer<BlockEnt
         }
 
         if (hasNote) {
-            model.scrollTube.render(poseStack, buffers.getBuffer(RenderType.entityCutout(SCROLL_TEXTURE)), light, OverlayTexture.NO_OVERLAY);
+            model.scrollTube.render(
+                    poseStack,
+                    buffers.getBuffer(RenderType.entityCutout(SCROLL_TEXTURE)),
+                    light,
+                    OverlayTexture.NO_OVERLAY);
             poseStack.pushPose();
             poseStack.scale(RIBBON_SCALE, RIBBON_SCALE, RIBBON_SCALE);
-            model.scrollRibbon.render(poseStack, buffers.getBuffer(RenderType.entityCutout(SCROLL_TEXTURE)),
-                    light, OverlayTexture.NO_OVERLAY, 0xFF000000 | noteColor);
+            model.scrollRibbon.render(
+                    poseStack,
+                    buffers.getBuffer(RenderType.entityCutout(SCROLL_TEXTURE)),
+                    light,
+                    OverlayTexture.NO_OVERLAY,
+                    0xFF000000 | noteColor);
             poseStack.popPose();
         }
 
@@ -158,10 +180,23 @@ public final class ResearchTableRenderer implements BlockEntityRenderer<BlockEnt
         }
     }
 
-    private static void vertexLit(PoseStack.Pose pose, VertexConsumer buffer, float x, float y, float z,
-                                  float u, float v, float nx, float ny, float nz, int light) {
-        buffer.addVertex(pose, x, y, z).setColor(-1).setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light)
+    private static void vertexLit(
+            PoseStack.Pose pose,
+            VertexConsumer buffer,
+            float x,
+            float y,
+            float z,
+            float u,
+            float v,
+            float nx,
+            float ny,
+            float nz,
+            int light) {
+        buffer.addVertex(pose, x, y, z)
+                .setColor(-1)
+                .setUv(u, v)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(light)
                 .setNormal(pose, nx, ny, nz);
     }
 }

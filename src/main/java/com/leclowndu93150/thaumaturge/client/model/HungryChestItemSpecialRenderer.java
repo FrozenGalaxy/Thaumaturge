@@ -14,13 +14,21 @@ public final class HungryChestItemSpecialRenderer extends BlockEntityWithoutLeve
     private final BlockEntityHungryChest chest;
 
     public HungryChestItemSpecialRenderer() {
-        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
-        this.chest = new BlockEntityHungryChest(BlockPos.ZERO, TCBlocks.HUNGRY_CHEST.get().defaultBlockState());
+        super(
+                Minecraft.getInstance().getBlockEntityRenderDispatcher(),
+                Minecraft.getInstance().getEntityModels());
+        this.chest = new BlockEntityHungryChest(
+                BlockPos.ZERO, TCBlocks.HUNGRY_CHEST.get().defaultBlockState());
     }
 
     @Override
-    public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack,
-                             MultiBufferSource buffers, int light, int overlay) {
+    public void renderByItem(
+            ItemStack stack,
+            ItemDisplayContext displayContext,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         Minecraft.getInstance().getBlockEntityRenderDispatcher().renderItem(chest, poseStack, buffers, light, overlay);
     }
 }

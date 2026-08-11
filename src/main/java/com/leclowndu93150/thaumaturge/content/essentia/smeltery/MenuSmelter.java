@@ -38,17 +38,29 @@ public final class MenuSmelter extends AbstractContainerMenu {
     }
 
     private MenuSmelter(int containerId, Inventory playerInventory, BlockPos pos) {
-        this(containerId, playerInventory, new ItemStackHandler(SLOT_COUNT),
-                ContainerLevelAccess.create(playerInventory.player.level(), pos), pos);
+        this(
+                containerId,
+                playerInventory,
+                new ItemStackHandler(SLOT_COUNT),
+                ContainerLevelAccess.create(playerInventory.player.level(), pos),
+                pos);
     }
 
     public MenuSmelter(int containerId, Inventory playerInventory, BlockEntitySmelter blockEntity) {
-        this(containerId, playerInventory, blockEntity.getInventory(),
+        this(
+                containerId,
+                playerInventory,
+                blockEntity.getInventory(),
                 ContainerLevelAccess.create(blockEntity.getLevel(), blockEntity.getBlockPos()),
                 blockEntity.getBlockPos());
     }
 
-    private MenuSmelter(int containerId, Inventory playerInventory, ItemStackHandler items, ContainerLevelAccess access, BlockPos pos) {
+    private MenuSmelter(
+            int containerId,
+            Inventory playerInventory,
+            ItemStackHandler items,
+            ContainerLevelAccess access,
+            BlockPos pos) {
         super(TCMenus.SMELTER.get(), containerId);
         this.items = items;
         this.access = access;
@@ -59,15 +71,17 @@ public final class MenuSmelter extends AbstractContainerMenu {
 
         for (int row = 0; row < PLAYER_ROWS; row++) {
             for (int col = 0; col < PLAYER_ROW_SLOTS; col++) {
-                addSlot(new Slot(playerInventory, col + row * PLAYER_ROW_SLOTS + PLAYER_ROW_SLOTS,
-                        PLAYER_GRID_X + col * 18, PLAYER_GRID_Y + row * 18));
+                addSlot(new Slot(
+                        playerInventory,
+                        col + row * PLAYER_ROW_SLOTS + PLAYER_ROW_SLOTS,
+                        PLAYER_GRID_X + col * 18,
+                        PLAYER_GRID_Y + row * 18));
             }
         }
 
         for (int col = 0; col < PLAYER_ROW_SLOTS; col++) {
-            addSlot(new Slot(playerInventory, col, PLAYER_GRID_X + col * 18, PLAYER_GRID_Y+3*18+4));
+            addSlot(new Slot(playerInventory, col, PLAYER_GRID_X + col * 18, PLAYER_GRID_Y + 3 * 18 + 4));
         }
-
     }
 
     public BlockPos pos() {
@@ -79,12 +93,16 @@ public final class MenuSmelter extends AbstractContainerMenu {
     }
 
     public BlockEntitySmelter blockEntity() {
-        return (BlockEntitySmelter) access.evaluate(Level::getBlockEntity).filter(be -> be instanceof BlockEntitySmelter).orElse(null);
+        return (BlockEntitySmelter) access.evaluate(Level::getBlockEntity)
+                .filter(be -> be instanceof BlockEntitySmelter)
+                .orElse(null);
     }
 
     @Override
     public boolean stillValid(Player player) {
-        return AbstractContainerMenu.stillValid(access, player, TCBlocks.SMELTER_BASIC.get()) || AbstractContainerMenu.stillValid(access, player, TCBlocks.SMELTER_THAUMIUM.get()) || AbstractContainerMenu.stillValid(access, player, TCBlocks.SMELTER_VOID.get());
+        return AbstractContainerMenu.stillValid(access, player, TCBlocks.SMELTER_BASIC.get())
+                || AbstractContainerMenu.stillValid(access, player, TCBlocks.SMELTER_THAUMIUM.get())
+                || AbstractContainerMenu.stillValid(access, player, TCBlocks.SMELTER_VOID.get());
     }
 
     @Override

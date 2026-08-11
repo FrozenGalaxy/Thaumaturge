@@ -17,12 +17,8 @@ public final class GolemBuilderCapabilities {
         event.registerBlockEntity(
                 EssentiaCapabilities.TRANSPORT,
                 TCBlockEntities.GOLEM_BUILDER.get(),
-                (be, side) -> side == null || be.isConnectable(side) ? be : null
-        );
+                (be, side) -> side == null || be.isConnectable(side) ? be : null);
         event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
-                TCBlockEntities.GOLEM_BUILDER.get(),
-                (be, side) -> be.output()
-        );
+                Capabilities.ItemHandler.BLOCK, TCBlockEntities.GOLEM_BUILDER.get(), (be, side) -> be.output());
     }
 }

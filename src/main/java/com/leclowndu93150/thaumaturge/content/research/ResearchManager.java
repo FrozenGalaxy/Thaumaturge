@@ -1,17 +1,10 @@
 package com.leclowndu93150.thaumaturge.content.research;
 
-import com.leclowndu93150.thaumaturge.content.research.note.ResearchNoteData;
-import com.leclowndu93150.thaumaturge.content.research.note.ResearchNotes;
-import com.leclowndu93150.thaumaturge.content.research.pool.AspectPools;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.capability.IPlayerKnowledge;
 import com.leclowndu93150.thaumaturge.api.capability.KnowledgeAccess;
-import com.leclowndu93150.thaumaturge.api.capability.ResearchFlag;
-import com.leclowndu93150.thaumaturge.config.ThaumaturgeCommonConfig;
-import com.leclowndu93150.thaumaturge.api.warp.WarpHelper;
-import com.leclowndu93150.thaumaturge.api.warp.WarpType;
-import com.leclowndu93150.thaumaturge.network.ClientboundKnowledgeGainPayload;
 import com.leclowndu93150.thaumaturge.api.capability.KnowledgeType;
+import com.leclowndu93150.thaumaturge.api.capability.ResearchFlag;
 import com.leclowndu93150.thaumaturge.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumaturge.api.research.IResearchCategory;
 import com.leclowndu93150.thaumaturge.api.research.IResearchEntry;
@@ -21,12 +14,22 @@ import com.leclowndu93150.thaumaturge.api.research.ResearchAddendum;
 import com.leclowndu93150.thaumaturge.api.research.ResearchEvent;
 import com.leclowndu93150.thaumaturge.api.research.ResearchParent;
 import com.leclowndu93150.thaumaturge.api.research.ResearchRequirement;
+import com.leclowndu93150.thaumaturge.api.warp.WarpHelper;
+import com.leclowndu93150.thaumaturge.api.warp.WarpType;
+import com.leclowndu93150.thaumaturge.config.ThaumaturgeCommonConfig;
+import com.leclowndu93150.thaumaturge.content.research.note.ResearchNoteData;
+import com.leclowndu93150.thaumaturge.content.research.note.ResearchNotes;
+import com.leclowndu93150.thaumaturge.content.research.pool.AspectPools;
+import com.leclowndu93150.thaumaturge.network.ClientboundKnowledgeGainPayload;
+import java.util.Map;
 import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -35,9 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
-import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.core.component.DataComponentType;
-import java.util.Map;
 
 public final class ResearchManager {
     private static final int STAGE_XP_REWARD = 5;
@@ -46,8 +46,8 @@ public final class ResearchManager {
     private ResearchManager() {}
 
     public static ResourceLocation craftedKey(ResourceLocation item) {
-        return ResourceLocation.fromNamespaceAndPath("thaumaturge",
-                CRAFTED_PREFIX + item.getNamespace() + "/" + item.getPath());
+        return ResourceLocation.fromNamespaceAndPath(
+                "thaumaturge", CRAFTED_PREFIX + item.getNamespace() + "/" + item.getPath());
     }
 
     public static boolean unlock(ServerPlayer player, ResourceLocation research) {
@@ -129,19 +129,21 @@ public final class ResearchManager {
         return changed;
     }
 
-    public static boolean gainKnowledge(ServerPlayer player, KnowledgeType type, Holder<IResearchCategory> category, int amount) {
+    public static boolean gainKnowledge(
+            ServerPlayer player, KnowledgeType type, Holder<IResearchCategory> category, int amount) {
         if (type == null || amount == 0) return false;
         ResearchEvent.KnowledgeGained event = new ResearchEvent.KnowledgeGained(player, type, category, amount);
         if (NeoForge.EVENT_BUS.post(event).isCanceled()) return false;
         PlayerKnowledge knowledge = (PlayerKnowledge) KnowledgeAccess.of(player);
-        ResourceKey<IResearchCategory> key = category == null ? null : category.unwrapKey().orElse(null);
+        ResourceKey<IResearchCategory> key =
+                category == null ? null : category.unwrapKey().orElse(null);
         int pointsBefore = knowledge.knowledge(type, key);
         boolean changed = knowledge.addKnowledge(type, key, amount);
         if (changed) knowledge.sync(player);
         int pointsGained = knowledge.knowledge(type, key) - pointsBefore;
         if (pointsGained > 0) {
-            PacketDistributor.sendToPlayer(player,
-                    new ClientboundKnowledgeGainPayload(type, Optional.ofNullable(key), pointsGained));
+            PacketDistributor.sendToPlayer(
+                    player, new ClientboundKnowledgeGainPayload(type, Optional.ofNullable(key), pointsGained));
         }
         return changed;
     }
@@ -172,8 +174,8 @@ public final class ResearchManager {
         return true;
     }
 
-    public static boolean stageRequirementsMet(Player player, IPlayerKnowledge knowledge, IResearchEntry entry,
-                                               ResourceLocation entryId, int stageIndex) {
+    public static boolean stageRequirementsMet(
+            Player player, IPlayerKnowledge knowledge, IResearchEntry entry, ResourceLocation entryId, int stageIndex) {
         IResearchStage stage = entry.stages().get(stageIndex);
         for (ResourceLocation required : stage.requiredResearch()) {
             if (!knowledge.isResearchComplete(required)) return false;
@@ -198,7 +200,8 @@ public final class ResearchManager {
 
     public static boolean isCraftSatisfied(Player player, IPlayerKnowledge knowledge, ResearchRequirement req) {
         for (Holder<Item> holder : req.items()) {
-            ResourceLocation itemId = holder.unwrapKey().map(ResourceKey::location).orElse(null);
+            ResourceLocation itemId =
+                    holder.unwrapKey().map(ResourceKey::location).orElse(null);
             if (itemId != null && knowledge.isResearchKnown(craftedKey(itemId))) return true;
         }
         return countMatching(player, req) > 0;
@@ -229,7 +232,8 @@ public final class ResearchManager {
         return true;
     }
 
-    private static void consumeStageRequirements(ServerPlayer player, PlayerKnowledge knowledge, IResearchEntry entry, IResearchStage stage) {
+    private static void consumeStageRequirements(
+            ServerPlayer player, PlayerKnowledge knowledge, IResearchEntry entry, IResearchStage stage) {
         for (ResearchRequirement req : stage.obtain()) {
             int remaining = req.amount();
             Inventory inv = player.getInventory();
@@ -257,7 +261,8 @@ public final class ResearchManager {
                 && stage.requiredResearch().isEmpty();
     }
 
-    private static boolean markCompleteInternal(ServerPlayer player, PlayerKnowledge knowledge, ResourceLocation research) {
+    private static boolean markCompleteInternal(
+            ServerPlayer player, PlayerKnowledge knowledge, ResourceLocation research) {
         ResearchEvent.Completed event = new ResearchEvent.Completed(player, research);
         if (NeoForge.EVENT_BUS.post(event).isCanceled()) return false;
         boolean changed = knowledge.markComplete(research);
@@ -282,16 +287,18 @@ public final class ResearchManager {
     }
 
     private static void notifyAddenda(ServerPlayer player, PlayerKnowledge knowledge, ResourceLocation completed) {
-        player.registryAccess().lookup(IResearchEntry.REGISTRY_KEY).ifPresent(lookup ->
-                lookup.listElements().forEach(holder -> {
+        player.registryAccess()
+                .lookup(IResearchEntry.REGISTRY_KEY)
+                .ifPresent(lookup -> lookup.listElements().forEach(holder -> {
                     IResearchEntry other = holder.value();
                     if (other.addenda().isEmpty()) return;
                     ResourceLocation otherId = holder.key().location();
                     if (!knowledge.isResearchComplete(otherId)) return;
                     for (ResearchAddendum addendum : other.addenda()) {
                         if (addendum.requiredResearch().contains(completed)) {
-                            player.sendSystemMessage(Component.translatable("tc.addaddendum",
-                                    Component.translatable(other.nameKey())).withStyle(ChatFormatting.DARK_PURPLE));
+                            player.sendSystemMessage(
+                                    Component.translatable("tc.addaddendum", Component.translatable(other.nameKey()))
+                                            .withStyle(ChatFormatting.DARK_PURPLE));
                             knowledge.setResearchFlag(otherId, ResearchFlag.PAGE);
                             break;
                         }

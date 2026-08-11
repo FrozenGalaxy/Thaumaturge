@@ -1,19 +1,15 @@
 package com.leclowndu93150.thaumaturge.content.essentia.smeltery;
 
-import com.leclowndu93150.thaumaturge.content.legacy.LegacyIds;
-import com.leclowndu93150.thaumaturge.serialization.TCNbt;
-import com.leclowndu93150.thaumaturge.Thaumaturge;
 import com.leclowndu93150.thaumaturge.api.aspect.*;
-import com.leclowndu93150.thaumaturge.api.aura.AuraHelper;
 import com.leclowndu93150.thaumaturge.api.essentia.EssentiaList;
 import com.leclowndu93150.thaumaturge.api.essentia.IEssentiaTransport;
-import com.leclowndu93150.thaumaturge.content.aspect.Aspect;
 import com.leclowndu93150.thaumaturge.content.essentia.EssentiaTransportHelper;
-import com.leclowndu93150.thaumaturge.content.essentia.flow.EssentiaFlowHandler;
-import com.leclowndu93150.thaumaturge.content.essentia.jar.BlockJar;
+import com.leclowndu93150.thaumaturge.content.legacy.LegacyIds;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
+import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import com.mojang.serialization.Codec;
+import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -26,11 +22,8 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
-
-import java.util.Objects;
 
 public class BlockEntityAlembic extends BlockEntity implements IEssentiaTransport, IAspectContainer {
     public static final int CAPACITY = 128;
@@ -81,34 +74,37 @@ public class BlockEntityAlembic extends BlockEntity implements IEssentiaTranspor
         return facing;
     }
 
-    protected void clearAspect(){
+    protected void clearAspect() {
         this.aspect = null;
         this.amount = 0;
         setChanged();
         syncToClient();
     }
 
-    protected static boolean processAlembics(Level level, BlockPos pos, Holder<IAspect> aspectHolder){
+    protected static boolean processAlembics(Level level, BlockPos pos, Holder<IAspect> aspectHolder) {
         int deep = 1;
-        while (true){
+        while (true) {
             BlockEntity be = level.getBlockEntity(pos.above(deep));
             if (be == null || !(be instanceof BlockEntityAlembic)) {
                 deep = 1;
-                while (true){
+                while (true) {
                     be = level.getBlockEntity(pos.above(deep));
                     if (be == null || !(be instanceof BlockEntityAlembic)) {
                         return false;
                     }
-                    BlockEntityAlembic alembic = (BlockEntityAlembic)be;
-                    if ((alembic.aspectFilter == null || Objects.equals(alembic.aspectFilter,aspectHolder.getKey())) && alembic.doAddToContainer(aspectHolder.getKey(), 1) == 0) {
+                    BlockEntityAlembic alembic = (BlockEntityAlembic) be;
+                    if ((alembic.aspectFilter == null || Objects.equals(alembic.aspectFilter, aspectHolder.getKey()))
+                            && alembic.doAddToContainer(aspectHolder.getKey(), 1) == 0) {
                         return true;
                     }
                     deep++;
                 }
             }
 
-            BlockEntityAlembic alembic = (BlockEntityAlembic)be;
-            if (alembic.amount > 0 && Objects.equals(alembic.aspect,aspectHolder.getKey()) && alembic.doAddToContainer(aspectHolder.getKey(),1)==0) {
+            BlockEntityAlembic alembic = (BlockEntityAlembic) be;
+            if (alembic.amount > 0
+                    && Objects.equals(alembic.aspect, aspectHolder.getKey())
+                    && alembic.doAddToContainer(aspectHolder.getKey(), 1) == 0) {
                 return true;
             }
 
@@ -116,14 +112,11 @@ public class BlockEntityAlembic extends BlockEntity implements IEssentiaTranspor
         }
     }
 
-
-
     protected void syncToClient() {
         if (level == null || level.isClientSide()) return;
         BlockState current = getBlockState();
         level.sendBlockUpdated(getBlockPos(), current, current, 3);
     }
-
 
     protected int doAddToContainer(ResourceKey<IAspect> incoming, int requested) {
         if (requested == 0) return 0;
@@ -227,7 +220,8 @@ public class BlockEntityAlembic extends BlockEntity implements IEssentiaTranspor
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
         aspect = TCNbt.read(input, "Aspect", ASPECT_KEY_CODEC, registries).orElse(null);
-        aspectFilter = TCNbt.read(input, "AspectFilter", ASPECT_KEY_CODEC, registries).orElse(null);
+        aspectFilter =
+                TCNbt.read(input, "AspectFilter", ASPECT_KEY_CODEC, registries).orElse(null);
         amount = input.getInt("Amount");
         facing = TCNbt.read(input, "Facing", Direction.CODEC, registries).orElse(Direction.DOWN);
     }
@@ -293,7 +287,7 @@ public class BlockEntityAlembic extends BlockEntity implements IEssentiaTranspor
     @Override
     public AspectList getAspects() {
         if (amount() == 0) return AspectList.EMPTY;
-        return AspectList.of(new AspectInstance(EssentiaTransportHelper.resolve(getLevel(),aspectKey()),amount()));
+        return AspectList.of(new AspectInstance(EssentiaTransportHelper.resolve(getLevel(), aspectKey()), amount()));
     }
 
     @Override
@@ -317,7 +311,7 @@ public class BlockEntityAlembic extends BlockEntity implements IEssentiaTranspor
     @Override
     public int addToContainer(Holder<IAspect> aspect, int amount) {
         if (amount == 0) return amount;
-        if ((this.amount < CAPACITY && Objects.equals(this.aspect, aspect.getKey())) || this.amount == 0){
+        if ((this.amount < CAPACITY && Objects.equals(this.aspect, aspect.getKey())) || this.amount == 0) {
             this.aspect = aspect.getKey();
             int added = Math.min(amount, CAPACITY - this.amount);
             this.amount += added;
@@ -354,5 +348,4 @@ public class BlockEntityAlembic extends BlockEntity implements IEssentiaTranspor
     public int containerContains(Holder<IAspect> aspect) {
         return Objects.equals(this.aspect, aspect.getKey()) ? this.amount : 0;
     }
-
 }

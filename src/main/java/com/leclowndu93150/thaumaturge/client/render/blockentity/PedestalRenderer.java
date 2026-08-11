@@ -29,7 +29,8 @@ public final class PedestalRenderer<T extends BlockEntityPedestal> implements Bl
     }
 
     @Override
-    public void render(T pedestal, float partialTick, PoseStack poseStack, MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            T pedestal, float partialTick, PoseStack poseStack, MultiBufferSource buffers, int light, int overlay) {
         ItemStack stack = pedestal.getItem();
         if (stack.isEmpty()) {
             return;

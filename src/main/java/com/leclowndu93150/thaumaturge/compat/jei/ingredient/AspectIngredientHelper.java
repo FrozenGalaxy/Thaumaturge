@@ -2,16 +2,14 @@ package com.leclowndu93150.thaumaturge.compat.jei.ingredient;
 
 import com.leclowndu93150.thaumaturge.api.aspect.AspectComponents;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
-import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
-import com.leclowndu93150.thaumaturge.content.item.PhialItem;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectKnowledgeAccess;
+import com.leclowndu93150.thaumaturge.content.item.PhialItem;
 import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.subtypes.UidContext;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public final class AspectIngredientHelper implements IIngredientHelper<AspectInstance> {
@@ -36,7 +34,9 @@ public final class AspectIngredientHelper implements IIngredientHelper<AspectIns
 
     @Override
     public String getUniqueId(AspectInstance ingredient, UidContext context) {
-        return ingredient.aspect().unwrapKey()
+        return ingredient
+                .aspect()
+                .unwrapKey()
                 .map(ResourceKey::location)
                 .orElse(UNKNOWN)
                 .toString();
@@ -44,9 +44,7 @@ public final class AspectIngredientHelper implements IIngredientHelper<AspectIns
 
     @Override
     public ResourceLocation getResourceLocation(AspectInstance ingredient) {
-        return ingredient.aspect().unwrapKey()
-                .map(ResourceKey::location)
-                .orElse(UNKNOWN);
+        return ingredient.aspect().unwrapKey().map(ResourceKey::location).orElse(UNKNOWN);
     }
 
     @Override
@@ -59,7 +57,9 @@ public final class AspectIngredientHelper implements IIngredientHelper<AspectIns
         if (ingredient == null) {
             return "null";
         }
-        return ingredient.aspect().unwrapKey()
+        return ingredient
+                .aspect()
+                .unwrapKey()
                 .map(key -> key.location().toString())
                 .orElse("unbound aspect holder");
     }

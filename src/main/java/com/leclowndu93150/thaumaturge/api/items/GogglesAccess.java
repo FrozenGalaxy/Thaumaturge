@@ -107,8 +107,8 @@ public final class GogglesAccess {
             return true;
         }
         if (curios != null) {
-            return curios.anyCurioMatches(entity,
-                    stack -> stack.getItem() instanceof IRevealer r && r.showNodes(stack, entity));
+            return curios.anyCurioMatches(
+                    entity, stack -> stack.getItem() instanceof IRevealer r && r.showNodes(stack, entity));
         }
         return false;
     }

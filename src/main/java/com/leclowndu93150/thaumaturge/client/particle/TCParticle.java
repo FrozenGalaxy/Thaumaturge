@@ -21,18 +21,33 @@ public abstract class TCParticle extends SingleQuadParticle {
     private double windX;
     private double windZ;
 
-    protected TCParticle(ClientLevel level, double x, double y, double z,
-                         double vx, double vy, double vz, ParticleSheet sheet) {
+    protected TCParticle(
+            ClientLevel level, double x, double y, double z, double vx, double vy, double vz, ParticleSheet sheet) {
         this(level, x, y, z, vx, vy, vz, sheet, null);
     }
 
-    protected TCParticle(ClientLevel level, double x, double y, double z,
-                         double vx, double vy, double vz, TextureAtlasSprite sprite) {
+    protected TCParticle(
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            double vx,
+            double vy,
+            double vz,
+            TextureAtlasSprite sprite) {
         this(level, x, y, z, vx, vy, vz, null, sprite);
     }
 
-    private TCParticle(ClientLevel level, double x, double y, double z,
-                       double vx, double vy, double vz, @Nullable ParticleSheet sheet, @Nullable TextureAtlasSprite sprite) {
+    private TCParticle(
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            double vx,
+            double vy,
+            double vz,
+            @Nullable ParticleSheet sheet,
+            @Nullable TextureAtlasSprite sprite) {
         super(level, x, y, z, vx, vy, vz);
         this.sheet = sheet;
         this.sprite = sprite;

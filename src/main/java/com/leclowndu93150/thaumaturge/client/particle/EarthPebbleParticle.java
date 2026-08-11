@@ -1,11 +1,10 @@
 package com.leclowndu93150.thaumaturge.client.particle;
-import net.minecraft.client.particle.ParticleRenderType;
 
 import com.leclowndu93150.thaumaturge.content.particle.EarthPebbleParticleOptions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.util.RandomSource;
 
 public final class EarthPebbleParticle extends TCParticle {
@@ -16,8 +15,16 @@ public final class EarthPebbleParticle extends TCParticle {
 
     private final float startSize;
 
-    private EarthPebbleParticle(ClientLevel level, double x, double y, double z,
-                                double vx, double vy, double vz, EarthPebbleParticleOptions options, ParticleSheet sheet) {
+    private EarthPebbleParticle(
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            double vx,
+            double vy,
+            double vz,
+            EarthPebbleParticleOptions options,
+            ParticleSheet sheet) {
         super(level, x, y, z, vx, vy, vz, sheet);
         this.lifetime = BASE_LIFETIME + this.random.nextInt(10);
         this.friction = FRICTION;
@@ -44,8 +51,15 @@ public final class EarthPebbleParticle extends TCParticle {
         private static final ParticleSheet SHEET = TCParticleSheets.sheet("earth_pebble");
 
         @Override
-        public Particle createParticle(EarthPebbleParticleOptions options, ClientLevel level, double x, double y, double z,
-                                       double vx, double vy, double vz) {
+        public Particle createParticle(
+                EarthPebbleParticleOptions options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double vx,
+                double vy,
+                double vz) {
             RandomSource random = level.getRandom();
             return new EarthPebbleParticle(level, x, y, z, vx, vy, vz, options, SHEET);
         }

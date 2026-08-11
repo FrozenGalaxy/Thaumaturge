@@ -37,14 +37,16 @@ public final class TubeModels {
         return ResourceLocation.fromNamespaceAndPath(TCIds.MODID, path);
     }
 
-    private static void registerTube(Consumer<BlockStateGenerator> blockStateOutput, Block block,
-                                     ResourceLocation coreModel, ResourceLocation sideModel) {
-        MultiPartGenerator generator = MultiPartGenerator.multiPart(block)
-                .with(Variant.variant().with(VariantProperties.MODEL, coreModel));
+    private static void registerTube(
+            Consumer<BlockStateGenerator> blockStateOutput,
+            Block block,
+            ResourceLocation coreModel,
+            ResourceLocation sideModel) {
+        MultiPartGenerator generator =
+                MultiPartGenerator.multiPart(block).with(Variant.variant().with(VariantProperties.MODEL, coreModel));
         for (Direction direction : Direction.values()) {
             BooleanProperty property = BlockEssentiaTransport.propertyFor(direction);
-            generator = generator.with(Condition.condition().term(property, true),
-                    sideVariant(sideModel, direction));
+            generator = generator.with(Condition.condition().term(property, true), sideVariant(sideModel, direction));
         }
         blockStateOutput.accept(generator);
     }
@@ -56,10 +58,12 @@ public final class TubeModels {
             case UP -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R180);
             case NORTH -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270);
             case SOUTH -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R90);
-            case WEST -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
-                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270);
-            case EAST -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
-                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
+            case WEST ->
+                variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
+                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270);
+            case EAST ->
+                variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
+                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
         };
     }
 }

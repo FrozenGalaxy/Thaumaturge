@@ -1,9 +1,9 @@
 package com.leclowndu93150.thaumaturge.content.wands;
 
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
-import java.util.List;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
@@ -15,7 +15,8 @@ public class ItemPrimalCharm extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> builder, TooltipFlag flag) {
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> builder, TooltipFlag flag) {
         int line = Math.floorMod(System.identityHashCode(stack), FLAVOR_LINE_COUNT);
         builder.add(Component.translatable("tooltip.thaumaturge.primal_charm." + line)
                 .withStyle(ChatFormatting.GOLD));

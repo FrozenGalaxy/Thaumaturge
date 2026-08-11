@@ -2,8 +2,8 @@ package com.leclowndu93150.thaumaturge.api.golems.seals;
 
 import java.util.function.Supplier;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ItemLike;
 
 /**
@@ -16,6 +16,6 @@ import net.minecraft.world.level.ItemLike;
  */
 public record SealType(Supplier<? extends ISeal> factory, Supplier<? extends ItemLike> placerItem) {
     /** The registry key for seal kinds. */
-    public static final ResourceKey<Registry<SealType>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            ResourceLocation.fromNamespaceAndPath("thaumaturge", "seal"));
+    public static final ResourceKey<Registry<SealType>> REGISTRY_KEY =
+            ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("thaumaturge", "seal"));
 }

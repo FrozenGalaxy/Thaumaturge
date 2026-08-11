@@ -15,7 +15,8 @@ public final class CultistRenderer extends HumanoidMobRenderer<EntityCultist, Hu
 
     public CultistRenderer(EntityRendererProvider.Context context) {
         super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)), SHADOW);
-        this.addLayer(new HumanoidArmorLayer<>(this,
+        this.addLayer(new HumanoidArmorLayer<>(
+                this,
                 new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)),
                 new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)),
                 context.getModelManager()));

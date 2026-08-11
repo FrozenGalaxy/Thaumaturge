@@ -4,10 +4,10 @@ import com.leclowndu93150.thaumaturge.api.entity.IEldritchMob;
 import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -22,8 +22,8 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -105,8 +105,11 @@ public class EntityEldritchCrab extends Monster implements IEldritchMob, ISidedH
     }
 
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                  MobSpawnType reason, @Nullable SpawnGroupData groupData) {
+    public @Nullable SpawnGroupData finalizeSpawn(
+            ServerLevelAccessor level,
+            DifficultyInstance difficulty,
+            MobSpawnType reason,
+            @Nullable SpawnGroupData groupData) {
         if (level.getDifficulty() == Difficulty.HARD) {
             this.setHelm(true);
         } else {
@@ -181,8 +184,14 @@ public class EntityEldritchCrab extends Monster implements IEldritchMob, ISidedH
             this.setHelm(false);
             level.sendParticles(
                     new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(TCItems.CRIMSON_PLATE_CHEST.get())),
-                    this.getX(), this.getY() + this.getBbHeight() / 2.0, this.getZ(),
-                    BREAK_PARTICLES, 0.1, 0.1, 0.1, 0.05);
+                    this.getX(),
+                    this.getY() + this.getBbHeight() / 2.0,
+                    this.getZ(),
+                    BREAK_PARTICLES,
+                    0.1,
+                    0.1,
+                    0.1,
+                    0.05);
         }
         return result;
     }

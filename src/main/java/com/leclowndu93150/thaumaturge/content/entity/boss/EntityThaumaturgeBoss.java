@@ -7,7 +7,6 @@ import com.leclowndu93150.thaumaturge.registry.TCItems;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
@@ -19,7 +18,6 @@ import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
@@ -66,7 +64,8 @@ public class EntityThaumaturgeBoss extends Monster implements ISidedHurt {
     private static final double PLAYER_DMG_BUFF = 0.5;
     private static final float PEARL_DROP_LIFT = 1.5F;
 
-    protected final ServerBossEvent bossEvent = new ServerBossEvent(getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
+    protected final ServerBossEvent bossEvent =
+            new ServerBossEvent(getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
     private final Map<Integer, Integer> aggro = new HashMap<>();
     protected int spawnTimer;
 
@@ -125,8 +124,11 @@ public class EntityThaumaturgeBoss extends Monster implements ISidedHurt {
     }
 
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                  MobSpawnType reason, @Nullable SpawnGroupData data) {
+    public @Nullable SpawnGroupData finalizeSpawn(
+            ServerLevelAccessor level,
+            DifficultyInstance difficulty,
+            MobSpawnType reason,
+            @Nullable SpawnGroupData data) {
         this.restrictTo(this.blockPosition(), HOME_RADIUS);
         this.generateName();
         this.bossEvent.setName(this.getDisplayName());
@@ -142,16 +144,16 @@ public class EntityThaumaturgeBoss extends Monster implements ISidedHurt {
         if (this.getAnger() > 0 && !this.level().isClientSide()) {
             this.setAnger(this.getAnger() - 1);
         }
-        if (this.level().isClientSide()
-                && this.getAnger() > 0
-                && this.random.nextInt(ANGRY_PARTICLE_CHANCE) == 0) {
-            this.level().addParticle(ParticleTypes.ANGRY_VILLAGER,
-                    this.getX() + this.random.nextFloat() * this.getBbWidth() - this.getBbWidth() / 2.0,
-                    this.getBoundingBox().minY + this.getBbHeight() + this.random.nextFloat() * 0.5,
-                    this.getZ() + this.random.nextFloat() * this.getBbWidth() - this.getBbWidth() / 2.0,
-                    this.random.nextGaussian() * 0.02,
-                    this.random.nextGaussian() * 0.02,
-                    this.random.nextGaussian() * 0.02);
+        if (this.level().isClientSide() && this.getAnger() > 0 && this.random.nextInt(ANGRY_PARTICLE_CHANCE) == 0) {
+            this.level()
+                    .addParticle(
+                            ParticleTypes.ANGRY_VILLAGER,
+                            this.getX() + this.random.nextFloat() * this.getBbWidth() - this.getBbWidth() / 2.0,
+                            this.getBoundingBox().minY + this.getBbHeight() + this.random.nextFloat() * 0.5,
+                            this.getZ() + this.random.nextFloat() * this.getBbWidth() - this.getBbWidth() / 2.0,
+                            this.random.nextGaussian() * 0.02,
+                            this.random.nextGaussian() * 0.02,
+                            this.random.nextGaussian() * 0.02);
         }
         if (!this.level().isClientSide()) {
             if (this.tickCount % HEAL_INTERVAL == 0) {
@@ -199,10 +201,10 @@ public class EntityThaumaturgeBoss extends Monster implements ISidedHurt {
             damage.removeModifier(dmgBuffId(slot));
         }
         for (int slot = 0; slot < Math.min(MAX_PLAYER_BUFFS, players - 1); slot++) {
-            health.addTransientModifier(new AttributeModifier(hpBuffId(slot),
-                    PLAYER_HP_BUFF, AttributeModifier.Operation.ADD_VALUE));
-            damage.addTransientModifier(new AttributeModifier(dmgBuffId(slot),
-                    PLAYER_DMG_BUFF, AttributeModifier.Operation.ADD_VALUE));
+            health.addTransientModifier(
+                    new AttributeModifier(hpBuffId(slot), PLAYER_HP_BUFF, AttributeModifier.Operation.ADD_VALUE));
+            damage.addTransientModifier(
+                    new AttributeModifier(dmgBuffId(slot), PLAYER_DMG_BUFF, AttributeModifier.Operation.ADD_VALUE));
         }
         this.setHealth(this.getHealth() * this.getMaxHealth() / oldMax);
     }
@@ -227,12 +229,12 @@ public class EntityThaumaturgeBoss extends Monster implements ISidedHurt {
         }
         if (damage > ENRAGE_THRESHOLD && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             if (this.getAnger() == 0) {
-                this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, ENRAGE_TICKS,
-                        (int) (damage / ENRAGE_REGEN_DIVISOR)));
-                this.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, ENRAGE_TICKS,
-                        (int) (damage / ENRAGE_STRENGTH_DIVISOR)));
-                this.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, ENRAGE_TICKS,
-                        (int) (damage / ENRAGE_HASTE_DIVISOR)));
+                this.addEffect(new MobEffectInstance(
+                        MobEffects.REGENERATION, ENRAGE_TICKS, (int) (damage / ENRAGE_REGEN_DIVISOR)));
+                this.addEffect(new MobEffectInstance(
+                        MobEffects.DAMAGE_BOOST, ENRAGE_TICKS, (int) (damage / ENRAGE_STRENGTH_DIVISOR)));
+                this.addEffect(new MobEffectInstance(
+                        MobEffects.DIG_SPEED, ENRAGE_TICKS, (int) (damage / ENRAGE_HASTE_DIVISOR)));
                 this.setAnger(ENRAGE_TICKS);
                 if (source.getEntity() instanceof ServerPlayer player) {
                     player.connection.send(new ClientboundSetActionBarTextPacket(Component.empty()
@@ -287,12 +289,14 @@ public class EntityThaumaturgeBoss extends Monster implements ISidedHurt {
     @Override
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
         super.dropCustomDeathLoot(level, source, recentlyHit);
-        level.addFreshEntity(new EntitySpecialItem(level, this.getX(),
-                this.getY() + this.getBbHeight() / 2.0F, this.getZ(),
+        level.addFreshEntity(new EntitySpecialItem(
+                level,
+                this.getX(),
+                this.getY() + this.getBbHeight() / 2.0F,
+                this.getZ(),
                 new ItemStack(TCItems.PRIMORDIAL_PEARL.get())));
         this.spawnAtLocation(new ItemStack(TCItems.LOOT_BAG_RARE.get()), PEARL_DROP_LIFT);
     }
 
-    public void generateName() {
-    }
+    public void generateName() {}
 }

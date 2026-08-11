@@ -17,24 +17,15 @@ import net.minecraft.world.phys.Vec3;
 public record Trajectory(Vec3 source, Vec3 direction) {
     /** Serializes both vectors as double triples. */
     public static final Codec<Trajectory> CODEC = RecordCodecBuilder.create(i -> i.group(
-            Vec3.CODEC.fieldOf("source").forGetter(Trajectory::source),
-            Vec3.CODEC.fieldOf("direction").forGetter(Trajectory::direction)
-    ).apply(i, Trajectory::new));
+                    Vec3.CODEC.fieldOf("source").forGetter(Trajectory::source),
+                    Vec3.CODEC.fieldOf("direction").forGetter(Trajectory::direction))
+            .apply(i, Trajectory::new));
 
     /** Network encoding of a single vector as double triples. */
     private static final StreamCodec<ByteBuf, Vec3> VEC3_STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.DOUBLE, Vec3::x,
-            ByteBufCodecs.DOUBLE, Vec3::y,
-            ByteBufCodecs.DOUBLE, Vec3::z,
-            Vec3::new
-    );
+            ByteBufCodecs.DOUBLE, Vec3::x, ByteBufCodecs.DOUBLE, Vec3::y, ByteBufCodecs.DOUBLE, Vec3::z, Vec3::new);
 
     /** Network encoding mirroring {@link #CODEC}. */
     public static final StreamCodec<ByteBuf, Trajectory> STREAM_CODEC = StreamCodec.composite(
-            VEC3_STREAM_CODEC,
-            Trajectory::source,
-            VEC3_STREAM_CODEC,
-            Trajectory::direction,
-            Trajectory::new
-    );
+            VEC3_STREAM_CODEC, Trajectory::source, VEC3_STREAM_CODEC, Trajectory::direction, Trajectory::new);
 }

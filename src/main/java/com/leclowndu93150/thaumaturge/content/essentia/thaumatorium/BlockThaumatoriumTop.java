@@ -1,10 +1,8 @@
 package com.leclowndu93150.thaumaturge.content.essentia.thaumatorium;
 
-import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.leclowndu93150.thaumaturge.registry.TCBlocks;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -39,7 +37,8 @@ public final class BlockThaumatoriumTop extends BaseEntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         BlockState below = level.getBlockState(pos.below());
         if (below.is(TCBlocks.THAUMATORIUM.get())) {
             return below.getBlock() instanceof BlockThaumatorium thaumatorium
@@ -52,7 +51,7 @@ public final class BlockThaumatoriumTop extends BaseEntityBlock {
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock())) {
-        
+
             if (level.getBlockState(pos.below()).is(TCBlocks.THAUMATORIUM.get())) {
                 level.destroyBlock(pos.below(), true);
             }

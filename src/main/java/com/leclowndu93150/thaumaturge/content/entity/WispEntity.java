@@ -1,33 +1,33 @@
 package com.leclowndu93150.thaumaturge.content.entity;
 
-import com.leclowndu93150.thaumaturge.content.entity.ai.GhastLikeFlight;
-import com.leclowndu93150.thaumaturge.content.entity.ai.GhastLikeLookGoal;
-import com.leclowndu93150.thaumaturge.content.entity.ai.GhastLikeMoveControl;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.aspect.IEntityAspectSource;
 import com.leclowndu93150.thaumaturge.api.aspect.TCAspects;
-import com.leclowndu93150.thaumaturge.content.entity.ai.FlyingWanderGoal;
-import com.leclowndu93150.thaumaturge.content.entity.ai.WispZapGoal;
 import com.leclowndu93150.thaumaturge.content.effect.WispEffects;
+import com.leclowndu93150.thaumaturge.content.entity.ai.FlyingWanderGoal;
+import com.leclowndu93150.thaumaturge.content.entity.ai.GhastLikeFlight;
+import com.leclowndu93150.thaumaturge.content.entity.ai.GhastLikeLookGoal;
+import com.leclowndu93150.thaumaturge.content.entity.ai.GhastLikeMoveControl;
+import com.leclowndu93150.thaumaturge.content.entity.ai.WispZapGoal;
 import com.leclowndu93150.thaumaturge.content.taint.item.EssentiaCrystalFactory;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Holder;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
@@ -80,7 +80,8 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
         this.goalSelector.addGoal(7, new GhastLikeLookGoal(this));
         this.goalSelector.addGoal(7, new WispZapGoal(this));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, RANDOM_AGGRO_INTERVAL, true, false, null));
+        this.targetSelector.addGoal(
+                2, new NearestAttackableTargetGoal<>(this, Player.class, RANDOM_AGGRO_INTERVAL, true, false, null));
     }
 
     @Override
@@ -98,7 +99,8 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
         if (parsed == null) {
             return null;
         }
-        return this.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY)
+        return this.registryAccess()
+                .lookupOrThrow(IAspect.REGISTRY_KEY)
                 .get(ResourceKey.create(IAspect.REGISTRY_KEY, parsed))
                 .map(holder -> (Holder<IAspect>) holder)
                 .orElse(null);
@@ -132,8 +134,7 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
     }
 
     @Override
-    protected void checkFallDamage(double ya, boolean onGround, BlockState onState, BlockPos pos) {
-    }
+    protected void checkFallDamage(double ya, boolean onGround, BlockState onState, BlockPos pos) {}
 
     @Override
     public void tick() {
@@ -147,19 +148,32 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
 
     private void clientAmbientFx() {
         if (this.tickCount <= 1) {
-            this.level().addParticle(WispEffects.burst(SPAWN_BURST_SIZE), this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
+            this.level()
+                    .addParticle(
+                            WispEffects.burst(SPAWN_BURST_SIZE), this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
         }
         if (this.isDeadOrDying() && this.deathTime == 1) {
-            this.level().addParticle(WispEffects.burst(DEATH_BURST_SIZE),
-                    this.getX(), this.getY() + DEATH_BURST_Y_OFFSET, this.getZ(), 0.0, 0.0, 0.0);
+            this.level()
+                    .addParticle(
+                            WispEffects.burst(DEATH_BURST_SIZE),
+                            this.getX(),
+                            this.getY() + DEATH_BURST_Y_OFFSET,
+                            this.getZ(),
+                            0.0,
+                            0.0,
+                            0.0);
         }
         Holder<IAspect> self = aspect();
         if (self != null && this.random.nextBoolean()) {
-            this.level().addParticle(WispEffects.mote(this.random, self.value().color()),
-                    this.getX() + (this.random.nextFloat() - this.random.nextFloat()) * MOTE_SPREAD,
-                    this.getY() + (this.random.nextFloat() - this.random.nextFloat()) * MOTE_SPREAD,
-                    this.getZ() + (this.random.nextFloat() - this.random.nextFloat()) * MOTE_SPREAD,
-                    0.0, 0.0, 0.0);
+            this.level()
+                    .addParticle(
+                            WispEffects.mote(this.random, self.value().color()),
+                            this.getX() + (this.random.nextFloat() - this.random.nextFloat()) * MOTE_SPREAD,
+                            this.getY() + (this.random.nextFloat() - this.random.nextFloat()) * MOTE_SPREAD,
+                            this.getZ() + (this.random.nextFloat() - this.random.nextFloat()) * MOTE_SPREAD,
+                            0.0,
+                            0.0,
+                            0.0);
         }
     }
 
@@ -216,12 +230,15 @@ public final class WispEntity extends Monster implements IEntityAspectSource {
         return MAX_SPAWN_CLUSTER;
     }
 
-    public static boolean checkWispSpawnRules(EntityType<WispEntity> type, ServerLevelAccessor level,
-                                              MobSpawnType reason, BlockPos pos, RandomSource random) {
-        int nearby = level.getEntitiesOfClass(WispEntity.class,
-                new AABB(pos).inflate(NEARBY_WISP_RANGE)).size();
-        return nearby < MAX_NEARBY_WISPS
-                && Monster.checkMonsterSpawnRules(type, level, reason, pos, random);
+    public static boolean checkWispSpawnRules(
+            EntityType<WispEntity> type,
+            ServerLevelAccessor level,
+            MobSpawnType reason,
+            BlockPos pos,
+            RandomSource random) {
+        int nearby = level.getEntitiesOfClass(WispEntity.class, new AABB(pos).inflate(NEARBY_WISP_RANGE))
+                .size();
+        return nearby < MAX_NEARBY_WISPS && Monster.checkMonsterSpawnRules(type, level, reason, pos, random);
     }
 
     @Override

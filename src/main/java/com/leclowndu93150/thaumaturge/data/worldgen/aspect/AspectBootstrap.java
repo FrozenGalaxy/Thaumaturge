@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 public final class AspectBootstrap {
     private AspectBootstrap() {}
@@ -55,20 +55,18 @@ public final class AspectBootstrap {
     }
 
     private static void primal(
-            BootstrapContext<IAspect> ctx,
-            ResourceKey<IAspect> key,
-            int color,
-            String chatColor,
-            int blend
-    ) {
-        ctx.register(key, new Aspect(
-                key.location().getPath(),
-                color,
-                List.of(),
-                Optional.of(chatColor),
-                ResourceLocation.fromNamespaceAndPath(key.location().getNamespace(), "textures/aspects/" + key.location().getPath() + ".png"),
-                blend
-        ));
+            BootstrapContext<IAspect> ctx, ResourceKey<IAspect> key, int color, String chatColor, int blend) {
+        ctx.register(
+                key,
+                new Aspect(
+                        key.location().getPath(),
+                        color,
+                        List.of(),
+                        Optional.of(chatColor),
+                        ResourceLocation.fromNamespaceAndPath(
+                                key.location().getNamespace(),
+                                "textures/aspects/" + key.location().getPath() + ".png"),
+                        blend));
     }
 
     private static void compound(
@@ -77,17 +75,19 @@ public final class AspectBootstrap {
             int color,
             int blend,
             ResourceKey<IAspect> componentA,
-            ResourceKey<IAspect> componentB
-    ) {
+            ResourceKey<IAspect> componentB) {
         Holder<IAspect> a = ctx.lookup(IAspect.REGISTRY_KEY).getOrThrow(componentA);
         Holder<IAspect> b = ctx.lookup(IAspect.REGISTRY_KEY).getOrThrow(componentB);
-        ctx.register(key, new Aspect(
-                key.location().getPath(),
-                color,
-                List.of(a, b),
-                Optional.empty(),
-                ResourceLocation.fromNamespaceAndPath(key.location().getNamespace(), "textures/aspects/" + key.location().getPath() + ".png"),
-                blend
-        ));
+        ctx.register(
+                key,
+                new Aspect(
+                        key.location().getPath(),
+                        color,
+                        List.of(a, b),
+                        Optional.empty(),
+                        ResourceLocation.fromNamespaceAndPath(
+                                key.location().getNamespace(),
+                                "textures/aspects/" + key.location().getPath() + ".png"),
+                        blend));
     }
 }

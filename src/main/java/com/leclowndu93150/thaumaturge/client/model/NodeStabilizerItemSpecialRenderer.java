@@ -18,14 +18,21 @@ public final class NodeStabilizerItemSpecialRenderer extends BlockEntityWithoutL
     }
 
     public NodeStabilizerItemSpecialRenderer(boolean advanced, boolean transducer) {
-        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+        super(
+                Minecraft.getInstance().getBlockEntityRenderDispatcher(),
+                Minecraft.getInstance().getEntityModels());
         this.advanced = advanced;
         this.transducer = transducer;
     }
 
     @Override
-    public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack,
-                             MultiBufferSource buffers, int light, int overlay) {
+    public void renderByItem(
+            ItemStack stack,
+            ItemDisplayContext displayContext,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         poseStack.pushPose();
         if (transducer) {
             poseStack.translate(0.5F, 1.0F, 0.5F);

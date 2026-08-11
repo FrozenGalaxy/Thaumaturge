@@ -1,6 +1,7 @@
 package com.leclowndu93150.thaumaturge.client.model.entity;
 
 import com.leclowndu93150.thaumaturge.content.entity.IBatAnimated;
+import java.util.function.Function;
 import net.minecraft.client.animation.definitions.BatAnimation;
 import net.minecraft.client.model.BatModel;
 import net.minecraft.client.model.HierarchicalModel;
@@ -9,7 +10,6 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
-import java.util.function.Function;
 
 public final class FireBatModel<T extends Mob & IBatAnimated> extends HierarchicalModel<T> {
     private static final float DEG_TO_RAD = (float) Math.PI / 180.0F;
@@ -38,8 +38,8 @@ public final class FireBatModel<T extends Mob & IBatAnimated> extends Hierarchic
     }
 
     @Override
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks,
-                          float netHeadYaw, float headPitch) {
+    public void setupAnim(
+            T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
         if (entity.isResting()) {
             this.head.yRot = netHeadYaw * DEG_TO_RAD;

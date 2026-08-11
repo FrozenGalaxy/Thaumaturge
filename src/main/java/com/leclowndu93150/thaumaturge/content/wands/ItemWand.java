@@ -1,6 +1,5 @@
 package com.leclowndu93150.thaumaturge.content.wands;
 
-import com.leclowndu93150.thaumaturge.api.wands.WandVis;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.aspect.TCAspects;
 import com.leclowndu93150.thaumaturge.api.aura.AuraHelper;
@@ -13,12 +12,14 @@ import com.leclowndu93150.thaumaturge.api.casters.IFocusBlockPicker;
 import com.leclowndu93150.thaumaturge.api.casters.IInteractWithCaster;
 import com.leclowndu93150.thaumaturge.api.items.IArchitect;
 import com.leclowndu93150.thaumaturge.api.wands.IWandRodOnUpdate;
+import com.leclowndu93150.thaumaturge.api.wands.WandCap;
+import com.leclowndu93150.thaumaturge.api.wands.WandRod;
+import com.leclowndu93150.thaumaturge.api.wands.WandVis;
+import com.leclowndu93150.thaumaturge.content.aura.node.BlockEntityNode;
 import com.leclowndu93150.thaumaturge.content.casters.CasterManager;
 import com.leclowndu93150.thaumaturge.content.casters.ItemFocus;
 import com.leclowndu93150.thaumaturge.content.effect.EffectDispatch;
-import com.leclowndu93150.thaumaturge.api.wands.WandCap;
-import com.leclowndu93150.thaumaturge.api.wands.WandRod;
-import com.leclowndu93150.thaumaturge.content.aura.node.BlockEntityNode;
+import com.leclowndu93150.thaumaturge.content.misc.TCActionBar;
 import com.leclowndu93150.thaumaturge.content.world.crystal.BlockCrystal;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
 import com.leclowndu93150.thaumaturge.registry.TCWandParts;
@@ -33,27 +34,25 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
-import com.leclowndu93150.thaumaturge.content.misc.TCActionBar;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public class ItemWand extends Item implements ICaster, IArchitect {
@@ -96,10 +95,11 @@ public class ItemWand extends Item implements ICaster, IArchitect {
         if (rodName.endsWith(STAFF_ROD_SUFFIX)) {
             rodName = rodName.substring(0, rodName.length() - STAFF_ROD_SUFFIX.length());
         }
-        String objKey = parts.rod().staff() ? "item.thaumaturge.wand.staff"
-                : parts.sceptre() ? "item.thaumaturge.wand.sceptre"
-                : "item.thaumaturge.wand.named";
-        return Component.translatable(objKey,
+        String objKey = parts.rod().staff()
+                ? "item.thaumaturge.wand.staff"
+                : parts.sceptre() ? "item.thaumaturge.wand.sceptre" : "item.thaumaturge.wand.named";
+        return Component.translatable(
+                objKey,
                 Component.translatable("wand.thaumaturge.cap." + capName),
                 Component.translatable("wand.thaumaturge.rod." + rodName));
     }
@@ -266,7 +266,8 @@ public class ItemWand extends Item implements ICaster, IArchitect {
     }
 
     @Override
-    public List<BlockPos> getArchitectBlocks(ItemStack stack, Level level, BlockPos pos, Direction side, Player player) {
+    public List<BlockPos> getArchitectBlocks(
+            ItemStack stack, Level level, BlockPos pos, Direction side, Player player) {
         IArchitect architect = architectElement(stack);
         return architect == null ? List.of() : architect.getArchitectBlocks(stack, level, pos, side, player);
     }
@@ -333,7 +334,8 @@ public class ItemWand extends Item implements ICaster, IArchitect {
         if (gained > 0) {
             WandVisHelper.addRealVis(stack, target, gained, true);
             sendRefineSparkle((ServerLevel) level, player, target);
-        } else if (ticksRemaining % NO_AURA_MESSAGE_INTERVAL_TICKS == 0 && player instanceof ServerPlayer serverPlayer) {
+        } else if (ticksRemaining % NO_AURA_MESSAGE_INTERVAL_TICKS == 0
+                && player instanceof ServerPlayer serverPlayer) {
             sendWandActionBar(serverPlayer, "tc.wand.noaura");
         }
     }
@@ -343,15 +345,18 @@ public class ItemWand extends Item implements ICaster, IArchitect {
     }
 
     private static void sendRefineSparkle(ServerLevel level, Player player, ResourceKey<IAspect> aspect) {
-        int color = level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).get(aspect)
+        int color = level.registryAccess()
+                .lookupOrThrow(IAspect.REGISTRY_KEY)
+                .get(aspect)
                 .map(holder -> holder.value().color())
                 .orElse(0xFFFFFF);
-        Vec3 origin = player.getEyePosition().add(
-                (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * REFINE_SPARKLE_SPREAD,
-                level.getRandom().nextFloat() * REFINE_SPARKLE_SPREAD,
-                (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * REFINE_SPARKLE_SPREAD);
-        Vec3 hand = player.getEyePosition().add(player.getLookAngle().scale(0.5))
-                .add(0.0, -0.3, 0.0);
+        Vec3 origin = player.getEyePosition()
+                .add(
+                        (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * REFINE_SPARKLE_SPREAD,
+                        level.getRandom().nextFloat() * REFINE_SPARKLE_SPREAD,
+                        (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * REFINE_SPARKLE_SPREAD);
+        Vec3 hand =
+                player.getEyePosition().add(player.getLookAngle().scale(0.5)).add(0.0, -0.3, 0.0);
         EffectDispatch.spawnVisSparkle(level, origin, hand, color);
     }
 
@@ -389,8 +394,10 @@ public class ItemWand extends Item implements ICaster, IArchitect {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> builder, TooltipFlag flag) {
-        builder.add(Component.translatable("tooltip.thaumaturge.wand.capacity",
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> builder, TooltipFlag flag) {
+        builder.add(Component.translatable(
+                        "tooltip.thaumaturge.wand.capacity",
                         WandVisHelper.getMaxVis(stack) / WandEconomy.CENTIVIS_PER_VIS)
                 .withStyle(ChatFormatting.GOLD));
         WandVis vis = WandVisHelper.getAllVis(stack);
@@ -398,19 +405,19 @@ public class ItemWand extends Item implements ICaster, IArchitect {
         MutableComponent amounts = null;
         Map<ResourceKey<IAspect>, Integer> pctByPrimal = new LinkedHashMap<>();
         for (ResourceKey<IAspect> primal : TCAspects.PRIMALS) {
-            pctByPrimal.put(primal,
-                    Math.round(WandVisHelper.getConsumptionModifier(stack, null, primal, false) * 100.0F));
+            pctByPrimal.put(
+                    primal, Math.round(WandVisHelper.getConsumptionModifier(stack, null, primal, false) * 100.0F));
             int amount = vis.amount(primal);
             if (amount <= 0) {
                 continue;
             }
-            Component chunk = Component.literal(
-                            VIS_FORMAT.format(amount / (float) WandEconomy.CENTIVIS_PER_VIS))
+            Component chunk = Component.literal(VIS_FORMAT.format(amount / (float) WandEconomy.CENTIVIS_PER_VIS))
                     .withStyle(WandTooltips.primalColor(registries, primal));
             if (amounts == null) {
                 amounts = Component.empty().append(chunk);
             } else {
-                amounts.append(Component.literal(" | ").withStyle(ChatFormatting.DARK_GRAY)).append(chunk);
+                amounts.append(Component.literal(" | ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(chunk);
             }
         }
         if (amounts != null) {
@@ -419,10 +426,12 @@ public class ItemWand extends Item implements ICaster, IArchitect {
         builder.add(WandTooltips.costSummary(registries, pctByPrimal));
         ItemStack focusStack = getFocusStack(stack);
         if (focusStack.getItem() instanceof ItemFocus focus) {
-            builder.add(Component.translatable("tooltip.thaumaturge.caster.vis_cost",
-                            ItemFocus.formatVis(focus.getVisCost(focusStack)))
+            builder.add(Component.translatable(
+                            "tooltip.thaumaturge.caster.vis_cost", ItemFocus.formatVis(focus.getVisCost(focusStack)))
                     .withStyle(ChatFormatting.ITALIC, ChatFormatting.AQUA));
-            builder.add(focusStack.getHoverName().copy()
+            builder.add(focusStack
+                    .getHoverName()
+                    .copy()
                     .withStyle(ChatFormatting.BOLD, ChatFormatting.ITALIC, ChatFormatting.GREEN));
             focus.addFocusInformation(focusStack, builder);
         }

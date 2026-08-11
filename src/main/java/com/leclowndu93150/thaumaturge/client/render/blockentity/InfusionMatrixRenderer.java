@@ -58,8 +58,13 @@ public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEn
     }
 
     @Override
-    public void render(BlockEntityInfusionMatrix matrix, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityInfusionMatrix matrix,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         var viewEntity = Minecraft.getInstance().getCameraEntity();
         float animationTime = viewEntity == null ? partialTick : viewEntity.tickCount + partialTick;
         float startUp = matrix.clientStartUp;
@@ -72,8 +77,8 @@ public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEn
 
         RenderType type = RenderType.entityCutout(texture);
         RenderType glowType = glowTypeFor(texture);
-        float instability = Math.min(6.0F,
-                1.0F + (stability < 0.0F ? -stability * 0.66F : 1.0F) * (Math.min(craftTicks, 50) / 50.0F));
+        float instability = Math.min(
+                6.0F, 1.0F + (stability < 0.0F ? -stability * 0.66F : 1.0F) * (Math.min(craftTicks, 50) / 50.0F));
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
         poseStack.mulPose(Axis.YP.rotationDegrees(animationTime % 360.0F * startUp));
@@ -94,7 +99,8 @@ public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEn
                     int bb = b == 0 ? -1 : 1;
                     int cc = c == 0 ? -1 : 1;
                     poseStack.pushPose();
-                    poseStack.translate(jx + aa * SUB_CUBE_OFFSET, jy + bb * SUB_CUBE_OFFSET, jz + cc * SUB_CUBE_OFFSET);
+                    poseStack.translate(
+                            jx + aa * SUB_CUBE_OFFSET, jy + bb * SUB_CUBE_OFFSET, jz + cc * SUB_CUBE_OFFSET);
                     if (a > 0) {
                         poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
                     }
@@ -107,9 +113,12 @@ public final class InfusionMatrixRenderer implements BlockEntityRenderer<BlockEn
                     poseStack.scale(SUB_CUBE_SCALE, SUB_CUBE_SCALE, SUB_CUBE_SCALE);
                     model.cube.render(poseStack, buffers.getBuffer(type), light, OverlayTexture.NO_OVERLAY, -1);
                     if (active) {
-                        float glowAlpha = (Mth.sin((animationTime + a * 2 + b * 3 + c * 4) / 4.0F) * 0.1F + 0.2F)
-                                * startUp;
-                        model.glow.render(poseStack, buffers.getBuffer(glowType), LightTexture.FULL_BRIGHT,
+                        float glowAlpha =
+                                (Mth.sin((animationTime + a * 2 + b * 3 + c * 4) / 4.0F) * 0.1F + 0.2F) * startUp;
+                        model.glow.render(
+                                poseStack,
+                                buffers.getBuffer(glowType),
+                                LightTexture.FULL_BRIGHT,
                                 OverlayTexture.NO_OVERLAY,
                                 ARGB32.colorFromFloat(glowAlpha, GLOW_RED, GLOW_GREEN, GLOW_BLUE));
                     }

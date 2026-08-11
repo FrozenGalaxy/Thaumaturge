@@ -3,18 +3,16 @@ package com.leclowndu93150.thaumaturge.serialization;
 import com.leclowndu93150.thaumaturge.Thaumaturge;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DynamicOps;
+import java.util.Optional;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
-
 public final class TCNbt {
 
-    private TCNbt() {
-    }
+    private TCNbt() {}
 
     public static <T> Optional<T> read(CompoundTag tag, String key, Codec<T> codec, HolderLookup.Provider registries) {
         return read(tag, key, codec, registries.createSerializationContext(NbtOps.INSTANCE));
@@ -33,7 +31,8 @@ public final class TCNbt {
                 .resultOrPartial(error -> Thaumaturge.LOGGER.error("Failed to decode '{}': {}", key, error));
     }
 
-    public static <T> void store(CompoundTag tag, String key, Codec<T> codec, HolderLookup.Provider registries, T value) {
+    public static <T> void store(
+            CompoundTag tag, String key, Codec<T> codec, HolderLookup.Provider registries, T value) {
         store(tag, key, codec, registries.createSerializationContext(NbtOps.INSTANCE), value);
     }
 
@@ -47,7 +46,8 @@ public final class TCNbt {
                 .ifPresent(encoded -> tag.put(key, encoded));
     }
 
-    public static <T> void storeNullable(CompoundTag tag, String key, Codec<T> codec, HolderLookup.Provider registries, @Nullable T value) {
+    public static <T> void storeNullable(
+            CompoundTag tag, String key, Codec<T> codec, HolderLookup.Provider registries, @Nullable T value) {
         if (value != null) {
             store(tag, key, codec, registries, value);
         }

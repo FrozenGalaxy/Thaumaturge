@@ -8,8 +8,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public record ClientboundAspectIndexPayload(AspectIndex index) implements CustomPacketPayload {
-    public static final CustomPacketPayload.Type<ClientboundAspectIndexPayload> TYPE = new CustomPacketPayload.Type<>(
-            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "aspect_index"));
+    public static final CustomPacketPayload.Type<ClientboundAspectIndexPayload> TYPE =
+            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "aspect_index"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundAspectIndexPayload> STREAM_CODEC =
             AspectIndex.STREAM_CODEC.map(ClientboundAspectIndexPayload::new, ClientboundAspectIndexPayload::index);

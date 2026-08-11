@@ -1,11 +1,11 @@
 package com.leclowndu93150.thaumaturge.api.golems.parts;
 
-import net.minecraft.core.Holder;
 import com.leclowndu93150.thaumaturge.api.golems.GolemTrait;
 import java.util.List;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -15,8 +15,8 @@ import org.jspecify.annotations.Nullable;
  */
 public final class GolemAddon extends GolemPart {
     /** The registry key for golem addons. */
-    public static final ResourceKey<Registry<GolemAddon>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            ResourceLocation.fromNamespaceAndPath("thaumaturge", "golem_addon"));
+    public static final ResourceKey<Registry<GolemAddon>> REGISTRY_KEY =
+            ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("thaumaturge", "golem_addon"));
 
     private final IAddonFunction function;
 
@@ -28,8 +28,13 @@ public final class GolemAddon extends GolemPart {
      * @param function   the behavior ticked for this addon, or null when it has none
      * @param traits     traits granted by this addon
      */
-    public GolemAddon(List<ResourceLocation> research, ResourceLocation icon, @Nullable GolemPartModel model,
-                      List<GolemComponent> components, @Nullable IAddonFunction function, List<Holder<GolemTrait>> traits) {
+    public GolemAddon(
+            List<ResourceLocation> research,
+            ResourceLocation icon,
+            @Nullable GolemPartModel model,
+            List<GolemComponent> components,
+            @Nullable IAddonFunction function,
+            List<Holder<GolemTrait>> traits) {
         super(research, icon, components, traits, model);
         this.function = function;
     }
@@ -44,6 +49,5 @@ public final class GolemAddon extends GolemPart {
      *
      * @since 1.0.0
      */
-    public interface IAddonFunction extends IGolemFunction {
-    }
+    public interface IAddonFunction extends IGolemFunction {}
 }

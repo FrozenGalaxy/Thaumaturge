@@ -14,11 +14,18 @@ import net.minecraft.resources.ResourceLocation;
  * @param requiredResearch research entries that must be complete for the page to show
  * @since 1.0.0
  */
-public record ResearchAddendum(String textKey, List<ResourceLocation> recipes, List<ResourceLocation> requiredResearch) {
+public record ResearchAddendum(
+        String textKey, List<ResourceLocation> recipes, List<ResourceLocation> requiredResearch) {
     /** Codec for datapack serialization. */
     public static final Codec<ResearchAddendum> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.STRING.fieldOf("text").forGetter(ResearchAddendum::textKey),
-            ResourceLocation.CODEC.listOf().optionalFieldOf("recipes", List.of()).forGetter(ResearchAddendum::recipes),
-            ResourceLocation.CODEC.listOf().optionalFieldOf("required_research", List.of()).forGetter(ResearchAddendum::requiredResearch)
-    ).apply(instance, ResearchAddendum::new));
+                    Codec.STRING.fieldOf("text").forGetter(ResearchAddendum::textKey),
+                    ResourceLocation.CODEC
+                            .listOf()
+                            .optionalFieldOf("recipes", List.of())
+                            .forGetter(ResearchAddendum::recipes),
+                    ResourceLocation.CODEC
+                            .listOf()
+                            .optionalFieldOf("required_research", List.of())
+                            .forGetter(ResearchAddendum::requiredResearch))
+            .apply(instance, ResearchAddendum::new));
 }

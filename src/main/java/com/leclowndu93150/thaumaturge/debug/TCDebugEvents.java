@@ -21,5 +21,4 @@ public class TCDebugEvents {
         HitResult hitResult = ScanRaycastHelper.performRaycast(player);
         PacketDistributor.sendToPlayer((ServerPlayer) player, new ClientboundRaycastDebugPayload(hitResult));
     }
-
 }

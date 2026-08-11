@@ -6,7 +6,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
 public final class BoltRenderType {
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/effect/essentia.png");
+    public static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/effect/essentia.png");
 
     public static final RenderType RENDER_TYPE = TCRenderTypes.additiveTextured(TEXTURE);
 

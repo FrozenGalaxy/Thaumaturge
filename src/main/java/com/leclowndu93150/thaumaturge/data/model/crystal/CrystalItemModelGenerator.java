@@ -27,7 +27,7 @@ public final class CrystalItemModelGenerator {
     }
 
     private static void emit(BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, Item item) {
-        ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(item),
-                TextureMapping.layer0(PLANTER_TEXTURE), modelOutput);
+        ModelTemplates.FLAT_ITEM.create(
+                ModelLocationUtils.getModelLocation(item), TextureMapping.layer0(PLANTER_TEXTURE), modelOutput);
     }
 }

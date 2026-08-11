@@ -18,8 +18,13 @@ public final class EldritchNothingRenderer implements BlockEntityRenderer<BlockE
     public EldritchNothingRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(BlockEntityEldritchNothing nothing, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityEldritchNothing nothing,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         Level level = nothing.getLevel();
         if (level == null) {
             return;
@@ -40,18 +45,24 @@ public final class EldritchNothingRenderer implements BlockEntityRenderer<BlockE
         float near = INSET;
         float far = 1.0F - INSET;
         switch (dir) {
-            case DOWN -> EldritchPortalSurface.quad(pose, buffer, worldPos,
-                    0.0F, near, 0.0F, 1.0F, near, 0.0F, 1.0F, near, 1.0F, 0.0F, near, 1.0F);
-            case UP -> EldritchPortalSurface.quad(pose, buffer, worldPos,
-                    0.0F, far, 0.0F, 1.0F, far, 0.0F, 1.0F, far, 1.0F, 0.0F, far, 1.0F);
-            case NORTH -> EldritchPortalSurface.quad(pose, buffer, worldPos,
-                    0.0F, 0.0F, near, 0.0F, 1.0F, near, 1.0F, 1.0F, near, 1.0F, 0.0F, near);
-            case SOUTH -> EldritchPortalSurface.quad(pose, buffer, worldPos,
-                    0.0F, 0.0F, far, 0.0F, 1.0F, far, 1.0F, 1.0F, far, 1.0F, 0.0F, far);
-            case WEST -> EldritchPortalSurface.quad(pose, buffer, worldPos,
-                    near, 0.0F, 0.0F, near, 1.0F, 0.0F, near, 1.0F, 1.0F, near, 0.0F, 1.0F);
-            case EAST -> EldritchPortalSurface.quad(pose, buffer, worldPos,
-                    far, 0.0F, 0.0F, far, 1.0F, 0.0F, far, 1.0F, 1.0F, far, 0.0F, 1.0F);
+            case DOWN ->
+                EldritchPortalSurface.quad(
+                        pose, buffer, worldPos, 0.0F, near, 0.0F, 1.0F, near, 0.0F, 1.0F, near, 1.0F, 0.0F, near, 1.0F);
+            case UP ->
+                EldritchPortalSurface.quad(
+                        pose, buffer, worldPos, 0.0F, far, 0.0F, 1.0F, far, 0.0F, 1.0F, far, 1.0F, 0.0F, far, 1.0F);
+            case NORTH ->
+                EldritchPortalSurface.quad(
+                        pose, buffer, worldPos, 0.0F, 0.0F, near, 0.0F, 1.0F, near, 1.0F, 1.0F, near, 1.0F, 0.0F, near);
+            case SOUTH ->
+                EldritchPortalSurface.quad(
+                        pose, buffer, worldPos, 0.0F, 0.0F, far, 0.0F, 1.0F, far, 1.0F, 1.0F, far, 1.0F, 0.0F, far);
+            case WEST ->
+                EldritchPortalSurface.quad(
+                        pose, buffer, worldPos, near, 0.0F, 0.0F, near, 1.0F, 0.0F, near, 1.0F, 1.0F, near, 0.0F, 1.0F);
+            case EAST ->
+                EldritchPortalSurface.quad(
+                        pose, buffer, worldPos, far, 0.0F, 0.0F, far, 1.0F, 0.0F, far, 1.0F, 1.0F, far, 0.0F, 1.0F);
         }
     }
 }

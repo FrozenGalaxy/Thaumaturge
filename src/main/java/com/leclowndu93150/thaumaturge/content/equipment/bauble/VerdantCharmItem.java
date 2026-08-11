@@ -4,6 +4,7 @@ import com.leclowndu93150.thaumaturge.api.items.IRechargable;
 import com.leclowndu93150.thaumaturge.api.items.RechargeAccess;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
 import com.leclowndu93150.thaumaturge.registry.TCMobEffects;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffects;
@@ -12,8 +13,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-
-import java.util.List;
 
 public final class VerdantCharmItem extends Item implements IRechargable {
     public static final int TYPE_BASE = 0;
@@ -45,13 +44,11 @@ public final class VerdantCharmItem extends Item implements IRechargable {
                 || !(wearer instanceof Player player)) {
             return;
         }
-        if (player.getEffect(MobEffects.WITHER) != null
-                && RechargeAccess.consumeCharge(stack, player, WITHER_COST)) {
+        if (player.getEffect(MobEffects.WITHER) != null && RechargeAccess.consumeCharge(stack, player, WITHER_COST)) {
             player.removeEffect(MobEffects.WITHER);
             return;
         }
-        if (player.getEffect(MobEffects.POISON) != null
-                && RechargeAccess.consumeCharge(stack, player, POISON_COST)) {
+        if (player.getEffect(MobEffects.POISON) != null && RechargeAccess.consumeCharge(stack, player, POISON_COST)) {
             player.removeEffect(MobEffects.POISON);
             return;
         }
@@ -68,8 +65,7 @@ public final class VerdantCharmItem extends Item implements IRechargable {
             return;
         }
         if (type == TYPE_SUSTAIN) {
-            if (player.getAirSupply() < LOW_AIR
-                    && RechargeAccess.consumeCharge(stack, player, SUSTAIN_COST)) {
+            if (player.getAirSupply() < LOW_AIR && RechargeAccess.consumeCharge(stack, player, SUSTAIN_COST)) {
                 player.setAirSupply(RESTORED_AIR);
                 return;
             }
@@ -90,7 +86,8 @@ public final class VerdantCharmItem extends Item implements IRechargable {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         int type = type(stack);
         if (type == TYPE_LIFE) {
             tooltip.add(Component.translatable("item.thaumaturge.verdant_charm.life.text")

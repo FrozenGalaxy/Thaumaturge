@@ -15,8 +15,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jspecify.annotations.Nullable;
@@ -57,18 +57,28 @@ public final class DeconstructionTableScreen extends AbstractTCContainerScreen<M
         int fill = BAR_MAX_H - table.breakTime() * BAR_MAX_H / BlockEntityDeconstructionTable.BREAK_TIME_TICKS;
         fill = Math.max(0, Math.min(BAR_MAX_H, fill));
         if (fill > 0) {
-            graphics.blit(TEXTURE,
-                    leftPos + BAR_X, topPos + BAR_Y + BAR_MAX_H - fill,
-                    (float) BAR_U, (float) (BAR_MAX_H - fill), BAR_W, fill, 256, 256);
+            graphics.blit(
+                    TEXTURE,
+                    leftPos + BAR_X,
+                    topPos + BAR_Y + BAR_MAX_H - fill,
+                    (float) BAR_U,
+                    (float) (BAR_MAX_H - fill),
+                    BAR_W,
+                    fill,
+                    256,
+                    256);
         }
         Holder<IAspect> result = resultHolder(table);
         if (result != null) {
             AspectTagRenderer.render(graphics, font, leftPos + RESULT_X, topPos + RESULT_Y, result, 1);
-            if (mouseX >= leftPos + RESULT_X && mouseX < leftPos + RESULT_X + RESULT_SIZE
-                    && mouseY >= topPos + RESULT_Y && mouseY < topPos + RESULT_Y + RESULT_SIZE) {
+            if (mouseX >= leftPos + RESULT_X
+                    && mouseX < leftPos + RESULT_X + RESULT_SIZE
+                    && mouseY >= topPos + RESULT_Y
+                    && mouseY < topPos + RESULT_Y + RESULT_SIZE) {
                 DeferredTooltip.set(
                         List.of(AspectComponents.name(result), Component.translatable("tc.decon.collect")),
-                        mouseX, mouseY);
+                        mouseX,
+                        mouseY);
             }
         }
     }
@@ -78,7 +88,10 @@ public final class DeconstructionTableScreen extends AbstractTCContainerScreen<M
         if (id == null || minecraft == null || minecraft.level == null) {
             return null;
         }
-        return minecraft.level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY)
+        return minecraft
+                .level
+                .registryAccess()
+                .lookupOrThrow(IAspect.REGISTRY_KEY)
                 .get(ResourceKey.create(IAspect.REGISTRY_KEY, id))
                 .map(reference -> (Holder<IAspect>) reference)
                 .orElse(null);
@@ -88,9 +101,12 @@ public final class DeconstructionTableScreen extends AbstractTCContainerScreen<M
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
             BlockEntityDeconstructionTable table = menu.blockEntity();
-            if (table != null && table.resultAspect() != null
-                    && mouseX >= leftPos + RESULT_X && mouseX < leftPos + RESULT_X + RESULT_SIZE
-                    && mouseY >= topPos + RESULT_Y && mouseY < topPos + RESULT_Y + RESULT_SIZE) {
+            if (table != null
+                    && table.resultAspect() != null
+                    && mouseX >= leftPos + RESULT_X
+                    && mouseX < leftPos + RESULT_X + RESULT_SIZE
+                    && mouseY >= topPos + RESULT_Y
+                    && mouseY < topPos + RESULT_Y + RESULT_SIZE) {
                 PacketDistributor.sendToServer(new ServerboundDeconCollectPayload(menu.pos()));
                 if (minecraft != null && minecraft.player != null) {
                     minecraft.getSoundManager().play(SimpleSoundInstance.forUI(TCSounds.HHON.get(), 1.0F, 0.3F));

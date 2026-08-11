@@ -16,11 +16,10 @@ import com.leclowndu93150.thaumaturge.registry.TCSounds;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
@@ -61,13 +60,15 @@ public final class FocusEffectHellbat implements FocusEffect {
     }
 
     @Override
-    public boolean apply(CastContext ctx, FocusSettings settings, HitResult target,
-            @Nullable Trajectory trajectory, int index) {
+    public boolean apply(
+            CastContext ctx, FocusSettings settings, HitResult target, @Nullable Trajectory trajectory, int index) {
         if (!(ctx.level() instanceof ServerLevel level)) {
             return false;
         }
-        LivingEntity struck = target instanceof EntityHitResult entityHit
-                && entityHit.getEntity() instanceof LivingEntity living ? living : null;
+        LivingEntity struck =
+                target instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof LivingEntity living
+                        ? living
+                        : null;
         LivingEntity caster = ctx.caster();
         if (struck == caster) {
             struck = null;
@@ -82,10 +83,13 @@ public final class FocusEffectHellbat implements FocusEffect {
                 continue;
             }
             bat.moveTo(
-                    origin.x + (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * SPAWN_SPREAD,
+                    origin.x
+                            + (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * SPAWN_SPREAD,
                     origin.y + 1.0 + level.getRandom().nextFloat() * SPAWN_SPREAD,
-                    origin.z + (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * SPAWN_SPREAD,
-                    level.getRandom().nextFloat() * 360.0F, 0.0F);
+                    origin.z
+                            + (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * SPAWN_SPREAD,
+                    level.getRandom().nextFloat() * 360.0F,
+                    0.0F);
             bat.summon(caster, struck, bonus);
             if (level.addFreshEntity(bat)) {
                 spawned = true;
@@ -93,8 +97,15 @@ public final class FocusEffectHellbat implements FocusEffect {
         }
         if (spawned) {
             level.levelEvent(SPAWN_LEVEL_EVENT, BlockPos.containing(origin), 0);
-            level.playSound(null, origin.x, origin.y, origin.z, TCSounds.ICE.get(), SoundSource.PLAYERS,
-                    0.2F, 0.95F + level.getRandom().nextFloat() * 0.1F);
+            level.playSound(
+                    null,
+                    origin.x,
+                    origin.y,
+                    origin.z,
+                    TCSounds.ICE.get(),
+                    SoundSource.PLAYERS,
+                    0.2F,
+                    0.95F + level.getRandom().nextFloat() * 0.1F);
         }
         return spawned;
     }
@@ -106,8 +117,8 @@ public final class FocusEffectHellbat implements FocusEffect {
 
     @Override
     public void impactParticles(Level level, Vec3 pos, Vec3 motion, Vec3 drift) {
-        FlameFanParticleOptions data = new FlameFanParticleOptions(
-                (float) (1.0 + level.getRandom().nextGaussian() * 0.2F), -0.1F, 0.7F);
+        FlameFanParticleOptions data =
+                new FlameFanParticleOptions((float) (1.0 + level.getRandom().nextGaussian() * 0.2F), -0.1F, 0.7F);
         level.addParticle(data, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
     }
 }

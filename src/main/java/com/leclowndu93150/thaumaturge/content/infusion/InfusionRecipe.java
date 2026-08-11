@@ -1,18 +1,18 @@
 package com.leclowndu93150.thaumaturge.content.infusion;
 
-import java.util.Arrays;
-import net.minecraft.core.HolderLookup;
-import com.leclowndu93150.thaumaturge.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.recipe.IInfusionRecipe;
 import com.leclowndu93150.thaumaturge.api.recipe.ResearchGate;
+import com.leclowndu93150.thaumaturge.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumaturge.registry.TCRecipeTypes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -26,15 +26,19 @@ import net.minecraft.world.level.Level;
 
 public final class InfusionRecipe implements Recipe<InfusionInput>, IInfusionRecipe {
     public static final MapCodec<InfusionRecipe> MAP_CODEC = RecordCodecBuilder.<InfusionRecipe>mapCodec(i -> i.group(
-            Ingredient.CODEC.fieldOf("catalyst").forGetter(r -> r.catalyst),
-            Ingredient.CODEC.listOf(1, 64).fieldOf("components").forGetter(r -> r.components),
-            AspectList.NON_EMPTY_CODEC.fieldOf("aspects").forGetter(r -> r.aspects),
-            Codec.intRange(0, 100).optionalFieldOf("instability", 0).forGetter(r -> r.instability),
-            ItemStack.CODEC.optionalFieldOf("result").forGetter(r -> r.result),
-            DataComponentPatch.CODEC.optionalFieldOf("catalyst_patch").forGetter(r -> r.catalystPatch),
-            ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research)
-    ).apply(i, InfusionRecipe::new)).validate(recipe ->
-            recipe.result.isPresent() == recipe.catalystPatch.isPresent()
+                            Ingredient.CODEC.fieldOf("catalyst").forGetter(r -> r.catalyst),
+                            Ingredient.CODEC.listOf(1, 64).fieldOf("components").forGetter(r -> r.components),
+                            AspectList.NON_EMPTY_CODEC.fieldOf("aspects").forGetter(r -> r.aspects),
+                            Codec.intRange(0, 100)
+                                    .optionalFieldOf("instability", 0)
+                                    .forGetter(r -> r.instability),
+                            ItemStack.CODEC.optionalFieldOf("result").forGetter(r -> r.result),
+                            DataComponentPatch.CODEC
+                                    .optionalFieldOf("catalyst_patch")
+                                    .forGetter(r -> r.catalystPatch),
+                            ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research))
+                    .apply(i, InfusionRecipe::new))
+            .validate(recipe -> recipe.result.isPresent() == recipe.catalystPatch.isPresent()
                     ? DataResult.error(() -> "Infusion recipe needs exactly one of result or catalyst_patch")
                     : DataResult.success(recipe));
 
@@ -64,10 +68,10 @@ public final class InfusionRecipe implements Recipe<InfusionInput>, IInfusionRec
                     ByteBufCodecs.VAR_INT.decode(buffer),
                     RESULT_STREAM_CODEC.decode(buffer),
                     PATCH_STREAM_CODEC.decode(buffer),
-                    RESEARCH_STREAM_CODEC.decode(buffer))
-    );
+                    RESEARCH_STREAM_CODEC.decode(buffer)));
 
-    public static final RecipeSerializer<InfusionRecipe> SERIALIZER = new SimpleRecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+    public static final RecipeSerializer<InfusionRecipe> SERIALIZER =
+            new SimpleRecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     private final Ingredient catalyst;
     private final List<Ingredient> components;
@@ -77,14 +81,24 @@ public final class InfusionRecipe implements Recipe<InfusionInput>, IInfusionRec
     private final Optional<DataComponentPatch> catalystPatch;
     private final Optional<ResearchGate> research;
 
-    public InfusionRecipe(Ingredient catalyst, List<Ingredient> components, AspectList aspects,
-                          int instability, ItemStack result, Optional<ResearchGate> research) {
+    public InfusionRecipe(
+            Ingredient catalyst,
+            List<Ingredient> components,
+            AspectList aspects,
+            int instability,
+            ItemStack result,
+            Optional<ResearchGate> research) {
         this(catalyst, components, aspects, instability, Optional.of(result), Optional.empty(), research);
     }
 
-    public InfusionRecipe(Ingredient catalyst, List<Ingredient> components, AspectList aspects,
-                          int instability, Optional<ItemStack> result,
-                          Optional<DataComponentPatch> catalystPatch, Optional<ResearchGate> research) {
+    public InfusionRecipe(
+            Ingredient catalyst,
+            List<Ingredient> components,
+            AspectList aspects,
+            int instability,
+            Optional<ItemStack> result,
+            Optional<DataComponentPatch> catalystPatch,
+            Optional<ResearchGate> research) {
         this.catalyst = catalyst;
         this.components = List.copyOf(components);
         this.aspects = aspects;
@@ -127,7 +141,8 @@ public final class InfusionRecipe implements Recipe<InfusionInput>, IInfusionRec
         if (result.isPresent()) {
             return result.get().copy();
         }
-        ItemStack display = Arrays.stream(catalyst.getItems()).findFirst()
+        ItemStack display = Arrays.stream(catalyst.getItems())
+                .findFirst()
                 .map(ItemStack::copy)
                 .orElse(ItemStack.EMPTY);
         catalystPatch.ifPresent(display::applyComponents);
@@ -169,9 +184,8 @@ public final class InfusionRecipe implements Recipe<InfusionInput>, IInfusionRec
         return TCRecipeTypes.INFUSION.get();
     }
 
-            @Override
+    @Override
     public boolean showNotification() {
         return false;
     }
-
 }

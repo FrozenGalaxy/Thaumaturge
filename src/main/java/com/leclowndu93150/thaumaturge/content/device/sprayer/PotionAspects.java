@@ -1,23 +1,23 @@
 package com.leclowndu93150.thaumaturge.content.device.sprayer;
 
-import java.util.Arrays;
+import com.leclowndu93150.thaumaturge.api.aspect.AspectIndexAccess;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.aspect.TCAspects;
-import com.leclowndu93150.thaumaturge.api.aspect.AspectIndexAccess;
 import com.leclowndu93150.thaumaturge.content.essentia.EssentiaTransportHelper;
 import com.leclowndu93150.thaumaturge.mixin.world.item.alchemy.PotionBrewingAccessor;
 import com.leclowndu93150.thaumaturge.mixin.world.item.alchemy.PotionBrewingMixAccessor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
@@ -35,8 +35,8 @@ final class PotionAspects {
     private PotionAspects() {}
 
     static AspectList of(ServerLevel level, ItemStack stack) {
-        Optional<Holder<Potion>> potion = stack
-                .getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion();
+        Optional<Holder<Potion>> potion = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
+                .potion();
         AspectList result = AspectList.EMPTY;
         boolean anyReagent = false;
         if (potion.isPresent() && !potion.get().is(Potions.WATER)) {
@@ -76,8 +76,8 @@ final class PotionAspects {
         return reagents;
     }
 
-    private static void collectReagents(List<?> mixes, Holder<Potion> target, List<ItemStack> reagents,
-                                        Set<ResourceLocation> visited, int depth) {
+    private static void collectReagents(
+            List<?> mixes, Holder<Potion> target, List<ItemStack> reagents, Set<ResourceLocation> visited, int depth) {
         if (depth > MAX_REAGENT_DEPTH) return;
         ResourceLocation targetId = target.unwrapKey().map(k -> k.location()).orElse(null);
         if (targetId == null || !visited.add(targetId)) return;

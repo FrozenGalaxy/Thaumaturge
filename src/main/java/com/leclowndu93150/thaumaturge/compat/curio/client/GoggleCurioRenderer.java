@@ -30,10 +30,18 @@ public final class GoggleCurioRenderer implements ICurioRenderer {
 
     @Override
     public <T extends LivingEntity, M extends EntityModel<T>> void render(
-            ItemStack stack, SlotContext slotContext, PoseStack poseStack,
-            RenderLayerParent<T, M> renderLayerParent, MultiBufferSource buffers, int light,
-            float limbSwing, float limbSwingAmount, float partialTicks,
-            float ageInTicks, float netHeadYaw, float headPitch) {
+            ItemStack stack,
+            SlotContext slotContext,
+            PoseStack poseStack,
+            RenderLayerParent<T, M> renderLayerParent,
+            MultiBufferSource buffers,
+            int light,
+            float limbSwing,
+            float limbSwingAmount,
+            float partialTicks,
+            float ageInTicks,
+            float netHeadYaw,
+            float headPitch) {
         if (!(renderLayerParent.getModel() instanceof HumanoidModel<?>)) {
             return;
         }
@@ -41,9 +49,8 @@ public final class GoggleCurioRenderer implements ICurioRenderer {
         if (wearer == null) {
             return;
         }
-        List<ResourceLocation> textures = stack.getItem() instanceof ArmorItem armorItem
-                ? armorTextures(armorItem)
-                : List.of(GOGGLES_TEXTURE);
+        List<ResourceLocation> textures =
+                stack.getItem() instanceof ArmorItem armorItem ? armorTextures(armorItem) : List.of(GOGGLES_TEXTURE);
         HumanoidModel<LivingEntity> model = armorModel();
         ICurioRenderer.followBodyRotations(wearer, model);
         model.setAllVisible(false);
@@ -57,9 +64,7 @@ public final class GoggleCurioRenderer implements ICurioRenderer {
 
     private static List<ResourceLocation> armorTextures(ArmorItem armorItem) {
         ArmorMaterial material = armorItem.getMaterial().value();
-        return material.layers().stream()
-                .map(layer -> layer.texture(false))
-                .toList();
+        return material.layers().stream().map(layer -> layer.texture(false)).toList();
     }
 
     private HumanoidModel<LivingEntity> armorModel() {

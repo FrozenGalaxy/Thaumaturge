@@ -15,8 +15,8 @@ import com.leclowndu93150.thaumaturge.content.particle.EarthPebbleParticleOption
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -64,22 +64,22 @@ public final class FocusEffectEarth implements FocusEffect {
     }
 
     @Override
-    public boolean apply(CastContext ctx, FocusSettings settings, HitResult target,
-            @Nullable Trajectory trajectory, int index) {
+    public boolean apply(
+            CastContext ctx, FocusSettings settings, HitResult target, @Nullable Trajectory trajectory, int index) {
         if (!(ctx.level() instanceof ServerLevel level)) {
             return false;
         }
         FocusFX.impact(level, target.getLocation(), id());
         if (target instanceof EntityHitResult entityHit && entityHit.getEntity() != null) {
             Entity struck = entityHit.getEntity();
-            struck.hurt(level.damageSources().thrown(struck, ctx.caster()),
-                    damageForDisplay(settings, ctx.power()));
+            struck.hurt(level.damageSources().thrown(struck, ctx.caster()), damageForDisplay(settings, ctx.power()));
             return true;
         }
         if (target instanceof BlockHitResult blockHit) {
             BlockPos pos = blockHit.getBlockPos();
             if (ctx.caster() instanceof Player player
-                    && level.getBlockState(pos).getDestroySpeed(level, pos) <= damageForDisplay(settings, ctx.power()) / HARDNESS_DIVISOR) {
+                    && level.getBlockState(pos).getDestroySpeed(level, pos)
+                            <= damageForDisplay(settings, ctx.power()) / HARDNESS_DIVISOR) {
                 BlockBreakerEngine.breaker(pos, level.getBlockState(pos), player)
                         .delay(index)
                         .visCost(BREAK_VIS_COST)
@@ -102,7 +102,13 @@ public final class FocusEffectEarth implements FocusEffect {
 
     @Override
     public void onCast(LivingEntity caster) {
-        caster.level().playSound(null, caster.blockPosition().above(), SoundEvents.DRAGON_FIREBALL_EXPLODE,
-                SoundSource.PLAYERS, 0.25F, 1.0F + (float) (caster.level().getRandom().nextGaussian() * 0.05F));
+        caster.level()
+                .playSound(
+                        null,
+                        caster.blockPosition().above(),
+                        SoundEvents.DRAGON_FIREBALL_EXPLODE,
+                        SoundSource.PLAYERS,
+                        0.25F,
+                        1.0F + (float) (caster.level().getRandom().nextGaussian() * 0.05F));
     }
 }

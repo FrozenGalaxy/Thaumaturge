@@ -13,7 +13,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -67,7 +66,10 @@ public abstract class FluxGooFluid extends BaseFlowingFluid {
         }
         int meta = state.getAmount() - 1;
         boolean airAbove = level.getBlockState(pos.above()).isAir();
-        if (meta >= SMALL_SLIME_META_MIN && meta < SMALL_SLIME_META_MAX && airAbove && rand.nextInt(SLIME_SPAWN_CHANCE) == 0) {
+        if (meta >= SMALL_SLIME_META_MIN
+                && meta < SMALL_SLIME_META_MAX
+                && airAbove
+                && rand.nextInt(SLIME_SPAWN_CHANCE) == 0) {
             spawnSlime(level, pos, 1);
         } else if (meta >= SMALL_SLIME_META_MAX && airAbove && rand.nextInt(SLIME_SPAWN_CHANCE) == 0) {
             spawnSlime(level, pos, 2);
@@ -199,7 +201,8 @@ public abstract class FluxGooFluid extends BaseFlowingFluid {
             scheduleGooTick(level, other);
             FluidState displacedFluid = displaced.getFluidState();
             if (!displacedFluid.isEmpty()) {
-                level.scheduleTick(pos, displacedFluid.getType(), displacedFluid.getType().getTickDelay(level));
+                level.scheduleTick(
+                        pos, displacedFluid.getType(), displacedFluid.getType().getTickDelay(level));
             }
             return 0;
         }
@@ -269,7 +272,9 @@ public abstract class FluxGooFluid extends BaseFlowingFluid {
 
     public static BlockState gooBlockState(int quanta) {
         int clamped = Math.max(1, Math.min(quanta, QUANTA_PER_BLOCK));
-        return TCBlocks.FLUX_GOO.get().defaultBlockState()
+        return TCBlocks.FLUX_GOO
+                .get()
+                .defaultBlockState()
                 .setValue(LiquidBlock.LEVEL, clamped >= QUANTA_PER_BLOCK ? 0 : QUANTA_PER_BLOCK - clamped);
     }
 
@@ -282,7 +287,9 @@ public abstract class FluxGooFluid extends BaseFlowingFluid {
         int amount = fs.getAmount();
         int meta = amount - 1;
         if (entity instanceof ThaumicSlime slime) {
-            if (!level.isClientSide() && slime.getSize() < meta && level.getRandom().nextBoolean()) {
+            if (!level.isClientSide()
+                    && slime.getSize() < meta
+                    && level.getRandom().nextBoolean()) {
                 slime.setSize(slime.getSize() + 1, true);
                 if (meta > 1) {
                     level.setBlock(pos, gooBlockState(meta), Block.UPDATE_CLIENTS);
@@ -298,8 +305,8 @@ public abstract class FluxGooFluid extends BaseFlowingFluid {
         entity.setDeltaMovement(motion.x * damp, motion.y, motion.z * damp);
         if (entity instanceof LivingEntity living) {
             int amp = meta / 3;
-            living.addEffect(new MobEffectInstance(TCMobEffects.VIS_EXHAUST,
-                    VIS_EXHAUST_DURATION, amp, true, true, false));
+            living.addEffect(
+                    new MobEffectInstance(TCMobEffects.VIS_EXHAUST, VIS_EXHAUST_DURATION, amp, true, true, false));
         }
     }
 

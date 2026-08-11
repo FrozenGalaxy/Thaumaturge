@@ -5,7 +5,6 @@ import com.leclowndu93150.thaumaturge.registry.TCEntities;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
 import java.util.EnumSet;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
@@ -73,7 +72,9 @@ public final class ThaumicSlimeSpitGoal extends Goal {
             shoot(child, dx, dy + hDist * ARC_COMPENSATION, dz, SPIT_SPEED, SPIT_SPREAD);
         }
         serverLevel.addFreshEntity(child);
-        slime.playSound(TCSounds.GORE.get(), 1.0F,
+        slime.playSound(
+                TCSounds.GORE.get(),
+                1.0F,
                 ((slime.getRandom().nextFloat() - slime.getRandom().nextFloat()) * 0.2F + 1.0F) * 0.8F);
         slime.setSize(slime.getSize() - 1, true);
     }

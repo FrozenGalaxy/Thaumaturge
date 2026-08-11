@@ -4,8 +4,8 @@ import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.warp.IPlayerWarp;
 import com.leclowndu93150.thaumaturge.api.warp.WarpHelper;
 import com.leclowndu93150.thaumaturge.api.warp.WarpType;
-import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.leclowndu93150.thaumaturge.client.render.GuiBlend;
+import com.leclowndu93150.thaumaturge.registry.TCItems;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -85,9 +85,18 @@ public final class SanityHudOverlay implements LeftHudStack.Gauge {
         if (height <= 0) {
             return;
         }
-        GuiBlend.blitTinted(graphics, HUD,
-                HUD_X + FILL_X - 1, HUD_Y + FILL_TOP - 1 + from, FILL_U, from,
-                FILL_W, height, TEX_SIZE, TEX_SIZE, tint);
+        GuiBlend.blitTinted(
+                graphics,
+                HUD,
+                HUD_X + FILL_X - 1,
+                HUD_Y + FILL_TOP - 1 + from,
+                FILL_U,
+                from,
+                FILL_W,
+                height,
+                TEX_SIZE,
+                TEX_SIZE,
+                tint);
     }
 
     private static boolean holds(Player player, boolean main) {

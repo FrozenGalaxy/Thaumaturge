@@ -135,20 +135,22 @@ public final class ScanningManager {
             }
         }
         if (failure != null) {
-            player.displayClientMessage(failure.copy()
-                    .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC), true);
+            player.displayClientMessage(
+                    failure.copy().withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC), true);
         } else if (!suppress) {
             if (found) {
-                player.displayClientMessage(Component.translatable("tc.knownobject")
-                        .withStyle(ChatFormatting.GREEN, ChatFormatting.ITALIC), true);
+                player.displayClientMessage(
+                        Component.translatable("tc.knownobject").withStyle(ChatFormatting.GREEN, ChatFormatting.ITALIC),
+                        true);
             } else {
-                player.displayClientMessage(Component.translatable("tc.unknownobject")
-                        .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC), true);
+                player.displayClientMessage(
+                        Component.translatable("tc.unknownobject")
+                                .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC),
+                        true);
             }
         }
         if (target instanceof BlockPos pos) {
-            IItemHandler handler =
-                    player.level().getCapability(Capabilities.ItemHandler.BLOCK, pos, Direction.UP);
+            IItemHandler handler = player.level().getCapability(Capabilities.ItemHandler.BLOCK, pos, Direction.UP);
             if (handler != null) {
                 int scanned = 0;
                 for (int index = 0; index < handler.getSlots(); index++) {
@@ -158,8 +160,10 @@ public final class ScanningManager {
                         scanned++;
                     }
                     if (scanned >= MAX_CONTAINER_SCANS) {
-                        player.displayClientMessage(Component.translatable("tc.invtoolarge")
-                                .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC), true);
+                        player.displayClientMessage(
+                                Component.translatable("tc.invtoolarge")
+                                        .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC),
+                                true);
                         break;
                     }
                 }
@@ -194,8 +198,11 @@ public final class ScanningManager {
     }
 
     private static Iterable<ScanEntry> scanEntries(Player player) {
-        return player.level().registryAccess().registry(ScanEntry.REGISTRY_KEY)
-                .<Iterable<ScanEntry>>map(registry -> registry.holders().map(Holder.Reference::value).toList())
+        return player.level()
+                .registryAccess()
+                .registry(ScanEntry.REGISTRY_KEY)
+                .<Iterable<ScanEntry>>map(registry ->
+                        registry.holders().map(Holder.Reference::value).toList())
                 .orElse(List.of());
     }
 

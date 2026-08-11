@@ -7,12 +7,12 @@ import com.leclowndu93150.thaumaturge.compat.jei.drawables.AlphaDrawable;
 import com.leclowndu93150.thaumaturge.compat.jei.utils.ResearchUtils;
 import com.leclowndu93150.thaumaturge.content.recipe.dust.DustTriggerMultiblockRecipe;
 import com.leclowndu93150.thaumaturge.registry.TCItems;
-import com.leclowndu93150.thaumaturge.registry.TCRecipeTypes;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import java.util.*;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -23,37 +23,42 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.TagKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
-import java.util.*;
-
 public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<DustTrigger>> {
-    public static final RecipeType<RecipeHolder<DustTrigger>> RECIPE_TYPE = RecipeType.createRecipeHolderType(ResourceLocation.fromNamespaceAndPath(TCIds.MODID,"multiblock_dust_trigger"));
+    public static final RecipeType<RecipeHolder<DustTrigger>> RECIPE_TYPE = RecipeType.createRecipeHolderType(
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "multiblock_dust_trigger"));
 
     private static final int WIDTH = 144;
     private static final int HEIGHT = 108;
 
-    private static final IDrawable resultIcon = new AlphaDrawable(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png"),41,7,30,30);
-    private static final IDrawable arrow = new AlphaDrawable(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png"), 199, 168, 26, 26);
+    private static final IDrawable resultIcon = new AlphaDrawable(
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png"),
+            41,
+            7,
+            30,
+            30);
+    private static final IDrawable arrow = new AlphaDrawable(
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png"),
+            199,
+            168,
+            26,
+            26);
     private final IDrawable icon;
 
     private static final int DUST_SLOT_X = WIDTH / 2 - arrow.getWidth() / 2 - 20 - 18;
@@ -62,7 +67,6 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
     private static final int RESULT_SLOT_Y = HEIGHT / 2 - 9;
 
     private int rotation = 0;
-
 
     public MultiblockCategory(IGuiHelper guiHelper) {
         this.icon = guiHelper.createDrawableItemStack(new ItemStack(TCItems.SALIS_MUNDUS.get()));
@@ -114,25 +118,30 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
         }
 
         Object2IntMap<BlueprintSource> inputMap = new Object2IntOpenHashMap<>();
-        Blueprint blueprint = lookupBlueprint(((DustTriggerMultiblockRecipe)recipe).blueprintId());
-        if (blueprint != null){
+        Blueprint blueprint = lookupBlueprint(((DustTriggerMultiblockRecipe) recipe).blueprintId());
+        if (blueprint != null) {
             for (int y = 0; y < blueprint.ySize(); y++) {
                 for (int x = 0; x < blueprint.xSize(); x++) {
                     for (int z = 0; z < blueprint.zSize(); z++) {
-                        BlueprintPart part = blueprint.cell(y,x,z);
+                        BlueprintPart part = blueprint.cell(y, x, z);
                         if (part != null && !part.source().getRepresentations().isEmpty()) {
-                            inputMap.computeInt(part.source(),(key,val)->val == null ? 1 : val + 1);
+                            inputMap.computeInt(part.source(), (key, val) -> val == null ? 1 : val + 1);
                         }
                     }
                 }
             }
         }
         int index = 0;
-        for (Object2IntMap.Entry<BlueprintSource> entry : inputMap.object2IntEntrySet().stream().sorted(Comparator.comparingInt(Object2IntMap.Entry::getIntValue)).toList().reversed()) {
+        for (Object2IntMap.Entry<BlueprintSource> entry : inputMap.object2IntEntrySet().stream()
+                .sorted(Comparator.comparingInt(Object2IntMap.Entry::getIntValue))
+                .toList()
+                .reversed()) {
             List<ItemStack> stacks = entry.getKey().getRepresentations();
             int count = entry.getIntValue();
-            builder.addInputSlot( 5 + index * 20,HEIGHT - 20)
-                    .addItemStacks(stacks.stream().map(stack->stack.copyWithCount(count)).toList());
+            builder.addInputSlot(5 + index * 20, HEIGHT - 20)
+                    .addItemStacks(stacks.stream()
+                            .map(stack -> stack.copyWithCount(count))
+                            .toList());
             index++;
         }
     }
@@ -144,11 +153,17 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
     private static final float PREVIEW_DEPTH = 200.0F;
 
     @Override
-    public void draw(RecipeHolder<DustTrigger> holder, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        resultIcon.draw(guiGraphics,RESULT_SLOT_X - 6, RESULT_SLOT_Y - 6);
-        arrow.draw(guiGraphics,WIDTH / 2 -arrow.getWidth() / 2 - 20,0);
+    public void draw(
+            RecipeHolder<DustTrigger> holder,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
+        resultIcon.draw(guiGraphics, RESULT_SLOT_X - 6, RESULT_SLOT_Y - 6);
+        arrow.draw(guiGraphics, WIDTH / 2 - arrow.getWidth() / 2 - 20, 0);
         boolean doesPassGate = holder.value().doesPassGate(Minecraft.getInstance().player);
-        if (!doesPassGate) guiGraphics.renderItem(Items.BARRIER.getDefaultInstance(),WIDTH / 2 -arrow.getWidth() / 2 - 14, 4);
+        if (!doesPassGate)
+            guiGraphics.renderItem(Items.BARRIER.getDefaultInstance(), WIDTH / 2 - arrow.getWidth() / 2 - 14, 4);
         drawExtra(holder, guiGraphics);
     }
 
@@ -168,9 +183,12 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
                     if (part != null) {
                         int py = -y + (blueprint.ySize() - 1);
                         blocks.put(new BlockPos(x, py, z), part.source().getState());
-                        minX = Math.min(minX, x); maxX = Math.max(maxX, x);
-                        minY = Math.min(minY, py); maxY = Math.max(maxY, py);
-                        minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
+                        minX = Math.min(minX, x);
+                        maxX = Math.max(maxX, x);
+                        minY = Math.min(minY, py);
+                        maxY = Math.max(maxY, py);
+                        minZ = Math.min(minZ, z);
+                        maxZ = Math.max(maxZ, z);
                     }
                 }
             }
@@ -196,8 +214,8 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
             BlockPos blockPos = entry.getKey();
             pose.pushPose();
             pose.translate(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-            dispatcher.renderSingleBlock(entry.getValue(), pose, buffers,
-                    LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+            dispatcher.renderSingleBlock(
+                    entry.getValue(), pose, buffers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
             pose.popPose();
         }
         buffers.endBatch();
@@ -205,7 +223,6 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
         pose.popPose();
         rotation++;
     }
-
 
     private @Nullable Blueprint lookupBlueprint(ResourceLocation blueprintId) {
         ResourceKey<Blueprint> key = ResourceKey.create(Blueprint.REGISTRY_KEY, blueprintId);
@@ -220,10 +237,19 @@ public final class MultiblockCategory implements IRecipeCategory<RecipeHolder<Du
     }
 
     @Override
-    public void getTooltip(ITooltipBuilder tooltip, RecipeHolder<DustTrigger> recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public void getTooltip(
+            ITooltipBuilder tooltip,
+            RecipeHolder<DustTrigger> recipe,
+            IRecipeSlotsView recipeSlotsView,
+            double mouseX,
+            double mouseY) {
         Optional<ResearchGate> gate = recipe.value().researchGate();
         boolean doesPassGate = recipe.value().doesPassGate(Minecraft.getInstance().player);
-        if (!doesPassGate && mouseX > WIDTH / 2 -arrow.getWidth() / 2 - 14 && mouseX < WIDTH / 2 -arrow.getWidth() / 2 +4 && mouseY > 4 && mouseY < 20){
+        if (!doesPassGate
+                && mouseX > WIDTH / 2 - arrow.getWidth() / 2 - 14
+                && mouseX < WIDTH / 2 - arrow.getWidth() / 2 + 4
+                && mouseY > 4
+                && mouseY < 20) {
             tooltip.addAll(ResearchUtils.generateMissingResearchList(gate.get()));
         }
     }

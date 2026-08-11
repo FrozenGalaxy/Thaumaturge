@@ -33,12 +33,18 @@ public final class AspectOrbRenderer extends EntityRenderer<EntityAspectOrb> {
     }
 
     @Override
-    public void render(EntityAspectOrb entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int packedLight) {
+    public void render(
+            EntityAspectOrb entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
         poseStack.pushPose();
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        float scale = BASE_SCALE + AGE_SCALE * ((float) (EntityAspectOrb.MAX_AGE - entity.getAge()) / EntityAspectOrb.MAX_AGE);
+        float scale = BASE_SCALE
+                + AGE_SCALE * ((float) (EntityAspectOrb.MAX_AGE - entity.getAge()) / EntityAspectOrb.MAX_AGE);
         poseStack.scale(scale, scale, scale);
         int frame = entity.tickCount * FRAMES_PER_TICK % FRAME_COUNT;
         float u0 = frame / (float) FRAME_COUNT;
@@ -46,10 +52,22 @@ public final class AspectOrbRenderer extends EntityRenderer<EntityAspectOrb> {
         int tint = ARGB32.color((int) (ALPHA * 255.0F), entity.getAspectColor());
         VertexConsumer buffer = buffers.getBuffer(ORB_TYPE);
         Matrix4f mat = poseStack.last().pose();
-        buffer.addVertex(mat, -HALF, -Y_OFFSET, 0.0F).setUv(u0, ROW_V1).setColor(tint).setLight(EMISSIVE_LIGHT);
-        buffer.addVertex(mat, HALF, -Y_OFFSET, 0.0F).setUv(u1, ROW_V1).setColor(tint).setLight(EMISSIVE_LIGHT);
-        buffer.addVertex(mat, HALF, 1.0F - Y_OFFSET, 0.0F).setUv(u1, ROW_V0).setColor(tint).setLight(EMISSIVE_LIGHT);
-        buffer.addVertex(mat, -HALF, 1.0F - Y_OFFSET, 0.0F).setUv(u0, ROW_V0).setColor(tint).setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, -HALF, -Y_OFFSET, 0.0F)
+                .setUv(u0, ROW_V1)
+                .setColor(tint)
+                .setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, HALF, -Y_OFFSET, 0.0F)
+                .setUv(u1, ROW_V1)
+                .setColor(tint)
+                .setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, HALF, 1.0F - Y_OFFSET, 0.0F)
+                .setUv(u1, ROW_V0)
+                .setColor(tint)
+                .setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, -HALF, 1.0F - Y_OFFSET, 0.0F)
+                .setUv(u0, ROW_V0)
+                .setColor(tint)
+                .setLight(EMISSIVE_LIGHT);
         poseStack.popPose();
     }
 

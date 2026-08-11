@@ -2,21 +2,16 @@ package com.leclowndu93150.thaumaturge.registry;
 
 import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.recipe.DustTrigger;
-import com.leclowndu93150.thaumaturge.api.recipe.IArcaneRecipe;
 import com.leclowndu93150.thaumaturge.content.infusion.InfusionEnchantmentRecipe;
-import com.leclowndu93150.thaumaturge.content.infusion.InfusionRunicAugmentRecipe;
 import com.leclowndu93150.thaumaturge.content.infusion.InfusionRecipe;
+import com.leclowndu93150.thaumaturge.content.infusion.InfusionRunicAugmentRecipe;
 import com.leclowndu93150.thaumaturge.content.recipe.crucible.CrucibleRecipe;
 import com.leclowndu93150.thaumaturge.content.recipe.workbench.ArcaneCraftingRecipe;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public final class TCRecipeTypes {
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES =

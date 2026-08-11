@@ -33,8 +33,7 @@ public class TCToggleButton extends TCButton {
             int textureHeight,
             BooleanSupplier state,
             Component message,
-            Runnable onPress
-    ) {
+            Runnable onPress) {
         super(x, y, width, height, message, onPress);
         this.texture = texture;
         this.u = u;
@@ -53,11 +52,31 @@ public class TCToggleButton extends TCButton {
         int color = activeTintColor(tintColor(), isHovered(), active);
         int drawX = getX() + (getWidth() - spriteWidth) / 2;
         int drawY = getY() + (getHeight() - spriteHeight) / 2;
-        WidgetRender.blitTinted(graphics, texture, drawX, drawY, (float) u, (float) v,
-                spriteWidth, spriteHeight, textureWidth, textureHeight, color);
+        WidgetRender.blitTinted(
+                graphics,
+                texture,
+                drawX,
+                drawY,
+                (float) u,
+                (float) v,
+                spriteWidth,
+                spriteHeight,
+                textureWidth,
+                textureHeight,
+                color);
         if (state.getAsBoolean()) {
-            WidgetRender.blitTinted(graphics, texture, drawX, drawY, (float) toggledU, (float) toggledV,
-                    spriteWidth, spriteHeight, textureWidth, textureHeight, color);
+            WidgetRender.blitTinted(
+                    graphics,
+                    texture,
+                    drawX,
+                    drawY,
+                    (float) toggledU,
+                    (float) toggledV,
+                    spriteWidth,
+                    spriteHeight,
+                    textureWidth,
+                    textureHeight,
+                    color);
         }
     }
 }

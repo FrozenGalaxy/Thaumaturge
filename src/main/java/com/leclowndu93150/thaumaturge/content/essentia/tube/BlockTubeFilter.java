@@ -42,14 +42,16 @@ public final class BlockTubeFilter extends BlockTube {
     }
 
     @Override
-    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide()) return null;
-        return createTickerHelper(type, TCBlockEntities.TUBE_FILTER.get(),
-                (lvl, pos, st, tube) -> tube.tickServer(lvl, pos, st));
+        return createTickerHelper(
+                type, TCBlockEntities.TUBE_FILTER.get(), (lvl, pos, st, tube) -> tube.tickServer(lvl, pos, st));
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof BlockEntityTubeFilter filter)) return InteractionResult.PASS;
         if (player.isSecondaryUseActive() && filter.aspectFilter() != null) {
             if (!level.isClientSide()) {
@@ -62,12 +64,21 @@ public final class BlockTubeFilter extends BlockTube {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!(level.getBlockEntity(pos) instanceof BlockEntityTubeFilter filter)) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+    protected ItemInteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
+        if (!(level.getBlockEntity(pos) instanceof BlockEntityTubeFilter filter))
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         if (filter.aspectFilter() != null) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         IEssentiaContainerItem container = stack.getCapability(EssentiaCapabilities.CONTAINER);
         if (container == null) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        if (container.getAspects(stack) == null || container.getAspects(stack).isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (container.getAspects(stack) == null || container.getAspects(stack).isEmpty())
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         AspectInstance first = container.getAspects(stack).entries().get(0);
         ResourceKey<IAspect> key = first.aspect().unwrapKey().orElse(null);
         if (key == null) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;

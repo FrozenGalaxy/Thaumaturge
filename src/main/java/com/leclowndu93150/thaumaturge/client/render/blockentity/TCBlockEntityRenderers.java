@@ -22,7 +22,8 @@ public final class TCBlockEntityRenderers {
         event.registerBlockEntityRenderer(TCBlockEntities.VIS_RELAY.get(), VisRelayRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.FOCAL_MANIPULATOR.get(), FocalManipulatorRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.PEDESTAL.get(), PedestalRenderer::new);
-        event.registerBlockEntityRenderer(TCBlockEntities.RECHARGE_PEDESTAL.get(),
+        event.registerBlockEntityRenderer(
+                TCBlockEntities.RECHARGE_PEDESTAL.get(),
                 context -> new RechargePedestalRenderer(context, RECHARGE_PEDESTAL_ITEM_SCALE));
         event.registerBlockEntityRenderer(TCBlockEntities.JAR.get(), JarRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.JAR_VOID.get(), JarRenderer::new);
@@ -39,12 +40,16 @@ public final class TCBlockEntityRenderers {
         event.registerBlockEntityRenderer(TCBlockEntities.RESEARCH_TABLE.get(), ResearchTableRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.DECONSTRUCTION_TABLE.get(), DeconstructionTableRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.MANA_POD.get(), ManaPodRenderer::new);
-        event.registerBlockEntityRenderer(TCBlockEntities.ELDRITCH_CAP.get(),
-                context -> new EldritchCapRenderer<>(context,
-                        EldritchCapRenderer.CAP_TEXTURE, EldritchCapRenderer.CAP_TEXTURE_OUTER, cap -> 0));
-        event.registerBlockEntityRenderer(TCBlockEntities.ELDRITCH_ALTAR.get(),
-                context -> new EldritchCapRenderer<>(context,
-                        EldritchCapRenderer.ALTAR_TEXTURE, EldritchCapRenderer.ALTAR_TEXTURE,
+        event.registerBlockEntityRenderer(
+                TCBlockEntities.ELDRITCH_CAP.get(),
+                context -> new EldritchCapRenderer<>(
+                        context, EldritchCapRenderer.CAP_TEXTURE, EldritchCapRenderer.CAP_TEXTURE_OUTER, cap -> 0));
+        event.registerBlockEntityRenderer(
+                TCBlockEntities.ELDRITCH_ALTAR.get(),
+                context -> new EldritchCapRenderer<>(
+                        context,
+                        EldritchCapRenderer.ALTAR_TEXTURE,
+                        EldritchCapRenderer.ALTAR_TEXTURE,
                         BlockEntityEldritchAltar::getEyes));
         event.registerBlockEntityRenderer(TCBlockEntities.ELDRITCH_PORTAL.get(), EldritchPortalRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.ELDRITCH_NOTHING.get(), EldritchNothingRenderer::new);

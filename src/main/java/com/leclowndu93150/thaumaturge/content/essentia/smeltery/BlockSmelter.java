@@ -1,17 +1,13 @@
 package com.leclowndu93150.thaumaturge.content.essentia.smeltery;
 
-import com.leclowndu93150.thaumaturge.content.research.DeviceGate;
 import com.leclowndu93150.thaumaturge.TCIds;
-import com.leclowndu93150.thaumaturge.content.workbench.BlockEntityArcaneWorkbench;
+import com.leclowndu93150.thaumaturge.content.research.DeviceGate;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
-import com.leclowndu93150.thaumaturge.registry.TCBlocks;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -39,7 +35,7 @@ public class BlockSmelter extends BaseEntityBlock {
 
     public BlockSmelter(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(LIT,false).setValue(FACING, Direction.NORTH));
+        registerDefaultState(defaultBlockState().setValue(LIT, false).setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -48,7 +44,8 @@ public class BlockSmelter extends BaseEntityBlock {
     }
 
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        return this.defaultBlockState()
+                .setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     protected BlockState rotate(BlockState state, Rotation rotation) {
@@ -65,7 +62,7 @@ public class BlockSmelter extends BaseEntityBlock {
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new BlockEntitySmelter(blockPos,blockState);
+        return new BlockEntitySmelter(blockPos, blockState);
     }
 
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
@@ -90,7 +87,8 @@ public class BlockSmelter extends BaseEntityBlock {
     }
 
     @Override
-    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> type) {
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState blockState, BlockEntityType<T> type) {
         return createTickerHelper(type, TCBlockEntities.SMELTER.get(), BlockEntitySmelter::staticTick);
     }
 
@@ -105,18 +103,19 @@ public class BlockSmelter extends BaseEntityBlock {
             double offset = 0.52D * direction.getAxisDirection().getStep();
             double randomOffset = random.nextDouble() * 0.6D - 0.3D;
 
-            if (axis == Direction.Axis.X){
-                level.addParticle(ParticleTypes.SMOKE, x+offset,y, z+randomOffset, 0.0D, 0.0D, 0.0D);
-                level.addParticle(ParticleTypes.FLAME, x+offset,y, z+randomOffset, 0.0D, 0.0D, 0.0D);
+            if (axis == Direction.Axis.X) {
+                level.addParticle(ParticleTypes.SMOKE, x + offset, y, z + randomOffset, 0.0D, 0.0D, 0.0D);
+                level.addParticle(ParticleTypes.FLAME, x + offset, y, z + randomOffset, 0.0D, 0.0D, 0.0D);
             } else {
-                level.addParticle(ParticleTypes.SMOKE, x+randomOffset,y, z+offset, 0.0D, 0.0D, 0.0D);
-                level.addParticle(ParticleTypes.FLAME, x+randomOffset,y, z+offset, 0.0D, 0.0D, 0.0D);
+                level.addParticle(ParticleTypes.SMOKE, x + randomOffset, y, z + offset, 0.0D, 0.0D, 0.0D);
+                level.addParticle(ParticleTypes.FLAME, x + randomOffset, y, z + offset, 0.0D, 0.0D, 0.0D);
             }
         }
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && !DeviceGate.passes(player, TCIds.rl("essentia_smelter"))) {
             return InteractionResult.CONSUME;
         }

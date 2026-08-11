@@ -1,6 +1,5 @@
 package com.leclowndu93150.thaumaturge.content.device.mirror;
 
-import com.leclowndu93150.thaumaturge.Thaumaturge;
 import com.leclowndu93150.thaumaturge.api.aura.AuraHelper;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
 import net.minecraft.core.BlockPos;
@@ -12,8 +11,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -120,7 +119,8 @@ public abstract class BlockEntityMirrorBase extends BlockEntity {
     }
 
     private boolean linksBackToSelf(BlockEntityMirrorBase target) {
-        return level != null && target.link != null
+        return level != null
+                && target.link != null
                 && target.link.pos().equals(worldPosition)
                 && target.link.dimension() == level.dimension();
     }

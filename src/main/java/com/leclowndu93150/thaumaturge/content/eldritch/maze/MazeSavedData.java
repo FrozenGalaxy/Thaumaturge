@@ -1,10 +1,9 @@
 package com.leclowndu93150.thaumaturge.content.eldritch.maze;
 
-import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.content.eldritch.OuterLands;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.core.HolderLookup;
@@ -23,14 +22,12 @@ public final class MazeSavedData extends SavedData {
             Codec.unboundedMap(Codec.STRING.xmap(Long::parseLong, String::valueOf), Codec.SHORT);
 
     public static final Codec<MazeSavedData> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            CELLS_CODEC.fieldOf("cells").forGetter(data -> data.cells),
-            Codec.INT.fieldOf("boss_count").forGetter(data -> data.bossCount)
-    ).apply(builder, MazeSavedData::new));
+                    CELLS_CODEC.fieldOf("cells").forGetter(data -> data.cells),
+                    Codec.INT.fieldOf("boss_count").forGetter(data -> data.bossCount))
+            .apply(builder, MazeSavedData::new));
 
-    public static final SavedData.Factory<MazeSavedData> FACTORY = new SavedData.Factory<>(
-            MazeSavedData::new,
-            MazeSavedData::load,
-            DataFixTypes.LEVEL);
+    public static final SavedData.Factory<MazeSavedData> FACTORY =
+            new SavedData.Factory<>(MazeSavedData::new, MazeSavedData::load, DataFixTypes.LEVEL);
 
     private final Map<Long, Short> cells;
     private int bossCount;

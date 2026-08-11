@@ -22,8 +22,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-public final class NodeStabilizerRenderer
-        implements BlockEntityRenderer<BlockEntityNodeStabilizer> {
+public final class NodeStabilizerRenderer implements BlockEntityRenderer<BlockEntityNodeStabilizer> {
     private static final ResourceLocation MODEL = TCIds.rl("models/mesh/node_stabilizer.tcmesh");
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/block/node_stabilizer.png");
     private static final ResourceLocation OVERLAY_TEXTURE = TCIds.rl("textures/block/node_stabilizer_over.png");
@@ -31,9 +30,11 @@ public final class NodeStabilizerRenderer
     private static final RenderType BASE = RenderType.entityCutout(TEXTURE);
     private static final RenderType OVERLAY = RenderType.entityTranslucentEmissive(OVERLAY_TEXTURE);
     private static final ResourceLocation TRANSDUCER_TEXTURE = TCIds.rl("textures/block/node_converter.png");
-    private static final ResourceLocation TRANSDUCER_OVERLAY_TEXTURE = TCIds.rl("textures/block/node_converter_over.png");
+    private static final ResourceLocation TRANSDUCER_OVERLAY_TEXTURE =
+            TCIds.rl("textures/block/node_converter_over.png");
     private static final RenderType TRANSDUCER_BASE = RenderType.entityCutout(TRANSDUCER_TEXTURE);
-    private static final RenderType TRANSDUCER_OVERLAY = RenderType.entityTranslucentEmissive(TRANSDUCER_OVERLAY_TEXTURE);
+    private static final RenderType TRANSDUCER_OVERLAY =
+            RenderType.entityTranslucentEmissive(TRANSDUCER_OVERLAY_TEXTURE);
     private static final float TRANSDUCER_EXTEND = 0.4F;
     private static final float TRANSDUCER_GLOW_GAIN = 2.5F;
     private static final ResourceLocation BUBBLE_TEXTURE = TCIds.rl("textures/misc/node_bubble.png");
@@ -60,8 +61,13 @@ public final class NodeStabilizerRenderer
     public NodeStabilizerRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(BlockEntityNodeStabilizer stabilizer, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityNodeStabilizer stabilizer,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         int count = stabilizer.count;
         boolean advanced = stabilizer.isAdvanced();
         LocalPlayer player = Minecraft.getInstance().player;
@@ -87,19 +93,27 @@ public final class NodeStabilizerRenderer
         poseStack.mulPose(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());
         PoseStack.Pose pose = poseStack.last();
         VertexConsumer buffer = buffers.getBuffer(BUBBLE);
-        buffer.addVertex(pose, -BUBBLE_HALF, -BUBBLE_HALF, 0.0F).setUv(0.0F, 1.0F)
-                .setColor(color).setLight(BUBBLE_LIGHT);
-        buffer.addVertex(pose, BUBBLE_HALF, -BUBBLE_HALF, 0.0F).setUv(1.0F, 1.0F)
-                .setColor(color).setLight(BUBBLE_LIGHT);
-        buffer.addVertex(pose, BUBBLE_HALF, BUBBLE_HALF, 0.0F).setUv(1.0F, 0.0F)
-                .setColor(color).setLight(BUBBLE_LIGHT);
-        buffer.addVertex(pose, -BUBBLE_HALF, BUBBLE_HALF, 0.0F).setUv(0.0F, 0.0F)
-                .setColor(color).setLight(BUBBLE_LIGHT);
+        buffer.addVertex(pose, -BUBBLE_HALF, -BUBBLE_HALF, 0.0F)
+                .setUv(0.0F, 1.0F)
+                .setColor(color)
+                .setLight(BUBBLE_LIGHT);
+        buffer.addVertex(pose, BUBBLE_HALF, -BUBBLE_HALF, 0.0F)
+                .setUv(1.0F, 1.0F)
+                .setColor(color)
+                .setLight(BUBBLE_LIGHT);
+        buffer.addVertex(pose, BUBBLE_HALF, BUBBLE_HALF, 0.0F)
+                .setUv(1.0F, 0.0F)
+                .setColor(color)
+                .setLight(BUBBLE_LIGHT);
+        buffer.addVertex(pose, -BUBBLE_HALF, BUBBLE_HALF, 0.0F)
+                .setUv(0.0F, 0.0F)
+                .setColor(color)
+                .setLight(BUBBLE_LIGHT);
         poseStack.popPose();
     }
 
-    public static void submitParts(int count, boolean advanced, float ticks,
-                                   PoseStack poseStack, MultiBufferSource buffers, int light) {
+    public static void submitParts(
+            int count, boolean advanced, float ticks, PoseStack poseStack, MultiBufferSource buffers, int light) {
         TCMesh mesh = GolemMeshes.get(MODEL);
         TCMeshPart lock = findPart(mesh, PART_LOCK);
         TCMeshPart piston = findPart(mesh, PART_PISTON);
@@ -126,8 +140,8 @@ public final class NodeStabilizerRenderer
         }
     }
 
-    public static void submitTransducerParts(float chargeFraction, float ticks,
-                                             PoseStack poseStack, MultiBufferSource buffers, int light) {
+    public static void submitTransducerParts(
+            float chargeFraction, float ticks, PoseStack poseStack, MultiBufferSource buffers, int light) {
         TCMesh mesh = GolemMeshes.get(MODEL);
         TCMeshPart lock = findPart(mesh, PART_LOCK);
         TCMeshPart piston = findPart(mesh, PART_PISTON);

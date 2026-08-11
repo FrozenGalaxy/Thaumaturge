@@ -2,8 +2,8 @@ package com.leclowndu93150.thaumaturge.api.research.scan;
 
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 

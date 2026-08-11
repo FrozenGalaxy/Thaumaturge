@@ -6,6 +6,7 @@ import com.leclowndu93150.thaumaturge.api.items.IWarpingGear;
 import com.leclowndu93150.thaumaturge.api.warp.WarpHelper;
 import com.leclowndu93150.thaumaturge.api.warp.WarpType;
 import com.leclowndu93150.thaumaturge.registry.TCAttributes;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -17,8 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-
-import java.util.List;
 
 public final class VoidseerCharmItem extends Item implements IVisDiscountGear, IWarpingGear {
     public static final ResourceLocation DISCOUNT_MODIFIER_ID = TCIds.rl("voidseer_discount");
@@ -50,8 +49,8 @@ public final class VoidseerCharmItem extends Item implements IVisDiscountGear, I
         }
         attribute.removeModifier(DISCOUNT_MODIFIER_ID);
         if (contribution != 0.0) {
-            attribute.addTransientModifier(new AttributeModifier(DISCOUNT_MODIFIER_ID,
-                    contribution, AttributeModifier.Operation.ADD_VALUE));
+            attribute.addTransientModifier(
+                    new AttributeModifier(DISCOUNT_MODIFIER_ID, contribution, AttributeModifier.Operation.ADD_VALUE));
         }
     }
 
@@ -73,7 +72,8 @@ public final class VoidseerCharmItem extends Item implements IVisDiscountGear, I
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.thaumaturge.voidseer_charm.text")
                 .withStyle(ChatFormatting.DARK_BLUE, ChatFormatting.ITALIC));
         super.appendHoverText(stack, context, tooltip, flag);

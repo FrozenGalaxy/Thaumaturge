@@ -31,14 +31,35 @@ public final class FloatyLineRenderer {
 
     private FloatyLineRenderer() {}
 
-    public static void draw(PoseStack poseStack, MultiBufferSource buffers, Vec3 fromRelative,
-                            float time, int color, float speed, float distanceFraction, float width) {
-        write(poseStack.last(), buffers.getBuffer(WISPY_LINE), fromRelative, time, color, speed,
-                distanceFraction, width);
+    public static void draw(
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            Vec3 fromRelative,
+            float time,
+            int color,
+            float speed,
+            float distanceFraction,
+            float width) {
+        write(
+                poseStack.last(),
+                buffers.getBuffer(WISPY_LINE),
+                fromRelative,
+                time,
+                color,
+                speed,
+                distanceFraction,
+                width);
     }
 
-    private static void write(PoseStack.Pose pose, VertexConsumer buffer, Vec3 fromRelative,
-                              float time, int color, float speed, float distanceFraction, float width) {
+    private static void write(
+            PoseStack.Pose pose,
+            VertexConsumer buffer,
+            Vec3 fromRelative,
+            float time,
+            int color,
+            float speed,
+            float distanceFraction,
+            float width) {
         float span = (float) fromRelative.length();
         if (span < MIN_SPAN) {
             return;
@@ -72,9 +93,19 @@ public final class FloatyLineRenderer {
         ribbon(pose, buffer, xs, ys, zs, us, alphas, width, 0.0F, red, green, blue);
     }
 
-    private static void ribbon(PoseStack.Pose pose, VertexConsumer buffer, float[] xs, float[] ys, float[] zs,
-                               float[] us, float[] alphas, float halfX, float halfY,
-                               float red, float green, float blue) {
+    private static void ribbon(
+            PoseStack.Pose pose,
+            VertexConsumer buffer,
+            float[] xs,
+            float[] ys,
+            float[] zs,
+            float[] us,
+            float[] alphas,
+            float halfX,
+            float halfY,
+            float red,
+            float green,
+            float blue) {
         for (int i = 1; i < xs.length; i++) {
             int prev = i - 1;
             int c0 = ARGB32.colorFromFloat(alphas[prev], red, green, blue);
@@ -86,10 +117,14 @@ public final class FloatyLineRenderer {
         }
     }
 
-    private static void edge(PoseStack.Pose pose, VertexConsumer buffer, float x, float y, float z,
-                             float u, float v, int color) {
-        buffer.addVertex(pose, x, y, z).setColor(color).setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(EMISSIVE_LIGHT).setNormal(pose, 0, 1, 0);
+    private static void edge(
+            PoseStack.Pose pose, VertexConsumer buffer, float x, float y, float z, float u, float v, int color) {
+        buffer.addVertex(pose, x, y, z)
+                .setColor(color)
+                .setUv(u, v)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(EMISSIVE_LIGHT)
+                .setNormal(pose, 0, 1, 0);
     }
 
     public static float time(long gameTime, float partialTicks) {

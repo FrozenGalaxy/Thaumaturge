@@ -9,7 +9,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -58,19 +57,27 @@ public final class BlockEldritchLock extends BaseEntityBlock {
     }
 
     @Override
-    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state,
-                                                                            BlockEntityType<T> type) {
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide()) {
-            return createTickerHelper(type, TCBlockEntities.ELDRITCH_LOCK.get(),
-                    (tickLevel, pos, tickState, lock) -> lock.clientTick());
+            return createTickerHelper(
+                    type, TCBlockEntities.ELDRITCH_LOCK.get(), (tickLevel, pos, tickState, lock) -> lock.clientTick());
         }
-        return createTickerHelper(type, TCBlockEntities.ELDRITCH_LOCK.get(),
+        return createTickerHelper(
+                type,
+                TCBlockEntities.ELDRITCH_LOCK.get(),
                 (tickLevel, pos, tickState, lock) -> lock.serverTick(tickLevel, pos));
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
-                                          Player player, InteractionHand hand, BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
         if (!stack.is(TCItems.RUNED_TABLET.get())) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }

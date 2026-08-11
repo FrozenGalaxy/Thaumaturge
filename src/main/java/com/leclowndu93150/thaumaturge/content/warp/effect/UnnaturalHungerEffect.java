@@ -1,6 +1,5 @@
 package com.leclowndu93150.thaumaturge.content.warp.effect;
 
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;

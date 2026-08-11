@@ -3,8 +3,8 @@ package com.leclowndu93150.thaumaturge.api.wands;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import java.util.List;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * A wand cap type. Caps determine how efficiently a wand spends its stored primal vis: the
@@ -15,8 +15,8 @@ import net.minecraft.resources.ResourceKey;
  */
 public final class WandCap {
     /** The registry key for wand caps. */
-    public static final ResourceKey<Registry<WandCap>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            ResourceLocation.fromNamespaceAndPath("thaumaturge", "wand_cap"));
+    public static final ResourceKey<Registry<WandCap>> REGISTRY_KEY =
+            ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("thaumaturge", "wand_cap"));
 
     private final float baseCostModifier;
     private final List<ResourceKey<IAspect>> specialCostAspects;
@@ -34,8 +34,12 @@ public final class WandCap {
      *                            rod's factor to price wand assembly
      * @param texture             the texture rendered on wand models built with this cap
      */
-    public WandCap(float baseCostModifier, List<ResourceKey<IAspect>> specialCostAspects,
-                   float specialCostModifier, int craftCost, ResourceLocation texture) {
+    public WandCap(
+            float baseCostModifier,
+            List<ResourceKey<IAspect>> specialCostAspects,
+            float specialCostModifier,
+            int craftCost,
+            ResourceLocation texture) {
         this.baseCostModifier = baseCostModifier;
         this.specialCostAspects = List.copyOf(specialCostAspects);
         this.specialCostModifier = specialCostModifier;

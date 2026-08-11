@@ -1,8 +1,8 @@
 package com.leclowndu93150.thaumaturge.api.casters;
 
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Registration entry for a focus element: the stateless behavior singleton plus the icon
@@ -15,6 +15,6 @@ import net.minecraft.resources.ResourceKey;
  */
 public record FocusElementType(FocusElement element, ResourceLocation icon, int color) {
     /** The registry key for focus element types. */
-    public static final ResourceKey<Registry<FocusElementType>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            ResourceLocation.fromNamespaceAndPath("thaumaturge", "focus_element"));
+    public static final ResourceKey<Registry<FocusElementType>> REGISTRY_KEY =
+            ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("thaumaturge", "focus_element"));
 }

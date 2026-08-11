@@ -3,9 +3,9 @@ package com.leclowndu93150.thaumaturge.content.device;
 import com.leclowndu93150.thaumaturge.api.aura.AuraHelper;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,7 +35,8 @@ public final class BlockEntityVisGenerator extends BlockEntity implements IEnerg
             generator.setChanged();
         }
         Direction facing = state.getValue(BlockStateProperties.FACING);
-        IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(facing), facing.getOpposite());
+        IEnergyStorage target =
+                level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(facing), facing.getOpposite());
         if (target != null) {
             int pushed = target.receiveEnergy(Math.min(generator.energy, MAX_PUSH), false);
             if (pushed > 0) {

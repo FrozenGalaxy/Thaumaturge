@@ -14,8 +14,16 @@ public final class CurseSmokeParticle extends TCParticle {
     private float flickerFrom;
     private float flickerTo;
 
-    private CurseSmokeParticle(ClientLevel level, double x, double y, double z,
-                               double vx, double vy, double vz, SimpleParticleType options, ParticleSheet sheet) {
+    private CurseSmokeParticle(
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            double vx,
+            double vy,
+            double vz,
+            SimpleParticleType options,
+            ParticleSheet sheet) {
         super(level, x, y, z, vx, vy, vz, sheet);
         this.rCol = 0.41F + this.random.nextFloat() * 0.2F;
         this.gCol = 0.0F;
@@ -43,8 +51,15 @@ public final class CurseSmokeParticle extends TCParticle {
         private static final ParticleSheet SHEET = TCParticleSheets.sheet("curse_smoke");
 
         @Override
-        public Particle createParticle(SimpleParticleType options, ClientLevel level, double x, double y, double z,
-                                       double vx, double vy, double vz) {
+        public Particle createParticle(
+                SimpleParticleType options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double vx,
+                double vy,
+                double vz) {
             RandomSource random = level.getRandom();
             return new CurseSmokeParticle(level, x, y, z, vx, vy, vz, options, SHEET);
         }

@@ -32,16 +32,22 @@ public final class SpecialItemRenderer extends ItemEntityRenderer {
     }
 
     @Override
-    public void render(ItemEntity entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int packedLight) {
+    public void render(
+            ItemEntity entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight) {
         ItemStack item = entity.getItem();
         if (!item.isEmpty()) {
             float ageInTicks = entity.getAge() + partialTicks;
             float bob = Mth.sin(ageInTicks / 10.0F + entity.bobOffs) * 0.1F + 0.1F;
             float rotationProgress = ageInTicks * ROTATION_SPEED;
             float ageScale = Math.min(ageInTicks, SCALE_UP_TICKS) / SCALE_UP_TICKS;
-            int coneCount = Minecraft.getInstance().options.graphicsMode().get()
-                    != GraphicsStatus.FAST ? CONE_COUNT_FANCY : CONE_COUNT_FAST;
+            int coneCount = Minecraft.getInstance().options.graphicsMode().get() != GraphicsStatus.FAST
+                    ? CONE_COUNT_FANCY
+                    : CONE_COUNT_FAST;
             VertexConsumer buffer = buffers.getBuffer(SPARKLE_TYPE);
             poseStack.pushPose();
             poseStack.translate(0.0F, bob + CONE_LIFT, 0.0F);

@@ -4,11 +4,8 @@ import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspectIndex;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
-import java.util.Optional;
-import net.minecraft.core.Holder;
-import net.minecraft.world.item.Item;
+import java.util.List;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
@@ -57,6 +54,9 @@ final class RecipeAspectDerivation {
     }
 
     static ItemStack representativeStack(Ingredient ingredient) {
-        return Arrays.stream(ingredient.getItems()).findFirst().map(found -> found.copyWithCount(1)).orElse(ItemStack.EMPTY);
+        return Arrays.stream(ingredient.getItems())
+                .findFirst()
+                .map(found -> found.copyWithCount(1))
+                .orElse(ItemStack.EMPTY);
     }
 }

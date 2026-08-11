@@ -20,8 +20,8 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
@@ -46,8 +46,13 @@ public final class BannerRenderer implements BlockEntityRenderer<BlockEntityBann
     }
 
     @Override
-    public void render(BlockEntityBanner banner, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityBanner banner,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         BlockState blockState = banner.getBlockState();
         boolean onWall = blockState.getBlock() instanceof BannerWallBlock;
         float yawDegrees;
@@ -67,7 +72,9 @@ public final class BannerRenderer implements BlockEntityRenderer<BlockEntityBann
         ResourceLocation aspectTexture = null;
         ResourceKey<IAspect> aspect = banner.aspect();
         if (aspect != null && banner.getLevel() != null) {
-            aspectTexture = banner.getLevel().registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY)
+            aspectTexture = banner.getLevel()
+                    .registryAccess()
+                    .lookupOrThrow(IAspect.REGISTRY_KEY)
                     .get(aspect)
                     .map(Holder::value)
                     .map(IAspect::texture)
@@ -101,8 +108,8 @@ public final class BannerRenderer implements BlockEntityRenderer<BlockEntityBann
         poseStack.popPose();
     }
 
-    private void submitAspect(PoseStack poseStack, MultiBufferSource buffers, float sway,
-                              ResourceLocation aspectTexture, int light) {
+    private void submitAspect(
+            PoseStack poseStack, MultiBufferSource buffers, float sway, ResourceLocation aspectTexture, int light) {
         poseStack.pushPose();
         poseStack.translate(0.0F, -5.0F / 16.0F, 0.0F);
         poseStack.mulPose(Axis.XP.rotation(sway));
@@ -116,7 +123,8 @@ public final class BannerRenderer implements BlockEntityRenderer<BlockEntityBann
         poseStack.popPose();
     }
 
-    private static void addVertex(VertexConsumer buffer, Matrix4f mat, float x, float y, float u, float v, int color, int light) {
+    private static void addVertex(
+            VertexConsumer buffer, Matrix4f mat, float x, float y, float u, float v, int color, int light) {
         buffer.addVertex(mat, x, y, ASPECT_Z)
                 .setUv(u, v)
                 .setColor(color)

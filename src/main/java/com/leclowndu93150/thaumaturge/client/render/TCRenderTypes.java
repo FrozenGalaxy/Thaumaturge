@@ -18,51 +18,100 @@ public final class TCRenderTypes {
             new RenderStateShard.ShaderStateShard(GameRenderer::getPositionTexColorShader);
     private static final RenderStateShard.OverlayStateShard OVERLAY = new RenderStateShard.OverlayStateShard(true);
 
-    private static final Function<ResourceLocation, RenderType> FX_ADDITIVE = Util.memoize(
-            texture -> particle("tc_fx_additive", texture,
-                    RenderStateShard.ADDITIVE_TRANSPARENCY, RenderStateShard.LEQUAL_DEPTH_TEST,
-                    RenderStateShard.COLOR_WRITE, false));
-    private static final Function<ResourceLocation, RenderType> FX_TRANSLUCENT = Util.memoize(
-            texture -> particle("tc_fx_translucent", texture,
-                    RenderStateShard.TRANSLUCENT_TRANSPARENCY, RenderStateShard.LEQUAL_DEPTH_TEST,
-                    RenderStateShard.COLOR_WRITE, true));
-    private static final Function<ResourceLocation, RenderType> FX_ADDITIVE_NO_DEPTH = Util.memoize(
-            texture -> particle("tc_fx_additive_no_depth", texture,
-                    RenderStateShard.ADDITIVE_TRANSPARENCY, RenderStateShard.NO_DEPTH_TEST,
-                    RenderStateShard.COLOR_WRITE, false));
-    private static final Function<ResourceLocation, RenderType> FX_TRANSLUCENT_NO_DEPTH = Util.memoize(
-            texture -> particle("tc_fx_translucent_no_depth", texture,
-                    RenderStateShard.TRANSLUCENT_TRANSPARENCY, RenderStateShard.NO_DEPTH_TEST,
-                    RenderStateShard.COLOR_WRITE, true));
+    private static final Function<ResourceLocation, RenderType> FX_ADDITIVE = Util.memoize(texture -> particle(
+            "tc_fx_additive",
+            texture,
+            RenderStateShard.ADDITIVE_TRANSPARENCY,
+            RenderStateShard.LEQUAL_DEPTH_TEST,
+            RenderStateShard.COLOR_WRITE,
+            false));
+    private static final Function<ResourceLocation, RenderType> FX_TRANSLUCENT = Util.memoize(texture -> particle(
+            "tc_fx_translucent",
+            texture,
+            RenderStateShard.TRANSLUCENT_TRANSPARENCY,
+            RenderStateShard.LEQUAL_DEPTH_TEST,
+            RenderStateShard.COLOR_WRITE,
+            true));
+    private static final Function<ResourceLocation, RenderType> FX_ADDITIVE_NO_DEPTH = Util.memoize(texture -> particle(
+            "tc_fx_additive_no_depth",
+            texture,
+            RenderStateShard.ADDITIVE_TRANSPARENCY,
+            RenderStateShard.NO_DEPTH_TEST,
+            RenderStateShard.COLOR_WRITE,
+            false));
+    private static final Function<ResourceLocation, RenderType> FX_TRANSLUCENT_NO_DEPTH =
+            Util.memoize(texture -> particle(
+                    "tc_fx_translucent_no_depth",
+                    texture,
+                    RenderStateShard.TRANSLUCENT_TRANSPARENCY,
+                    RenderStateShard.NO_DEPTH_TEST,
+                    RenderStateShard.COLOR_WRITE,
+                    true));
 
-    private static final Function<ResourceLocation, RenderType> ADDITIVE_TEXTURED = Util.memoize(
-            texture -> textured("tc_additive_textured", texture,
-                    RenderStateShard.ADDITIVE_TRANSPARENCY, RenderStateShard.LEQUAL_DEPTH_TEST, false));
-    private static final Function<ResourceLocation, RenderType> TRANSLUCENT_TEXTURED = Util.memoize(
-            texture -> textured("tc_translucent_textured", texture,
-                    RenderStateShard.TRANSLUCENT_TRANSPARENCY, RenderStateShard.LEQUAL_DEPTH_TEST, true));
-    private static final Function<ResourceLocation, RenderType> ADDITIVE_TEXTURED_NO_DEPTH = Util.memoize(
-            texture -> textured("tc_additive_textured_no_depth", texture,
-                    RenderStateShard.ADDITIVE_TRANSPARENCY, RenderStateShard.NO_DEPTH_TEST, false));
+    private static final Function<ResourceLocation, RenderType> ADDITIVE_TEXTURED = Util.memoize(texture -> textured(
+            "tc_additive_textured",
+            texture,
+            RenderStateShard.ADDITIVE_TRANSPARENCY,
+            RenderStateShard.LEQUAL_DEPTH_TEST,
+            false));
+    private static final Function<ResourceLocation, RenderType> TRANSLUCENT_TEXTURED = Util.memoize(texture -> textured(
+            "tc_translucent_textured",
+            texture,
+            RenderStateShard.TRANSLUCENT_TRANSPARENCY,
+            RenderStateShard.LEQUAL_DEPTH_TEST,
+            true));
+    private static final Function<ResourceLocation, RenderType> ADDITIVE_TEXTURED_NO_DEPTH =
+            Util.memoize(texture -> textured(
+                    "tc_additive_textured_no_depth",
+                    texture,
+                    RenderStateShard.ADDITIVE_TRANSPARENCY,
+                    RenderStateShard.NO_DEPTH_TEST,
+                    false));
 
-    private static final Function<ResourceLocation, RenderType> ENTITY_CUTOUT_FLAT = Util.memoize(
-            texture -> flat("tc_entity_cutout_flat", texture, null,
-                    RenderStateShard.LEQUAL_DEPTH_TEST, RenderStateShard.COLOR_DEPTH_WRITE, false));
-    private static final Function<ResourceLocation, RenderType> ENTITY_TRANSLUCENT_FLAT = Util.memoize(
-            texture -> flat("tc_entity_translucent_flat", texture, RenderStateShard.TRANSLUCENT_TRANSPARENCY,
-                    RenderStateShard.LEQUAL_DEPTH_TEST, RenderStateShard.COLOR_WRITE, true));
-    private static final Function<ResourceLocation, RenderType> ENTITY_ADDITIVE_EMISSIVE = Util.memoize(
-            texture -> flat("tc_entity_additive_emissive", texture, RenderStateShard.ADDITIVE_TRANSPARENCY,
-                    RenderStateShard.LEQUAL_DEPTH_TEST, RenderStateShard.COLOR_WRITE, false));
-    private static final Function<ResourceLocation, RenderType> ENTITY_TRANSLUCENT_NO_DEPTH = Util.memoize(
-            texture -> flat("tc_entity_translucent_no_depth", texture, RenderStateShard.TRANSLUCENT_TRANSPARENCY,
-                    RenderStateShard.NO_DEPTH_TEST, RenderStateShard.COLOR_WRITE, true));
-    private static final Function<ResourceLocation, RenderType> TAINTED_SWIRL_NO_DEPTH = Util.memoize(
-            texture -> flat("tc_tainted_swirl_no_depth", texture, RenderStateShard.TRANSLUCENT_TRANSPARENCY,
-                    RenderStateShard.LEQUAL_DEPTH_TEST, RenderStateShard.COLOR_WRITE, false));
+    private static final Function<ResourceLocation, RenderType> ENTITY_CUTOUT_FLAT = Util.memoize(texture -> flat(
+            "tc_entity_cutout_flat",
+            texture,
+            null,
+            RenderStateShard.LEQUAL_DEPTH_TEST,
+            RenderStateShard.COLOR_DEPTH_WRITE,
+            false));
+    private static final Function<ResourceLocation, RenderType> ENTITY_TRANSLUCENT_FLAT = Util.memoize(texture -> flat(
+            "tc_entity_translucent_flat",
+            texture,
+            RenderStateShard.TRANSLUCENT_TRANSPARENCY,
+            RenderStateShard.LEQUAL_DEPTH_TEST,
+            RenderStateShard.COLOR_WRITE,
+            true));
+    private static final Function<ResourceLocation, RenderType> ENTITY_ADDITIVE_EMISSIVE = Util.memoize(texture -> flat(
+            "tc_entity_additive_emissive",
+            texture,
+            RenderStateShard.ADDITIVE_TRANSPARENCY,
+            RenderStateShard.LEQUAL_DEPTH_TEST,
+            RenderStateShard.COLOR_WRITE,
+            false));
+    private static final Function<ResourceLocation, RenderType> ENTITY_TRANSLUCENT_NO_DEPTH =
+            Util.memoize(texture -> flat(
+                    "tc_entity_translucent_no_depth",
+                    texture,
+                    RenderStateShard.TRANSLUCENT_TRANSPARENCY,
+                    RenderStateShard.NO_DEPTH_TEST,
+                    RenderStateShard.COLOR_WRITE,
+                    true));
+    private static final Function<ResourceLocation, RenderType> TAINTED_SWIRL_NO_DEPTH = Util.memoize(texture -> flat(
+            "tc_tainted_swirl_no_depth",
+            texture,
+            RenderStateShard.TRANSLUCENT_TRANSPARENCY,
+            RenderStateShard.LEQUAL_DEPTH_TEST,
+            RenderStateShard.COLOR_WRITE,
+            false));
 
-    public static final RenderType SPARKLE = RenderType.create("tc_sparkle",
-            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES, BUFFER, false, false,
+    public static final RenderType SPARKLE = RenderType.create(
+            "tc_sparkle",
+            DefaultVertexFormat.POSITION_COLOR,
+            VertexFormat.Mode.TRIANGLES,
+            BUFFER,
+            false,
+            false,
             RenderType.CompositeState.builder()
                     .setShaderState(RenderStateShard.RENDERTYPE_LIGHTNING_SHADER)
                     .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
@@ -71,8 +120,13 @@ public final class TCRenderTypes {
                     .setCullState(RenderStateShard.NO_CULL)
                     .createCompositeState(false));
 
-    public static final RenderType SPARKLE_CULLED = RenderType.create("tc_sparkle_culled",
-            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES, BUFFER, false, false,
+    public static final RenderType SPARKLE_CULLED = RenderType.create(
+            "tc_sparkle_culled",
+            DefaultVertexFormat.POSITION_COLOR,
+            VertexFormat.Mode.TRIANGLES,
+            BUFFER,
+            false,
+            false,
             RenderType.CompositeState.builder()
                     .setShaderState(RenderStateShard.RENDERTYPE_LIGHTNING_SHADER)
                     .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
@@ -130,11 +184,20 @@ public final class TCRenderTypes {
         return TAINTED_SWIRL_NO_DEPTH.apply(texture);
     }
 
-    private static RenderType particle(String name, ResourceLocation texture,
-                                       RenderStateShard.TransparencyStateShard transparency,
-                                       RenderStateShard.DepthTestStateShard depthTest,
-                                       RenderStateShard.WriteMaskStateShard writeMask, boolean sort) {
-        return RenderType.create(name, DefaultVertexFormat.PARTICLE, VertexFormat.Mode.QUADS, BUFFER, false, sort,
+    private static RenderType particle(
+            String name,
+            ResourceLocation texture,
+            RenderStateShard.TransparencyStateShard transparency,
+            RenderStateShard.DepthTestStateShard depthTest,
+            RenderStateShard.WriteMaskStateShard writeMask,
+            boolean sort) {
+        return RenderType.create(
+                name,
+                DefaultVertexFormat.PARTICLE,
+                VertexFormat.Mode.QUADS,
+                BUFFER,
+                false,
+                sort,
                 RenderType.CompositeState.builder()
                         .setShaderState(PARTICLE_SHADER)
                         .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
@@ -146,10 +209,19 @@ public final class TCRenderTypes {
                         .createCompositeState(false));
     }
 
-    private static RenderType textured(String name, ResourceLocation texture,
-                                       RenderStateShard.TransparencyStateShard transparency,
-                                       RenderStateShard.DepthTestStateShard depthTest, boolean sort) {
-        return RenderType.create(name, DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, BUFFER, false, sort,
+    private static RenderType textured(
+            String name,
+            ResourceLocation texture,
+            RenderStateShard.TransparencyStateShard transparency,
+            RenderStateShard.DepthTestStateShard depthTest,
+            boolean sort) {
+        return RenderType.create(
+                name,
+                DefaultVertexFormat.POSITION_TEX_COLOR,
+                VertexFormat.Mode.QUADS,
+                BUFFER,
+                false,
+                sort,
                 RenderType.CompositeState.builder()
                         .setShaderState(POSITION_TEX_COLOR_SHADER)
                         .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
@@ -160,10 +232,13 @@ public final class TCRenderTypes {
                         .createCompositeState(false));
     }
 
-    private static RenderType flat(String name, ResourceLocation texture,
-                                   RenderStateShard.TransparencyStateShard transparency,
-                                   RenderStateShard.DepthTestStateShard depthTest,
-                                   RenderStateShard.WriteMaskStateShard writeMask, boolean sort) {
+    private static RenderType flat(
+            String name,
+            ResourceLocation texture,
+            RenderStateShard.TransparencyStateShard transparency,
+            RenderStateShard.DepthTestStateShard depthTest,
+            RenderStateShard.WriteMaskStateShard writeMask,
+            boolean sort) {
         RenderType.CompositeState.CompositeStateBuilder builder = RenderType.CompositeState.builder()
                 .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
                 .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
@@ -174,7 +249,13 @@ public final class TCRenderTypes {
         if (transparency != null) {
             builder.setTransparencyState(transparency);
         }
-        return RenderType.create(name, DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, BUFFER, false, sort,
+        return RenderType.create(
+                name,
+                DefaultVertexFormat.NEW_ENTITY,
+                VertexFormat.Mode.QUADS,
+                BUFFER,
+                false,
+                sort,
                 builder.createCompositeState(false));
     }
 }

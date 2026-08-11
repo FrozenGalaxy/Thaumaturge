@@ -18,14 +18,19 @@ import net.minecraft.world.level.Level;
 
 public class AlembicRenderer implements BlockEntityRenderer<BlockEntityAlembic> {
 
-    private static final ResourceLocation LABEL_TEXTURE = ResourceLocation.fromNamespaceAndPath("thaumaturge", "textures/entity/label.png");
+    private static final ResourceLocation LABEL_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("thaumaturge", "textures/entity/label.png");
 
-    public AlembicRenderer(BlockEntityRendererProvider.Context context) {
-    }
+    public AlembicRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(BlockEntityAlembic alembic, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityAlembic alembic,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         Level level = alembic.getLevel();
         if (level == null || alembic.aspectFilterKey() == null) {
             return;
@@ -51,8 +56,7 @@ public class AlembicRenderer implements BlockEntityRenderer<BlockEntityAlembic> 
             int light,
             float nx,
             float ny,
-            float nz
-    ) {
+            float nz) {
         buffer.addVertex(pose, x, y, z)
                 .setUv(u, v)
                 .setOverlay(OverlayTexture.NO_OVERLAY)
@@ -61,8 +65,13 @@ public class AlembicRenderer implements BlockEntityRenderer<BlockEntityAlembic> 
                 .setColor(color);
     }
 
-    private void submitFilterLabel(Direction facing, ResourceLocation filterTexture, int filterColor,
-                                   PoseStack poseStack, MultiBufferSource buffers, int light) {
+    private void submitFilterLabel(
+            Direction facing,
+            ResourceLocation filterTexture,
+            int filterColor,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light) {
         poseStack.pushPose();
         poseStack.translate(0.5, 0.5, 0.5);
         if (facing.getAxis() == Direction.Axis.Z) poseStack.mulPose(Axis.YP.rotationDegrees(180));
@@ -73,7 +82,11 @@ public class AlembicRenderer implements BlockEntityRenderer<BlockEntityAlembic> 
             poseStack.pushPose();
             poseStack.mulPose(Axis.YP.rotationDegrees(180));
             poseStack.translate(0.0, 0.0, 0.001);
-            aspectIconQuad(buffers.getBuffer(RenderType.entityTranslucent(filterTexture)), poseStack.last(), filterColor, light);
+            aspectIconQuad(
+                    buffers.getBuffer(RenderType.entityTranslucent(filterTexture)),
+                    poseStack.last(),
+                    filterColor,
+                    light);
             poseStack.popPose();
         }
         poseStack.popPose();

@@ -1,13 +1,8 @@
 package com.leclowndu93150.thaumaturge.compat.jei.drawables;
 
-
 import mezz.jei.api.gui.drawable.IDrawableStatic;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-
 import net.minecraft.resources.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 
 public class AlphaDrawable implements IDrawableStatic {
     private final ResourceLocation identifier;
@@ -24,7 +19,16 @@ public class AlphaDrawable implements IDrawableStatic {
         this(identifier, u, v, width, height, 0, 0, 0, 0);
     }
 
-    public AlphaDrawable(ResourceLocation identifier, int u, int v, int width, int height, int paddingTop, int paddingBottom, int paddingLeft, int paddingRight) {
+    public AlphaDrawable(
+            ResourceLocation identifier,
+            int u,
+            int v,
+            int width,
+            int height,
+            int paddingTop,
+            int paddingBottom,
+            int paddingLeft,
+            int paddingRight) {
         this.identifier = identifier;
 
         this.u = u;
@@ -48,7 +52,6 @@ public class AlphaDrawable implements IDrawableStatic {
         return height + paddingTop + paddingBottom;
     }
 
-
     @Override
     public void draw(GuiGraphics guiGraphics) {
         draw(guiGraphics, 0, 0);
@@ -58,8 +61,16 @@ public class AlphaDrawable implements IDrawableStatic {
     public void draw(GuiGraphics guiGraphics, int xOffset, int yOffset) {
         draw(guiGraphics, xOffset, yOffset, 0, 0, 0, 0);
     }
+
     @Override
-    public void draw(GuiGraphics guiGraphics, int xOffset, int yOffset, int maskTop, int maskBottom, int maskLeft, int maskRight) {
+    public void draw(
+            GuiGraphics guiGraphics,
+            int xOffset,
+            int yOffset,
+            int maskTop,
+            int maskBottom,
+            int maskLeft,
+            int maskRight) {
         int x = xOffset + this.paddingLeft + maskLeft;
         int y = yOffset + this.paddingTop + maskTop;
         int u = this.u + maskLeft;

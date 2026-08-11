@@ -38,14 +38,20 @@ public final class TCColorHandlers {
         event.register(focusColor, TCItems.FOCUS_2.get());
         event.register(focusColor, TCItems.FOCUS_3.get());
         for (DyeColor dye : DyeColor.values()) {
-            event.register(new AspectFilterTint(dye.getMapColor().col), TCItems.BANNERS.get(dye).get());
-            event.register(constant(0xFF000000 | dye.getMapColor().col), TCBlocks.CANDLES.get(dye).get());
-            event.register(constant(0xFF000000 | (dye.getTextureDiffuseColor() & 0xFFFFFF)),
+            event.register(
+                    new AspectFilterTint(dye.getMapColor().col),
+                    TCItems.BANNERS.get(dye).get());
+            event.register(
+                    constant(0xFF000000 | dye.getMapColor().col),
+                    TCBlocks.CANDLES.get(dye).get());
+            event.register(
+                    constant(0xFF000000 | (dye.getTextureDiffuseColor() & 0xFFFFFF)),
                     TCItems.NITORS.get(dye).get());
         }
         event.register(constant(GREATWOOD_FOLIAGE_ARGB), TCItems.LEAVES_GREATWOOD.get());
-        event.register((stack, tintIndex) -> tintIndex == 0
-                ? 0xFF000000 | GrassColor.get(0.5D, 1.0D) : -1, TCItems.GRASS_AMBIENT.get());
+        event.register(
+                (stack, tintIndex) -> tintIndex == 0 ? 0xFF000000 | GrassColor.get(0.5D, 1.0D) : -1,
+                TCItems.GRASS_AMBIENT.get());
         event.register(dyed(CRYSTAL_AER_COLOR), TCItems.CRYSTAL_AER.get());
         event.register(dyed(CRYSTAL_IGNIS_COLOR), TCItems.CRYSTAL_IGNIS.get());
         event.register(dyed(CRYSTAL_AQUA_COLOR), TCItems.CRYSTAL_AQUA.get());
@@ -53,8 +59,13 @@ public final class TCColorHandlers {
         event.register(dyed(CRYSTAL_ORDO_COLOR), TCItems.CRYSTAL_ORDO.get());
         event.register(dyed(CRYSTAL_PERDITIO_COLOR), TCItems.CRYSTAL_PERDITIO.get());
         event.register(dyed(CRYSTAL_VITIUM_COLOR), TCItems.CRYSTAL_VITIUM.get());
-        event.register(dyed(ROBES_UNDYED_ARGB), TCItems.CLOTH_CHEST.get(), TCItems.CLOTH_LEGS.get(),
-                TCItems.CLOTH_BOOTS.get(), TCItems.VOID_ROBE_HELM.get(), TCItems.VOID_ROBE_CHEST.get(),
+        event.register(
+                dyed(ROBES_UNDYED_ARGB),
+                TCItems.CLOTH_CHEST.get(),
+                TCItems.CLOTH_LEGS.get(),
+                TCItems.CLOTH_BOOTS.get(),
+                TCItems.VOID_ROBE_HELM.get(),
+                TCItems.VOID_ROBE_CHEST.get(),
                 TCItems.VOID_ROBE_LEGS.get());
     }
 

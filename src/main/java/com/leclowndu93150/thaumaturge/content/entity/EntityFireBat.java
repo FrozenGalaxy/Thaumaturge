@@ -1,15 +1,12 @@
 package com.leclowndu93150.thaumaturge.content.entity;
 
+import com.leclowndu93150.thaumaturge.content.entity.ai.FireBatAttackGoal;
+import com.leclowndu93150.thaumaturge.content.entity.ai.FlyingWanderGoal;
 import com.leclowndu93150.thaumaturge.content.entity.ai.GhastLikeFlight;
 import com.leclowndu93150.thaumaturge.content.entity.ai.GhastLikeLookGoal;
 import com.leclowndu93150.thaumaturge.content.entity.ai.GhastLikeMoveControl;
-import com.leclowndu93150.thaumaturge.content.entity.ai.FireBatAttackGoal;
-import com.leclowndu93150.thaumaturge.content.entity.ai.FlyingWanderGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -18,11 +15,13 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
@@ -30,6 +29,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -77,8 +77,12 @@ public final class EntityFireBat extends Monster implements IBatAnimated, ISided
         return summonLife > 0;
     }
 
-    public static boolean checkFireBatSpawnRules(EntityType<EntityFireBat> type, ServerLevelAccessor level,
-                                                 MobSpawnType reason, BlockPos pos, RandomSource random) {
+    public static boolean checkFireBatSpawnRules(
+            EntityType<EntityFireBat> type,
+            ServerLevelAccessor level,
+            MobSpawnType reason,
+            BlockPos pos,
+            RandomSource random) {
         if (level.getMaxLocalRawBrightness(pos) > random.nextInt(SPAWN_LIGHT_CAP)) {
             return false;
         }
@@ -105,8 +109,10 @@ public final class EntityFireBat extends Monster implements IBatAnimated, ISided
         this.goalSelector.addGoal(5, new FlyingWanderGoal(this, false, () -> !isHanging()));
         this.goalSelector.addGoal(7, new GhastLikeLookGoal(this));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class,
-                10, false, false, target -> target != this.owner));
+        this.targetSelector.addGoal(
+                2,
+                new NearestAttackableTargetGoal<>(
+                        this, Player.class, 10, false, false, target -> target != this.owner));
     }
 
     @Override
@@ -149,12 +155,10 @@ public final class EntityFireBat extends Monster implements IBatAnimated, ISided
     }
 
     @Override
-    protected void doPush(Entity entity) {
-    }
+    protected void doPush(Entity entity) {}
 
     @Override
-    protected void checkFallDamage(double ya, boolean onGround, BlockState onState, BlockPos pos) {
-    }
+    protected void checkFallDamage(double ya, boolean onGround, BlockState onState, BlockPos pos) {}
 
     @Override
     public boolean isIgnoringBlockTriggers() {

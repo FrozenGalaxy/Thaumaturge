@@ -10,7 +10,6 @@ import com.leclowndu93150.thaumaturge.api.aspect.IAspectRecipeContributor;
 import com.leclowndu93150.thaumaturge.api.aspect.RegisterAspectContributorsEvent;
 import com.leclowndu93150.thaumaturge.content.wands.WandAspectVariants;
 import com.leclowndu93150.thaumaturge.registry.TCItems;
-import net.neoforged.bus.api.IEventBus;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,6 +23,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.neoforged.bus.api.IEventBus;
 
 public final class AspectIndexBuilder {
     public static final int MAX_AMOUNT_PER_ASPECT = 500;
@@ -80,11 +80,14 @@ public final class AspectIndexBuilder {
     private static AspectList cap(AspectList list, HolderLookup.Provider registries) {
         AspectList result = AspectList.EMPTY;
         for (var entry : list.entries()) {
-            Holder<IAspect> bound = entry.aspect().unwrapKey()
+            Holder<IAspect> bound = entry.aspect()
+                    .unwrapKey()
                     .map(key -> Aspects.resolve(registries, key))
                     .orElse(null);
             if (bound == null) {
-                Thaumaturge.LOGGER.warn("Dropping aspect {} while building the aspect index: not resolvable in the active registries", entry.aspect());
+                Thaumaturge.LOGGER.warn(
+                        "Dropping aspect {} while building the aspect index: not resolvable in the active registries",
+                        entry.aspect());
                 continue;
             }
             int capped = Math.min(MAX_AMOUNT_PER_ASPECT, entry.amount());

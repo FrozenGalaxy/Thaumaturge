@@ -99,9 +99,16 @@ public final class ThaumometerClientHandler {
             return;
         }
         if (elapsed % SCAN_TICK_SOUND_INTERVAL == 0) {
-            player.level().playLocalSound(player.getX(), player.getY(), player.getZ(),
-                    TCSounds.CAMERA_TICKS.get(), SoundSource.PLAYERS, SCAN_TICK_VOLUME,
-                    SCAN_TICK_PITCH_BASE + level.getRandom().nextFloat() * SCAN_TICK_PITCH_SPREAD, false);
+            player.level()
+                    .playLocalSound(
+                            player.getX(),
+                            player.getY(),
+                            player.getZ(),
+                            TCSounds.CAMERA_TICKS.get(),
+                            SoundSource.PLAYERS,
+                            SCAN_TICK_VOLUME,
+                            SCAN_TICK_PITCH_BASE + level.getRandom().nextFloat() * SCAN_TICK_PITCH_SPREAD,
+                            false);
             drawScanTickFx(level, target);
         }
         if (elapsed >= ThaumometerItem.SCAN_COMPLETE_ELAPSED_TICKS) {
@@ -123,17 +130,27 @@ public final class ThaumometerClientHandler {
     private static void drawScanTickFx(Level level, @Nullable Object target) {
         RandomSource rand = level.getRandom();
         if (target instanceof Entity entity) {
-            ClientEffects.blockRunes(level,
+            ClientEffects.blockRunes(
+                    level,
                     entity.getX() - 0.5,
                     entity.getY() + entity.getEyeHeight() / 2.0F,
                     entity.getZ() - 0.5,
-                    0.3F + rand.nextFloat() * 0.7F, 0.0F, 0.3F + rand.nextFloat() * 0.7F,
-                    (int) (entity.getBbHeight() * RUNE_ENTITY_HEIGHT_SCALE), RUNE_GRAVITY);
+                    0.3F + rand.nextFloat() * 0.7F,
+                    0.0F,
+                    0.3F + rand.nextFloat() * 0.7F,
+                    (int) (entity.getBbHeight() * RUNE_ENTITY_HEIGHT_SCALE),
+                    RUNE_GRAVITY);
         } else if (target instanceof BlockPos pos) {
-            ClientEffects.blockRunes(level,
-                    pos.getX(), pos.getY() + 0.25, pos.getZ(),
-                    0.3F + rand.nextFloat() * 0.7F, 0.0F, 0.3F + rand.nextFloat() * 0.7F,
-                    RUNE_BLOCK_DURATION, RUNE_GRAVITY);
+            ClientEffects.blockRunes(
+                    level,
+                    pos.getX(),
+                    pos.getY() + 0.25,
+                    pos.getZ(),
+                    0.3F + rand.nextFloat() * 0.7F,
+                    0.0F,
+                    0.3F + rand.nextFloat() * 0.7F,
+                    RUNE_BLOCK_DURATION,
+                    RUNE_GRAVITY);
         }
     }
 

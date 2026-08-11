@@ -14,8 +14,8 @@ import com.leclowndu93150.thaumaturge.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumaturge.content.entity.EntitySpellBat;
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import org.jspecify.annotations.Nullable;
 
@@ -68,9 +68,9 @@ public final class FocusMediumSpellBat implements FocusMedium {
 
     @Override
     public List<SettingDefinition> settings() {
-        int[] friend = new int[]{0, 1};
-        String[] friendDesc = new String[]{"focus.common.enemy", "focus.common.friend"};
-        return List.of(new SettingDefinition("target", "focus.common.target",
-                new SettingDefinition.IntList(friend, friendDesc)));
+        int[] friend = new int[] {0, 1};
+        String[] friendDesc = new String[] {"focus.common.enemy", "focus.common.friend"};
+        return List.of(new SettingDefinition(
+                "target", "focus.common.target", new SettingDefinition.IntList(friend, friendDesc)));
     }
 }

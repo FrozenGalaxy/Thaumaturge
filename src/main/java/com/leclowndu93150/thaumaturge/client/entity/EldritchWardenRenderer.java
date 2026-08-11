@@ -20,8 +20,13 @@ public final class EldritchWardenRenderer
     }
 
     @Override
-    public void render(EntityEldritchWarden entity, float entityYaw, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light) {
+    public void render(
+            EntityEldritchWarden entity,
+            float entityYaw,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light) {
         float spawnFraction = entity.getSpawnTimer() / SPAWN_TICKS;
         poseStack.pushPose();
         if (spawnFraction > 0.0F) {

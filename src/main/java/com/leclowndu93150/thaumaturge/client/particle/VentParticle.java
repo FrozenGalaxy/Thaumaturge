@@ -1,5 +1,4 @@
 package com.leclowndu93150.thaumaturge.client.particle;
-import net.minecraft.client.particle.ParticleRenderType;
 
 import com.leclowndu93150.thaumaturge.content.particle.VentParticleOptions;
 import net.minecraft.client.GraphicsStatus;
@@ -7,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
@@ -28,8 +28,8 @@ public final class VentParticle extends TCParticle {
     private final float riseAccel;
     private float growth;
 
-    private VentParticle(ClientLevel level, double x, double y, double z,
-                         VentParticleOptions options, ParticleSheet sheet) {
+    private VentParticle(
+            ClientLevel level, double x, double y, double z, VentParticleOptions options, ParticleSheet sheet) {
         super(level, x, y, z, options.vx(), options.vy(), options.vz(), sheet);
         this.variant = options.variant();
         this.fullScale = options.scale();
@@ -67,7 +67,8 @@ public final class VentParticle extends TCParticle {
     }
 
     private void removeIfFarFromCamera(double x, double y, double z) {
-        int range = Minecraft.getInstance().options.graphicsMode().get() == GraphicsStatus.FAST ? NEAR_RANGE : FAR_RANGE;
+        int range =
+                Minecraft.getInstance().options.graphicsMode().get() == GraphicsStatus.FAST ? NEAR_RANGE : FAR_RANGE;
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         if (camera.distanceToSqr(x, y, z) > (double) range * range) {
             remove();
@@ -104,8 +105,15 @@ public final class VentParticle extends TCParticle {
         private static final ParticleSheet SHEET = TCParticleSheets.sheet("vent");
 
         @Override
-        public Particle createParticle(VentParticleOptions options, ClientLevel level, double x, double y, double z,
-                                       double vx, double vy, double vz) {
+        public Particle createParticle(
+                VentParticleOptions options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double vx,
+                double vy,
+                double vz) {
             RandomSource random = level.getRandom();
             return new VentParticle(level, x, y, z, options, SHEET);
         }

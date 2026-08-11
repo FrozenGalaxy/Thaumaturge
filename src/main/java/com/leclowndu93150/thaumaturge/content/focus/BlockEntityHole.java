@@ -1,14 +1,14 @@
 package com.leclowndu93150.thaumaturge.content.focus;
-import net.minecraft.util.FastColor.ARGB32;
 
-import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import com.leclowndu93150.thaumaturge.content.focus.effect.FocusEffectRift;
 import com.leclowndu93150.thaumaturge.content.particle.SparkleParticleOptions;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
+import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.Direction;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -32,7 +32,9 @@ public final class BlockEntityHole extends BlockEntity {
     int countdown = 0;
     int countdownmax = DEFAULT_COUNTDOWN_MAX;
     int count = 0;
-    @Nullable Direction direction = null;
+
+    @Nullable
+    Direction direction = null;
 
     public BlockEntityHole(BlockPos pos, BlockState state) {
         super(TCBlockEntities.HOLE.get(), pos, state);
@@ -51,30 +53,46 @@ public final class BlockEntityHole extends BlockEntity {
                 case Y -> {
                     for (int a = 0; a < RING_CELLS; a++) {
                         if (a / RING_SIZE != 1 || a % RING_SIZE != 1) {
-                            FocusEffectRift.createHole(level, pos.offset(-1 + a / RING_SIZE, 0, -1 + a % RING_SIZE),
-                                    null, 1, hole.countdownmax);
+                            FocusEffectRift.createHole(
+                                    level,
+                                    pos.offset(-1 + a / RING_SIZE, 0, -1 + a % RING_SIZE),
+                                    null,
+                                    1,
+                                    hole.countdownmax);
                         }
                     }
                 }
                 case Z -> {
                     for (int a = 0; a < RING_CELLS; a++) {
                         if (a / RING_SIZE != 1 || a % RING_SIZE != 1) {
-                            FocusEffectRift.createHole(level, pos.offset(-1 + a / RING_SIZE, -1 + a % RING_SIZE, 0),
-                                    null, 1, hole.countdownmax);
+                            FocusEffectRift.createHole(
+                                    level,
+                                    pos.offset(-1 + a / RING_SIZE, -1 + a % RING_SIZE, 0),
+                                    null,
+                                    1,
+                                    hole.countdownmax);
                         }
                     }
                 }
                 case X -> {
                     for (int a = 0; a < RING_CELLS; a++) {
                         if (a / RING_SIZE != 1 || a % RING_SIZE != 1) {
-                            FocusEffectRift.createHole(level, pos.offset(0, -1 + a / RING_SIZE, -1 + a % RING_SIZE),
-                                    null, 1, hole.countdownmax);
+                            FocusEffectRift.createHole(
+                                    level,
+                                    pos.offset(0, -1 + a / RING_SIZE, -1 + a % RING_SIZE),
+                                    null,
+                                    1,
+                                    hole.countdownmax);
                         }
                     }
                 }
             }
-            if (!FocusEffectRift.createHole(level, pos.relative(hole.direction.getOpposite()), hole.direction,
-                    hole.count - 1, hole.countdownmax)) {
+            if (!FocusEffectRift.createHole(
+                    level,
+                    pos.relative(hole.direction.getOpposite()),
+                    hole.direction,
+                    hole.count - 1,
+                    hole.countdownmax)) {
                 hole.count = 0;
             }
         }
@@ -104,7 +122,8 @@ public final class BlockEntityHole extends BlockEntity {
                     continue;
                 }
                 if (!level.getBlockState(pos.relative(d2)).isSolidRender(level, pos.relative(d2))
-                        && !level.getBlockState(pos.relative(d1).relative(d2)).isSolidRender(level, pos.relative(d1).relative(d2))) {
+                        && !level.getBlockState(pos.relative(d1).relative(d2))
+                                .isSolidRender(level, pos.relative(d1).relative(d2))) {
                     continue;
                 }
                 RandomSource rand = level.getRandom();
@@ -135,7 +154,12 @@ public final class BlockEntityHole extends BlockEntity {
         }
         SparkleParticleOptions data = new SparkleParticleOptions(
                 ARGB32.colorFromFloat(1.0F, SPARKLE_RED, SPARKLE_GREEN, SPARKLE_BLUE),
-                0.6F + rand.nextFloat() * 0.2F, 0, 1.0F, 0.0F, 2, false);
+                0.6F + rand.nextFloat() * 0.2F,
+                0,
+                1.0F,
+                0.0F,
+                2,
+                false);
         level.addParticle(data, x, y, z, 0.0, 0.0, 0.0);
     }
 

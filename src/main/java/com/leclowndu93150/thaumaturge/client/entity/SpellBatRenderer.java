@@ -22,13 +22,20 @@ public final class SpellBatRenderer extends MobRenderer<EntitySpellBat, FireBatM
     private static final int FULLBRIGHT_BLOCK_LIGHT = 15;
 
     public SpellBatRenderer(EntityRendererProvider.Context context) {
-        super(context, new FireBatModel<>(context.bakeLayer(TCModelLayers.FIRE_BAT),
-                RenderType::entityTranslucent), SHADOW);
+        super(
+                context,
+                new FireBatModel<>(context.bakeLayer(TCModelLayers.FIRE_BAT), RenderType::entityTranslucent),
+                SHADOW);
     }
 
     @Override
-    public void render(EntitySpellBat entity, float entityYaw, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light) {
+    public void render(
+            EntitySpellBat entity,
+            float entityYaw,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light) {
         MultiBufferSource tinted = new TintBufferSource(buffers, ARGB32.color(TINT_ALPHA, entity.getColor()));
         super.render(entity, entityYaw, partialTick, poseStack, tinted, light);
     }

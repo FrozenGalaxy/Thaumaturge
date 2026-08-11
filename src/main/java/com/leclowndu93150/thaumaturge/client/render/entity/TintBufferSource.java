@@ -37,8 +37,8 @@ public final class TintBufferSource implements MultiBufferSource {
 
         @Override
         public VertexConsumer setColor(int red, int green, int blue, int alpha) {
-            return super.setColor(red * tintRed / 255, green * tintGreen / 255,
-                    blue * tintBlue / 255, alpha * tintAlpha / 255);
+            return super.setColor(
+                    red * tintRed / 255, green * tintGreen / 255, blue * tintBlue / 255, alpha * tintAlpha / 255);
         }
     }
 }

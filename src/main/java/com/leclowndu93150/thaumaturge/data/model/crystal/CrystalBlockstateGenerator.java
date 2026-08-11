@@ -26,7 +26,7 @@ public final class CrystalBlockstateGenerator {
     }
 
     private static void emit(Consumer<BlockStateGenerator> blockStateOutput, Block block) {
-        blockStateOutput.accept(MultiVariantGenerator.multiVariant(block,
-                Variant.variant().with(VariantProperties.MODEL, CRYSTAL_MODEL)));
+        blockStateOutput.accept(MultiVariantGenerator.multiVariant(
+                block, Variant.variant().with(VariantProperties.MODEL, CRYSTAL_MODEL)));
     }
 }

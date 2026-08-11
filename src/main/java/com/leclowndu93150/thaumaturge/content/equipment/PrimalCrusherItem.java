@@ -19,13 +19,15 @@ public final class PrimalCrusherItem extends Item implements IWarpingGear {
     }
 
     private static Tool crusherTool() {
-        return new Tool(List.of(
-                Tool.Rule.deniesDrops(TCMaterials.TOOL_PRIMAL_VOID.getIncorrectBlocksForDrops()),
-                Tool.Rule.minesAndDrops(BlockTags.MINEABLE_WITH_PICKAXE,
-                        TCMaterials.TOOL_PRIMAL_VOID.getSpeed()),
-                Tool.Rule.minesAndDrops(BlockTags.MINEABLE_WITH_SHOVEL,
-                        TCMaterials.TOOL_PRIMAL_VOID.getSpeed())),
-                1.0F, 1);
+        return new Tool(
+                List.of(
+                        Tool.Rule.deniesDrops(TCMaterials.TOOL_PRIMAL_VOID.getIncorrectBlocksForDrops()),
+                        Tool.Rule.minesAndDrops(
+                                BlockTags.MINEABLE_WITH_PICKAXE, TCMaterials.TOOL_PRIMAL_VOID.getSpeed()),
+                        Tool.Rule.minesAndDrops(
+                                BlockTags.MINEABLE_WITH_SHOVEL, TCMaterials.TOOL_PRIMAL_VOID.getSpeed())),
+                1.0F,
+                1);
     }
 
     @Override

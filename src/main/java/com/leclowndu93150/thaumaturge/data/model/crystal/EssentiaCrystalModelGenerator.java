@@ -16,7 +16,9 @@ public final class EssentiaCrystalModelGenerator {
     private EssentiaCrystalModelGenerator() {}
 
     public static void register(BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
-        ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(TCItems.ESSENTIA_CRYSTAL.get()),
-                TextureMapping.layer0(CRYSTAL_TEXTURE), modelOutput);
+        ModelTemplates.FLAT_ITEM.create(
+                ModelLocationUtils.getModelLocation(TCItems.ESSENTIA_CRYSTAL.get()),
+                TextureMapping.layer0(CRYSTAL_TEXTURE),
+                modelOutput);
     }
 }

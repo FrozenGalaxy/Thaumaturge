@@ -1,23 +1,22 @@
 package com.leclowndu93150.thaumaturge.content.crucible;
 
-import com.leclowndu93150.thaumaturge.serialization.TCNbt;
-import com.leclowndu93150.thaumaturge.Thaumaturge;
+import com.leclowndu93150.thaumaturge.api.aspect.AspectIndexAccess;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspectContainer;
 import com.leclowndu93150.thaumaturge.api.aspect.TCAspects;
 import com.leclowndu93150.thaumaturge.api.aura.AuraHelper;
-import com.leclowndu93150.thaumaturge.api.aspect.AspectIndexAccess;
-import com.leclowndu93150.thaumaturge.content.entity.EntitySpecialItem;
 import com.leclowndu93150.thaumaturge.content.effect.Effects;
+import com.leclowndu93150.thaumaturge.content.entity.EntitySpecialItem;
 import com.leclowndu93150.thaumaturge.content.recipe.ThaumaturgeCraftingManager;
 import com.leclowndu93150.thaumaturge.content.recipe.crucible.CrucibleRecipe;
 import com.leclowndu93150.thaumaturge.content.recipe.crucible.CrucibleRecipeInput;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.leclowndu93150.thaumaturge.registry.TCBlockTags;
-import com.leclowndu93150.thaumaturge.registry.TCBlocks;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
+import com.leclowndu93150.thaumaturge.serialization.TCNbt;
+import java.awt.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -32,29 +31,21 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
-
-import java.awt.*;
 
 public class BlockEntityCrucible extends BlockEntity implements IAspectContainer {
 
     public static final int TANK_CAPACITY = 1000;
     public static final int MAX_ASPECT = 500;
 
-    private final FluidTank tank = new FluidTank(TANK_CAPACITY){
+    private final FluidTank tank = new FluidTank(TANK_CAPACITY) {
         @Override
         protected void onContentsChanged() {
             super.onContentsChanged();
@@ -74,40 +65,39 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
     private int delay = 0;
 
     public BlockEntityCrucible(BlockPos worldPosition, BlockState blockState) {
-        super(TCBlockEntities.CRUCIBLE.get(),worldPosition, blockState);
+        super(TCBlockEntities.CRUCIBLE.get(), worldPosition, blockState);
     }
 
-    private void tick(){
+    private void tick() {
         if (level == null) return;
         counter++;
         int prevHeat = heat;
-        if (!level.isClientSide()){
-            if (tank.getFluidAmount() > 0 ){
+        if (!level.isClientSide()) {
+            if (tank.getFluidAmount() > 0) {
                 BlockState below = level.getBlockState(getBlockPos().below());
                 boolean hasHeatBelow = below.is(TCBlockTags.CRUCIBLE_HEAT_SOURCES);
-                if (!hasHeatBelow){
-                    if (heat > 0){
+                if (!hasHeatBelow) {
+                    if (heat > 0) {
                         heat--;
                         if (heat == 149) {
                             setChanged();
                             syncToClient();
                         }
                     }
-                } else if (heat < 200){
+                } else if (heat < 200) {
                     heat++;
-                    if (prevHeat < 151 && heat >= 151){
+                    if (prevHeat < 151 && heat >= 151) {
                         setChanged();
                         syncToClient();
                     }
                 }
-            } else if (heat > 0){
+            } else if (heat > 0) {
                 heat--;
             }
 
-            if (aspects.totalAmount() > MAX_ASPECT)
-                spillRandom();
+            if (aspects.totalAmount() > MAX_ASPECT) spillRandom();
 
-            if (counter >= 100L){
+            if (counter >= 100L) {
                 spillRandom();
                 counter = 0L;
             }
@@ -132,25 +122,65 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
         if (level == null || level.isClientSide()) return;
         ServerLevel level = (ServerLevel) this.level;
         if (this.heat > 150) {
-            Effects.crucibleFroth(level,new Vec3(
-                    getBlockPos().getX() + 0.2F + level.getRandom().nextFloat() * 0.6F,
-                            getBlockPos().getY() + getFluidHeight(),
-                            getBlockPos().getZ() + 0.2F + level.getRandom().nextFloat() * 0.6F
-                            )).send();
+            Effects.crucibleFroth(
+                            level,
+                            new Vec3(
+                                    getBlockPos().getX()
+                                            + 0.2F
+                                            + level.getRandom().nextFloat() * 0.6F,
+                                    getBlockPos().getY() + getFluidHeight(),
+                                    getBlockPos().getZ()
+                                            + 0.2F
+                                            + level.getRandom().nextFloat() * 0.6F))
+                    .send();
             if (this.aspects.totalAmount() > MAX_ASPECT) {
                 for (int a = 0; a < 2; a++) {
-                    Effects.crucibleFrothDown(level, new Vec3(getBlockPos().getX(), getBlockPos().getY() + 1, getBlockPos().getZ() + level.getRandom().nextFloat())).send();
-                    Effects.crucibleFrothDown(level, new Vec3(getBlockPos().getX() + 1, getBlockPos().getY() + 1, getBlockPos().getZ() + level.getRandom().nextFloat())).send();
-                    Effects.crucibleFrothDown(level, new Vec3(getBlockPos().getX() + level.getRandom().nextFloat(), getBlockPos().getY() + 1, getBlockPos().getZ())).send();
-                    Effects.crucibleFrothDown(level, new Vec3(getBlockPos().getX() + level.getRandom().nextFloat(), getBlockPos().getY() + 1, getBlockPos().getZ() + 1)).send();
+                    Effects.crucibleFrothDown(
+                                    level,
+                                    new Vec3(
+                                            getBlockPos().getX(),
+                                            getBlockPos().getY() + 1,
+                                            getBlockPos().getZ()
+                                                    + level.getRandom().nextFloat()))
+                            .send();
+                    Effects.crucibleFrothDown(
+                                    level,
+                                    new Vec3(
+                                            getBlockPos().getX() + 1,
+                                            getBlockPos().getY() + 1,
+                                            getBlockPos().getZ()
+                                                    + level.getRandom().nextFloat()))
+                            .send();
+                    Effects.crucibleFrothDown(
+                                    level,
+                                    new Vec3(
+                                            getBlockPos().getX()
+                                                    + level.getRandom().nextFloat(),
+                                            getBlockPos().getY() + 1,
+                                            getBlockPos().getZ()))
+                            .send();
+                    Effects.crucibleFrothDown(
+                                    level,
+                                    new Vec3(
+                                            getBlockPos().getX()
+                                                    + level.getRandom().nextFloat(),
+                                            getBlockPos().getY() + 1,
+                                            getBlockPos().getZ() + 1))
+                            .send();
                 }
             }
         }
 
         if (level.getRandom().nextInt(6) == 0 && !this.aspects.isEmpty()) {
-            int color = this.aspects.entries().get(level.getRandom().nextInt(aspects.size())).aspect().value().color() + -16777216;
-            int x = 5 +  level.getRandom().nextInt(22);
-            int y = 5 +  level.getRandom().nextInt(22);
+            int color = this.aspects
+                            .entries()
+                            .get(level.getRandom().nextInt(aspects.size()))
+                            .aspect()
+                            .value()
+                            .color()
+                    + -16777216;
+            int x = 5 + level.getRandom().nextInt(22);
+            int y = 5 + level.getRandom().nextInt(22);
             this.delay = level.getRandom().nextInt(10);
             this.prevcolor = color;
             this.prevx = x;
@@ -159,11 +189,14 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
             float r = c.getRed() / 255.0F;
             float g = c.getGreen() / 255.0F;
             float b = c.getBlue() / 255.0F;
-            Effects.crucibleBubble(level,new Vec3(
-                            getBlockPos().getX() + x / 32.0F + 1/64F,
-                            getBlockPos().getY() + 0.05F + getFluidHeight(),
-                            getBlockPos().getX() + x / 32.0F + 1/64F
-                    )).color(r,g,b).send();
+            Effects.crucibleBubble(
+                            level,
+                            new Vec3(
+                                    getBlockPos().getX() + x / 32.0F + 1 / 64F,
+                                    getBlockPos().getY() + 0.05F + getFluidHeight(),
+                                    getBlockPos().getX() + x / 32.0F + 1 / 64F))
+                    .color(r, g, b)
+                    .send();
         }
     }
 
@@ -173,8 +206,7 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
     }
 
     @Override
-    public void setAspects(AspectList aspects) {
-    }
+    public void setAspects(AspectList aspects) {}
 
     @Override
     public boolean doesContainerAccept(Holder<IAspect> aspect) {
@@ -206,7 +238,7 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
         super.saveAdditional(output, registries);
         TCNbt.store(output, "Aspects", AspectList.CODEC, registries, aspects);
         output.put("Tank", tank.writeToNBT(registries, new CompoundTag()));
-        output.putShort("Heat",heat);
+        output.putShort("Heat", heat);
     }
 
     @Override
@@ -246,7 +278,7 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
     }
 
     public float getFluidHeight() {
-        float base = 0.3F + 0.5F * ((float)this.tank.getFluidAmount() / TANK_CAPACITY);
+        float base = 0.3F + 0.5F * ((float) this.tank.getFluidAmount() / TANK_CAPACITY);
         float out = base + (float) this.aspects.totalAmount() / MAX_ASPECT * (1.0F - base);
         if (out > 1.0F) {
             out = 1.001F;
@@ -262,25 +294,27 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
     public void spillRemnants() {
         if (level == null || level.isClientSide()) return;
         int total = aspects.totalAmount();
-        if (tank.getFluidAmount() > 0 || total > 0){
+        if (tank.getFluidAmount() > 0 || total > 0) {
             tank.setFluid(FluidStack.EMPTY);
-            AuraHelper.polluteAura(level,getBlockPos(),total * 0.25f, true);
-            int fluxAmount = aspects.amountOf(level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).getOrThrow(TCAspects.VITIUM));
-            if (fluxAmount > 0)
-                AuraHelper.polluteAura(level,getBlockPos(), fluxAmount * 0.75f, false);
+            AuraHelper.polluteAura(level, getBlockPos(), total * 0.25f, true);
+            int fluxAmount = aspects.amountOf(
+                    level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).getOrThrow(TCAspects.VITIUM));
+            if (fluxAmount > 0) AuraHelper.polluteAura(level, getBlockPos(), fluxAmount * 0.75f, false);
             this.aspects = AspectList.EMPTY;
-            level.blockEvent(getBlockPos(),getBlockState().getBlock(),2, 5);
+            level.blockEvent(getBlockPos(), getBlockState().getBlock(), 2, 5);
             setChanged();
             syncToClient();
         }
     }
 
-    public void spillRandom(){
+    public void spillRandom() {
         if (level == null || level.isClientSide()) return;
-        if (!aspects.isEmpty()){
-            Holder<IAspect> randAspect = aspects.entries().get(level.getRandom().nextInt(aspects.size())).aspect();
-            aspects = aspects.reduce(randAspect,1);
-            AuraHelper.polluteAura(level,getBlockPos(),randAspect.is(TCAspects.VITIUM) ? 1.0f : 0.25f,true);
+        if (!aspects.isEmpty()) {
+            Holder<IAspect> randAspect = aspects.entries()
+                    .get(level.getRandom().nextInt(aspects.size()))
+                    .aspect();
+            aspects = aspects.reduce(randAspect, 1);
+            AuraHelper.polluteAura(level, getBlockPos(), randAspect.is(TCAspects.VITIUM) ? 1.0f : 0.25f, true);
         }
         setChanged();
         syncToClient();
@@ -297,10 +331,18 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
     @Override
     public boolean triggerEvent(int event, int data) {
         if (level == null) return false;
-        if (event == 99){
-            level.playLocalSound(getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5, TCSounds.SPILL.get(), SoundSource.BLOCKS,0.2f,1.0F,false);
-            if (!level.isClientSide()){
-                Effects.bamf((ServerLevel) level,Vec3.atCenterOf(getBlockPos()).add(0F,0.75F,0F))
+        if (event == 99) {
+            level.playLocalSound(
+                    getBlockPos().getX() + 0.5f,
+                    getBlockPos().getY() + 0.5,
+                    getBlockPos().getZ() + 0.5,
+                    TCSounds.SPILL.get(),
+                    SoundSource.BLOCKS,
+                    0.2f,
+                    1.0F,
+                    false);
+            if (!level.isClientSide()) {
+                Effects.bamf((ServerLevel) level, Vec3.atCenterOf(getBlockPos()).add(0F, 0.75F, 0F))
                         .withSound()
                         .fancy()
                         .side(Direction.UP)
@@ -310,20 +352,40 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
         } else if (event != 2) {
             return super.triggerEvent(event, data);
         } else {
-            level.playLocalSound(getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5, TCSounds.SPILL.get(), SoundSource.BLOCKS,0.2f,1.0F,false);
-            if (!level.isClientSide()){
+            level.playLocalSound(
+                    getBlockPos().getX() + 0.5f,
+                    getBlockPos().getY() + 0.5,
+                    getBlockPos().getZ() + 0.5,
+                    TCSounds.SPILL.get(),
+                    SoundSource.BLOCKS,
+                    0.2f,
+                    1.0F,
+                    false);
+            if (!level.isClientSide()) {
                 for (int q = 0; q < 10; q++) {
                     Color color;
-                    if (aspects.isEmpty()){
-                        color = new Color(1.0F,1.0F,1.0F);
+                    if (aspects.isEmpty()) {
+                        color = new Color(1.0F, 1.0F, 1.0F);
                     } else {
-                        color = new Color(aspects.entries().get(level.getRandom().nextInt(aspects.size())).aspect().value().color());
+                        color = new Color(aspects.entries()
+                                .get(level.getRandom().nextInt(aspects.size()))
+                                .aspect()
+                                .value()
+                                .color());
                     }
-                    Effects.crucibleBoil((ServerLevel) level,new Vec3(
-                            getBlockPos().getX() + 0.2F - level.getRandom().nextFloat() * 0.6F,
-                            getBlockPos().getY() + 0.1F + getFluidHeight(),
-                            getBlockPos().getZ() + 0.2F - level.getRandom().nextFloat() * 0.6F
-                    )).heat(data).color(color.getRed() / 255f, color.getGreen() / 255F, color.getBlue() / 255F).send();
+                    Effects.crucibleBoil(
+                                    (ServerLevel) level,
+                                    new Vec3(
+                                            getBlockPos().getX()
+                                                    + 0.2F
+                                                    - level.getRandom().nextFloat() * 0.6F,
+                                            getBlockPos().getY() + 0.1F + getFluidHeight(),
+                                            getBlockPos().getZ()
+                                                    + 0.2F
+                                                    - level.getRandom().nextFloat() * 0.6F))
+                            .heat(data)
+                            .color(color.getRed() / 255f, color.getGreen() / 255F, color.getBlue() / 255F)
+                            .send();
                 }
             }
             return true;
@@ -341,14 +403,26 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
             }
 
             items.shrink(spitout.getCount());
-            EntitySpecialItem entityitem = new EntitySpecialItem(level, getBlockPos().getX() + 0.5F, getBlockPos().getY() + 0.71F, getBlockPos().getZ() + 0.5F, spitout);
-            entityitem.setDeltaMovement(first ? 0.0 : (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * 0.01F,0.075F,first ? 0.0 : (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * 0.01F);
+            EntitySpecialItem entityitem = new EntitySpecialItem(
+                    level,
+                    getBlockPos().getX() + 0.5F,
+                    getBlockPos().getY() + 0.71F,
+                    getBlockPos().getZ() + 0.5F,
+                    spitout);
+            entityitem.setDeltaMovement(
+                    first
+                            ? 0.0
+                            : (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * 0.01F,
+                    0.075F,
+                    first
+                            ? 0.0
+                            : (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * 0.01F);
             level.addFreshEntity(entityitem);
             first = false;
         } while (items.getCount() > 0);
     }
 
-    public ItemStack attemptSmelt(ItemStack stack, Player owner){
+    public ItemStack attemptSmelt(ItemStack stack, Player owner) {
         if (level == null || level.isClientSide()) return stack;
         if (owner == null || owner.isDeadOrDying()) return stack;
         if (tank.getFluidAmount() <= 0) return stack;
@@ -357,16 +431,17 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
         int count = stack.getCount();
 
         for (int i = 0; i < count; i++) {
-            CrucibleRecipe recipe = ThaumaturgeCraftingManager.findMatchingCrucibleRecipe((ServerLevel) level,owner, this.aspects, stack);
-            if (recipe != null){
-                ItemStack out = recipe.assemble(new CrucibleRecipeInput(stack,this.aspects), level.registryAccess());
+            CrucibleRecipe recipe = ThaumaturgeCraftingManager.findMatchingCrucibleRecipe(
+                    (ServerLevel) level, owner, this.aspects, stack);
+            if (recipe != null) {
+                ItemStack out = recipe.assemble(new CrucibleRecipeInput(stack, this.aspects), level.registryAccess());
                 this.aspects = recipe.removeMatching(aspects);
                 {
                     tank.drain(50, IFluidHandler.FluidAction.EXECUTE);
                 }
                 ejectItem(out.copy());
-                NeoForge.EVENT_BUS.post(new CrucibleEvent.CrucibleCraftedEvent(owner, getBlockPos(), getBlockState(),
-                        this, out.copy(), recipe.aspects()));
+                NeoForge.EVENT_BUS.post(new CrucibleEvent.CrucibleCraftedEvent(
+                        owner, getBlockPos(), getBlockState(), this, out.copy(), recipe.aspects()));
                 craftDone = true;
                 count--;
                 this.counter = -250L;
@@ -376,8 +451,8 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
                         owner, getBlockPos(), getBlockState(), this, stack, aspects);
                 NeoForge.EVENT_BUS.post(event);
                 aspects = event.getAspects();
-                if (!aspects.isEmpty() && !event.isCanceled()){
-                    for (AspectInstance aspect : aspects.entries()){
+                if (!aspects.isEmpty() && !event.isCanceled()) {
+                    for (AspectInstance aspect : aspects.entries()) {
                         this.aspects = this.aspects.add(aspect);
                     }
                     bubble = true;
@@ -387,15 +462,21 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
             }
         }
 
-        if (bubble){
-            level.playSound(null,getBlockPos(),TCSounds.BUBBLE.get(), SoundSource.BLOCKS,0.2F, 1.0F + level.getRandom().nextFloat() * 0.4F);
+        if (bubble) {
+            level.playSound(
+                    null,
+                    getBlockPos(),
+                    TCSounds.BUBBLE.get(),
+                    SoundSource.BLOCKS,
+                    0.2F,
+                    1.0F + level.getRandom().nextFloat() * 0.4F);
             syncToClient();
-            level.blockEvent(getBlockPos(),getBlockState().getBlock(),2,1);
+            level.blockEvent(getBlockPos(), getBlockState().getBlock(), 2, 1);
         }
 
-        if (craftDone){
+        if (craftDone) {
             syncToClient();
-            level.blockEvent(getBlockPos(),getBlockState().getBlock(),99,0);
+            level.blockEvent(getBlockPos(), getBlockState().getBlock(), 99, 0);
         }
 
         setChanged();
@@ -403,13 +484,13 @@ public class BlockEntityCrucible extends BlockEntity implements IAspectContainer
         return stack.copyWithCount(count);
     }
 
-    public void attemptSmelt(ItemEntity entity){
+    public void attemptSmelt(ItemEntity entity) {
         if (entity.level().isClientSide()) return;
         ItemStack stack = entity.getItem();
         Entity throwerRef = entity.getOwner();
         if (!(throwerRef instanceof Player player)) return;
-        ItemStack res = attemptSmelt(stack,player);
-        if ( res != null && res.getCount()>0){
+        ItemStack res = attemptSmelt(stack, player);
+        if (res != null && res.getCount() > 0) {
             stack.setCount(res.getCount());
             entity.setItem(stack);
         } else {

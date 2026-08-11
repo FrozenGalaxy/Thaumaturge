@@ -41,8 +41,8 @@ public final class ResearchToast implements Toast {
     @Override
     public Toast.Visibility render(GuiGraphics graphics, ToastComponent manager, long timeVisible) {
         Font font = manager.getMinecraft().font;
-        graphics.blit(HUD, 0, 0, (float) BACKGROUND_U, (float) BACKGROUND_V,
-                BACKGROUND_W, BACKGROUND_H, TEX_SIZE, TEX_SIZE);
+        graphics.blit(
+                HUD, 0, 0, (float) BACKGROUND_U, (float) BACKGROUND_V, BACKGROUND_W, BACKGROUND_H, TEX_SIZE, TEX_SIZE);
         EntryIconRenderer.drawResearchIcon(graphics, ICON_X, ICON_Y, icon, false);
         graphics.drawString(font, title, TEXT_X, TITLE_Y, TITLE_COLOR, false);
         float nameWidth = font.width(subtitle);
@@ -57,7 +57,8 @@ public final class ResearchToast implements Toast {
             graphics.drawString(font, subtitle, TEXT_X, NAME_Y, NAME_COLOR, false);
         }
         return timeVisible >= DURATION_MS * manager.getNotificationDisplayTimeMultiplier()
-                ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
+                ? Toast.Visibility.HIDE
+                : Toast.Visibility.SHOW;
     }
 
     @Override

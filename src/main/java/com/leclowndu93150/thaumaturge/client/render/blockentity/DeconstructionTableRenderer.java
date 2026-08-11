@@ -15,8 +15,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
@@ -41,8 +41,13 @@ public final class DeconstructionTableRenderer implements BlockEntityRenderer<Bl
     }
 
     @Override
-    public void render(BlockEntityDeconstructionTable table, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityDeconstructionTable table,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         if (table.getLevel() == null) {
             return;
         }
@@ -83,9 +88,14 @@ public final class DeconstructionTableRenderer implements BlockEntityRenderer<Bl
             poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
             poseStack.mulPose(Axis.ZP.rotationDegrees(ticks % 360.0F));
             poseStack.scale(ASPECT_SCALE, ASPECT_SCALE, ASPECT_SCALE);
-            AspectTagWorldRenderer.renderQuad(poseStack.last(),
-                    buffers.getBuffer(RenderType.entityTranslucent(aspect.value().texture())),
-                    aspect, ASPECT_ALPHA, false, light);
+            AspectTagWorldRenderer.renderQuad(
+                    poseStack.last(),
+                    buffers.getBuffer(
+                            RenderType.entityTranslucent(aspect.value().texture())),
+                    aspect,
+                    ASPECT_ALPHA,
+                    false,
+                    light);
             poseStack.popPose();
         }
     }
@@ -95,7 +105,9 @@ public final class DeconstructionTableRenderer implements BlockEntityRenderer<Bl
         if (id == null || table.getLevel() == null) {
             return null;
         }
-        return table.getLevel().registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY)
+        return table.getLevel()
+                .registryAccess()
+                .lookupOrThrow(IAspect.REGISTRY_KEY)
                 .get(ResourceKey.create(IAspect.REGISTRY_KEY, id))
                 .map(holder -> (Holder<IAspect>) holder)
                 .orElse(null);

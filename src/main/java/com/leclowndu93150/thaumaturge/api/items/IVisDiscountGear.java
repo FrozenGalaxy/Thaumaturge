@@ -1,7 +1,6 @@
 package com.leclowndu93150.thaumaturge.api.items;
 
 import net.minecraft.world.entity.EquipmentSlotGroup;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Equipable;
 import net.minecraft.world.item.ItemStack;
 

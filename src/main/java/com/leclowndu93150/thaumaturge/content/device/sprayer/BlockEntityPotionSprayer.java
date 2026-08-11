@@ -1,11 +1,5 @@
 package com.leclowndu93150.thaumaturge.content.device.sprayer;
 
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.Holder;
-import com.leclowndu93150.thaumaturge.serialization.TCNbt;
-import com.leclowndu93150.thaumaturge.Thaumaturge;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
@@ -13,12 +7,17 @@ import com.leclowndu93150.thaumaturge.api.essentia.IEssentiaTransport;
 import com.leclowndu93150.thaumaturge.content.essentia.flow.EssentiaFlowHandler;
 import com.leclowndu93150.thaumaturge.content.particle.VentParticleOptions;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
+import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -126,8 +125,16 @@ public final class BlockEntityPotionSprayer extends BlockEntity implements IEsse
             if (!activated && charges > 0) {
                 charges--;
                 spray(server, pos, facing);
-                server.playSound(null, pos, SoundEvents.LAVA_EXTINGUISH, SoundSource.BLOCKS, 0.25F,
-                        2.6F + (server.getRandom().nextFloat() - server.getRandom().nextFloat()) * 0.8F);
+                server.playSound(
+                        null,
+                        pos,
+                        SoundEvents.LAVA_EXTINGUISH,
+                        SoundSource.BLOCKS,
+                        0.25F,
+                        2.6F
+                                + (server.getRandom().nextFloat()
+                                                - server.getRandom().nextFloat())
+                                        * 0.8F);
                 server.blockEvent(pos, state.getBlock(), VENT_EVENT, 0);
                 setChanged();
                 syncToClient();
@@ -141,14 +148,19 @@ public final class BlockEntityPotionSprayer extends BlockEntity implements IEsse
     private void spray(ServerLevel server, BlockPos pos, Direction facing) {
         List<MobEffectInstance> effects = new ArrayList<>();
         potion.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
-                .getAllEffects().forEach(effects::add);
+                .getAllEffects()
+                .forEach(effects::add);
         if (effects.isEmpty()) {
             return;
         }
         BlockPos center = pos.relative(facing, SPRAY_REACH);
         AABB box = new AABB(
-                center.getX() - SPRAY_AREA, center.getY() - SPRAY_AREA, center.getZ() - SPRAY_AREA,
-                center.getX() + 1 + SPRAY_AREA, center.getY() + 1 + SPRAY_AREA, center.getZ() + 1 + SPRAY_AREA);
+                center.getX() - SPRAY_AREA,
+                center.getY() - SPRAY_AREA,
+                center.getZ() - SPRAY_AREA,
+                center.getX() + 1 + SPRAY_AREA,
+                center.getY() + 1 + SPRAY_AREA,
+                center.getZ() + 1 + SPRAY_AREA);
         for (LivingEntity target : server.getEntitiesOfClass(LivingEntity.class, box)) {
             if (!target.isAlive() || !target.isAffectedByPotions()) {
                 continue;
@@ -177,11 +189,14 @@ public final class BlockEntityPotionSprayer extends BlockEntity implements IEsse
             double mx = rand.nextGaussian() * 0.06 + facing.getStepX() * VENT_SPEED;
             double my = rand.nextGaussian() * 0.06 + facing.getStepY() * VENT_SPEED;
             double mz = rand.nextGaussian() * 0.06 + facing.getStepZ() * VENT_SPEED;
-            level.addParticle(new VentParticleOptions(mx, my, mz, color, 4.0F, false),
+            level.addParticle(
+                    new VentParticleOptions(mx, my, mz, color, 4.0F, false),
                     pos.getX() + 0.5F + fx + facing.getStepX() / 2.0F,
                     pos.getY() + 0.5F + fy + facing.getStepY() / 2.0F,
                     pos.getZ() + 0.5F + fz + facing.getStepZ() / 2.0F,
-                    0.0, 0.0, 0.0);
+                    0.0,
+                    0.0,
+                    0.0);
         }
     }
 
@@ -203,7 +218,8 @@ public final class BlockEntityPotionSprayer extends BlockEntity implements IEsse
         color = DEFAULT_COLOR;
         if (!potion.isEmpty()) {
             recipe = PotionAspects.of((ServerLevel) level, potion);
-            color = potion.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).getColor();
+            color = potion.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
+                    .getColor();
         } else {
             recipe = AspectList.EMPTY;
         }

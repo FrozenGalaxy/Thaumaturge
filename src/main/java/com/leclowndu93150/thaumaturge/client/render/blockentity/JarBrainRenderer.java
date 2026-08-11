@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
@@ -33,8 +32,13 @@ public final class JarBrainRenderer implements BlockEntityRenderer<BlockEntityJa
     }
 
     @Override
-    public void render(BlockEntityJarBrain jar, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityJarBrain jar,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         float delta = jar.rota - jar.rotb;
         while (delta >= (float) Math.PI) {
             delta -= (float) (Math.PI * 2);
@@ -43,7 +47,8 @@ public final class JarBrainRenderer implements BlockEntityRenderer<BlockEntityJa
             delta += (float) (Math.PI * 2);
         }
         float yawRadians = jar.rotb + delta * partialTick;
-        float time = (Minecraft.getInstance().player == null ? 0 : Minecraft.getInstance().player.tickCount) + partialTick;
+        float time =
+                (Minecraft.getInstance().player == null ? 0 : Minecraft.getInstance().player.tickCount) + partialTick;
         float bobOffset = Mth.sin(time / BOB_PERIOD) * BOB_AMPLITUDE + BOB_AMPLITUDE;
 
         poseStack.pushPose();

@@ -6,10 +6,10 @@ import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspectContainer;
 import com.leclowndu93150.thaumaturge.api.capability.KnowledgeAccess;
 import com.leclowndu93150.thaumaturge.api.items.GogglesAccess;
+import com.leclowndu93150.thaumaturge.client.render.aspect.AspectTagWorldRenderer;
 import com.leclowndu93150.thaumaturge.content.aura.node.BlockEntityNode;
 import com.leclowndu93150.thaumaturge.content.research.scan.ScanNode;
 import com.leclowndu93150.thaumaturge.registry.TCItems;
-import com.leclowndu93150.thaumaturge.client.render.aspect.AspectTagWorldRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -99,8 +99,8 @@ public final class GogglesWorldOverlay {
         lastTarget = null;
     }
 
-    private static void drawTags(PoseStack poseStack, Minecraft mc,
-                                 double x, double y, double z, AspectList aspects, Direction dir) {
+    private static void drawTags(
+            PoseStack poseStack, Minecraft mc, double x, double y, double z, AspectList aspects, Direction dir) {
         AspectTagWorldRenderer.renderTagCloud(poseStack, mc, x, y, z, aspects, dir, tagScale, TAG_ALPHA);
     }
 }

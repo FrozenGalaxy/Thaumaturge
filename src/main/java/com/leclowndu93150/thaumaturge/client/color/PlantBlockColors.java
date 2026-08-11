@@ -17,10 +17,12 @@ public final class PlantBlockColors {
 
     @SubscribeEvent
     public static void onRegisterBlockColors(RegisterColorHandlersEvent.Block event) {
-        BlockColor grass = (state, level, pos, tintIndex) ->
-                level != null && pos != null ? BiomeColors.getAverageGrassColor(level, pos) : GrassColor.getDefaultColor();
-        BlockColor foliage = (state, level, pos, tintIndex) ->
-                level != null && pos != null ? BiomeColors.getAverageFoliageColor(level, pos) : FoliageColor.getDefaultColor();
+        BlockColor grass = (state, level, pos, tintIndex) -> level != null && pos != null
+                ? BiomeColors.getAverageGrassColor(level, pos)
+                : GrassColor.getDefaultColor();
+        BlockColor foliage = (state, level, pos, tintIndex) -> level != null && pos != null
+                ? BiomeColors.getAverageFoliageColor(level, pos)
+                : FoliageColor.getDefaultColor();
         event.register(grass, TCBlocks.GRASS_AMBIENT.get());
         event.register(foliage, TCBlocks.LEAVES_GREATWOOD.get());
     }

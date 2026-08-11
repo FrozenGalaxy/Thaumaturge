@@ -42,8 +42,10 @@ public final class TCItemRenderExtensions {
     }
 
     @SafeVarargs
-    private static void register(RegisterClientExtensionsEvent event,
-                                 Supplier<BlockEntityWithoutLevelRenderer> factory, Holder<Item>... items) {
+    private static void register(
+            RegisterClientExtensionsEvent event,
+            Supplier<BlockEntityWithoutLevelRenderer> factory,
+            Holder<Item>... items) {
         event.registerItem(new BewlrExtension(factory), items);
     }
 

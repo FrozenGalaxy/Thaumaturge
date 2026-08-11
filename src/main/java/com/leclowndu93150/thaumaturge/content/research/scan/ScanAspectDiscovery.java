@@ -3,12 +3,12 @@ package com.leclowndu93150.thaumaturge.content.research.scan;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.research.scan.IScanThing;
-import com.leclowndu93150.thaumaturge.content.research.pool.AspectPools;
 import com.leclowndu93150.thaumaturge.api.research.scan.ScanKeys;
 import com.leclowndu93150.thaumaturge.api.research.scan.ScanningManager;
+import com.leclowndu93150.thaumaturge.content.research.pool.AspectPools;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -27,8 +27,10 @@ public final class ScanAspectDiscovery implements IScanThing {
         if (target == null) {
             return false;
         }
-        Holder<IAspect> holder = player.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY)
-                .get(aspect).orElse(null);
+        Holder<IAspect> holder = player.registryAccess()
+                .lookupOrThrow(IAspect.REGISTRY_KEY)
+                .get(aspect)
+                .orElse(null);
         if (holder == null) {
             return false;
         }
@@ -46,8 +48,7 @@ public final class ScanAspectDiscovery implements IScanThing {
     }
 
     @Override
-    public void onSuccess(Player player, @Nullable Object target) {
-    }
+    public void onSuccess(Player player, @Nullable Object target) {}
 
     @Override
     public ResourceLocation getResearchKey(Player player, @Nullable Object target) {

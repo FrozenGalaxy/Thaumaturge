@@ -1,12 +1,11 @@
 package com.leclowndu93150.thaumaturge.client.hud;
 
-import net.minecraft.core.Holder;
-import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.TCIds;
+import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.capability.KnowledgeType;
 import com.leclowndu93150.thaumaturge.api.research.IResearchCategory;
-import com.leclowndu93150.thaumaturge.client.render.aspect.ParticleTextures;
 import com.leclowndu93150.thaumaturge.client.render.GuiBlend;
+import com.leclowndu93150.thaumaturge.client.render.aspect.ParticleTextures;
 import com.mojang.math.Axis;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +15,9 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -64,9 +64,18 @@ public final class KnowledgeGainOverlay implements LayeredDraw.Layer {
         int hh = graphics.guiHeight();
 
         int bookTint = ARGB32.color(Math.round(bookFade / BOOK_FADE_MAX * 255.0F), 255, 255, 255);
-        GuiBlend.blitTinted(graphics, BOOK,
-                ww - BOOK_CORNER_OFFSET, hh - BOOK_CORNER_OFFSET,
-                0.0F, 0.0F, BOOK_SIZE, BOOK_SIZE, BOOK_SIZE, BOOK_SIZE, bookTint);
+        GuiBlend.blitTinted(
+                graphics,
+                BOOK,
+                ww - BOOK_CORNER_OFFSET,
+                hh - BOOK_CORNER_OFFSET,
+                0.0F,
+                0.0F,
+                BOOK_SIZE,
+                BOOK_SIZE,
+                BOOK_SIZE,
+                BOOK_SIZE,
+                bookTint);
 
         for (Tracker current : TRACKERS) {
             Random rand = new Random(current.seed);
@@ -99,8 +108,12 @@ public final class KnowledgeGainOverlay implements LayeredDraw.Layer {
             graphics.pose().mulPose(Axis.ZP.rotationDegrees(84 + rand.nextInt(12) - QUAD_INTRINSIC_ROTATION));
 
             if (current.aspect != null) {
-                drawCentered(graphics, current.aspect.value().texture(), s,
-                        ARGB32.color(ICON_ALPHA, current.aspect.value().color()), false);
+                drawCentered(
+                        graphics,
+                        current.aspect.value().texture(),
+                        s,
+                        ARGB32.color(ICON_ALPHA, current.aspect.value().color()),
+                        false);
             } else {
                 ResourceLocation typeIcon = current.type == KnowledgeType.THEORY ? KNOW_THEORY : KNOW_OBSERVATION;
                 drawCentered(graphics, typeIcon, s, ARGB32.color(ICON_ALPHA, 255, 255, 255), false);
@@ -122,7 +135,8 @@ public final class KnowledgeGainOverlay implements LayeredDraw.Layer {
             graphics.pose().popPose();
 
             if (mc.level != null
-                    && mc.level.getRandom().nextInt((int) (1.0F + (float) current.progress / current.max * 10.0F)) == 0) {
+                    && mc.level.getRandom().nextInt((int) (1.0F + (float) current.progress / current.max * 10.0F))
+                            == 0) {
                 spawnSpark(mc, xx, yy);
             }
         }
@@ -167,9 +181,18 @@ public final class KnowledgeGainOverlay implements LayeredDraw.Layer {
             graphics.pose().pushPose();
             graphics.pose().translate(x - size / 2.0F, y - size / 2.0F, 0.0F);
             graphics.pose().scale(size / texFrame, size / texFrame, 1.0F);
-            GuiBlend.blitAdditive(graphics, ParticleTextures.PARTICLES,
-                    0, 0, frameU * texFrame, frameV * texFrame,
-                    (int) texFrame, (int) texFrame, 1024, 1024, tint);
+            GuiBlend.blitAdditive(
+                    graphics,
+                    ParticleTextures.PARTICLES,
+                    0,
+                    0,
+                    frameU * texFrame,
+                    frameV * texFrame,
+                    (int) texFrame,
+                    (int) texFrame,
+                    1024,
+                    1024,
+                    tint);
             graphics.pose().popPose();
         }
     }
@@ -195,31 +218,64 @@ public final class KnowledgeGainOverlay implements LayeredDraw.Layer {
         graphics.pose().pushPose();
         graphics.pose().translate(-size / 2.0F, -size / 2.0F, 0.0F);
         graphics.pose().scale(size / texFrame, size / texFrame, 1.0F);
-        GuiBlend.blitAdditive(graphics, ParticleTextures.PARTICLES,
-                0, 0, frameU * texFrame, frameV * texFrame,
-                (int) texFrame, (int) texFrame, 1024, 1024, tint);
+        GuiBlend.blitAdditive(
+                graphics,
+                ParticleTextures.PARTICLES,
+                0,
+                0,
+                frameU * texFrame,
+                frameV * texFrame,
+                (int) texFrame,
+                (int) texFrame,
+                1024,
+                1024,
+                tint);
         graphics.pose().popPose();
     }
 
-    private static void drawCentered(GuiGraphics graphics, ResourceLocation texture, float size, int tint, boolean additive) {
+    private static void drawCentered(
+            GuiGraphics graphics, ResourceLocation texture, float size, int tint, boolean additive) {
         graphics.pose().pushPose();
         graphics.pose().translate(-size / 2.0F, -size / 2.0F, 0.0F);
         graphics.pose().scale(size / ICON_TEX_SIZE, size / ICON_TEX_SIZE, 1.0F);
         if (additive) {
-            GuiBlend.blitAdditive(graphics, texture, 0, 0, 0.0F, 0.0F,
-                    ICON_TEX_SIZE, ICON_TEX_SIZE, ICON_TEX_SIZE, ICON_TEX_SIZE, tint);
+            GuiBlend.blitAdditive(
+                    graphics,
+                    texture,
+                    0,
+                    0,
+                    0.0F,
+                    0.0F,
+                    ICON_TEX_SIZE,
+                    ICON_TEX_SIZE,
+                    ICON_TEX_SIZE,
+                    ICON_TEX_SIZE,
+                    tint);
         } else {
-            GuiBlend.blitTinted(graphics, texture, 0, 0, 0.0F, 0.0F,
-                    ICON_TEX_SIZE, ICON_TEX_SIZE, ICON_TEX_SIZE, ICON_TEX_SIZE, tint);
+            GuiBlend.blitTinted(
+                    graphics,
+                    texture,
+                    0,
+                    0,
+                    0.0F,
+                    0.0F,
+                    ICON_TEX_SIZE,
+                    ICON_TEX_SIZE,
+                    ICON_TEX_SIZE,
+                    ICON_TEX_SIZE,
+                    tint);
         }
         graphics.pose().popPose();
     }
 
-    private static @Nullable ResourceLocation categoryIcon(Minecraft mc, @Nullable ResourceKey<IResearchCategory> category) {
+    private static @Nullable ResourceLocation categoryIcon(
+            Minecraft mc, @Nullable ResourceKey<IResearchCategory> category) {
         if (category == null || mc.level == null) {
             return null;
         }
-        return mc.level.registryAccess().lookupOrThrow(IResearchCategory.REGISTRY_KEY)
+        return mc.level
+                .registryAccess()
+                .lookupOrThrow(IResearchCategory.REGISTRY_KEY)
                 .get(category)
                 .map(holder -> holder.value().icon())
                 .orElse(null);
@@ -229,8 +285,8 @@ public final class KnowledgeGainOverlay implements LayeredDraw.Layer {
         TRACKERS.add(new Tracker(KnowledgeType.OBSERVATION, null, aspect, duration, seed));
     }
 
-    public static void addTracker(KnowledgeType type, @Nullable ResourceKey<IResearchCategory> category,
-                                  int duration, long seed) {
+    public static void addTracker(
+            KnowledgeType type, @Nullable ResourceKey<IResearchCategory> category, int duration, long seed) {
         int total = type == KnowledgeType.THEORY ? duration + THEORY_EXTRA_TICKS : duration;
         TRACKERS.add(new Tracker(type, category, total, seed));
     }
@@ -315,8 +371,12 @@ public final class KnowledgeGainOverlay implements LayeredDraw.Layer {
             this(type, category, null, duration, seed);
         }
 
-        Tracker(KnowledgeType type, @Nullable ResourceKey<IResearchCategory> category,
-                @Nullable Holder<IAspect> aspect, int duration, long seed) {
+        Tracker(
+                KnowledgeType type,
+                @Nullable ResourceKey<IResearchCategory> category,
+                @Nullable Holder<IAspect> aspect,
+                int duration,
+                long seed) {
             this.type = type;
             this.category = category;
             this.aspect = aspect;

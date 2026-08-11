@@ -1,6 +1,5 @@
 package com.leclowndu93150.thaumaturge.content.infernalfurnace;
 
-import net.minecraft.world.item.ItemStack;
 import com.leclowndu93150.thaumaturge.config.ThaumaturgeServerConfig;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.leclowndu93150.thaumaturge.registry.TCBlocks;
@@ -8,16 +7,17 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Containers;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Blaze;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.Containers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
@@ -41,14 +41,14 @@ public class BlockInfernalFurnace extends BaseEntityBlock {
                 for (int i = 0; i < furnace.inventory().getSlots(); i++) {
                     ItemStack resource = furnace.inventory().getStackInSlot(i);
                     if (!resource.isEmpty()) {
-                        Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, resource.copy());
+                        Containers.dropItemStack(
+                                level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, resource.copy());
                     }
                 }
             }
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
-
 
     private static final MapCodec<BlockInfernalFurnace> CODEC = simpleCodec(BlockInfernalFurnace::new);
 
@@ -68,8 +68,9 @@ public class BlockInfernalFurnace extends BaseEntityBlock {
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return Shapes.box(0,0,0,1,0.5,1);
+    protected VoxelShape getCollisionShape(
+            BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return Shapes.box(0, 0, 0, 1, 0.5, 1);
     }
 
     @Override
@@ -118,18 +119,18 @@ public class BlockInfernalFurnace extends BaseEntityBlock {
 
     @Override
     public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
-        destroyFurnace(level,pos,state,pos);
+        destroyFurnace(level, pos, state, pos);
         super.destroy(level, pos, state);
     }
 
     @Override
     protected BlockState rotate(BlockState state, Rotation rotation) {
-        return state.setValue(FACING,rotation.rotate(state.getValue(FACING)));
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
     protected BlockState mirror(BlockState state, Mirror mirror) {
-        return state.setValue(FACING,mirror.mirror(state.getValue(FACING)));
+        return state.setValue(FACING, mirror.mirror(state.getValue(FACING)));
     }
 
     @Override
@@ -142,14 +143,14 @@ public class BlockInfernalFurnace extends BaseEntityBlock {
         return new BlockEntityInfernalFurnace(blockPos, blockState);
     }
 
-
     @Override
     protected VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
-        return Shapes.box(-1,-1,-1,2,2,2);
+        return Shapes.box(-1, -1, -1, 2, 2, 2);
     }
 
     @Override
-    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> type) {
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState blockState, BlockEntityType<T> type) {
         return createTickerHelper(type, TCBlockEntities.INFERNAL_FURNACE.get(), BlockEntityInfernalFurnace::staticTick);
     }
 
@@ -164,16 +165,16 @@ public class BlockInfernalFurnace extends BaseEntityBlock {
         if (entity.getZ() > pos.getZ() + 0.7F)
             entity.setDeltaMovement(entity.getDeltaMovement().add(0, 0, -1.0E-4F));
 
-        if (!level.isClientSide() && entity.tickCount % 10 == 0){
-            if (entity instanceof ItemEntity it){
-                entity.setDeltaMovement(entity.getDeltaMovement().with(Direction.Axis.Y,0.025F));
-                if (entity.onGround()){
+        if (!level.isClientSide() && entity.tickCount % 10 == 0) {
+            if (entity instanceof ItemEntity it) {
+                entity.setDeltaMovement(entity.getDeltaMovement().with(Direction.Axis.Y, 0.025F));
+                if (entity.onGround()) {
                     BlockEntityInfernalFurnace furnace = (BlockEntityInfernalFurnace) level.getBlockEntity(pos);
-                    if (furnace != null){
+                    if (furnace != null) {
                         it.setItem(furnace.addItemsToInventory(it.getItem()));
                     }
                 }
-            } else if (entity instanceof LivingEntity lv && !lv.fireImmune()){
+            } else if (entity instanceof LivingEntity lv && !lv.fireImmune()) {
                 entity.lavaHurt();
                 lv.igniteForSeconds(10);
             }

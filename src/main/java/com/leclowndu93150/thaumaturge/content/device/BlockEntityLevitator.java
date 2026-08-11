@@ -1,9 +1,8 @@
 package com.leclowndu93150.thaumaturge.content.device;
 
-import com.leclowndu93150.thaumaturge.Thaumaturge;
 import com.leclowndu93150.thaumaturge.api.aura.AuraHelper;
-import com.leclowndu93150.thaumaturge.registry.TCParticles;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
+import com.leclowndu93150.thaumaturge.registry.TCParticles;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -55,7 +54,8 @@ public final class BlockEntityLevitator extends BlockEntity {
             rangeActual = 0;
         }
         int probe = counter % RANGES[range];
-        if (level.getBlockState(pos.relative(facing, 1 + probe)).isSolidRender(level, pos.relative(facing, 1 + probe))) {
+        if (level.getBlockState(pos.relative(facing, 1 + probe))
+                .isSolidRender(level, pos.relative(facing, 1 + probe))) {
             if (1 + probe < rangeActual) {
                 rangeActual = 1 + probe;
             }
@@ -124,11 +124,15 @@ public final class BlockEntityLevitator extends BlockEntity {
             return;
         }
         RandomSource rand = level.getRandom();
-        spawnParticle(level, rand,
+        spawnParticle(
+                level,
+                rand,
                 pos.getX() + 0.25F + rand.nextFloat() * 0.5F,
                 pos.getY() + 0.25F + rand.nextFloat() * 0.5F,
                 pos.getZ() + 0.25F + rand.nextFloat() * 0.5F,
-                facing.getStepX() / 50.0, facing.getStepY() / 50.0, facing.getStepZ() / 50.0);
+                facing.getStepX() / 50.0,
+                facing.getStepY() / 50.0,
+                facing.getStepZ() / 50.0);
     }
 
     private static void drawFXAt(Level level, Entity entity) {
@@ -136,7 +140,9 @@ public final class BlockEntityLevitator extends BlockEntity {
             return;
         }
         RandomSource rand = level.getRandom();
-        spawnParticle(level, rand,
+        spawnParticle(
+                level,
+                rand,
                 entity.getX() + (rand.nextFloat() - rand.nextFloat()) * entity.getBbWidth(),
                 entity.getY() + rand.nextFloat() * entity.getBbHeight(),
                 entity.getZ() + (rand.nextFloat() - rand.nextFloat()) * entity.getBbWidth(),
@@ -145,8 +151,8 @@ public final class BlockEntityLevitator extends BlockEntity {
                 (rand.nextFloat() - rand.nextFloat()) * 0.01);
     }
 
-    private static void spawnParticle(Level level, RandomSource rand, double x, double y, double z,
-                                      double vx, double vy, double vz) {
+    private static void spawnParticle(
+            Level level, RandomSource rand, double x, double y, double z, double vx, double vy, double vz) {
         level.addParticle(TCParticles.LEVITATOR_MIST.get(), x, y, z, vx, vy, vz);
     }
 

@@ -17,8 +17,10 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
     private static final int GRIM_TINT = ARGB32.colorFromFloat(1.0F, 0.6F, 0.6F, 0.6F);
 
     @ModifyVariable(
-            method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
-            at = @At("HEAD"), argsOnly = true)
+            method =
+                    "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+            at = @At("HEAD"),
+            argsOnly = true)
     private MultiBufferSource thaumaturge$grimTint(MultiBufferSource buffers, T entity) {
         if (ChampionHelper.championType(entity) == ChampionModifier.GRIM) {
             return new TintBufferSource(buffers, GRIM_TINT);

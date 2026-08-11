@@ -27,7 +27,7 @@ public final class LegacyItemLift {
         model.getTransforms().getTransform(context).apply(false, poseStack);
         Matrix4f matrix = poseStack.last().pose();
 
-        float[] bounds = { Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY };
+        float[] bounds = {Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY};
         accumulateY(model.getQuads(null, null, random), matrix, bounds);
         for (Direction direction : Direction.values()) {
             accumulateY(model.getQuads(null, direction, random), matrix, bounds);
@@ -45,7 +45,8 @@ public final class LegacyItemLift {
             int stride = vertices.length / 4;
             for (int vertex = 0; vertex < 4; vertex++) {
                 int base = vertex * stride;
-                corner.set(Float.intBitsToFloat(vertices[base]),
+                corner.set(
+                        Float.intBitsToFloat(vertices[base]),
                         Float.intBitsToFloat(vertices[base + 1]),
                         Float.intBitsToFloat(vertices[base + 2]));
                 matrix.transformPosition(corner);

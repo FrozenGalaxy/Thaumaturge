@@ -27,9 +27,12 @@ public final class CrystalUnbakedModel implements IUnbakedGeometry<CrystalUnbake
     private CrystalUnbakedModel() {}
 
     @Override
-    public BakedModel bake(IGeometryBakingContext context, ModelBaker baker,
-                           Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState,
-                           ItemOverrides overrides) {
+    public BakedModel bake(
+            IGeometryBakingContext context,
+            ModelBaker baker,
+            Function<Material, TextureAtlasSprite> spriteGetter,
+            ModelState modelState,
+            ItemOverrides overrides) {
         TCMesh mesh = loadMesh();
         TextureAtlasSprite particle = spriteGetter.apply(context.getMaterial(PARTICLE_SLOT));
         return new CrystalBakedModel(mesh, particle);
@@ -49,7 +52,8 @@ public final class CrystalUnbakedModel implements IUnbakedGeometry<CrystalUnbake
         private Loader() {}
 
         @Override
-        public CrystalUnbakedModel read(JsonObject jsonObject, JsonDeserializationContext context) throws JsonParseException {
+        public CrystalUnbakedModel read(JsonObject jsonObject, JsonDeserializationContext context)
+                throws JsonParseException {
             return new CrystalUnbakedModel();
         }
     }

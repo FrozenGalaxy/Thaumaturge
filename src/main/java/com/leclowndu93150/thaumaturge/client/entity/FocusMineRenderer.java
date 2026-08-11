@@ -33,14 +33,18 @@ public final class FocusMineRenderer extends EntityRenderer<EntityFocusMine> {
     }
 
     @Override
-    public void render(EntityFocusMine entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int packedLight) {
+    public void render(
+            EntityFocusMine entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
         float ticks = entity.tickCount + partialTicks;
         int color = entity.renderColor();
-        float pulse = entity.isArmed()
-                ? Mth.sin(ticks / PULSE_PERIOD) * PULSE_AMPLITUDE + PULSE_BASE
-                : UNARMED_BRIGHTNESS;
+        float pulse =
+                entity.isArmed() ? Mth.sin(ticks / PULSE_PERIOD) * PULSE_AMPLITUDE + PULSE_BASE : UNARMED_BRIGHTNESS;
         float r = ((color >> 16) & 0xFF) / COLOR_DIVISOR * pulse;
         float g = ((color >> 8) & 0xFF) / COLOR_DIVISOR * pulse;
         float b = (color & 0xFF) / COLOR_DIVISOR * pulse;
@@ -49,8 +53,12 @@ public final class FocusMineRenderer extends EntityRenderer<EntityFocusMine> {
         poseStack.translate(0.0F, GROUND_LIFT, 0.0F);
         poseStack.mulPose(Axis.YP.rotationDegrees(ticks * SPIN_DEGREES_PER_TICK));
         poseStack.mulPose(Axis.ZP.rotationDegrees(-90.0F));
-        model.root.render(poseStack, buffers.getBuffer(RenderType.entityCutout(TEXTURE)),
-                packedLight, OverlayTexture.NO_OVERLAY, tint);
+        model.root.render(
+                poseStack,
+                buffers.getBuffer(RenderType.entityCutout(TEXTURE)),
+                packedLight,
+                OverlayTexture.NO_OVERLAY,
+                tint);
         poseStack.popPose();
     }
 

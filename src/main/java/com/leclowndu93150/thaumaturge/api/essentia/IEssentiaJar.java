@@ -20,16 +20,13 @@ public interface IEssentiaJar {
     int DEFAULT_CAPACITY = 250;
 
     /** The side texture of a standard jar. */
-    ResourceLocation DEFAULT_SIDE_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("thaumaturge", "block/jar_side");
+    ResourceLocation DEFAULT_SIDE_TEXTURE = ResourceLocation.fromNamespaceAndPath("thaumaturge", "block/jar_side");
 
     /** The top texture of a standard jar. */
-    ResourceLocation DEFAULT_TOP_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("thaumaturge", "block/jar_top");
+    ResourceLocation DEFAULT_TOP_TEXTURE = ResourceLocation.fromNamespaceAndPath("thaumaturge", "block/jar_top");
 
     /** The bottom texture of a standard jar. */
-    ResourceLocation DEFAULT_BOTTOM_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("thaumaturge", "block/jar_bottom");
+    ResourceLocation DEFAULT_BOTTOM_TEXTURE = ResourceLocation.fromNamespaceAndPath("thaumaturge", "block/jar_bottom");
 
     /**
      * The amount of a single aspect this jar kind can hold.

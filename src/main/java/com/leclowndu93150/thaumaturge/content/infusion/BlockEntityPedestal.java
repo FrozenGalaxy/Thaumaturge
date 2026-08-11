@@ -1,12 +1,10 @@
 package com.leclowndu93150.thaumaturge.content.infusion;
 
-import org.jspecify.annotations.Nullable;
-import net.minecraft.core.Direction;
-import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import com.leclowndu93150.thaumaturge.content.device.BlockInlay;
-import com.leclowndu93150.thaumaturge.Thaumaturge;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
+import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -16,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 public class BlockEntityPedestal extends BlockEntity {
     private ItemStack item = ItemStack.EMPTY;
@@ -75,12 +74,14 @@ public class BlockEntityPedestal extends BlockEntity {
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
+
     public @Nullable BlockPos findInstabilityMitigator() {
         if (level == null) {
             return null;
         }
         int charge = getBlockState().hasProperty(BlockPedestal.CHARGE)
-                ? getBlockState().getValue(BlockPedestal.CHARGE) : 0;
+                ? getBlockState().getValue(BlockPedestal.CHARGE)
+                : 0;
         if (charge <= 0) {
             return null;
         }

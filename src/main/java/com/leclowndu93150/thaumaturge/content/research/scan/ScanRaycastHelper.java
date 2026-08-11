@@ -38,9 +38,12 @@ public final class ScanRaycastHelper {
         Vec3 start = ctx.start();
         Vec3 direction = ctx.direction();
 
-        BlockHitResult blockResult = level.clip(new ClipContext(start,
+        BlockHitResult blockResult = level.clip(new ClipContext(
+                start,
                 start.add(direction.scale(ctx.blockReach())),
-                ClipContext.Block.OUTLINE, ctx.fluidFilter(), ctx.entity()));
+                ClipContext.Block.OUTLINE,
+                ctx.fluidFilter(),
+                ctx.entity()));
         EntityHitResult entityResult = clipEntity(start, direction, ctx.entityReach(), ctx.entity());
 
         if (blockResult.getType() != HitResult.Type.MISS && entityResult != null) {
@@ -51,8 +54,11 @@ public final class ScanRaycastHelper {
         if (blockResult.getType() != HitResult.Type.MISS) {
             return blockResult;
         }
-        return entityResult != null ? entityResult
-                : BlockHitResult.miss(ctx.entity().getEyePosition(), ctx.entity().getDirection(),
+        return entityResult != null
+                ? entityResult
+                : BlockHitResult.miss(
+                        ctx.entity().getEyePosition(),
+                        ctx.entity().getDirection(),
                         ctx.entity().blockPosition());
     }
 
@@ -60,12 +66,23 @@ public final class ScanRaycastHelper {
         AABB box = entity.getBoundingBox()
                 .expandTowards(direction.scale(entityReach))
                 .inflate(ENTITY_BOX_PADDING, ENTITY_BOX_PADDING, ENTITY_BOX_PADDING);
-        return ProjectileUtil.getEntityHitResult(entity, start, start.add(direction.scale(entityReach)), box,
-                candidate -> !candidate.isSpectator(), entityReach * entityReach);
+        return ProjectileUtil.getEntityHitResult(
+                entity,
+                start,
+                start.add(direction.scale(entityReach)),
+                box,
+                candidate -> !candidate.isSpectator(),
+                entityReach * entityReach);
     }
 
-    public record ScanRaycastContext(Level level, Vec3 start, Vec3 direction, double blockReach, double entityReach,
-                                     ClipContext.Fluid fluidFilter, Entity entity) {
+    public record ScanRaycastContext(
+            Level level,
+            Vec3 start,
+            Vec3 direction,
+            double blockReach,
+            double entityReach,
+            ClipContext.Fluid fluidFilter,
+            Entity entity) {
         public ScanRaycastContext {
             Objects.requireNonNull(level, "level cannot be null");
             Objects.requireNonNull(start, "start cannot be null");

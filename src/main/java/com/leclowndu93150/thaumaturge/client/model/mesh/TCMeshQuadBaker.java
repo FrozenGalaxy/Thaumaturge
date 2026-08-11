@@ -17,37 +17,53 @@ public final class TCMeshQuadBaker {
 
     private TCMeshQuadBaker() {}
 
-    public static void bakePart(TCMeshPart part, TextureAtlasSprite sprite, int tintIndex,
-                                Matrix4f transform, List<BakedQuad> output) {
+    public static void bakePart(
+            TCMeshPart part, TextureAtlasSprite sprite, int tintIndex, Matrix4f transform, List<BakedQuad> output) {
         bakePart(part, sprite, tintIndex, transform, false, 0, 0, output);
     }
 
-    public static void bakePart(TCMeshPart part, TextureAtlasSprite sprite, int tintIndex,
-                                Matrix4f transform, boolean flipV, List<BakedQuad> output) {
+    public static void bakePart(
+            TCMeshPart part,
+            TextureAtlasSprite sprite,
+            int tintIndex,
+            Matrix4f transform,
+            boolean flipV,
+            List<BakedQuad> output) {
         bakePart(part, sprite, tintIndex, transform, flipV, 0, 0, output);
     }
 
-    public static void bakePart(TCMeshPart part, TextureAtlasSprite sprite, int tintIndex,
-                                Matrix4f transform, boolean flipV, int blockLight, int skyLight,
-                                List<BakedQuad> output) {
+    public static void bakePart(
+            TCMeshPart part,
+            TextureAtlasSprite sprite,
+            int tintIndex,
+            Matrix4f transform,
+            boolean flipV,
+            int blockLight,
+            int skyLight,
+            List<BakedQuad> output) {
         QuadBakingVertexConsumer consumer = new QuadBakingVertexConsumer();
         for (int quad = 0; quad < part.quadCount(); quad++) {
             output.add(bakeQuad(part, quad, sprite, transform, tintIndex, flipV, blockLight, skyLight, consumer));
         }
     }
 
-    private static BakedQuad bakeQuad(TCMeshPart part, int quad, TextureAtlasSprite sprite,
-                                      Matrix4f transform, int tintIndex, boolean flipV, int blockLight, int skyLight,
-                                      QuadBakingVertexConsumer consumer) {
+    private static BakedQuad bakeQuad(
+            TCMeshPart part,
+            int quad,
+            TextureAtlasSprite sprite,
+            Matrix4f transform,
+            int tintIndex,
+            boolean flipV,
+            int blockLight,
+            int skyLight,
+            QuadBakingVertexConsumer consumer) {
         Vector3f[] positions = new Vector3f[CORNERS_PER_QUAD];
         float[] us = new float[CORNERS_PER_QUAD];
         float[] vs = new float[CORNERS_PER_QUAD];
         for (int i = 0; i < CORNERS_PER_QUAD; i++) {
             int vertex = quad * CORNERS_PER_QUAD + i;
             Vector3f pos = new Vector3f(
-                    part.positions()[vertex * 3],
-                    part.positions()[vertex * 3 + 1],
-                    part.positions()[vertex * 3 + 2]);
+                    part.positions()[vertex * 3], part.positions()[vertex * 3 + 1], part.positions()[vertex * 3 + 2]);
             float u = 0.0F;
             float v = 0.0F;
             if (part.uvs() != null) {

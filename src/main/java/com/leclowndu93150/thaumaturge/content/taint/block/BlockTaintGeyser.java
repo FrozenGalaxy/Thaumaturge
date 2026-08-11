@@ -8,7 +8,6 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -44,9 +43,14 @@ public final class BlockTaintGeyser extends AbstractTaintBlock {
         double z = pos.getZ() + 0.5;
         if (random.nextFloat() < SWARM_SPAWN_CHANCE
                 && level.hasNearbyAlivePlayer(x, y, z, SWARM_PLAYER_RANGE)
-                && level.getEntitiesOfClass(EntityTaintSwarm.class,
-                        AABB.ofSize(pos.getCenter(), SWARM_EXCLUSION_RANGE * 2,
-                                SWARM_EXCLUSION_RANGE * 2, SWARM_EXCLUSION_RANGE * 2)).isEmpty()) {
+                && level.getEntitiesOfClass(
+                                EntityTaintSwarm.class,
+                                AABB.ofSize(
+                                        pos.getCenter(),
+                                        SWARM_EXCLUSION_RANGE * 2,
+                                        SWARM_EXCLUSION_RANGE * 2,
+                                        SWARM_EXCLUSION_RANGE * 2))
+                        .isEmpty()) {
             EntityTaintSwarm swarm = TCEntities.TAINT_SWARM.get().create(level);
             if (swarm != null) {
                 swarm.moveTo(x, pos.getY() + 1.25, z, random.nextInt(360), 0.0F);

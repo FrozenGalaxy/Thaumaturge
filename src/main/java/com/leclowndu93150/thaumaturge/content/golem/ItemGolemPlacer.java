@@ -1,12 +1,13 @@
 package com.leclowndu93150.thaumaturge.content.golem;
 
-import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
-import com.leclowndu93150.thaumaturge.api.golems.parts.GolemMaterial;
 import com.leclowndu93150.thaumaturge.api.golems.GolemTrait;
 import com.leclowndu93150.thaumaturge.api.golems.ISealDisplayer;
+import com.leclowndu93150.thaumaturge.api.golems.parts.GolemMaterial;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
 import com.leclowndu93150.thaumaturge.registry.TCEntities;
 import com.leclowndu93150.thaumaturge.registry.TCGolemParts;
+import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -18,8 +19,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-
-import java.util.List;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
@@ -29,7 +28,8 @@ public final class ItemGolemPlacer extends Item implements ISealDisplayer {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         GolemProperties props = stack.get(TCDataComponents.GOLEM_PROPERTIES.get());
         if (props == null) {
             return;
@@ -37,23 +37,27 @@ public final class ItemGolemPlacer extends Item implements ISealDisplayer {
         if (props.hasTrait(TCGolemTraits.SMART.get())) {
             if (props.getRank() >= EntityThaumaturgeGolem.MAX_RANK) {
                 tooltip.add(Component.translatable("golem.rank")
-                        .append(" " + props.getRank()).withStyle(ChatFormatting.GOLD));
+                        .append(" " + props.getRank())
+                        .withStyle(ChatFormatting.GOLD));
             } else {
                 int xp = stack.getOrDefault(TCDataComponents.GOLEM_XP.get(), 0);
                 int needed = (props.getRank() + 1) * (props.getRank() + 1) * EntityThaumaturgeGolem.XP_PER_RANK_UNIT;
                 tooltip.add(Component.translatable("golem.rank")
-                        .append(" " + props.getRank()).withStyle(ChatFormatting.GOLD)
-                        .append(Component.literal(" (" + xp + "/" + needed + ")").withStyle(ChatFormatting.DARK_GREEN)));
+                        .append(" " + props.getRank())
+                        .withStyle(ChatFormatting.GOLD)
+                        .append(Component.literal(" (" + xp + "/" + needed + ")")
+                                .withStyle(ChatFormatting.DARK_GREEN)));
             }
         }
         ResourceLocation materialKey = TCGolemParts.materials().getKey(props.getMaterial());
         if (materialKey != null) {
-            tooltip.add(Component.translatable(GolemMaterial.nameKey(materialKey))
-                    .withStyle(ChatFormatting.GREEN));
+            tooltip.add(
+                    Component.translatable(GolemMaterial.nameKey(materialKey)).withStyle(ChatFormatting.GREEN));
         }
         for (GolemTrait trait : props.getTraits()) {
             tooltip.add(Component.literal("-")
-                    .append(Component.translatable(GolemTrait.nameKey(TCGolemTraits.registry().getKey(trait))))
+                    .append(Component.translatable(
+                            GolemTrait.nameKey(TCGolemTraits.registry().getKey(trait))))
                     .withStyle(ChatFormatting.BLUE));
         }
     }

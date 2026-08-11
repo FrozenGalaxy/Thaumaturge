@@ -1,9 +1,10 @@
 package com.leclowndu93150.thaumaturge.content.device;
 
-import com.leclowndu93150.thaumaturge.Thaumaturge;
 import com.leclowndu93150.thaumaturge.content.entity.EntityFluxRift;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.leclowndu93150.thaumaturge.registry.TCItems;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -21,9 +22,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.items.ItemStackHandler;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public final class BlockEntityVoidSiphon extends BlockEntity {
     public static final int PROGRESS_REQUIRED = 2000;
@@ -107,8 +105,8 @@ public final class BlockEntityVoidSiphon extends BlockEntity {
             Vec3 from = new Vec3(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5);
             Vec3 to = rift.position();
             from = from.add(to.subtract(from).normalize());
-            HitResult hit = level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
-                    CollisionContext.empty()));
+            HitResult hit = level.clip(new ClipContext(
+                    from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
             if (hit.getType() == HitResult.Type.MISS) {
                 found.add(rift);
             }

@@ -22,8 +22,10 @@ public final class GhastLikeMoveControl extends MoveControl {
         if (this.operation == MoveControl.Operation.MOVE_TO) {
             if (this.floatDuration-- <= 0) {
                 this.floatDuration += this.flyer.getRandom().nextInt(5) + 2;
-                Vec3 delta = new Vec3(this.wantedX - this.flyer.getX(),
-                        this.wantedY - this.flyer.getY(), this.wantedZ - this.flyer.getZ());
+                Vec3 delta = new Vec3(
+                        this.wantedX - this.flyer.getX(),
+                        this.wantedY - this.flyer.getY(),
+                        this.wantedZ - this.flyer.getZ());
                 double distance = delta.length();
                 delta = delta.normalize();
                 if (canReach(delta, Mth.ceil(distance))) {

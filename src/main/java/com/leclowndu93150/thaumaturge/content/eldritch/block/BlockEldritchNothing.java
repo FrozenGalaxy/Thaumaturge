@@ -1,8 +1,8 @@
 package com.leclowndu93150.thaumaturge.content.eldritch.block;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -60,12 +60,14 @@ public final class BlockEldritchNothing extends Block implements EntityBlock {
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getCollisionShape(
+            BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return COLLISION;
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos fromPos, boolean movedByPiston) {
+    protected void neighborChanged(
+            BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos fromPos, boolean movedByPiston) {
         boolean exposed = isExposed(level, pos);
         if (state.getValue(EXPOSED) != exposed) {
             level.setBlock(pos, state.setValue(EXPOSED, exposed), 3);

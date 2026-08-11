@@ -1,18 +1,18 @@
 package com.leclowndu93150.thaumaturge.content.essentia.jar;
 
-import com.leclowndu93150.thaumaturge.content.legacy.LegacyIds;
-import com.leclowndu93150.thaumaturge.api.essentia.IEssentiaJar;
-import com.leclowndu93150.thaumaturge.serialization.TCNbt;
-import com.leclowndu93150.thaumaturge.Thaumaturge;
 import com.leclowndu93150.thaumaturge.api.aspect.*;
-import com.leclowndu93150.thaumaturge.api.essentia.EssentiaList;
-import com.leclowndu93150.thaumaturge.api.essentia.IEssentiaTransport;
 import com.leclowndu93150.thaumaturge.api.aura.AuraHelper;
+import com.leclowndu93150.thaumaturge.api.essentia.EssentiaList;
+import com.leclowndu93150.thaumaturge.api.essentia.IEssentiaJar;
+import com.leclowndu93150.thaumaturge.api.essentia.IEssentiaTransport;
 import com.leclowndu93150.thaumaturge.content.essentia.EssentiaTransportHelper;
 import com.leclowndu93150.thaumaturge.content.essentia.flow.EssentiaFlowHandler;
+import com.leclowndu93150.thaumaturge.content.legacy.LegacyIds;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
+import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import com.mojang.serialization.Codec;
+import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -29,14 +29,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Objects;
-
 public class BlockEntityJar extends BlockEntity implements IEssentiaTransport, IAspectSource {
     public static final int CAPACITY = IEssentiaJar.DEFAULT_CAPACITY;
 
     public int capacity() {
         return getBlockState().getBlock() instanceof IEssentiaJar jar ? jar.jarCapacity() : CAPACITY;
     }
+
     private static final Codec<ResourceKey<IAspect>> ASPECT_KEY_CODEC = LegacyIds.ASPECT_KEY_CODEC;
 
     private @Nullable ResourceKey<IAspect> aspect;
@@ -116,7 +115,7 @@ public class BlockEntityJar extends BlockEntity implements IEssentiaTransport, I
         return facing;
     }
 
-    protected void clearAspect(){
+    protected void clearAspect() {
         this.aspect = null;
         this.amount = 0;
         setChanged();
@@ -272,7 +271,8 @@ public class BlockEntityJar extends BlockEntity implements IEssentiaTransport, I
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
         aspect = TCNbt.read(input, "Aspect", ASPECT_KEY_CODEC, registries).orElse(null);
-        aspectFilter = TCNbt.read(input, "AspectFilter", ASPECT_KEY_CODEC, registries).orElse(null);
+        aspectFilter =
+                TCNbt.read(input, "AspectFilter", ASPECT_KEY_CODEC, registries).orElse(null);
         amount = input.getInt("Amount");
         facing = TCNbt.read(input, "Facing", Direction.CODEC, registries).orElse(Direction.DOWN);
         braced = input.getBoolean("Braced");
@@ -340,7 +340,7 @@ public class BlockEntityJar extends BlockEntity implements IEssentiaTransport, I
     @Override
     public AspectList getAspects() {
         if (amount() == 0) return AspectList.EMPTY;
-        return AspectList.of(new AspectInstance(EssentiaTransportHelper.resolve(getLevel(),aspectKey()),amount()));
+        return AspectList.of(new AspectInstance(EssentiaTransportHelper.resolve(getLevel(), aspectKey()), amount()));
     }
 
     @Override
@@ -364,7 +364,7 @@ public class BlockEntityJar extends BlockEntity implements IEssentiaTransport, I
     @Override
     public int addToContainer(Holder<IAspect> aspect, int amount) {
         if (amount == 0) return amount;
-        if ((this.amount < capacity() && Objects.equals(this.aspect, aspect.getKey())) || this.amount == 0){
+        if ((this.amount < capacity() && Objects.equals(this.aspect, aspect.getKey())) || this.amount == 0) {
             this.aspect = aspect.getKey();
             int added = Math.min(amount, capacity() - this.amount);
             this.amount += added;

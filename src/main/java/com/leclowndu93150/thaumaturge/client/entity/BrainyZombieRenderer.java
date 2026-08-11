@@ -20,15 +20,21 @@ public final class BrainyZombieRenderer
     private static final float ANGER_TINT_STRENGTH = 0.5F;
 
     public BrainyZombieRenderer(EntityRendererProvider.Context context) {
-        super(context,
+        super(
+                context,
                 new ZombieModel<>(context.bakeLayer(ModelLayers.ZOMBIE)),
                 new ZombieModel<>(context.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
                 new ZombieModel<>(context.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)));
     }
 
     @Override
-    public void render(EntityBrainyZombie entity, float entityYaw, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light) {
+    public void render(
+            EntityBrainyZombie entity,
+            float entityYaw,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light) {
         float anger = entity instanceof EntityGiantBrainyZombie giant ? giant.getAnger() : 0.0F;
         if (anger > 0.0F) {
             float fade = 1.0F - Math.min(1.0F, anger) * ANGER_TINT_STRENGTH;

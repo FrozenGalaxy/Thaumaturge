@@ -1,16 +1,15 @@
 package com.leclowndu93150.thaumaturge.content.recipe.crucible;
 
-import net.minecraft.core.HolderLookup;
-import com.leclowndu93150.thaumaturge.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumaturge.api.recipe.ResearchGated;
-import com.leclowndu93150.thaumaturge.content.recipe.dust.DustTriggerSimpleRecipe;
+import com.leclowndu93150.thaumaturge.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumaturge.registry.TCRecipeTypes;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.registries.Registries;
+import java.util.Optional;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -18,16 +17,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
-import java.util.Optional;
-
 public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGated {
 
     public static final MapCodec<CrucibleRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-            Ingredient.CODEC.fieldOf("catalyst").forGetter(r -> r.catalyst),
-            AspectList.NON_EMPTY_CODEC.fieldOf("aspects").forGetter(r-> r.aspects),
-            ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
-            ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research)
-    ).apply(i, CrucibleRecipe::new));
+                    Ingredient.CODEC.fieldOf("catalyst").forGetter(r -> r.catalyst),
+                    AspectList.NON_EMPTY_CODEC.fieldOf("aspects").forGetter(r -> r.aspects),
+                    ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
+                    ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research))
+            .apply(i, CrucibleRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, CrucibleRecipe> STREAM_CODEC = StreamCodec.composite(
             Ingredient.CONTENTS_STREAM_CODEC,
@@ -38,11 +35,10 @@ public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGate
             r -> r.result,
             ByteBufCodecs.optional(ResearchGate.STREAM_CODEC),
             r -> r.research,
-            CrucibleRecipe::new
-    );
+            CrucibleRecipe::new);
 
-    public static final RecipeSerializer<CrucibleRecipe> SERIALIZER = new SimpleRecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
-
+    public static final RecipeSerializer<CrucibleRecipe> SERIALIZER =
+            new SimpleRecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     private final Ingredient catalyst;
     private final AspectList aspects;
@@ -56,13 +52,12 @@ public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGate
         this.research = research;
     }
 
-
     @Override
     public boolean matches(CrucibleRecipeInput input, Level level) {
         if (!catalyst.test(input.catalyst())) return false;
         if (input.availableAspects().isEmpty()) return false;
-        for (AspectInstance aspect : aspects.entries()){
-            if (input.availableAspects().amountOf(aspect.aspect()) < aspect.amount()){
+        for (AspectInstance aspect : aspects.entries()) {
+            if (input.availableAspects().amountOf(aspect.aspect()) < aspect.amount()) {
                 return false;
             }
         }
@@ -78,7 +73,6 @@ public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGate
 
         return temp;
     }
-
 
     @Override
     public ItemStack assemble(CrucibleRecipeInput crucibleRecipeInput, HolderLookup.Provider registries) {
@@ -110,7 +104,7 @@ public class CrucibleRecipe implements Recipe<CrucibleRecipeInput>, ResearchGate
         return TCRecipeTypes.CRUCIBLE.get();
     }
 
-            public AspectList aspects() {
+    public AspectList aspects() {
         return aspects;
     }
 

@@ -8,8 +8,8 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 public final class TCTooltips {
     private TCTooltips() {}
@@ -87,8 +87,7 @@ public final class TCTooltips {
             int totalStages,
             List<Component> missingParents,
             boolean hasNewResearch,
-            boolean hasNewPage
-    ) {
+            boolean hasNewPage) {
         List<Component> lines = new ArrayList<>();
         lines.add(entryNameGold(name));
         switch (status) {

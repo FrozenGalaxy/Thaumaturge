@@ -1,12 +1,11 @@
 package com.leclowndu93150.thaumaturge.client.screen.golem;
-import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
 
 import com.leclowndu93150.thaumaturge.api.golems.GolemTrait;
-import com.leclowndu93150.thaumaturge.api.golems.seals.ISealConfigArea;
 import com.leclowndu93150.thaumaturge.api.golems.seals.ISealConfigFilter;
 import com.leclowndu93150.thaumaturge.api.golems.seals.ISealConfigToggles;
 import com.leclowndu93150.thaumaturge.api.golems.seals.ISealEntity;
 import com.leclowndu93150.thaumaturge.api.golems.seals.ISealGui;
+import com.leclowndu93150.thaumaturge.client.render.GuiBlend;
 import com.leclowndu93150.thaumaturge.client.screen.AbstractTCContainerScreen;
 import com.leclowndu93150.thaumaturge.client.screen.TCScreenTextures;
 import com.leclowndu93150.thaumaturge.client.screen.widget.TCButton;
@@ -14,10 +13,9 @@ import com.leclowndu93150.thaumaturge.client.screen.widget.TCButtonIcon;
 import com.leclowndu93150.thaumaturge.client.screen.widget.TCHoverButton;
 import com.leclowndu93150.thaumaturge.client.screen.widget.TCImageButton;
 import com.leclowndu93150.thaumaturge.client.screen.widget.TCPlusMinusButton;
-import com.leclowndu93150.thaumaturge.client.render.GuiBlend;
 import com.leclowndu93150.thaumaturge.content.golem.seals.MenuSealBase;
+import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
 import net.minecraft.client.gui.GuiGraphics;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
@@ -88,8 +86,11 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
                 int xx = (int) (Mth.cos((start - c * slice) / 180.0F * (float) Math.PI) * 86.0F);
                 int yy = (int) (Mth.sin((start - c * slice) / 180.0F * (float) Math.PI) * 86.0F);
                 int index = c;
-                CategoryButton button = new CategoryButton(leftPos + middleX + xx - 8, topPos + middleY + yy - 8,
-                        cat, menu.category() == cat,
+                CategoryButton button = new CategoryButton(
+                        leftPos + middleX + xx - 8,
+                        topPos + middleY + yy - 8,
+                        cat,
+                        menu.category() == cat,
                         Component.translatable("button.category." + cat),
                         () -> selectCategory(index));
                 addRenderableWidget(button);
@@ -98,33 +99,51 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
         }
         int xx = (int) (Mth.cos((start - c * slice) / 180.0F * (float) Math.PI) * 86.0F);
         int yy = (int) (Mth.sin((start - c * slice) / 180.0F * (float) Math.PI) * 86.0F);
-        addRenderableWidget(new StateButton(leftPos + middleX + xx - 8, topPos + middleY + yy - 8,
+        addRenderableWidget(new StateButton(
+                leftPos + middleX + xx - 8,
+                topPos + middleY + yy - 8,
                 () -> seal.isRedstoneSensitive() ? REDSTONE_U_ON : REDSTONE_U_OFF,
                 () -> Component.translatable(seal.isRedstoneSensitive() ? "golem.prop.redon" : "golem.prop.redoff"),
                 () -> {
                     seal.setRedstoneSensitive(!seal.isRedstoneSensitive());
-                    sendButton(seal.isRedstoneSensitive()
-                            ? MenuSealBase.BUTTON_REDSTONE_ON : MenuSealBase.BUTTON_REDSTONE_OFF);
+                    sendButton(
+                            seal.isRedstoneSensitive()
+                                    ? MenuSealBase.BUTTON_REDSTONE_ON
+                                    : MenuSealBase.BUTTON_REDSTONE_OFF);
                 }));
         switch (menu.category()) {
             case ISealGui.CAT_PRIORITY -> {
-                addRenderableWidget(TCPlusMinusButton.minus(leftPos + middleX - 5 - 14, topPos + middleY - 17,
-                        Component.empty(), () -> sendButton(MenuSealBase.BUTTON_PRIORITY_DOWN)));
-                addRenderableWidget(TCPlusMinusButton.plus(leftPos + middleX - 5 + 14, topPos + middleY - 17,
-                        Component.empty(), () -> sendButton(MenuSealBase.BUTTON_PRIORITY_UP)));
-                addRenderableWidget(TCPlusMinusButton.minus(leftPos + middleX + 18 - 12, topPos + middleY + 4,
-                        Component.empty(), () -> sendButton(MenuSealBase.BUTTON_COLOR_DOWN)));
-                addRenderableWidget(TCPlusMinusButton.plus(leftPos + middleX + 18 + 11, topPos + middleY + 4,
-                        Component.empty(), () -> sendButton(MenuSealBase.BUTTON_COLOR_UP)));
-                if (minecraft != null && minecraft.player != null
+                addRenderableWidget(TCPlusMinusButton.minus(
+                        leftPos + middleX - 5 - 14,
+                        topPos + middleY - 17,
+                        Component.empty(),
+                        () -> sendButton(MenuSealBase.BUTTON_PRIORITY_DOWN)));
+                addRenderableWidget(TCPlusMinusButton.plus(
+                        leftPos + middleX - 5 + 14,
+                        topPos + middleY - 17,
+                        Component.empty(),
+                        () -> sendButton(MenuSealBase.BUTTON_PRIORITY_UP)));
+                addRenderableWidget(TCPlusMinusButton.minus(
+                        leftPos + middleX + 18 - 12,
+                        topPos + middleY + 4,
+                        Component.empty(),
+                        () -> sendButton(MenuSealBase.BUTTON_COLOR_DOWN)));
+                addRenderableWidget(TCPlusMinusButton.plus(
+                        leftPos + middleX + 18 + 11,
+                        topPos + middleY + 4,
+                        Component.empty(),
+                        () -> sendButton(MenuSealBase.BUTTON_COLOR_UP)));
+                if (minecraft != null
+                        && minecraft.player != null
                         && minecraft.player.getUUID().equals(seal.getOwner())) {
-                    addRenderableWidget(new StateButton(leftPos + middleX - 32, topPos + middleY,
+                    addRenderableWidget(new StateButton(
+                            leftPos + middleX - 32,
+                            topPos + middleY,
                             () -> seal.isLocked() ? LOCK_U_LOCKED : LOCK_U_UNLOCKED,
                             () -> Component.translatable(seal.isLocked() ? "golem.prop.lock" : "golem.prop.unlock"),
                             () -> {
                                 seal.setLocked(!seal.isLocked());
-                                sendButton(seal.isLocked()
-                                        ? MenuSealBase.BUTTON_LOCK : MenuSealBase.BUTTON_UNLOCK);
+                                sendButton(seal.isLocked() ? MenuSealBase.BUTTON_LOCK : MenuSealBase.BUTTON_UNLOCK);
                             }));
                 }
             }
@@ -132,15 +151,18 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
                 if (seal.getSeal() instanceof ISealConfigFilter filter) {
                     int size = filter.getFilterSize();
                     int offsetY = 16 + (size - 1) / 3 * 12;
-                    addRenderableWidget(new StateButton(leftPos + middleX - 8,
+                    addRenderableWidget(new StateButton(
+                            leftPos + middleX - 8,
                             topPos + middleY + (size - 1) / 3 * 24 - offsetY + 27,
                             () -> filter.isBlacklist() ? BLACKLIST_U : WHITELIST_U,
-                            () -> Component.translatable(filter.isBlacklist()
-                                    ? "golem.prop.blacklist" : "golem.prop.whitelist"),
+                            () -> Component.translatable(
+                                    filter.isBlacklist() ? "golem.prop.blacklist" : "golem.prop.whitelist"),
                             () -> {
                                 filter.setBlacklist(!filter.isBlacklist());
-                                sendButton(filter.isBlacklist()
-                                        ? MenuSealBase.BUTTON_BLACKLIST_ON : MenuSealBase.BUTTON_BLACKLIST_OFF);
+                                sendButton(
+                                        filter.isBlacklist()
+                                                ? MenuSealBase.BUTTON_BLACKLIST_ON
+                                                : MenuSealBase.BUTTON_BLACKLIST_OFF);
                             }));
                 }
             }
@@ -149,10 +171,10 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
                     int y = topPos + middleY - 25 + axis * 25;
                     int down = MenuSealBase.BUTTON_AREA_BASE + axis * 2;
                     int up = down + 1;
-                    addRenderableWidget(TCPlusMinusButton.minus(leftPos + middleX - 5 - 14, y,
-                            Component.empty(), () -> sendButton(down)));
-                    addRenderableWidget(TCPlusMinusButton.plus(leftPos + middleX - 5 + 14, y,
-                            Component.empty(), () -> sendButton(up)));
+                    addRenderableWidget(TCPlusMinusButton.minus(
+                            leftPos + middleX - 5 - 14, y, Component.empty(), () -> sendButton(down)));
+                    addRenderableWidget(TCPlusMinusButton.plus(
+                            leftPos + middleX - 5 + 14, y, Component.empty(), () -> sendButton(up)));
                 }
             }
             case ISealGui.CAT_TOGGLES -> {
@@ -168,13 +190,16 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
                     for (int p = 0; p < props.length; p++) {
                         ISealConfigToggles.SealToggle prop = props[p];
                         int index = p;
-                        addRenderableWidget(new PropButton(leftPos + middleX - width,
-                                topPos + middleY - 5 - height + p * spacing * 2, prop,
+                        addRenderableWidget(new PropButton(
+                                leftPos + middleX - width,
+                                topPos + middleY - 5 - height + p * spacing * 2,
+                                prop,
                                 () -> {
                                     prop.setValue(!prop.getValue());
                                     sendButton((prop.getValue()
-                                            ? MenuSealBase.BUTTON_TOGGLE_ON_BASE
-                                            : MenuSealBase.BUTTON_TOGGLE_OFF_BASE) + index);
+                                                    ? MenuSealBase.BUTTON_TOGGLE_ON_BASE
+                                                    : MenuSealBase.BUTTON_TOGGLE_OFF_BASE)
+                                            + index);
                                 }));
                     }
                 }
@@ -183,8 +208,7 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
                 addTagButtons(seal.getSeal().getRequiredTags(), -8);
                 addTagButtons(seal.getSeal().getForbiddenTags(), 24);
             }
-            default -> {
-            }
+            default -> {}
         }
     }
 
@@ -195,10 +219,16 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
         for (int p = 0; p < tags.length; p++) {
             GolemTrait tag = tags[p];
             TCHoverButton button = new TCHoverButton(
-                    leftPos + middleX + p * 18 - (tags.length - 1) * 9, topPos + middleY + yOffset, 16, 16,
+                    leftPos + middleX + p * 18 - (tags.length - 1) * 9,
+                    topPos + middleY + yOffset,
+                    16,
+                    16,
                     new TCButtonIcon.TextureIcon(tag.icon()),
-                    Component.translatable(GolemTrait.nameKey(TCGolemTraits.registry().getKey(tag))), () -> {});
-            button.setDescription(Component.translatable(GolemTrait.descriptionKey(TCGolemTraits.registry().getKey(tag))));
+                    Component.translatable(
+                            GolemTrait.nameKey(TCGolemTraits.registry().getKey(tag))),
+                    () -> {});
+            button.setDescription(Component.translatable(
+                    GolemTrait.descriptionKey(TCGolemTraits.registry().getKey(tag))));
             addRenderableWidget(button);
         }
     }
@@ -224,11 +254,26 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
 
     @Override
     protected void renderBackgroundTexture(GuiGraphics graphics) {
-        graphics.blit(TCScreenTextures.GUI_BASE,
-                leftPos + middleX - 80, topPos + middleY - 80, CIRCLE_U, CIRCLE_V,
-                CIRCLE_SIZE, CIRCLE_SIZE, ATLAS, ATLAS);
-        graphics.blit(TCScreenTextures.GUI_BASE,
-                leftPos, topPos + PANEL_Y, 0, PANEL_V, PANEL_WIDTH, PANEL_HEIGHT, ATLAS, ATLAS);
+        graphics.blit(
+                TCScreenTextures.GUI_BASE,
+                leftPos + middleX - 80,
+                topPos + middleY - 80,
+                CIRCLE_U,
+                CIRCLE_V,
+                CIRCLE_SIZE,
+                CIRCLE_SIZE,
+                ATLAS,
+                ATLAS);
+        graphics.blit(
+                TCScreenTextures.GUI_BASE,
+                leftPos,
+                topPos + PANEL_Y,
+                0,
+                PANEL_V,
+                PANEL_WIDTH,
+                PANEL_HEIGHT,
+                ATLAS,
+                ATLAS);
     }
 
     @Override
@@ -237,34 +282,69 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
         if (seal == null) {
             return;
         }
-        drawCentered(graphics, Component.translatable("button.category." + menu.category()).getString(),
-                leftPos + middleX, topPos + middleY - 64, WHITE);
+        drawCentered(
+                graphics,
+                Component.translatable("button.category." + menu.category()).getString(),
+                leftPos + middleX,
+                topPos + middleY - 64,
+                WHITE);
         switch (menu.category()) {
             case ISealGui.CAT_PRIORITY -> {
-                graphics.blit(TCScreenTextures.GUI_BASE,
-                        leftPos + middleX + 17, topPos + middleY + 3, COLOR_DIAL_U, COLOR_DIAL_V, 12, 12, ATLAS, ATLAS);
+                graphics.blit(
+                        TCScreenTextures.GUI_BASE,
+                        leftPos + middleX + 17,
+                        topPos + middleY + 3,
+                        COLOR_DIAL_U,
+                        COLOR_DIAL_V,
+                        12,
+                        12,
+                        ATLAS,
+                        ATLAS);
                 if (menu.color() >= 1 && menu.color() <= 16) {
                     int dye = DyeColor.byId(menu.color() - 1).getTextureDiffuseColor();
-                    GuiBlend.blitTinted(graphics, TCScreenTextures.GUI_BASE,
-                            leftPos + middleX + 20, topPos + middleY + 6, COLOR_SWATCH_U, COLOR_SWATCH_V,
-                            6, 6, ATLAS, ATLAS, ARGB32.opaque(dye));
+                    GuiBlend.blitTinted(
+                            graphics,
+                            TCScreenTextures.GUI_BASE,
+                            leftPos + middleX + 20,
+                            topPos + middleY + 6,
+                            COLOR_SWATCH_U,
+                            COLOR_SWATCH_V,
+                            6,
+                            6,
+                            ATLAS,
+                            ATLAS,
+                            ARGB32.opaque(dye));
                 }
                 int mx = mouseX - leftPos;
                 int my = mouseY - topPos;
                 if (mx >= middleX + 5 && mx <= middleX + 41 && my >= middleY + 3 && my <= middleY + 15) {
                     String label = menu.color() >= 1 && menu.color() <= 16
-                            ? Component.translatable("golem.prop.color",
-                            Component.translatable("color.minecraft." + DyeColor.byId(menu.color() - 1).getName())).getString()
+                            ? Component.translatable(
+                                            "golem.prop.color",
+                                            Component.translatable("color.minecraft."
+                                                    + DyeColor.byId(menu.color() - 1)
+                                                            .getName()))
+                                    .getString()
                             : Component.translatable("golem.prop.colorall").getString();
                     drawCentered(graphics, label, leftPos + middleX + 23, topPos + middleY + 17, WHITE);
                 }
-                drawCentered(graphics, Component.translatable("golem.prop.priority").getString(),
-                        leftPos + middleX, topPos + middleY - 28, LABEL_BLUE);
-                drawCentered(graphics, String.valueOf(menu.priority()), leftPos + middleX, topPos + middleY - 16, WHITE);
-                if (minecraft != null && minecraft.player != null
+                drawCentered(
+                        graphics,
+                        Component.translatable("golem.prop.priority").getString(),
+                        leftPos + middleX,
+                        topPos + middleY - 28,
+                        LABEL_BLUE);
+                drawCentered(
+                        graphics, String.valueOf(menu.priority()), leftPos + middleX, topPos + middleY - 16, WHITE);
+                if (minecraft != null
+                        && minecraft.player != null
                         && minecraft.player.getUUID().equals(seal.getOwner())) {
-                    drawCentered(graphics, Component.translatable("golem.prop.owner").getString(),
-                            leftPos + middleX, topPos + middleY + 32, LABEL_BLUE);
+                    drawCentered(
+                            graphics,
+                            Component.translatable("golem.prop.owner").getString(),
+                            leftPos + middleX,
+                            topPos + middleY + 32,
+                            LABEL_BLUE);
                 }
             }
             case ISealGui.CAT_FILTER -> {
@@ -275,9 +355,16 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
                     for (int a = 0; a < size; a++) {
                         int x = a % 3;
                         int y = a / 3;
-                        graphics.blit(TCScreenTextures.GUI_BASE,
-                                leftPos + middleX + x * 24 - offsetX, topPos + middleY + y * 24 - offsetY,
-                                FILTER_FRAME_U, FILTER_FRAME_V, FILTER_FRAME_SIZE, FILTER_FRAME_SIZE, ATLAS, ATLAS);
+                        graphics.blit(
+                                TCScreenTextures.GUI_BASE,
+                                leftPos + middleX + x * 24 - offsetX,
+                                topPos + middleY + y * 24 - offsetY,
+                                FILTER_FRAME_U,
+                                FILTER_FRAME_V,
+                                FILTER_FRAME_SIZE,
+                                FILTER_FRAME_SIZE,
+                                ATLAS,
+                                ATLAS);
                     }
                     if (!filter.isBlacklist()) {
                         for (int i = 0; i < menu.filterSlotCount(); i++) {
@@ -285,39 +372,63 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
                             if (slot.isActive() && !slot.getItem().isEmpty()) {
                                 int limit = filter.getFilterSlotSize(i);
                                 String text = limit == 0 ? "*" : String.valueOf(limit);
-                                graphics.drawString(font, text,
-                                        leftPos + slot.x + 17 - font.width(text), topPos + slot.y + 9,
-                                        limit == 0 ? 0xFFAA00 : WHITE, true);
+                                graphics.drawString(
+                                        font,
+                                        text,
+                                        leftPos + slot.x + 17 - font.width(text),
+                                        topPos + slot.y + 9,
+                                        limit == 0 ? 0xFFAA00 : WHITE,
+                                        true);
                             }
                         }
                     }
                 }
             }
             case ISealGui.CAT_AREA -> {
-                drawCentered(graphics, Component.translatable("button.caption.y").getString(),
-                        leftPos + middleX, topPos + middleY - 33, LABEL_GREY);
-                drawCentered(graphics, Component.translatable("button.caption.x").getString(),
-                        leftPos + middleX, topPos + middleY - 9, LABEL_GREY);
-                drawCentered(graphics, Component.translatable("button.caption.z").getString(),
-                        leftPos + middleX, topPos + middleY + 15, LABEL_GREY);
-                drawCentered(graphics, String.valueOf(menu.area().getY()), leftPos + middleX, topPos + middleY - 24, WHITE);
+                drawCentered(
+                        graphics,
+                        Component.translatable("button.caption.y").getString(),
+                        leftPos + middleX,
+                        topPos + middleY - 33,
+                        LABEL_GREY);
+                drawCentered(
+                        graphics,
+                        Component.translatable("button.caption.x").getString(),
+                        leftPos + middleX,
+                        topPos + middleY - 9,
+                        LABEL_GREY);
+                drawCentered(
+                        graphics,
+                        Component.translatable("button.caption.z").getString(),
+                        leftPos + middleX,
+                        topPos + middleY + 15,
+                        LABEL_GREY);
+                drawCentered(
+                        graphics, String.valueOf(menu.area().getY()), leftPos + middleX, topPos + middleY - 24, WHITE);
                 drawCentered(graphics, String.valueOf(menu.area().getX()), leftPos + middleX, topPos + middleY, WHITE);
-                drawCentered(graphics, String.valueOf(menu.area().getZ()), leftPos + middleX, topPos + middleY + 24, WHITE);
+                drawCentered(
+                        graphics, String.valueOf(menu.area().getZ()), leftPos + middleX, topPos + middleY + 24, WHITE);
             }
             case ISealGui.CAT_TAGS -> {
-                drawCentered(graphics, Component.translatable("button.caption.required").getString(),
-                        leftPos + middleX, topPos + middleY - 26, LABEL_GREY);
-                drawCentered(graphics, Component.translatable("button.caption.forbidden").getString(),
-                        leftPos + middleX, topPos + middleY + 6, LABEL_GREY);
+                drawCentered(
+                        graphics,
+                        Component.translatable("button.caption.required").getString(),
+                        leftPos + middleX,
+                        topPos + middleY - 26,
+                        LABEL_GREY);
+                drawCentered(
+                        graphics,
+                        Component.translatable("button.caption.forbidden").getString(),
+                        leftPos + middleX,
+                        topPos + middleY + 6,
+                        LABEL_GREY);
             }
-            default -> {
-            }
+            default -> {}
         }
     }
 
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-    }
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {}
 
     private void drawCentered(GuiGraphics graphics, String text, int x, int y, int color) {
         graphics.drawString(font, text, x - font.width(text) / 2, y, ARGB32.opaque(color), true);
@@ -335,8 +446,20 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
         private final boolean active;
 
         CategoryButton(int x, int y, int categoryIcon, boolean active, Component message, Runnable onPress) {
-            super(x, y, 16, 16, TCScreenTextures.GUI_BASE, categoryIcon * 16, CATEGORY_ICON_V,
-                    16, 16, ATLAS, ATLAS, message, onPress);
+            super(
+                    x,
+                    y,
+                    16,
+                    16,
+                    TCScreenTextures.GUI_BASE,
+                    categoryIcon * 16,
+                    CATEGORY_ICON_V,
+                    16,
+                    16,
+                    ATLAS,
+                    ATLAS,
+                    message,
+                    onPress);
             this.active = active;
             if (active) {
                 setTintColor(0xFFFFFFFF);
@@ -358,8 +481,17 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
         @Override
         protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             setMessage(messageSupplier.get());
-            GuiBlend.blitTinted(graphics, TCScreenTextures.GUI_BASE,
-                    getX(), getY(), uv.get(), TOGGLE_V, 16, 16, ATLAS, ATLAS,
+            GuiBlend.blitTinted(
+                    graphics,
+                    TCScreenTextures.GUI_BASE,
+                    getX(),
+                    getY(),
+                    uv.get(),
+                    TOGGLE_V,
+                    16,
+                    16,
+                    ATLAS,
+                    ATLAS,
                     activeTintColor(tintColor(), isHovered(), active));
         }
     }
@@ -374,14 +506,22 @@ public final class SealScreen extends AbstractTCContainerScreen<MenuSealBase> {
 
         @Override
         protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-            graphics.blit(TCScreenTextures.GUI_BASE,
-                    getX() - 2, getY() - 2, PROP_BG_U, PROP_BG_V, 12, 12, ATLAS, ATLAS);
+            graphics.blit(
+                    TCScreenTextures.GUI_BASE, getX() - 2, getY() - 2, PROP_BG_U, PROP_BG_V, 12, 12, ATLAS, ATLAS);
             if (prop.getValue()) {
-                graphics.blit(TCScreenTextures.GUI_BASE,
-                        getX() - 2, getY() - 2, PROP_CHECK_U, PROP_BG_V, 12, 12, ATLAS, ATLAS);
+                graphics.blit(
+                        TCScreenTextures.GUI_BASE,
+                        getX() - 2,
+                        getY() - 2,
+                        PROP_CHECK_U,
+                        PROP_BG_V,
+                        12,
+                        12,
+                        ATLAS,
+                        ATLAS);
             }
-            graphics.drawString(font, Component.translatable(prop.getName()).getString(),
-                    getX() + 12, getY(), 0xFFFFFFFF, true);
+            graphics.drawString(
+                    font, Component.translatable(prop.getName()).getString(), getX() + 12, getY(), 0xFFFFFFFF, true);
         }
     }
 }

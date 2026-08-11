@@ -57,10 +57,9 @@ public final class CasterKeyHandler {
                 }
                 if (!radialLock
                         && (player.getMainHandItem().getItem() instanceof ICaster
-                        || player.getOffhandItem().getItem() instanceof ICaster)) {
+                                || player.getOffhandItem().getItem() instanceof ICaster)) {
                     if (player.isShiftKeyDown()) {
-                        PacketDistributor.sendToServer(
-                                new ServerboundFocusChangePayload(CasterManager.REMOVE_FOCUS));
+                        PacketDistributor.sendToServer(new ServerboundFocusChangePayload(CasterManager.REMOVE_FOCUS));
                     } else {
                         radialActive = true;
                     }
@@ -76,7 +75,9 @@ public final class CasterKeyHandler {
                 if (!keyPressedG) {
                     int mod = InputConstants.isKeyDown(mc.getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL)
                             ? MOD_CYCLE_DIM
-                            : InputConstants.isKeyDown(mc.getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT) ? MOD_SHIFT : MOD_GROW;
+                            : InputConstants.isKeyDown(mc.getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)
+                                    ? MOD_SHIFT
+                                    : MOD_GROW;
                     PacketDistributor.sendToServer(new ServerboundCasterKeyPayload(mod));
                 }
                 keyPressedG = true;

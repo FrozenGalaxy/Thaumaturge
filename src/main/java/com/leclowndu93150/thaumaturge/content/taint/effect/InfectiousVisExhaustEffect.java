@@ -27,15 +27,17 @@ public final class InfectiousVisExhaustEffect extends MobEffect {
     public boolean applyEffectTick(LivingEntity mob, int amplification) {
         ServerLevel level = (ServerLevel) mob.level();
         AABB box = mob.getBoundingBox().inflate(SPREAD_RADIUS, SPREAD_RADIUS, SPREAD_RADIUS);
-        List<LivingEntity> nearby = level.getEntitiesOfClass(LivingEntity.class, box,
+        List<LivingEntity> nearby = level.getEntitiesOfClass(
+                LivingEntity.class,
+                box,
                 target -> target != mob && !target.hasEffect(TCMobEffects.INFECTIOUS_VIS_EXHAUST));
         for (LivingEntity target : nearby) {
             if (amplification > 0) {
-                target.addEffect(new MobEffectInstance(TCMobEffects.INFECTIOUS_VIS_EXHAUST,
-                        EFFECT_DURATION, amplification - 1, false, true, false));
+                target.addEffect(new MobEffectInstance(
+                        TCMobEffects.INFECTIOUS_VIS_EXHAUST, EFFECT_DURATION, amplification - 1, false, true, false));
             } else {
-                target.addEffect(new MobEffectInstance(TCMobEffects.VIS_EXHAUST,
-                        EFFECT_DURATION, 0, false, true, false));
+                target.addEffect(
+                        new MobEffectInstance(TCMobEffects.VIS_EXHAUST, EFFECT_DURATION, 0, false, true, false));
             }
         }
         return true;

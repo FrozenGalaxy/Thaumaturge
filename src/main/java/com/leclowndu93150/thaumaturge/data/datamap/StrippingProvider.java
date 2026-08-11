@@ -1,14 +1,13 @@
 package com.leclowndu93150.thaumaturge.data.datamap;
 
 import com.leclowndu93150.thaumaturge.registry.TCBlocks;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.DataMapProvider;
 import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 import net.neoforged.neoforge.registries.datamaps.builtin.Strippable;
-
-import java.util.concurrent.CompletableFuture;
 
 public final class StrippingProvider extends DataMapProvider {
     public StrippingProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {

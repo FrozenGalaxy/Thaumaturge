@@ -3,7 +3,6 @@ package com.leclowndu93150.thaumaturge.content.device;
 import com.leclowndu93150.thaumaturge.api.aura.AuraHelper;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
@@ -12,7 +11,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import org.jspecify.annotations.Nullable;
 
 public final class BlockVisBattery extends Block {
     public static final MapCodec<BlockVisBattery> CODEC = simpleCodec(BlockVisBattery::new);
@@ -75,7 +73,8 @@ public final class BlockVisBattery extends Block {
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean movedByPiston) {
+    protected void neighborChanged(
+            BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean movedByPiston) {
         if (level.hasNeighborSignal(pos)) {
             level.scheduleTick(pos, this, 1);
         }

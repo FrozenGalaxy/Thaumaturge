@@ -3,23 +3,21 @@ package com.leclowndu93150.thaumaturge.content.casters;
 import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.content.casters.BlockWorkQueues.BreakerTask;
 import com.leclowndu93150.thaumaturge.content.casters.BlockWorkQueues.SwapperTask;
+import com.leclowndu93150.thaumaturge.content.effect.Effects;
 import com.leclowndu93150.thaumaturge.content.entity.EntitySpecialItem;
 import com.leclowndu93150.thaumaturge.content.wands.WandVisHelper;
-import com.leclowndu93150.thaumaturge.content.effect.Effects;
 import com.leclowndu93150.thaumaturge.registry.TCAttachments;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -45,8 +43,8 @@ public final class BlockBreakerEngine {
         return new BreakerTask.Builder(pos, source, player);
     }
 
-    public static SwapperTask.Builder swapper(BlockPos pos, @Nullable BlockState source,
-            @Nullable BlockState target, Player player) {
+    public static SwapperTask.Builder swapper(
+            BlockPos pos, @Nullable BlockState source, @Nullable BlockState target, Player player) {
         return new SwapperTask.Builder(pos, source, target, player);
     }
 
@@ -89,8 +87,8 @@ public final class BlockBreakerEngine {
                 continue;
             }
             if (task.fx()) {
-                level.destroyBlockProgress(task.pos().hashCode(), task.pos(),
-                        (int) ((1.0F - task.durability() / task.durabilityMax()) * BREAK_PROGRESS_STEPS));
+                level.destroyBlockProgress(task.pos().hashCode(), task.pos(), (int)
+                        ((1.0F - task.durability() / task.durabilityMax()) * BREAK_PROGRESS_STEPS));
             }
             float remaining = task.durability() - task.strength();
             if (remaining <= 0.0F) {
@@ -112,8 +110,8 @@ public final class BlockBreakerEngine {
             return;
         }
         BlockState state = level.getBlockState(pos);
-        BlockEvent.BreakEvent event = CommonHooks.fireBlockBreak(level,
-                serverPlayer.gameMode.getGameModeForPlayer(), serverPlayer, pos, state);
+        BlockEvent.BreakEvent event = CommonHooks.fireBlockBreak(
+                level, serverPlayer.gameMode.getGameModeForPlayer(), serverPlayer, pos, state);
         if (event.isCanceled()) {
             return;
         }
@@ -156,7 +154,8 @@ public final class BlockBreakerEngine {
                 continue;
             }
             int slot = 1;
-            ItemStack targetItem = task.target() != null ? new ItemStack(task.target().getBlock()) : ItemStack.EMPTY;
+            ItemStack targetItem =
+                    task.target() != null ? new ItemStack(task.target().getBlock()) : ItemStack.EMPTY;
             if (task.consumeTarget() && !targetItem.isEmpty() && !player.hasInfiniteMaterials()) {
                 slot = findInventorySlot(player, targetItem);
             }
@@ -213,19 +212,29 @@ public final class BlockBreakerEngine {
 
     private static void collectDrops(ServerLevel level, SwapperTask task, Player player) {
         BlockState current = level.getBlockState(task.pos());
-        List<ItemStack> drops = Block.getDrops(current, level, task.pos(), level.getBlockEntity(task.pos()),
-                player, harvestTool(level, player, task.silk(), task.fortune()));
+        List<ItemStack> drops = Block.getDrops(
+                current,
+                level,
+                task.pos(),
+                level.getBlockEntity(task.pos()),
+                player,
+                harvestTool(level, player, task.silk(), task.fortune()));
         for (ItemStack drop : drops) {
             if (!player.getInventory().add(drop)) {
-                level.addFreshEntity(new EntitySpecialItem(level,
-                        task.pos().getX() + 0.5, task.pos().getY() + 0.5, task.pos().getZ() + 0.5, drop));
+                level.addFreshEntity(new EntitySpecialItem(
+                        level,
+                        task.pos().getX() + 0.5,
+                        task.pos().getY() + 0.5,
+                        task.pos().getZ() + 0.5,
+                        drop));
             }
         }
     }
 
     private static void sendSwapFx(ServerLevel level, SwapperTask task) {
         Effects.Bamf bamf = Effects.bamf(level, task.pos())
-                .color(((task.color() >> 16) & 0xFF) / COLOR_DIVISOR,
+                .color(
+                        ((task.color() >> 16) & 0xFF) / COLOR_DIVISOR,
                         ((task.color() >> 8) & 0xFF) / COLOR_DIVISOR,
                         (task.color() & 0xFF) / COLOR_DIVISOR)
                 .withSound();
@@ -243,7 +252,8 @@ public final class BlockBreakerEngine {
                         continue;
                     }
                     BlockPos neighbour = task.pos().offset(xx, yy, zz);
-                    if (task.source() != null && level.getBlockState(neighbour) == task.source()
+                    if (task.source() != null
+                            && level.getBlockState(neighbour) == task.source()
                             && isExposed(level, neighbour)) {
                         queues.swappers().add(task.spreadTo(neighbour));
                     }

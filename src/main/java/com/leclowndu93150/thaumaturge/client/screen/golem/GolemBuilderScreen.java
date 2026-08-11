@@ -1,19 +1,19 @@
 package com.leclowndu93150.thaumaturge.client.screen.golem;
-import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
-import com.leclowndu93150.thaumaturge.api.golems.parts.GolemPart;
 
 import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.aspect.TCAspects;
+import com.leclowndu93150.thaumaturge.api.capability.IPlayerKnowledge;
+import com.leclowndu93150.thaumaturge.api.capability.KnowledgeAccess;
 import com.leclowndu93150.thaumaturge.api.golems.GolemTrait;
 import com.leclowndu93150.thaumaturge.api.golems.parts.GolemAddon;
 import com.leclowndu93150.thaumaturge.api.golems.parts.GolemArm;
 import com.leclowndu93150.thaumaturge.api.golems.parts.GolemHead;
 import com.leclowndu93150.thaumaturge.api.golems.parts.GolemLeg;
 import com.leclowndu93150.thaumaturge.api.golems.parts.GolemMaterial;
-import com.leclowndu93150.thaumaturge.api.capability.IPlayerKnowledge;
-import com.leclowndu93150.thaumaturge.api.capability.KnowledgeAccess;
+import com.leclowndu93150.thaumaturge.api.golems.parts.GolemPart;
 import com.leclowndu93150.thaumaturge.api.items.InvHelper;
+import com.leclowndu93150.thaumaturge.client.render.GuiBlend;
 import com.leclowndu93150.thaumaturge.client.screen.AbstractTCContainerScreen;
 import com.leclowndu93150.thaumaturge.client.screen.widget.TCButton;
 import com.leclowndu93150.thaumaturge.client.screen.widget.TCButtonIcon;
@@ -24,11 +24,10 @@ import com.leclowndu93150.thaumaturge.content.golem.press.BlockEntityGolemBuilde
 import com.leclowndu93150.thaumaturge.content.golem.press.MenuGolemBuilder;
 import com.leclowndu93150.thaumaturge.network.ServerboundGolemPressPayload;
 import com.leclowndu93150.thaumaturge.registry.TCGolemParts;
-import com.leclowndu93150.thaumaturge.client.render.GuiBlend;
+import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
-
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
@@ -160,29 +159,100 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
         clearWidgets();
         craftButton = new CraftButton(leftPos + CRAFT_X, topPos + CRAFT_Y, this::craft);
         addRenderableWidget(craftButton);
-        addScrollPair(valHeads.size(), 112, 16, () -> headIndex--, () -> headIndex++, () -> headIndex, valHeads::size, this::setHeadIndex);
-        addScrollPair(valMats.size(), 16, 16, () -> matIndex--, () -> matIndex++, () -> matIndex, valMats::size, this::setMatIndex);
-        addScrollPair(valArms.size(), 112, 40, () -> armIndex--, () -> armIndex++, () -> armIndex, valArms::size, this::setArmIndex);
-        addScrollPair(valLegs.size(), 112, 64, () -> legIndex--, () -> legIndex++, () -> legIndex, valLegs::size, this::setLegIndex);
-        addScrollPair(valAddons.size(), 16, 64, () -> addonIndex--, () -> addonIndex++, () -> addonIndex, valAddons::size, this::setAddonIndex);
+        addScrollPair(
+                valHeads.size(),
+                112,
+                16,
+                () -> headIndex--,
+                () -> headIndex++,
+                () -> headIndex,
+                valHeads::size,
+                this::setHeadIndex);
+        addScrollPair(
+                valMats.size(),
+                16,
+                16,
+                () -> matIndex--,
+                () -> matIndex++,
+                () -> matIndex,
+                valMats::size,
+                this::setMatIndex);
+        addScrollPair(
+                valArms.size(),
+                112,
+                40,
+                () -> armIndex--,
+                () -> armIndex++,
+                () -> armIndex,
+                valArms::size,
+                this::setArmIndex);
+        addScrollPair(
+                valLegs.size(),
+                112,
+                64,
+                () -> legIndex--,
+                () -> legIndex++,
+                () -> legIndex,
+                valLegs::size,
+                this::setLegIndex);
+        addScrollPair(
+                valAddons.size(),
+                16,
+                64,
+                () -> addonIndex--,
+                () -> addonIndex++,
+                () -> addonIndex,
+                valAddons::size,
+                this::setAddonIndex);
         if (!valHeads.isEmpty()) {
-            addPartButton(120, 24, valHeads.get(headIndex).icon(), "head", keyOf(TCGolemParts.heads(), valHeads.get(headIndex)), WHITE);
+            addPartButton(
+                    120,
+                    24,
+                    valHeads.get(headIndex).icon(),
+                    "head",
+                    keyOf(TCGolemParts.heads(), valHeads.get(headIndex)),
+                    WHITE);
         }
         if (!valMats.isEmpty()) {
-            addPartButton(24, 24, MATERIAL_ICON, "material", keyOf(TCGolemParts.materials(), valMats.get(matIndex)),
+            addPartButton(
+                    24,
+                    24,
+                    MATERIAL_ICON,
+                    "material",
+                    keyOf(TCGolemParts.materials(), valMats.get(matIndex)),
                     valMats.get(matIndex).itemColor());
         }
         if (!valArms.isEmpty()) {
-            addPartButton(120, 48, valArms.get(armIndex).icon(), "arm", keyOf(TCGolemParts.arms(), valArms.get(armIndex)), WHITE);
+            addPartButton(
+                    120,
+                    48,
+                    valArms.get(armIndex).icon(),
+                    "arm",
+                    keyOf(TCGolemParts.arms(), valArms.get(armIndex)),
+                    WHITE);
         }
         if (!valLegs.isEmpty()) {
-            addPartButton(120, 72, valLegs.get(legIndex).icon(), "leg", keyOf(TCGolemParts.legs(), valLegs.get(legIndex)), WHITE);
+            addPartButton(
+                    120,
+                    72,
+                    valLegs.get(legIndex).icon(),
+                    "leg",
+                    keyOf(TCGolemParts.legs(), valLegs.get(legIndex)),
+                    WHITE);
         }
-        if (!valAddons.isEmpty() && !"none".equals(keyOf(TCGolemParts.addons(), valAddons.get(addonIndex)).getPath())) {
-            addPartButton(24, 72, valAddons.get(addonIndex).icon(), "addon", keyOf(TCGolemParts.addons(), valAddons.get(addonIndex)), WHITE);
+        if (!valAddons.isEmpty()
+                && !"none"
+                        .equals(keyOf(TCGolemParts.addons(), valAddons.get(addonIndex))
+                                .getPath())) {
+            addPartButton(
+                    24,
+                    72,
+                    valAddons.get(addonIndex).icon(),
+                    "addon",
+                    keyOf(TCGolemParts.addons(), valAddons.get(addonIndex)),
+                    WHITE);
         }
-        if (valHeads.isEmpty() || valMats.isEmpty() || valArms.isEmpty()
-                || valLegs.isEmpty() || valAddons.isEmpty()) {
+        if (valHeads.isEmpty() || valMats.isEmpty() || valArms.isEmpty() || valLegs.isEmpty() || valAddons.isEmpty()) {
             props = GolemProperties.createDefault();
             components = List.of();
             owns = new boolean[0];
@@ -203,7 +273,8 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
         props.setAddon(valAddons.get(addonIndex));
         BlockEntityGolemBuilder builder = menu.blockEntity();
         if (builder != null) {
-            PacketDistributor.sendToServer(new ServerboundGolemPressPayload(builder.getBlockPos(), props.copy(), false));
+            PacketDistributor.sendToServer(
+                    new ServerboundGolemPressPayload(builder.getBlockPos(), props.copy(), false));
         }
         redoComps();
         GolemTrait[] tags = props.getTraits().toArray(new GolemTrait[0]);
@@ -213,10 +284,16 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
             int row = 0;
             int col = 0;
             for (GolemTrait tag : tags) {
-                TCHoverButton button = TCHoverButton.centered(leftPos + 72 + col * 16 - xx, topPos + 48 + 16 * row - yy,
-                        16, new TCButtonIcon.TextureIcon(tag.icon()),
-                        Component.translatable(GolemTrait.nameKey(TCGolemTraits.registry().getKey(tag))), () -> {});
-                button.setDescription(Component.translatable(GolemTrait.descriptionKey(TCGolemTraits.registry().getKey(tag))));
+                TCHoverButton button = TCHoverButton.centered(
+                        leftPos + 72 + col * 16 - xx,
+                        topPos + 48 + 16 * row - yy,
+                        16,
+                        new TCButtonIcon.TextureIcon(tag.icon()),
+                        Component.translatable(
+                                GolemTrait.nameKey(TCGolemTraits.registry().getKey(tag))),
+                        () -> {});
+                button.setDescription(Component.translatable(
+                        GolemTrait.descriptionKey(TCGolemTraits.registry().getKey(tag))));
                 addRenderableWidget(button);
                 if (++row > 3) {
                     row = 0;
@@ -237,7 +314,9 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
             armorValue = (int) (armorValue * 0.75);
         }
         armor = armorValue / 2.0F;
-        double damageValue = props.hasTrait(TCGolemTraits.FIGHTER.get()) ? props.getMaterial().damage() : 0.0;
+        double damageValue = props.hasTrait(TCGolemTraits.FIGHTER.get())
+                ? props.getMaterial().damage()
+                : 0.0;
         if (props.hasTrait(TCGolemTraits.BRUTAL.get())) {
             damageValue = Math.max(damageValue * 1.5, damageValue + 1.0);
         }
@@ -276,21 +355,36 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
         int size();
     }
 
-    private void addScrollPair(int optionCount, int baseX, int baseY, Runnable decrement, Runnable increment,
-                               IndexGetter index, SizeGetter size, IndexSetter setter) {
+    private void addScrollPair(
+            int optionCount,
+            int baseX,
+            int baseY,
+            Runnable decrement,
+            Runnable increment,
+            IndexGetter index,
+            SizeGetter size,
+            IndexSetter setter) {
         if (optionCount <= 1) {
             return;
         }
-        addRenderableWidget(TCScrollButton.of(leftPos + baseX - 5 - 6, topPos - 5 + baseY + 8,
-                TCScrollButton.Direction.LEFT, Component.empty(), () -> {
+        addRenderableWidget(TCScrollButton.of(
+                leftPos + baseX - 5 - 6,
+                topPos - 5 + baseY + 8,
+                TCScrollButton.Direction.LEFT,
+                Component.empty(),
+                () -> {
                     decrement.run();
                     if (index.get() < 0) {
                         setter.set(size.size() - 1);
                     }
                     gatherInfo();
                 }));
-        addRenderableWidget(TCScrollButton.of(leftPos + baseX - 5 + 22, topPos - 5 + baseY + 8,
-                TCScrollButton.Direction.RIGHT, Component.empty(), () -> {
+        addRenderableWidget(TCScrollButton.of(
+                leftPos + baseX - 5 + 22,
+                topPos - 5 + baseY + 8,
+                TCScrollButton.Direction.RIGHT,
+                Component.empty(),
+                () -> {
                     increment.run();
                     if (index.get() >= size.size()) {
                         setter.set(0);
@@ -300,9 +394,13 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
     }
 
     private void addPartButton(int x, int y, ResourceLocation icon, String kind, ResourceLocation id, int color) {
-        TCHoverButton button = TCHoverButton.centered(leftPos + x, topPos + y, 16,
+        TCHoverButton button = TCHoverButton.centered(
+                leftPos + x,
+                topPos + y,
+                16,
                 new TCButtonIcon.TextureIcon(icon),
-                Component.translatable(GolemPart.nameKey(kind, id)), () -> {});
+                Component.translatable(GolemPart.nameKey(kind, id)),
+                () -> {});
         button.setDescription(Component.translatable(GolemPart.descriptionKey(kind, id)));
         button.setTintColor(ARGB32.opaque(color));
         addRenderableWidget(button);
@@ -314,8 +412,7 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
     }
 
     private void computeOwnership() {
-        if (valHeads.isEmpty() || valMats.isEmpty() || valArms.isEmpty()
-                || valLegs.isEmpty() || valAddons.isEmpty()) {
+        if (valHeads.isEmpty() || valMats.isEmpty() || valArms.isEmpty() || valLegs.isEmpty() || valAddons.isEmpty()) {
             allFound = false;
             if (craftButton != null) {
                 craftButton.active = false;
@@ -353,17 +450,28 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
         if (!components.isEmpty()) {
             Holder<IAspect> machina = machinaHolder();
             if (machina != null) {
-                TCHoverButton aspectButton = TCHoverButton.centered(leftPos + 152, topPos + 24, 16,
+                TCHoverButton aspectButton = TCHoverButton.centered(
+                        leftPos + 152,
+                        topPos + 24,
+                        16,
                         new TCButtonIcon.AspectIcon(machina),
-                        Component.translatable("aspect.thaumaturge." + machina.value().tag()), () -> {});
-                aspectButton.setDescription(Component.translatable("aspect.thaumaturge." + machina.value().tag() + ".desc"));
+                        Component.translatable(
+                                "aspect.thaumaturge." + machina.value().tag()),
+                        () -> {});
+                aspectButton.setDescription(Component.translatable(
+                        "aspect.thaumaturge." + machina.value().tag() + ".desc"));
                 addRenderableWidget(aspectButton);
             }
             int row = 1;
             int col = 0;
             for (ItemStack stack : components) {
-                TCHoverButton componentButton = TCHoverButton.centered(leftPos + 152 + col * 16, topPos + 24 + 16 * row, 16,
-                        new TCButtonIcon.StackIcon(stack), Component.empty(), () -> {});
+                TCHoverButton componentButton = TCHoverButton.centered(
+                        leftPos + 152 + col * 16,
+                        topPos + 24 + 16 * row,
+                        16,
+                        new TCButtonIcon.StackIcon(stack),
+                        Component.empty(),
+                        () -> {});
                 componentButton.setMessage(stack.getHoverName());
                 addRenderableWidget(componentButton);
                 if (++row > 3) {
@@ -392,8 +500,12 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
         if (minecraft == null || minecraft.level == null) {
             return null;
         }
-        return minecraft.level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY)
-                .get(TCAspects.MACHINA).orElse(null);
+        return minecraft
+                .level
+                .registryAccess()
+                .lookupOrThrow(IAspect.REGISTRY_KEY)
+                .get(TCAspects.MACHINA)
+                .orElse(null);
     }
 
     private void craft() {
@@ -414,9 +526,17 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
             int col = 0;
             for (int i = 0; i < components.size(); i++) {
                 if (owns.length > i && !owns[i]) {
-                    GuiBlend.blitTinted(graphics, TEXTURE,
-                            leftPos + COMPONENT_GRID_X + col * 16, topPos + COMPONENT_GRID_Y + 16 * row,
-                            MISSING_U, MISSING_V, 16, 16, 256, 256,
+                    GuiBlend.blitTinted(
+                            graphics,
+                            TEXTURE,
+                            leftPos + COMPONENT_GRID_X + col * 16,
+                            topPos + COMPONENT_GRID_Y + 16 * row,
+                            MISSING_U,
+                            MISSING_V,
+                            16,
+                            16,
+                            256,
+                            256,
                             ARGB32.color(128, 0xFFFFFF));
                 }
                 if (++row > 3) {
@@ -426,10 +546,16 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
             }
         }
         if (menu.cost() > 0) {
-            graphics.blit(TEXTURE,
-                    leftPos + PROGRESS_X, topPos + PROGRESS_Y, PROGRESS_U, PROGRESS_V,
+            graphics.blit(
+                    TEXTURE,
+                    leftPos + PROGRESS_X,
+                    topPos + PROGRESS_Y,
+                    PROGRESS_U,
+                    PROGRESS_V,
                     (int) (PROGRESS_WIDTH * (1.0F - (float) menu.cost() / Math.max(1, menu.maxCost()))),
-                    PROGRESS_HEIGHT, 256, 256);
+                    PROGRESS_HEIGHT,
+                    256,
+                    256);
             if (!disableAll) {
                 disableAll = true;
                 computeOwnership();
@@ -473,12 +599,20 @@ public final class GolemBuilderScreen extends AbstractTCContainerScreen<MenuGole
         @Override
         protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             int alpha = isHovered() && active ? 255 : 230;
-            GuiBlend.blitTinted(graphics, TEXTURE, getX(), getY(),
-                    CRAFT_U, CRAFT_V, CRAFT_WIDTH, CRAFT_HEIGHT, 256, 256,
+            GuiBlend.blitTinted(
+                    graphics,
+                    TEXTURE,
+                    getX(),
+                    getY(),
+                    CRAFT_U,
+                    CRAFT_V,
+                    CRAFT_WIDTH,
+                    CRAFT_HEIGHT,
+                    256,
+                    256,
                     ARGB32.color(alpha, 0xFFFFFF));
             if (!active) {
-                graphics.blit(TEXTURE, getX(), getY(),
-                        CRAFT_U, CRAFT_DISABLED_V, CRAFT_WIDTH, CRAFT_HEIGHT, 256, 256);
+                graphics.blit(TEXTURE, getX(), getY(), CRAFT_U, CRAFT_DISABLED_V, CRAFT_WIDTH, CRAFT_HEIGHT, 256, 256);
             }
         }
     }

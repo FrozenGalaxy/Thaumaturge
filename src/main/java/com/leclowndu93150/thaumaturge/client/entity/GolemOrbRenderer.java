@@ -31,8 +31,13 @@ public final class GolemOrbRenderer extends EntityRenderer<EntityGolemOrb> {
     }
 
     @Override
-    public void render(EntityGolemOrb entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int packedLight) {
+    public void render(
+            EntityGolemOrb entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
         poseStack.pushPose();
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());

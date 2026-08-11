@@ -30,8 +30,13 @@ public final class EldritchGuardianRenderer
     }
 
     @Override
-    public void render(EntityEldritchGuardian entity, float entityYaw, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light) {
+    public void render(
+            EntityEldritchGuardian entity,
+            float entityYaw,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light) {
         float alpha = computeAlpha(entity);
         MultiBufferSource tinted = new TintBufferSource(buffers, ARGB32.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F));
         super.render(entity, entityYaw, partialTick, poseStack, tinted, light);
@@ -47,13 +52,13 @@ public final class EldritchGuardianRenderer
         if (distSq < NEAR_RANGE_SQ) {
             return NEAR_ALPHA;
         }
-        return (float) (1.0 - Math.min(far - NEAR_RANGE_SQ, distSq - NEAR_RANGE_SQ)
-                / (far - NEAR_RANGE_SQ)) * NEAR_ALPHA;
+        return (float) (1.0 - Math.min(far - NEAR_RANGE_SQ, distSq - NEAR_RANGE_SQ) / (far - NEAR_RANGE_SQ))
+                * NEAR_ALPHA;
     }
 
     @Override
-    protected @Nullable RenderType getRenderType(EntityEldritchGuardian entity, boolean isBodyVisible,
-                                                 boolean forceTransparent, boolean appearGlowing) {
+    protected @Nullable RenderType getRenderType(
+            EntityEldritchGuardian entity, boolean isBodyVisible, boolean forceTransparent, boolean appearGlowing) {
         return RenderType.itemEntityTranslucentCull(getTextureLocation(entity));
     }
 

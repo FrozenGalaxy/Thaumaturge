@@ -2,6 +2,7 @@ package com.leclowndu93150.thaumaturge.content.device.mirror;
 
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -13,8 +14,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-
-import java.util.List;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -59,12 +58,16 @@ public final class ItemBlockMirror extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
         GlobalPos link = stack.get(TCDataComponents.MIRROR_LINK.get());
         if (link != null) {
-            tooltip.add(Component.translatable("tc.handmirrorlinkedto.full",
-                    link.pos().getX(), link.pos().getY(), link.pos().getZ(),
+            tooltip.add(Component.translatable(
+                    "tc.handmirrorlinkedto.full",
+                    link.pos().getX(),
+                    link.pos().getY(),
+                    link.pos().getZ(),
                     link.dimension().location().toString()));
         }
     }

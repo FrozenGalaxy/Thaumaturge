@@ -17,19 +17,24 @@ import net.neoforged.neoforge.fluids.FluidStack;
 
 public final class CrucibleRenderer implements BlockEntityRenderer<BlockEntityCrucible> {
 
-    public CrucibleRenderer(BlockEntityRendererProvider.Context context) {
-    }
+    public CrucibleRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(BlockEntityCrucible crucible, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityCrucible crucible,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         FluidStack fluid = crucible.getTank().getFluid();
         if (fluid.isEmpty()) return;
         float height = crucible.getFluidHeight();
 
         IClientFluidTypeExtensions ext = IClientFluidTypeExtensions.of(fluid.getFluid());
         TextureAtlasSprite sprite = Minecraft.getInstance()
-                .getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(ext.getStillTexture(fluid));
+                .getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
+                .apply(ext.getStillTexture(fluid));
         int color = ext.getTintColor(fluid);
 
         float recolor = (float) crucible.getAspects().totalAmount() / BlockEntityCrucible.MAX_ASPECT;

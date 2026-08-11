@@ -13,8 +13,18 @@ import org.jspecify.annotations.Nullable;
 public final class FluxGooDropletParticle extends BreakingItemParticle {
     private final float baseAlpha;
 
-    private FluxGooDropletParticle(ClientLevel level, double x, double y, double z, double xa, double ya, double za,
-                                   ItemStack stack, int color, float alpha, int lifetime) {
+    private FluxGooDropletParticle(
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            double xa,
+            double ya,
+            double za,
+            ItemStack stack,
+            int color,
+            float alpha,
+            int lifetime) {
         super(level, x, y, z, xa, ya, za, stack);
         this.baseAlpha = alpha;
         this.alpha = alpha;
@@ -37,15 +47,30 @@ public final class FluxGooDropletParticle extends BreakingItemParticle {
     public static final class Provider implements ParticleProvider<FluxGooDropletParticleOptions> {
         @Nullable
         @Override
-        public Particle createParticle(FluxGooDropletParticleOptions options, ClientLevel level,
-                                       double x, double y, double z,
-                                       double xa, double ya, double za) {
+        public Particle createParticle(
+                FluxGooDropletParticleOptions options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double xa,
+                double ya,
+                double za) {
             RandomSource random = level.getRandom();
-            int lifetime = options.lifetime() > 0
-                    ? options.lifetime()
-                    : (int) (66.0F / (random.nextFloat() * 0.9F + 0.1F));
-            return new FluxGooDropletParticle(level, x, y, z, xa, ya, za,
-                    new ItemStack(Items.SLIME_BALL), options.color(), options.alpha(), lifetime);
+            int lifetime =
+                    options.lifetime() > 0 ? options.lifetime() : (int) (66.0F / (random.nextFloat() * 0.9F + 0.1F));
+            return new FluxGooDropletParticle(
+                    level,
+                    x,
+                    y,
+                    z,
+                    xa,
+                    ya,
+                    za,
+                    new ItemStack(Items.SLIME_BALL),
+                    options.color(),
+                    options.alpha(),
+                    lifetime);
         }
     }
 }

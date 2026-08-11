@@ -116,13 +116,7 @@ public final class RecipeDisplayWidget {
         return PANEL_SIZE;
     }
 
-    public static void renderCrafting(
-            GuiGraphics graphics,
-            int x,
-            int y,
-            RecipeHolder<?> holder,
-            long gameTime
-    ) {
+    public static void renderCrafting(GuiGraphics graphics, int x, int y, RecipeHolder<?> holder, long gameTime) {
         int cx = x + CENTER_OFFSET;
         int cy = y + CENTER_OFFSET;
         Recipe<?> recipeValue = holder.value();
@@ -155,13 +149,7 @@ public final class RecipeDisplayWidget {
     }
 
     public static @Nullable ItemStack hoverStackForDisplay(
-            int x,
-            int y,
-            RecipeHolder<?> holder,
-            long gameTime,
-            double mouseX,
-            double mouseY
-    ) {
+            int x, int y, RecipeHolder<?> holder, long gameTime, double mouseX, double mouseY) {
         int cx = x + CENTER_OFFSET;
         int cy = y + CENTER_OFFSET;
         Recipe<?> recipeValue = holder.value();
@@ -196,12 +184,7 @@ public final class RecipeDisplayWidget {
     }
 
     public static @Nullable Component hoverPopupForDisplay(
-            int x,
-            int y,
-            RecipeHolder<?> holder,
-            double mouseX,
-            double mouseY
-    ) {
+            int x, int y, RecipeHolder<?> holder, double mouseX, double mouseY) {
         int cx = x + CENTER_OFFSET;
         int cy = y + CENTER_OFFSET;
         Recipe<?> recipeValue = holder.value();
@@ -239,12 +222,15 @@ public final class RecipeDisplayWidget {
         GuiBlend.blitTinted(
                 graphics,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
-                WORKBENCH_PANEL_OFFSET_X, WORKBENCH_PANEL_OFFSET_Y,
-                (float) WORKBENCH_PANEL_U, (float) WORKBENCH_PANEL_V,
-                WORKBENCH_PANEL_W, WORKBENCH_PANEL_H,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
-                0xFFFFFFFF
-        );
+                WORKBENCH_PANEL_OFFSET_X,
+                WORKBENCH_PANEL_OFFSET_Y,
+                (float) WORKBENCH_PANEL_U,
+                (float) WORKBENCH_PANEL_V,
+                WORKBENCH_PANEL_W,
+                WORKBENCH_PANEL_H,
+                TCScreenTextures.TEX_SIZE,
+                TCScreenTextures.TEX_SIZE,
+                0xFFFFFFFF);
         graphics.pose().popPose();
     }
 
@@ -255,12 +241,15 @@ public final class RecipeDisplayWidget {
         GuiBlend.blitTinted(
                 graphics,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
-                ARCANE_PANEL_OFFSET_X, ARCANE_PANEL_OFFSET_Y,
-                (float) ARCANE_PANEL_U, (float) ARCANE_PANEL_V,
-                ARCANE_PANEL_W, ARCANE_PANEL_H,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
-                0xFFFFFFFF
-        );
+                ARCANE_PANEL_OFFSET_X,
+                ARCANE_PANEL_OFFSET_Y,
+                (float) ARCANE_PANEL_U,
+                (float) ARCANE_PANEL_V,
+                ARCANE_PANEL_W,
+                ARCANE_PANEL_H,
+                TCScreenTextures.TEX_SIZE,
+                TCScreenTextures.TEX_SIZE,
+                0xFFFFFFFF);
         graphics.pose().popPose();
     }
 
@@ -271,12 +260,15 @@ public final class RecipeDisplayWidget {
         GuiBlend.blitTinted(
                 graphics,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
-                SLOT_FRAME_OFFSET_X, SLOT_FRAME_OFFSET_Y,
-                (float) SLOT_FRAME_U, (float) SLOT_FRAME_V,
-                SLOT_FRAME_W, SLOT_FRAME_H,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
-                0xFFFFFFFF
-        );
+                SLOT_FRAME_OFFSET_X,
+                SLOT_FRAME_OFFSET_Y,
+                (float) SLOT_FRAME_U,
+                (float) SLOT_FRAME_V,
+                SLOT_FRAME_W,
+                SLOT_FRAME_H,
+                TCScreenTextures.TEX_SIZE,
+                TCScreenTextures.TEX_SIZE,
+                0xFFFFFFFF);
         graphics.pose().popPose();
     }
 
@@ -287,12 +279,15 @@ public final class RecipeDisplayWidget {
         GuiBlend.blitTinted(
                 graphics,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
-                VIS_COST_OFFSET_X, VIS_COST_OFFSET_Y,
-                (float) VIS_COST_U, (float) VIS_COST_V,
-                VIS_COST_W, VIS_COST_H,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
-                VIS_OVERLAY_TINT
-        );
+                VIS_COST_OFFSET_X,
+                VIS_COST_OFFSET_Y,
+                (float) VIS_COST_U,
+                (float) VIS_COST_V,
+                VIS_COST_W,
+                VIS_COST_H,
+                TCScreenTextures.TEX_SIZE,
+                TCScreenTextures.TEX_SIZE,
+                VIS_OVERLAY_TINT);
         graphics.pose().popPose();
     }
 
@@ -329,7 +324,10 @@ public final class RecipeDisplayWidget {
         for (Slot slot : layout.slots) {
             ItemStack stack = pickRotating(slot.cycle, slot.counter);
             if (!stack.isEmpty()) {
-                graphics.renderItem(stack, cx + GRID_ANCHOR_X + slot.col * GRID_STRIDE, cy + GRID_ANCHOR_Y + slot.row * GRID_STRIDE);
+                graphics.renderItem(
+                        stack,
+                        cx + GRID_ANCHOR_X + slot.col * GRID_STRIDE,
+                        cy + GRID_ANCHOR_Y + slot.row * GRID_STRIDE);
             }
         }
     }
@@ -340,7 +338,10 @@ public final class RecipeDisplayWidget {
         for (int a = 0; a < sz; a++) {
             ItemStack stack = crystals.get(a);
             if (stack.isEmpty()) continue;
-            graphics.renderItem(stack, cx + CRYSTAL_BASE_OFFSET_X - sz * CRYSTAL_HALF_STRIDE + a * CRYSTAL_STRIDE, cy + CRYSTAL_OFFSET_Y);
+            graphics.renderItem(
+                    stack,
+                    cx + CRYSTAL_BASE_OFFSET_X - sz * CRYSTAL_HALF_STRIDE + a * CRYSTAL_STRIDE,
+                    cy + CRYSTAL_OFFSET_Y);
         }
     }
 
@@ -356,7 +357,8 @@ public final class RecipeDisplayWidget {
         return null;
     }
 
-    private static @Nullable ItemStack hoverCrystal(int cx, int cy, List<ItemStack> crystals, double mouseX, double mouseY) {
+    private static @Nullable ItemStack hoverCrystal(
+            int cx, int cy, List<ItemStack> crystals, double mouseX, double mouseY) {
         if (crystals.isEmpty()) return null;
         int sz = crystals.size();
         for (int a = 0; a < sz; a++) {
@@ -575,8 +577,7 @@ public final class RecipeDisplayWidget {
             }
         }
         int inst = Math.min(INFUSION_INSTABILITY_MAX, display.instability() / 2);
-        Component text = Component.translatable("tc.inst")
-                .append(Component.translatable("tc.inst." + inst));
+        Component text = Component.translatable("tc.inst").append(Component.translatable("tc.inst." + inst));
         int offset = font.width(text);
         graphics.drawString(font, text, cx - offset / 2, cy + INFUSION_INSTABILITY_Y, LABEL_COLOR, false);
     }
@@ -610,11 +611,14 @@ public final class RecipeDisplayWidget {
         int maxPy = (dz - 1) * PREVIEW_CELL_HALF_STRIDE + (dy - 1) * PREVIEW_LAYER_STRIDE;
         int unscaledWidth = (dx + dz - 1) * PREVIEW_CELL_STRIDE + PREVIEW_CELL_STRIDE;
         int unscaledHeight = maxPy - minPy + PREVIEW_CELL_STRIDE;
-        float scale = Math.min(1.0F, Math.min(
-                (float) (PREVIEW_HALF_WIDTH * 2) / unscaledWidth,
-                (float) (PREVIEW_BOTTOM - PREVIEW_TOP) / unscaledHeight));
+        float scale = Math.min(
+                1.0F,
+                Math.min(
+                        (float) (PREVIEW_HALF_WIDTH * 2) / unscaledWidth,
+                        (float) (PREVIEW_BOTTOM - PREVIEW_TOP) / unscaledHeight));
         float originX = cx - unscaledWidth * scale / 2.0F;
-        float originY = cy + PREVIEW_TOP + (PREVIEW_BOTTOM - PREVIEW_TOP - unscaledHeight * scale) / 2.0F - minPy * scale;
+        float originY =
+                cy + PREVIEW_TOP + (PREVIEW_BOTTOM - PREVIEW_TOP - unscaledHeight * scale) / 2.0F - minPy * scale;
         graphics.pose().pushPose();
         graphics.pose().translate(originX, originY, 0);
         graphics.pose().scale(scale, scale, 1F);
@@ -655,12 +659,15 @@ public final class RecipeDisplayWidget {
         GuiBlend.blitTinted(
                 graphics,
                 TCScreenTextures.RESEARCH_BOOK_OVERLAY,
-                ox, oy,
-                (float) u, (float) v,
-                w, h,
-                TCScreenTextures.TEX_SIZE, TCScreenTextures.TEX_SIZE,
-                0xFFFFFFFF
-        );
+                ox,
+                oy,
+                (float) u,
+                (float) v,
+                w,
+                h,
+                TCScreenTextures.TEX_SIZE,
+                TCScreenTextures.TEX_SIZE,
+                0xFFFFFFFF);
     }
 
     private static List<AspectInstance> sortedAspects(AspectList aspects) {
@@ -669,8 +676,8 @@ public final class RecipeDisplayWidget {
                 .toList();
     }
 
-    private static void drawAspectGrid(GuiGraphics graphics, Font font, int sx, int sy,
-                                       AspectList aspects, int perRow) {
+    private static void drawAspectGrid(
+            GuiGraphics graphics, Font font, int sx, int sy, AspectList aspects, int perRow) {
         List<AspectInstance> sorted = sortedAspects(aspects);
         int rows = (sorted.size() - 1) / perRow;
         int startY = sy - ASPECT_HALF_CELL * rows;
@@ -685,7 +692,7 @@ public final class RecipeDisplayWidget {
     private static int[] aspectCell(int sx, int sy, int index, int count, int perRow, int rows) {
         int shift = (perRow - count % perRow) * ASPECT_HALF_CELL;
         int m = index / perRow >= rows && (rows > 1 || count < perRow) ? 1 : 0;
-        return new int[]{sx + index % perRow * ASPECT_CELL + shift * m, sy + index / perRow * ASPECT_CELL};
+        return new int[] {sx + index % perRow * ASPECT_CELL + shift * m, sy + index / perRow * ASPECT_CELL};
     }
 
     private static int[] infusionRingOffset(int index, int count) {
@@ -693,7 +700,7 @@ public final class RecipeDisplayWidget {
         float rot = -90.0F + pieSlice * index;
         int xx = (int) (Mth.cos(rot / 180.0F * (float) Math.PI) * INFUSION_RING_RADIUS) - 8;
         int yy = (int) (Mth.sin(rot / 180.0F * (float) Math.PI) * INFUSION_RING_RADIUS) - 8;
-        return new int[]{xx, yy};
+        return new int[] {xx, yy};
     }
 
     private static @Nullable Blueprint lookupBlueprint(ResourceLocation blueprintId) {
@@ -701,12 +708,14 @@ public final class RecipeDisplayWidget {
         if (mc.level == null) {
             return null;
         }
-        Registry<Blueprint> registry = mc.level.registryAccess().registry(Blueprint.REGISTRY_KEY).orElse(null);
+        Registry<Blueprint> registry =
+                mc.level.registryAccess().registry(Blueprint.REGISTRY_KEY).orElse(null);
         if (registry == null) {
             return null;
         }
         return registry.getHolder(ResourceKey.create(Blueprint.REGISTRY_KEY, blueprintId))
-                .map(Holder::value).orElse(null);
+                .map(Holder::value)
+                .orElse(null);
     }
 
     private static List<ItemStack> blueprintIngredients(ResourceLocation blueprintId) {
@@ -727,7 +736,8 @@ public final class RecipeDisplayWidget {
         }
         List<ItemStack> out = new ArrayList<>();
         counts.entrySet().stream()
-                .sorted(Comparator.comparingInt((Map.Entry<BlueprintSource, Integer> e) -> e.getValue()).reversed())
+                .sorted(Comparator.comparingInt((Map.Entry<BlueprintSource, Integer> e) -> e.getValue())
+                        .reversed())
                 .forEach(e -> {
                     ItemStack stack = e.getKey().getRepresentations().get(0).copy();
                     stack.setCount(e.getValue());
@@ -736,8 +746,8 @@ public final class RecipeDisplayWidget {
         return out;
     }
 
-    private static @Nullable ItemStack hoverCruciblePage(int cx, int cy, CrucibleRecipe display,
-                                                         double mouseX, double mouseY) {
+    private static @Nullable ItemStack hoverCruciblePage(
+            int cx, int cy, CrucibleRecipe display, double mouseX, double mouseY) {
         ItemStack result = resultOf(display, registries());
         if (!result.isEmpty() && hitItem(cx + CRUCIBLE_RESULT_X, cy + CRUCIBLE_RESULT_Y, mouseX, mouseY)) {
             return result;
@@ -749,8 +759,8 @@ public final class RecipeDisplayWidget {
         return null;
     }
 
-    private static @Nullable ItemStack hoverInfusionPage(int cx, int cy, IInfusionRecipe display,
-                                                         double mouseX, double mouseY) {
+    private static @Nullable ItemStack hoverInfusionPage(
+            int cx, int cy, IInfusionRecipe display, double mouseX, double mouseY) {
         ItemStack result = display.resultItem();
         if (!result.isEmpty() && hitItem(cx + CRUCIBLE_RESULT_X, cy + INFUSION_RESULT_Y, mouseX, mouseY)) {
             return result;
@@ -772,16 +782,19 @@ public final class RecipeDisplayWidget {
         return null;
     }
 
-    private static @Nullable ItemStack hoverConstructPage(int cx, int cy, DustTriggerMultiblockRecipe display,
-                                                          double mouseX, double mouseY) {
+    private static @Nullable ItemStack hoverConstructPage(
+            int cx, int cy, DustTriggerMultiblockRecipe display, double mouseX, double mouseY) {
         ItemStack result = display.result();
         if (!result.isEmpty() && hitItem(cx + OUTPUT_OFFSET_X, cy + OUTPUT_OFFSET_Y, mouseX, mouseY)) {
             return result;
         }
         List<ItemStack> ingredients = blueprintIngredients(display.blueprintId());
         for (int a = 0; a < ingredients.size(); a++) {
-            if (hitItem(cx + CONSTRUCT_INGREDIENT_X + a * CONSTRUCT_INGREDIENT_STRIDE,
-                    cy + CONSTRUCT_INGREDIENT_Y, mouseX, mouseY)) {
+            if (hitItem(
+                    cx + CONSTRUCT_INGREDIENT_X + a * CONSTRUCT_INGREDIENT_STRIDE,
+                    cy + CONSTRUCT_INGREDIENT_Y,
+                    mouseX,
+                    mouseY)) {
                 return ingredients.get(a);
             }
         }
@@ -792,15 +805,16 @@ public final class RecipeDisplayWidget {
         return mouseX >= x && mouseX < x + ITEM_HIT_SIZE && mouseY >= y && mouseY < y + ITEM_HIT_SIZE;
     }
 
-    private static @Nullable Component hoverAspectGrid(int sx, int sy, List<AspectInstance> sorted, int perRow,
-                                                       double mouseX, double mouseY) {
+    private static @Nullable Component hoverAspectGrid(
+            int sx, int sy, List<AspectInstance> sorted, int perRow, double mouseX, double mouseY) {
         int rows = (sorted.size() - 1) / perRow;
         int startY = sy - ASPECT_HALF_CELL * rows;
         for (int index = 0; index < sorted.size(); index++) {
             int[] pos = aspectCell(sx, startY, index, sorted.size(), perRow, rows);
             if (hitItem(pos[0], pos[1], mouseX, mouseY)) {
                 AspectInstance instance = sorted.get(index);
-                return AspectComponents.name(instance.aspect()).append("\n")
+                return AspectComponents.name(instance.aspect())
+                        .append("\n")
                         .append(AspectComponents.description(instance.aspect()));
             }
         }

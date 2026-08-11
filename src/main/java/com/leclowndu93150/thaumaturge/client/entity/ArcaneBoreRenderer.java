@@ -9,9 +9,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
@@ -43,8 +43,13 @@ public final class ArcaneBoreRenderer extends MobRenderer<EntityArcaneBore, Arca
     }
 
     @Override
-    public void render(EntityArcaneBore entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int packedLight) {
+    public void render(
+            EntityArcaneBore entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
         if (!(entity.clientDigging && entity.isActive() && entity.validInventory())) {
             return;
@@ -72,14 +77,22 @@ public final class ArcaneBoreRenderer extends MobRenderer<EntityArcaneBore, Arca
             float v0 = -1.0F + uvOffset + (float) strip / BEAM_STRIPS;
             float v1 = (float) BEAM_LENGTH + v0;
             Matrix4f mat = poseStack.last().pose();
-            buffer.addVertex(mat, 0.0F, 0.0F, -(float) BEAM_LENGTH).setUv(1.0F, v1)
-                    .setColor(BEAM_TINT).setLight(BEAM_LIGHT);
-            buffer.addVertex(mat, -BEAM_RADIUS, 0.0F, 0.0F).setUv(1.0F, v0)
-                    .setColor(BEAM_TINT).setLight(BEAM_LIGHT);
-            buffer.addVertex(mat, BEAM_RADIUS, 0.0F, 0.0F).setUv(0.0F, v0)
-                    .setColor(BEAM_TINT).setLight(BEAM_LIGHT);
-            buffer.addVertex(mat, 0.0F, 0.0F, -(float) BEAM_LENGTH).setUv(0.0F, v1)
-                    .setColor(BEAM_TINT).setLight(BEAM_LIGHT);
+            buffer.addVertex(mat, 0.0F, 0.0F, -(float) BEAM_LENGTH)
+                    .setUv(1.0F, v1)
+                    .setColor(BEAM_TINT)
+                    .setLight(BEAM_LIGHT);
+            buffer.addVertex(mat, -BEAM_RADIUS, 0.0F, 0.0F)
+                    .setUv(1.0F, v0)
+                    .setColor(BEAM_TINT)
+                    .setLight(BEAM_LIGHT);
+            buffer.addVertex(mat, BEAM_RADIUS, 0.0F, 0.0F)
+                    .setUv(0.0F, v0)
+                    .setColor(BEAM_TINT)
+                    .setLight(BEAM_LIGHT);
+            buffer.addVertex(mat, 0.0F, 0.0F, -(float) BEAM_LENGTH)
+                    .setUv(0.0F, v1)
+                    .setColor(BEAM_TINT)
+                    .setLight(BEAM_LIGHT);
         }
         poseStack.popPose();
         poseStack.pushPose();
@@ -99,13 +112,17 @@ public final class ArcaneBoreRenderer extends MobRenderer<EntityArcaneBore, Arca
         VertexConsumer buffer = buffers.getBuffer(BeamRenderType.NODE_TYPE);
         Matrix4f matrix = poseStack.last().pose();
         buffer.addVertex(matrix, -TIP_FLARE_HALF_SIZE, -TIP_FLARE_HALF_SIZE, 0.0F)
-                .setUv(u1, v1).setColor(TIP_FLARE_TINT);
+                .setUv(u1, v1)
+                .setColor(TIP_FLARE_TINT);
         buffer.addVertex(matrix, -TIP_FLARE_HALF_SIZE, TIP_FLARE_HALF_SIZE, 0.0F)
-                .setUv(u1, v0).setColor(TIP_FLARE_TINT);
+                .setUv(u1, v0)
+                .setColor(TIP_FLARE_TINT);
         buffer.addVertex(matrix, TIP_FLARE_HALF_SIZE, TIP_FLARE_HALF_SIZE, 0.0F)
-                .setUv(u0, v0).setColor(TIP_FLARE_TINT);
+                .setUv(u0, v0)
+                .setColor(TIP_FLARE_TINT);
         buffer.addVertex(matrix, TIP_FLARE_HALF_SIZE, -TIP_FLARE_HALF_SIZE, 0.0F)
-                .setUv(u0, v1).setColor(TIP_FLARE_TINT);
+                .setUv(u0, v1)
+                .setColor(TIP_FLARE_TINT);
     }
 
     @Override

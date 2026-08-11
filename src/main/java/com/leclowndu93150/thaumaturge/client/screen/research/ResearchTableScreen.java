@@ -1,7 +1,5 @@
 package com.leclowndu93150.thaumaturge.client.screen.research;
 
-import net.minecraft.world.item.ItemStack;
-import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectComponents;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
@@ -23,27 +21,27 @@ import com.leclowndu93150.thaumaturge.content.research.table.MenuResearchTable;
 import com.leclowndu93150.thaumaturge.network.ServerboundTableCombinePayload;
 import com.leclowndu93150.thaumaturge.network.ServerboundTableDuplicatePayload;
 import com.leclowndu93150.thaumaturge.network.ServerboundTablePlaceAspectPayload;
+import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
+import com.mojang.math.Axis;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jspecify.annotations.Nullable;
 
@@ -153,10 +151,17 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
 
     @Override
     protected void renderBackgroundTexture(GuiGraphics graphics) {
-        graphics.blit(TEXTURE, leftPos, topPos,
-                0.0F, 0.0F, GUI_SIZE, MAIN_PANE_H, 256, 256);
-        graphics.blit(TEXTURE, leftPos + LOWER_PANEL_X, topPos + MAIN_PANE_H,
-                0.0F, (float) LOWER_PANEL_V, LOWER_PANEL_W, LOWER_PANEL_H, 256, 256);
+        graphics.blit(TEXTURE, leftPos, topPos, 0.0F, 0.0F, GUI_SIZE, MAIN_PANE_H, 256, 256);
+        graphics.blit(
+                TEXTURE,
+                leftPos + LOWER_PANEL_X,
+                topPos + MAIN_PANE_H,
+                0.0F,
+                (float) LOWER_PANEL_V,
+                LOWER_PANEL_W,
+                LOWER_PANEL_H,
+                256,
+                256);
     }
 
     private @Nullable BlockEntityResearchTable table() {
@@ -164,7 +169,8 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
     }
 
     private @Nullable ResearchNoteData noteData() {
-        return ResearchNotes.dataOf(menu.slots.get(BlockEntityResearchTable.SLOT_NOTE).getItem());
+        return ResearchNotes.dataOf(
+                menu.slots.get(BlockEntityResearchTable.SLOT_NOTE).getItem());
     }
 
     private boolean hasInkReady() {
@@ -224,9 +230,18 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
             graphics.pose().pushPose();
             graphics.pose().translate(x, y, 0);
             graphics.pose().scale(PALETTE_TAG_SCALE, PALETTE_TAG_SCALE, 1F);
-            AspectTagRenderer.render(graphics, font, 1.0, 1.0, aspect,
-                    pool().amount(AspectPools.idOf(aspect)), 0, 0.0,
-                    AspectTagRenderer.BlendMode.ALPHA, alpha, false);
+            AspectTagRenderer.render(
+                    graphics,
+                    font,
+                    1.0,
+                    1.0,
+                    aspect,
+                    pool().amount(AspectPools.idOf(aspect)),
+                    0,
+                    0.0,
+                    AspectTagRenderer.BlendMode.ALPHA,
+                    alpha,
+                    false);
             graphics.pose().popPose();
             if (mouseX >= x && mouseX < x + PALETTE_CELL && mouseY >= y && mouseY < y + PALETTE_CELL) {
                 hovered = aspect;
@@ -234,15 +249,31 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
         }
         int lastPage = lastPage(aspects.size());
         if (page > 0) {
-            graphics.blit(TEXTURE, leftPos + ARROW_PREV_X, topPos + ARROW_Y,
-                    (float) ARROW_PREV_U, (float) ARROW_V, ARROW_W, ARROW_H, 256, 256);
+            graphics.blit(
+                    TEXTURE,
+                    leftPos + ARROW_PREV_X,
+                    topPos + ARROW_Y,
+                    (float) ARROW_PREV_U,
+                    (float) ARROW_V,
+                    ARROW_W,
+                    ARROW_H,
+                    256,
+                    256);
             if (inRect(mouseX, mouseY, leftPos + ARROW_PREV_X, topPos + ARROW_Y, ARROW_W, ARROW_H)) {
                 DeferredTooltip.set(Component.translatable("tc.table.page.prev"), mouseX, mouseY);
             }
         }
         if (page < lastPage) {
-            graphics.blit(TEXTURE, leftPos + ARROW_NEXT_X, topPos + ARROW_Y,
-                    (float) ARROW_NEXT_U, (float) ARROW_V, ARROW_W, ARROW_H, 256, 256);
+            graphics.blit(
+                    TEXTURE,
+                    leftPos + ARROW_NEXT_X,
+                    topPos + ARROW_Y,
+                    (float) ARROW_NEXT_U,
+                    (float) ARROW_V,
+                    ARROW_W,
+                    ARROW_H,
+                    256,
+                    256);
             if (inRect(mouseX, mouseY, leftPos + ARROW_NEXT_X, topPos + ARROW_Y, ARROW_W, ARROW_H)) {
                 DeferredTooltip.set(Component.translatable("tc.table.page.next"), mouseX, mouseY);
             }
@@ -266,24 +297,42 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
         drawSelectTag(graphics, select1, leftPos + SELECT1_CENTER_X, topPos + SELECT_CENTER_Y);
         drawSelectTag(graphics, select2, leftPos + SELECT2_CENTER_X, topPos + SELECT_CENTER_Y);
         if (select1 != null && select2 != null) {
-            graphics.blit(TEXTURE, leftPos + COMBINE_X, topPos + COMBINE_Y,
-                    (float) COMBINE_U, (float) COMBINE_V, COMBINE_W, COMBINE_H, 256, 256);
+            graphics.blit(
+                    TEXTURE,
+                    leftPos + COMBINE_X,
+                    topPos + COMBINE_Y,
+                    (float) COMBINE_U,
+                    (float) COMBINE_V,
+                    COMBINE_W,
+                    COMBINE_H,
+                    256,
+                    256);
             if (System.currentTimeMillis() < combineCooldownUntil) {
-                graphics.blit(TEXTURE, leftPos + COMBINE_X, topPos + COMBINE_Y,
-                        (float) COMBINE_U, (float) COMBINE_PRESSED_V, COMBINE_W, COMBINE_H, 256, 256);
+                graphics.blit(
+                        TEXTURE,
+                        leftPos + COMBINE_X,
+                        topPos + COMBINE_Y,
+                        (float) COMBINE_U,
+                        (float) COMBINE_PRESSED_V,
+                        COMBINE_W,
+                        COMBINE_H,
+                        256,
+                        256);
             }
             if (inRect(mouseX, mouseY, leftPos + COMBINE_X, topPos + COMBINE_Y, COMBINE_W, COMBINE_H)) {
                 DeferredTooltip.set(Component.translatable("tc.table.combine"), mouseX, mouseY);
             }
         }
         if (inRect(mouseX, mouseY, leftPos + SELECT1_HIT_X, topPos + SELECT_HIT_Y, SELECT_SIZE, SELECT_SIZE)) {
-            DeferredTooltip.set(select1 != null
-                    ? AspectComponents.name(select1)
-                    : Component.translatable("tc.table.select"), mouseX, mouseY);
+            DeferredTooltip.set(
+                    select1 != null ? AspectComponents.name(select1) : Component.translatable("tc.table.select"),
+                    mouseX,
+                    mouseY);
         } else if (inRect(mouseX, mouseY, leftPos + SELECT2_HIT_X, topPos + SELECT_HIT_Y, SELECT_SIZE, SELECT_SIZE)) {
-            DeferredTooltip.set(select2 != null
-                    ? AspectComponents.name(select2)
-                    : Component.translatable("tc.table.select"), mouseX, mouseY);
+            DeferredTooltip.set(
+                    select2 != null ? AspectComponents.name(select2) : Component.translatable("tc.table.select"),
+                    mouseX,
+                    mouseY);
         }
     }
 
@@ -294,8 +343,8 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
         graphics.pose().pushPose();
         graphics.pose().translate(centerX, centerY, 0);
         graphics.pose().scale(SELECT_SCALE, SELECT_SCALE, 1F);
-        AspectTagRenderer.render(graphics, font, -8.0, -8.0, aspect, 0, 0, 0.0,
-                AspectTagRenderer.BlendMode.ALPHA, 1.0F, false);
+        AspectTagRenderer.render(
+                graphics, font, -8.0, -8.0, aspect, 0, 0, 0.0, AspectTagRenderer.BlendMode.ALPHA, 1.0F, false);
         graphics.pose().popPose();
     }
 
@@ -305,19 +354,30 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
             return;
         }
         ResearchNoteData data = noteData();
-        if (data == null || !data.complete()
-                || !KnowledgeAccess.of(minecraft.player).isResearchComplete(BlockEntityResearchTable.RESEARCH_DUPLICATION)) {
+        if (data == null
+                || !data.complete()
+                || !KnowledgeAccess.of(minecraft.player)
+                        .isResearchComplete(BlockEntityResearchTable.RESEARCH_DUPLICATION)) {
             return;
         }
-        graphics.blit(TEXTURE, leftPos + DUPE_X, topPos + DUPE_Y,
-                (float) DUPE_U, (float) DUPE_V, DUPE_SIZE, DUPE_SIZE, 256, 256);
+        graphics.blit(
+                TEXTURE,
+                leftPos + DUPE_X,
+                topPos + DUPE_Y,
+                (float) DUPE_U,
+                (float) DUPE_V,
+                DUPE_SIZE,
+                DUPE_SIZE,
+                256,
+                256);
         if (inRect(mouseX, mouseY, leftPos + DUPE_X, topPos + DUPE_Y, DUPE_SIZE, DUPE_SIZE)) {
             List<Component> lines = new ArrayList<>();
             lines.add(Component.translatable("tc.research.copy"));
             AspectList cost = table.duplicationCost(minecraft.player, data);
             if (cost != null) {
                 for (AspectInstance instance : cost.entries()) {
-                    lines.add(AspectComponents.name(instance.aspect()).copy()
+                    lines.add(AspectComponents.name(instance.aspect())
+                            .copy()
                             .append(Component.literal(" x" + instance.amount())));
                 }
             }
@@ -340,8 +400,10 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
             return false;
         }
         ResearchNoteData data = noteData();
-        return data != null && data.complete()
-                && KnowledgeAccess.of(minecraft.player).isResearchComplete(BlockEntityResearchTable.RESEARCH_DUPLICATION);
+        return data != null
+                && data.complete()
+                && KnowledgeAccess.of(minecraft.player)
+                        .isResearchComplete(BlockEntityResearchTable.RESEARCH_DUPLICATION);
     }
 
     private List<Holder<IAspect>> discoveredCompounds() {
@@ -372,20 +434,37 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
         int center = leftPos + SHEET_X + SHEET_SIZE / 2;
         if (lastPage > 0) {
             String label = (helperPage + 1) + "/" + (lastPage + 1);
-            graphics.drawString(font, label, center - font.width(label) / 2, topPos + HELPER_ARROW_Y, 0xFF3A2A1A, false);
+            graphics.drawString(
+                    font, label, center - font.width(label) / 2, topPos + HELPER_ARROW_Y, 0xFF3A2A1A, false);
         }
         if (helperPage > 0) {
             int x = center - HELPER_PAGE_HALF_GAP - ARROW_W;
-            graphics.blit(TEXTURE, x, topPos + HELPER_ARROW_Y,
-                    (float) ARROW_PREV_U, (float) ARROW_V, ARROW_W, ARROW_H, 256, 256);
+            graphics.blit(
+                    TEXTURE,
+                    x,
+                    topPos + HELPER_ARROW_Y,
+                    (float) ARROW_PREV_U,
+                    (float) ARROW_V,
+                    ARROW_W,
+                    ARROW_H,
+                    256,
+                    256);
             if (inRect(mouseX, mouseY, x, topPos + HELPER_ARROW_Y, ARROW_W, ARROW_H)) {
                 DeferredTooltip.set(Component.translatable("tc.table.page.prev"), mouseX, mouseY);
             }
         }
         if (helperPage < lastPage) {
             int x = center + HELPER_PAGE_HALF_GAP;
-            graphics.blit(TEXTURE, x, topPos + HELPER_ARROW_Y,
-                    (float) ARROW_NEXT_U, (float) ARROW_V, ARROW_W, ARROW_H, 256, 256);
+            graphics.blit(
+                    TEXTURE,
+                    x,
+                    topPos + HELPER_ARROW_Y,
+                    (float) ARROW_NEXT_U,
+                    (float) ARROW_V,
+                    ARROW_W,
+                    ARROW_H,
+                    256,
+                    256);
             if (inRect(mouseX, mouseY, x, topPos + HELPER_ARROW_Y, ARROW_W, ARROW_H)) {
                 DeferredTooltip.set(Component.translatable("tc.table.page.next"), mouseX, mouseY);
             }
@@ -394,20 +473,29 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
 
     private void drawHelperTag(GuiGraphics graphics, Holder<IAspect> aspect, int x, int y, int mouseX, int mouseY) {
         if (AspectPools.isDiscovered(minecraft.player, aspect)) {
-            AspectTagRenderer.render(graphics, font, (double) x, (double) y, aspect, 0, 0, 0.0,
-                    AspectTagRenderer.BlendMode.ALPHA, 1.0F, false);
+            AspectTagRenderer.render(
+                    graphics,
+                    font,
+                    (double) x,
+                    (double) y,
+                    aspect,
+                    0,
+                    0,
+                    0.0,
+                    AspectTagRenderer.BlendMode.ALPHA,
+                    1.0F,
+                    false);
             if (inRect(mouseX, mouseY, x, y, 16, 16)) {
                 DeferredTooltip.set(AspectComponents.name(aspect), mouseX, mouseY);
             }
         } else {
-            GuiBlend.blitTinted(graphics, UNKNOWN_ASPECT, x, y,
-                    16, 16, 0.0F, 0.0F, 32, 32, 32, 32, ARGB32.color(128, 0x000000));
+            GuiBlend.blitTinted(
+                    graphics, UNKNOWN_ASPECT, x, y, 16, 16, 0.0F, 0.0F, 32, 32, 32, 32, ARGB32.color(128, 0x000000));
         }
     }
 
     private void drawSheet(GuiGraphics graphics, int mouseX, int mouseY) {
-        graphics.blit(PARCHMENT, leftPos + SHEET_X, topPos + SHEET_Y,
-                0.0F, 0.0F, SHEET_SIZE, SHEET_SIZE, 256, 256);
+        graphics.blit(PARCHMENT, leftPos + SHEET_X, topPos + SHEET_Y, 0.0F, 0.0F, SHEET_SIZE, SHEET_SIZE, 256, 256);
         if (helperOpen) {
             drawHelper(graphics, mouseX, mouseY);
             return;
@@ -427,23 +515,55 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
             int cy = topPos + HEX_ORIGIN_Y + Math.round(cell.hex().pixelY(HEX_SIZE));
             if (!data.complete() && cell.type() != ResearchNoteData.TYPE_ROOT) {
                 boolean hover = cell.hex().equals(hoveredHex);
-                GuiBlend.blitTinted(graphics, hover ? HEX_HOVER : HEX_IDLE,
-                        cx - HEX_TILE_HALF, cy - HEX_TILE_HALF,
-                        16, 16, 0.0F, 0.0F, 32, 32, 32, 32,
+                GuiBlend.blitTinted(
+                        graphics,
+                        hover ? HEX_HOVER : HEX_IDLE,
+                        cx - HEX_TILE_HALF,
+                        cy - HEX_TILE_HALF,
+                        16,
+                        16,
+                        0.0F,
+                        0.0F,
+                        32,
+                        32,
+                        32,
+                        32,
                         ARGB32.color(hover ? 255 : 64, 0xFFFFFF));
             }
             Holder<IAspect> aspect = cell.aspectOrNull();
             if (aspect != null) {
                 if (!AspectPools.isDiscovered(minecraft.player, aspect)) {
-                    GuiBlend.blitTinted(graphics, UNKNOWN_ASPECT, cx + ORB_OFFSET, cy + ORB_OFFSET,
-                            16, 16, 0.0F, 0.0F, 32, 32, 32, 32, ARGB32.color(128, 0x000000));
+                    GuiBlend.blitTinted(
+                            graphics,
+                            UNKNOWN_ASPECT,
+                            cx + ORB_OFFSET,
+                            cy + ORB_OFFSET,
+                            16,
+                            16,
+                            0.0F,
+                            0.0F,
+                            32,
+                            32,
+                            32,
+                            32,
+                            ARGB32.color(128, 0x000000));
                     if (cell.hex().equals(hoveredHex)) {
                         DeferredTooltip.set(Component.translatable("tc.aspect.unknown"), mouseX, mouseY);
                     }
                 } else {
                     float alpha = 1.0F;
-                    AspectTagRenderer.render(graphics, font, (double) (cx + ORB_OFFSET), (double) (cy + ORB_OFFSET),
-                            aspect, 0, 0, 0.0, AspectTagRenderer.BlendMode.ALPHA, alpha, false);
+                    AspectTagRenderer.render(
+                            graphics,
+                            font,
+                            (double) (cx + ORB_OFFSET),
+                            (double) (cy + ORB_OFFSET),
+                            aspect,
+                            0,
+                            0,
+                            0.0,
+                            AspectTagRenderer.BlendMode.ALPHA,
+                            alpha,
+                            false);
                     if (cell.hex().equals(hoveredHex) && draggedAspect == null) {
                         DeferredTooltip.set(aspectTooltip(aspect), mouseX, mouseY);
                     }
@@ -455,8 +575,8 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
         }
     }
 
-    private void drawConnections(GuiGraphics graphics, ResearchNoteData data,
-                                 Map<HexGrid.Hex, ResearchNoteData.Cell> cells) {
+    private void drawConnections(
+            GuiGraphics graphics, ResearchNoteData data, Map<HexGrid.Hex, ResearchNoteData.Cell> cells) {
         for (ResearchNoteData.Cell cell : data.cells()) {
             if (!cell.active()) {
                 continue;
@@ -467,7 +587,9 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
                 if (other == null || !other.active()) {
                     continue;
                 }
-                if (NoteRules.connects(cell.aspectOrNull(), other.aspectOrNull(),
+                if (NoteRules.connects(
+                        cell.aspectOrNull(),
+                        other.aspectOrNull(),
                         a -> AspectPools.isDiscovered(minecraft.player, a))) {
                     int x1 = leftPos + HEX_ORIGIN_X + Math.round(cell.hex().pixelX(HEX_SIZE));
                     int y1 = topPos + HEX_ORIGIN_Y + Math.round(cell.hex().pixelY(HEX_SIZE));
@@ -487,8 +609,20 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
         graphics.pose().pushPose();
         graphics.pose().translate(x1, y1, 0);
         graphics.pose().mulPose(Axis.ZP.rotation((float) Math.atan2(dy, dx)));
-        GuiBlend.blitAdditive(graphics, LINE_TEXTURE,
-                0, -LINE_HALF_WIDTH, length, LINE_HALF_WIDTH * 2, 0.0F, 0.0F, 4, 4, 4, 4, color);
+        GuiBlend.blitAdditive(
+                graphics,
+                LINE_TEXTURE,
+                0,
+                -LINE_HALF_WIDTH,
+                length,
+                LINE_HALF_WIDTH * 2,
+                0.0F,
+                0.0F,
+                4,
+                4,
+                4,
+                4,
+                color);
         graphics.pose().popPose();
     }
 
@@ -504,10 +638,22 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
     private void drawSlotHints(GuiGraphics graphics, int mouseX, int mouseY) {
         if (menu.getCarried().isEmpty() && draggedAspect == null) {
             if (menu.slots.get(0).getItem().isEmpty()
-                    && inRect(mouseX, mouseY, leftPos + MenuResearchTable.SCRIBE_TOOLS_X, topPos + MenuResearchTable.SCRIBE_TOOLS_Y, 16, 16)) {
+                    && inRect(
+                            mouseX,
+                            mouseY,
+                            leftPos + MenuResearchTable.SCRIBE_TOOLS_X,
+                            topPos + MenuResearchTable.SCRIBE_TOOLS_Y,
+                            16,
+                            16)) {
                 DeferredTooltip.set(Component.translatable("tc.table.slot.tools"), mouseX, mouseY);
             } else if (menu.slots.get(1).getItem().isEmpty()
-                    && inRect(mouseX, mouseY, leftPos + MenuResearchTable.NOTE_X, topPos + MenuResearchTable.NOTE_Y, 16, 16)) {
+                    && inRect(
+                            mouseX,
+                            mouseY,
+                            leftPos + MenuResearchTable.NOTE_X,
+                            topPos + MenuResearchTable.NOTE_Y,
+                            16,
+                            16)) {
                 DeferredTooltip.set(Component.translatable("tc.table.slot.note"), mouseX, mouseY);
             }
         }
@@ -515,14 +661,26 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
 
     private void drawDragged(GuiGraphics graphics, int mouseX, int mouseY) {
         if (draggedAspect != null) {
-            AspectTagRenderer.render(graphics, font, (double) (mouseX - 8), (double) (mouseY - 8),
-                    draggedAspect, 0, 0, 0.0, AspectTagRenderer.BlendMode.ALPHA, 1.0F, false);
+            AspectTagRenderer.render(
+                    graphics,
+                    font,
+                    (double) (mouseX - 8),
+                    (double) (mouseY - 8),
+                    draggedAspect,
+                    0,
+                    0,
+                    0.0,
+                    AspectTagRenderer.BlendMode.ALPHA,
+                    1.0F,
+                    false);
         }
     }
 
     private HexGrid.@Nullable Hex hexAt(double mouseX, double mouseY) {
-        if (mouseX < leftPos + SHEET_X || mouseX >= leftPos + SHEET_X + SHEET_SIZE
-                || mouseY < topPos + SHEET_Y || mouseY >= topPos + SHEET_Y + SHEET_SIZE) {
+        if (mouseX < leftPos + SHEET_X
+                || mouseX >= leftPos + SHEET_X + SHEET_SIZE
+                || mouseY < topPos + SHEET_Y
+                || mouseY >= topPos + SHEET_Y + SHEET_SIZE) {
             return null;
         }
         float relX = (float) (mouseX - leftPos - HEX_ORIGIN_X);
@@ -531,8 +689,10 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
     }
 
     private @Nullable Holder<IAspect> paletteAspectAt(double mouseX, double mouseY) {
-        if (mouseX < leftPos + PALETTE_X || mouseX >= leftPos + PALETTE_X + PALETTE_W
-                || mouseY < topPos + PALETTE_Y || mouseY >= topPos + PALETTE_Y + PALETTE_H) {
+        if (mouseX < leftPos + PALETTE_X
+                || mouseX >= leftPos + PALETTE_X + PALETTE_W
+                || mouseY < topPos + PALETTE_Y
+                || mouseY >= topPos + PALETTE_Y + PALETTE_H) {
             return null;
         }
         int col = (int) ((mouseX - leftPos - PALETTE_X) / PALETTE_CELL);
@@ -557,22 +717,27 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
                     return true;
                 }
             }
-            if (handleArrows(mx, my) || handleCombineButton(mx, my)
-                    || handleSelectRemove(mx, my) || handleDuplicate(mx, my)) {
+            if (handleArrows(mx, my)
+                    || handleCombineButton(mx, my)
+                    || handleSelectRemove(mx, my)
+                    || handleDuplicate(mx, my)) {
                 return true;
             }
             Holder<IAspect> palette = paletteAspectAt(mx, my);
             if (palette != null) {
-				if (Minecraft.getInstance().player != null)
-	                if (Minecraft.getInstance().player.isShiftKeyDown() && !palette.value().isPrimal() && KnowledgeAccess.of(minecraft.player).isResearchComplete(BlockEntityResearchTable.RESEARCH_MASTERY)) {
-	                    List<Holder<IAspect>> components = palette.value().components();
-	                    if (components.size() == 2) {
-	                        select1 = components.get(0);
-	                        select2 = components.get(1);
-	                        playSound(TCSounds.HHON.get(), 0.2F, 1.0F);
-	                        return true;
-	                    }
-	                }
+                if (Minecraft.getInstance().player != null)
+                    if (Minecraft.getInstance().player.isShiftKeyDown()
+                            && !palette.value().isPrimal()
+                            && KnowledgeAccess.of(minecraft.player)
+                                    .isResearchComplete(BlockEntityResearchTable.RESEARCH_MASTERY)) {
+                        List<Holder<IAspect>> components = palette.value().components();
+                        if (components.size() == 2) {
+                            select1 = components.get(0);
+                            select2 = components.get(1);
+                            playSound(TCSounds.HHON.get(), 0.2F, 1.0F);
+                            return true;
+                        }
+                    }
                 if (availableOf(palette) > 0) {
                     draggedAspect = palette;
                     playSound(TCSounds.HHOFF.get(), 0.2F, 1.0F);
@@ -585,8 +750,8 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
                 if (data != null && !data.complete()) {
                     ResearchNoteData.Cell cell = data.cellAt(hex);
                     if (cell != null && cell.type() == ResearchNoteData.TYPE_PLACED) {
-                        PacketDistributor.sendToServer(new ServerboundTablePlaceAspectPayload(
-                                menu.pos(), hex.q(), hex.r(), Optional.empty()));
+                        PacketDistributor.sendToServer(
+                                new ServerboundTablePlaceAspectPayload(menu.pos(), hex.q(), hex.r(), Optional.empty()));
                         playSound(TCSounds.ERASE.get(), 0.2F, 1.0F);
                         return true;
                     }
@@ -610,11 +775,11 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
                             menu.pos(), hex.q(), hex.r(), Optional.of(AspectPools.idOf(draggedAspect))));
                     playSound(TCSounds.WRITE.get(), 0.2F, 1.0F);
                 }
-            } else if (inRect(mx, my, leftPos + SELECT1_HIT_X - 8, topPos + SELECT_HIT_Y - 8,
-                    SELECT_SIZE * 2, SELECT_SIZE * 2)) {
+            } else if (inRect(
+                    mx, my, leftPos + SELECT1_HIT_X - 8, topPos + SELECT_HIT_Y - 8, SELECT_SIZE * 2, SELECT_SIZE * 2)) {
                 select1 = draggedAspect;
-            } else if (inRect(mx, my, leftPos + SELECT2_HIT_X - 8, topPos + SELECT_HIT_Y - 8,
-                    SELECT_SIZE * 2, SELECT_SIZE * 2)) {
+            } else if (inRect(
+                    mx, my, leftPos + SELECT2_HIT_X - 8, topPos + SELECT_HIT_Y - 8, SELECT_SIZE * 2, SELECT_SIZE * 2)) {
                 select2 = draggedAspect;
             }
             draggedAspect = null;
@@ -626,12 +791,14 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
     private boolean handleHelperArrows(double mx, double my) {
         int lastPage = Math.max(0, (discoveredCompounds().size() - 1) / HELPER_ROWS);
         int center = leftPos + SHEET_X + SHEET_SIZE / 2;
-        if (helperPage > 0 && inRect(mx, my, center - HELPER_PAGE_HALF_GAP - ARROW_W, topPos + HELPER_ARROW_Y, ARROW_W, ARROW_H)) {
+        if (helperPage > 0
+                && inRect(mx, my, center - HELPER_PAGE_HALF_GAP - ARROW_W, topPos + HELPER_ARROW_Y, ARROW_W, ARROW_H)) {
             helperPage--;
             playSound(TCSounds.KEY.get(), 0.3F, 1.0F);
             return true;
         }
-        if (helperPage < lastPage && inRect(mx, my, center + HELPER_PAGE_HALF_GAP, topPos + HELPER_ARROW_Y, ARROW_W, ARROW_H)) {
+        if (helperPage < lastPage
+                && inRect(mx, my, center + HELPER_PAGE_HALF_GAP, topPos + HELPER_ARROW_Y, ARROW_W, ARROW_H)) {
             helperPage++;
             playSound(TCSounds.KEY.get(), 0.3F, 1.0F);
             return true;
@@ -655,7 +822,8 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
     }
 
     private boolean handleCombineButton(double mx, double my) {
-        if (select1 == null || select2 == null
+        if (select1 == null
+                || select2 == null
                 || !inRect(mx, my, leftPos + COMBINE_X, topPos + COMBINE_Y, COMBINE_W, COMBINE_H)) {
             return false;
         }
@@ -664,9 +832,11 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
         }
         combineCooldownUntil = System.currentTimeMillis() + COMBINE_COOLDOWN_MS;
         BlockEntityResearchTable table = table();
-        boolean bonus1 = table != null && pool().amount(AspectPools.idOf(select1)) <= 0
+        boolean bonus1 = table != null
+                && pool().amount(AspectPools.idOf(select1)) <= 0
                 && table.bonusAspects().amountOf(select1) > 0;
-        boolean bonus2 = table != null && pool().amount(AspectPools.idOf(select2)) <= 0
+        boolean bonus2 = table != null
+                && pool().amount(AspectPools.idOf(select2)) <= 0
                 && table.bonusAspects().amountOf(select2) > 0;
         PacketDistributor.sendToServer(new ServerboundTableCombinePayload(
                 menu.pos(), AspectPools.idOf(select1), AspectPools.idOf(select2), bonus1, bonus2));
@@ -677,12 +847,14 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
     }
 
     private boolean handleSelectRemove(double mx, double my) {
-        if (select1 != null && inRect(mx, my, leftPos + SELECT1_HIT_X, topPos + SELECT_HIT_Y, SELECT_SIZE, SELECT_SIZE)) {
+        if (select1 != null
+                && inRect(mx, my, leftPos + SELECT1_HIT_X, topPos + SELECT_HIT_Y, SELECT_SIZE, SELECT_SIZE)) {
             select1 = null;
             playSound(TCSounds.HHOFF.get(), 0.2F, 1.0F);
             return true;
         }
-        if (select2 != null && inRect(mx, my, leftPos + SELECT2_HIT_X, topPos + SELECT_HIT_Y, SELECT_SIZE, SELECT_SIZE)) {
+        if (select2 != null
+                && inRect(mx, my, leftPos + SELECT2_HIT_X, topPos + SELECT_HIT_Y, SELECT_SIZE, SELECT_SIZE)) {
             select2 = null;
             playSound(TCSounds.HHOFF.get(), 0.2F, 1.0F);
             return true;
@@ -692,13 +864,16 @@ public final class ResearchTableScreen extends AbstractTCContainerScreen<MenuRes
 
     private boolean handleDuplicate(double mx, double my) {
         BlockEntityResearchTable table = table();
-        if (table == null || minecraft.player == null
+        if (table == null
+                || minecraft.player == null
                 || !inRect(mx, my, leftPos + DUPE_X, topPos + DUPE_Y, DUPE_SIZE, DUPE_SIZE)) {
             return false;
         }
         ResearchNoteData data = noteData();
-        if (data == null || !data.complete()
-                || !KnowledgeAccess.of(minecraft.player).isResearchComplete(BlockEntityResearchTable.RESEARCH_DUPLICATION)) {
+        if (data == null
+                || !data.complete()
+                || !KnowledgeAccess.of(minecraft.player)
+                        .isResearchComplete(BlockEntityResearchTable.RESEARCH_DUPLICATION)) {
             return false;
         }
         PacketDistributor.sendToServer(new ServerboundTableDuplicatePayload(menu.pos()));

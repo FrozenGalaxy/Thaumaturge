@@ -23,9 +23,9 @@ public final class BellowsRenderer implements BlockEntityRenderer<BlockEntityBel
     private static final int TOP = 1;
     private static final int BAG = 2;
     public static final ModelResourceLocation[] MODEL_IDS = {
-            ModelResourceLocation.standalone(TCIds.rl("block/bellows/bottom_plank")),
-            ModelResourceLocation.standalone(TCIds.rl("block/bellows/top_plank")),
-            ModelResourceLocation.standalone(TCIds.rl("block/bellows/bag"))
+        ModelResourceLocation.standalone(TCIds.rl("block/bellows/bottom_plank")),
+        ModelResourceLocation.standalone(TCIds.rl("block/bellows/top_plank")),
+        ModelResourceLocation.standalone(TCIds.rl("block/bellows/bag"))
     };
 
     private final RandomSource random = RandomSource.create();
@@ -33,8 +33,13 @@ public final class BellowsRenderer implements BlockEntityRenderer<BlockEntityBel
     public BellowsRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(BlockEntityBellows bellows, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityBellows bellows,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         BlockState state = bellows.getBlockState();
         Direction facing = state.getValue(BlockBellows.FACING);
         float scale = bellows.inflation;
@@ -68,13 +73,24 @@ public final class BellowsRenderer implements BlockEntityRenderer<BlockEntityBel
         poseStack.popPose();
     }
 
-    private void renderPart(int index, BlockState state, PoseStack poseStack,
-                            MultiBufferSource buffers, int light, int overlay) {
+    private void renderPart(
+            int index, BlockState state, PoseStack poseStack, MultiBufferSource buffers, int light, int overlay) {
         BakedModel model = Minecraft.getInstance().getModelManager().getModel(MODEL_IDS[index]);
-        ModelBlockRenderer modelRenderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
+        ModelBlockRenderer modelRenderer =
+                Minecraft.getInstance().getBlockRenderer().getModelRenderer();
         for (RenderType renderType : model.getRenderTypes(state, random, ModelData.EMPTY)) {
-            modelRenderer.renderModel(poseStack.last(), buffers.getBuffer(renderType), state, model,
-                    1.0F, 1.0F, 1.0F, light, overlay, ModelData.EMPTY, renderType);
+            modelRenderer.renderModel(
+                    poseStack.last(),
+                    buffers.getBuffer(renderType),
+                    state,
+                    model,
+                    1.0F,
+                    1.0F,
+                    1.0F,
+                    light,
+                    overlay,
+                    ModelData.EMPTY,
+                    renderType);
         }
     }
 }

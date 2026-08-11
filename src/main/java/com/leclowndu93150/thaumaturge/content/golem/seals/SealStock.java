@@ -1,6 +1,5 @@
 package com.leclowndu93150.thaumaturge.content.golem.seals;
 
-import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
 import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.golems.GolemHelper;
 import com.leclowndu93150.thaumaturge.api.golems.GolemTrait;
@@ -9,6 +8,7 @@ import com.leclowndu93150.thaumaturge.api.golems.seals.ISealConfigToggles;
 import com.leclowndu93150.thaumaturge.api.golems.seals.ISealEntity;
 import com.leclowndu93150.thaumaturge.api.golems.tasks.Task;
 import com.leclowndu93150.thaumaturge.api.items.InvHelper;
+import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -20,10 +20,10 @@ public class SealStock extends SealFiltered implements ISealConfigToggles {
     private static final int SCAN_INTERVAL = 20;
 
     protected final ISealConfigToggles.SealToggle[] props = {
-            new ISealConfigToggles.SealToggle(true, "pmeta", "golem.prop.meta"),
-            new ISealConfigToggles.SealToggle(true, "pnbt", "golem.prop.nbt"),
-            new ISealConfigToggles.SealToggle(false, "pore", "golem.prop.ore"),
-            new ISealConfigToggles.SealToggle(false, "pmod", "golem.prop.mod")
+        new ISealConfigToggles.SealToggle(true, "pmeta", "golem.prop.meta"),
+        new ISealConfigToggles.SealToggle(true, "pnbt", "golem.prop.nbt"),
+        new ISealConfigToggles.SealToggle(false, "pore", "golem.prop.ore"),
+        new ISealConfigToggles.SealToggle(false, "pmod", "golem.prop.mod")
     };
 
     private int delay = System.identityHashCode(this) % 50;
@@ -43,7 +43,8 @@ public class SealStock extends SealFiltered implements ISealConfigToggles {
         if (delay++ % SCAN_INTERVAL != 0) {
             return;
         }
-        IItemHandler inv = InvHelper.getItemHandlerAt(level, seal.getSealPos().pos(), seal.getSealPos().face());
+        IItemHandler inv = InvHelper.getItemHandlerAt(
+                level, seal.getSealPos().pos(), seal.getSealPos().face());
         if (inv == null) {
             return;
         }
@@ -55,17 +56,18 @@ public class SealStock extends SealFiltered implements ISealConfigToggles {
             if (amount < getFilterSlotSize(slot)) {
                 ItemStack wanted = getFilterSlot(slot).copy();
                 wanted.setCount(Math.min(wanted.getMaxStackSize(), getFilterSlotSize(slot) - amount));
-                wanted = InvHelper.hasRoomFor(level, seal.getSealPos().pos(), seal.getSealPos().face(), wanted);
+                wanted = InvHelper.hasRoomFor(
+                        level, seal.getSealPos().pos(), seal.getSealPos().face(), wanted);
                 if (!wanted.isEmpty()) {
-                    GolemHelper.requestProvisioning(level, seal.getSealPos().pos(), seal.getSealPos().face(), wanted);
+                    GolemHelper.requestProvisioning(
+                            level, seal.getSealPos().pos(), seal.getSealPos().face(), wanted);
                 }
             }
         }
     }
 
     @Override
-    public void onTaskStarted(Level level, IGolemAPI golem, Task task) {
-    }
+    public void onTaskStarted(Level level, IGolemAPI golem, Task task) {}
 
     @Override
     public boolean onTaskCompletion(Level level, IGolemAPI golem, Task task) {
@@ -89,7 +91,7 @@ public class SealStock extends SealFiltered implements ISealConfigToggles {
 
     @Override
     public int[] getGuiCategories() {
-        return new int[]{CAT_FILTER, CAT_TOGGLES, CAT_PRIORITY, CAT_TAGS};
+        return new int[] {CAT_FILTER, CAT_TOGGLES, CAT_PRIORITY, CAT_TAGS};
     }
 
     @Override
@@ -99,16 +101,14 @@ public class SealStock extends SealFiltered implements ISealConfigToggles {
 
     @Override
     public GolemTrait[] getForbiddenTags() {
-        return new GolemTrait[]{TCGolemTraits.CLUMSY.get()};
+        return new GolemTrait[] {TCGolemTraits.CLUMSY.get()};
     }
 
     @Override
-    public void onTaskSuspension(Level level, Task task) {
-    }
+    public void onTaskSuspension(Level level, Task task) {}
 
     @Override
-    public void onRemoval(Level level, BlockPos pos, Direction side) {
-    }
+    public void onRemoval(Level level, BlockPos pos, Direction side) {}
 
     @Override
     public boolean hasStacksizeLimiters() {

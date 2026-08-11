@@ -1,38 +1,37 @@
 package com.leclowndu93150.thaumaturge.content.entity;
 
+import com.leclowndu93150.thaumaturge.TCIds;
+import com.leclowndu93150.thaumaturge.api.aspect.AspectIndexAccess;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.aspect.TCAspects;
-import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.casters.CastStreams;
 import com.leclowndu93150.thaumaturge.api.casters.FocusEngine;
 import com.leclowndu93150.thaumaturge.api.casters.FocusPackage;
-import com.leclowndu93150.thaumaturge.api.aspect.AspectIndexAccess;
 import com.leclowndu93150.thaumaturge.content.entity.ai.PechItemGoal;
 import com.leclowndu93150.thaumaturge.content.entity.ai.PechTradeGoal;
 import com.leclowndu93150.thaumaturge.content.pech.MenuPech;
 import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.NonNullList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.RandomSource;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
@@ -42,10 +41,10 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -68,6 +67,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.AABB;
 import org.jspecify.annotations.Nullable;
 
@@ -107,8 +107,7 @@ public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
     private final RangedAttackGoal arrowAttackGoal = new RangedAttackGoal(this, 0.6, 20, 50, 15.0F);
     private final RangedAttackGoal blastAttackGoal = new RangedAttackGoal(this, 0.6, 20, 50, 15.0F);
     private final MeleeAttackGoal meleeAttackGoal = new MeleeAttackGoal(this, 0.6, false);
-    private final AvoidEntityGoal<Player> avoidPlayerGoal =
-            new AvoidEntityGoal<>(this, Player.class, 8.0F, 0.5, 0.6);
+    private final AvoidEntityGoal<Player> avoidPlayerGoal = new AvoidEntityGoal<>(this, Player.class, 8.0F, 0.5, 0.6);
 
     public EntityPech(EntityType<? extends EntityPech> type, Level level) {
         super(type, level);
@@ -123,10 +122,14 @@ public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
                 .add(Attributes.ARMOR, 2.0);
     }
 
-    public static boolean checkPechSpawnRules(EntityType<EntityPech> type, ServerLevelAccessor level,
-                                              MobSpawnType reason, BlockPos pos, RandomSource random) {
-        int count = level.getEntitiesOfClass(EntityPech.class,
-                new AABB(pos).inflate(16.0, 16.0, 16.0)).size();
+    public static boolean checkPechSpawnRules(
+            EntityType<EntityPech> type,
+            ServerLevelAccessor level,
+            MobSpawnType reason,
+            BlockPos pos,
+            RandomSource random) {
+        int count = level.getEntitiesOfClass(EntityPech.class, new AABB(pos).inflate(16.0, 16.0, 16.0))
+                .size();
         return count < MAX_NEARBY_PECHS && Monster.checkMonsterSpawnRules(type, level, reason, pos, random);
     }
 
@@ -142,8 +145,9 @@ public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
         this.goalSelector.addGoal(10, new LookAtPlayerGoal(this, LivingEntity.class, 8.0F));
         this.goalSelector.addGoal(11, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class,
-                10, true, false, target -> this.getAnger() > 0));
+        this.targetSelector.addGoal(
+                2,
+                new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, target -> this.getAnger() > 0));
     }
 
     @Override
@@ -215,8 +219,11 @@ public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
             ItemStack arrowStack = new ItemStack(Items.ARROW);
             if (this.random.nextFloat() < POISON_ARROW_CHANCE) {
                 arrowStack = new ItemStack(Items.TIPPED_ARROW);
-                arrowStack.set(DataComponents.POTION_CONTENTS,
-                        new PotionContents(Optional.empty(), Optional.empty(),
+                arrowStack.set(
+                        DataComponents.POTION_CONTENTS,
+                        new PotionContents(
+                                Optional.empty(),
+                                Optional.empty(),
                                 List.of(new MobEffectInstance(MobEffects.POISON, 40))));
             }
             Arrow arrow = new Arrow(this.level(), this, arrowStack, null);
@@ -224,12 +231,16 @@ public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
             double dy = target.getBoundingBox().minY + target.getBbHeight() / 3.0F - arrow.getY();
             double dz = target.getZ() - this.getZ();
             double horizontal = Math.sqrt(dx * dx + dz * dz);
-            arrow.shoot(dx, dy + horizontal * 0.2F, dz, 1.6F,
+            arrow.shoot(
+                    dx,
+                    dy + horizontal * 0.2F,
+                    dz,
+                    1.6F,
                     14 - this.level().getDifficulty().getId() * 4);
-            arrow.setBaseDamage(velocity * 2.0F + this.random.nextGaussian() * 0.25
+            arrow.setBaseDamage(velocity * 2.0F
+                    + this.random.nextGaussian() * 0.25
                     + this.level().getDifficulty().getId() * 0.11F);
-            this.playSound(SoundEvents.ARROW_SHOOT, 1.0F,
-                    1.0F / (this.random.nextFloat() * 0.4F + 0.8F));
+            this.playSound(SoundEvents.ARROW_SHOOT, 1.0F, 1.0F / (this.random.nextFloat() * 0.4F + 0.8F));
             this.level().addFreshEntity(arrow);
         } else if (this.getPechType() == TYPE_MAGE) {
             double offset = this.distanceTo(target) / MAGE_BLAST_OFFSET_DIVISOR;
@@ -275,15 +286,16 @@ public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
             case 7 -> this.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.FISHING_ROD));
             case 8 -> this.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.STONE_PICKAXE));
             case 9 -> this.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_PICKAXE));
-            default -> {
-            }
+            default -> {}
         }
     }
 
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level,
-                                                  DifficultyInstance difficulty, MobSpawnType reason,
-                                                  @Nullable SpawnGroupData groupData) {
+    public @Nullable SpawnGroupData finalizeSpawn(
+            ServerLevelAccessor level,
+            DifficultyInstance difficulty,
+            MobSpawnType reason,
+            @Nullable SpawnGroupData groupData) {
         this.setDropChance(EquipmentSlot.MAINHAND, 0.2F);
         this.setDropChance(EquipmentSlot.OFFHAND, 0.2F);
         this.rollHeldItem();
@@ -332,8 +344,8 @@ public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
     public void playAmbientSound() {
         if (!this.level().isClientSide()) {
             if (this.random.nextInt(3) == 0) {
-                for (Entity entity : this.level().getEntities(this,
-                        this.getBoundingBox().inflate(4.0, 2.0, 4.0))) {
+                for (Entity entity :
+                        this.level().getEntities(this, this.getBoundingBox().inflate(4.0, 2.0, 4.0))) {
                     if (entity instanceof EntityPech) {
                         this.level().broadcastEntityEvent(this, TRADE_MUMBLE_EVENT);
                         this.playSound(TCSounds.PECH_TRADE.get(), this.getSoundVolume(), this.getVoicePitch());
@@ -375,8 +387,8 @@ public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
         }
         Entity attacker = source.getEntity();
         if (attacker instanceof Player) {
-            for (EntityPech pech : level.getEntitiesOfClass(EntityPech.class,
-                    this.getBoundingBox().inflate(32.0, 16.0, 32.0))) {
+            for (EntityPech pech : level.getEntitiesOfClass(
+                    EntityPech.class, this.getBoundingBox().inflate(32.0, 16.0, 32.0))) {
                 if (pech != this) {
                     pech.becomeAngryAt(attacker);
                 }
@@ -419,13 +431,15 @@ public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
     }
 
     private void spawnMoodParticle(ParticleOptions particle) {
-        this.level().addParticle(particle,
-                this.getX() + this.random.nextFloat() * this.getBbWidth() * 2.0F - this.getBbWidth(),
-                this.getY() + 0.5 + this.random.nextFloat() * this.getBbHeight(),
-                this.getZ() + this.random.nextFloat() * this.getBbWidth() * 2.0F - this.getBbWidth(),
-                this.random.nextGaussian() * 0.02,
-                this.random.nextGaussian() * 0.02,
-                this.random.nextGaussian() * 0.02);
+        this.level()
+                .addParticle(
+                        particle,
+                        this.getX() + this.random.nextFloat() * this.getBbWidth() * 2.0F - this.getBbWidth(),
+                        this.getY() + 0.5 + this.random.nextFloat() * this.getBbHeight(),
+                        this.getZ() + this.random.nextFloat() * this.getBbWidth() * 2.0F - this.getBbWidth(),
+                        this.random.nextGaussian() * 0.02,
+                        this.random.nextGaussian() * 0.02,
+                        this.random.nextGaussian() * 0.02);
     }
 
     @Override
@@ -543,8 +557,7 @@ public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
         if (stack.is(Items.ENDER_PEARL)) {
             return true;
         }
-        return AspectIndexAccess.index().of(stack)
-                .amountOf(desiderium()) > 1;
+        return AspectIndexAccess.index().of(stack).amountOf(desiderium()) > 1;
     }
 
     public int getValue(ItemStack stack) {
@@ -554,8 +567,7 @@ public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
         if (stack.is(Items.ENDER_PEARL)) {
             return PECH_ENDER_PEARL_VALUE;
         }
-        return Math.min(MAX_ASPECT_VALUE,
-                AspectIndexAccess.index().of(stack).amountOf(desiderium()) / 2);
+        return Math.min(MAX_ASPECT_VALUE, AspectIndexAccess.index().of(stack).amountOf(desiderium()) / 2);
     }
 
     private Holder<IAspect> desiderium() {
@@ -570,9 +582,10 @@ public class EntityPech extends Monster implements RangedAttackMob, ISidedHurt {
         }
         if (this.isTamed()) {
             if (player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.openMenu(new SimpleMenuProvider(
-                        (id, inventory, p) -> new MenuPech(id, inventory, this),
-                        this.getDisplayName()), buf -> buf.writeVarInt(this.getId()));
+                serverPlayer.openMenu(
+                        new SimpleMenuProvider(
+                                (id, inventory, p) -> new MenuPech(id, inventory, this), this.getDisplayName()),
+                        buf -> buf.writeVarInt(this.getId()));
             }
             return InteractionResult.SUCCESS;
         }

@@ -13,7 +13,6 @@ public final class DustTriggerBlockedBreakHandler {
     public static void onBreak(BlockEvent.BreakEvent event) {
         if (DustTriggerSwapQueue.isBlocked(event.getLevel(), event.getPos())) {
             event.setCanceled(true);
-            
         }
     }
 }

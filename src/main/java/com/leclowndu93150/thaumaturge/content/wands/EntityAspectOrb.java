@@ -1,6 +1,5 @@
 package com.leclowndu93150.thaumaturge.content.wands;
 
-import com.leclowndu93150.thaumaturge.api.wands.WandVis;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.aspect.TCAspects;
 import com.leclowndu93150.thaumaturge.registry.TCEntities;
@@ -9,9 +8,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -62,7 +60,8 @@ public class EntityAspectOrb extends Entity {
     }
 
     public ResourceKey<IAspect> getAspect() {
-        return ResourceKey.create(IAspect.REGISTRY_KEY,
+        return ResourceKey.create(
+                IAspect.REGISTRY_KEY,
                 ResourceLocation.fromNamespaceAndPath("thaumaturge", entityData.get(DATA_ASPECT)));
     }
 
@@ -75,8 +74,10 @@ public class EntityAspectOrb extends Entity {
     }
 
     public int getAspectColor() {
-        Holder<IAspect> holder = level().registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY)
-                .get(getAspect()).orElse(null);
+        Holder<IAspect> holder = level().registryAccess()
+                .lookupOrThrow(IAspect.REGISTRY_KEY)
+                .get(getAspect())
+                .orElse(null);
         return holder == null ? 0xFFFFFF : holder.value().color();
     }
 
@@ -101,7 +102,9 @@ public class EntityAspectOrb extends Entity {
         }
         if (level().getFluidState(blockPosition()).is(FluidTags.LAVA)) {
             setDeltaMovement(
-                    (random.nextFloat() - random.nextFloat()) * 0.2F, 0.2, (random.nextFloat() - random.nextFloat()) * 0.2F);
+                    (random.nextFloat() - random.nextFloat()) * 0.2F,
+                    0.2,
+                    (random.nextFloat() - random.nextFloat()) * 0.2F);
             playSound(SoundEvents.GENERIC_EXTINGUISH_FIRE, 0.4F, 2.0F + random.nextFloat() * 0.4F);
         }
         followNearbyPlayer();
@@ -110,7 +113,10 @@ public class EntityAspectOrb extends Entity {
         checkInsideBlocks();
         float friction = FRICTION;
         if (onGround()) {
-            friction = level().getBlockState(getBlockPosBelowThatAffectsMyMovement()).getBlock().getFriction() * FRICTION;
+            friction = level().getBlockState(getBlockPosBelowThatAffectsMyMovement())
+                            .getBlock()
+                            .getFriction()
+                    * FRICTION;
         }
         setDeltaMovement(getDeltaMovement().multiply(friction, FRICTION, friction));
         if (verticalCollisionBelow && fallSpeed < -getGravity()) {
@@ -130,11 +136,13 @@ public class EntityAspectOrb extends Entity {
                 && (followingPlayer == null || followingPlayer.distanceToSqr(this) > FOLLOW_RANGE * FOLLOW_RANGE)) {
             followingPlayer = null;
             double closest = Double.MAX_VALUE;
-            for (Player player : level().getEntitiesOfClass(Player.class,
-                    getBoundingBox().inflate(FOLLOW_RANGE))) {
+            for (Player player :
+                    level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(FOLLOW_RANGE))) {
                 double distance = player.distanceToSqr(this);
-                if (distance < closest && !player.isSpectator()
-                        && !WandVisHelper.findWandInHotbarWithRoom(player, getAspect(), aspectValue).isEmpty()) {
+                if (distance < closest
+                        && !player.isSpectator()
+                        && !WandVisHelper.findWandInHotbarWithRoom(player, getAspect(), aspectValue)
+                                .isEmpty()) {
                     closest = distance;
                     followingPlayer = player;
                 }
@@ -162,7 +170,9 @@ public class EntityAspectOrb extends Entity {
                 WandVisHelper.addVis(wand, getAspect(), aspectValue, true);
                 player.takeXpDelay = 2;
                 player.take(this, 1);
-                playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 0.1F,
+                playSound(
+                        SoundEvents.EXPERIENCE_ORB_PICKUP,
+                        0.1F,
                         0.5F * ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.8F));
                 discard();
             }
@@ -198,7 +208,11 @@ public class EntityAspectOrb extends Entity {
         health = input.contains("Health") ? input.getShort("Health") : (short) DEFAULT_HEALTH;
         age = input.getShort("Age");
         aspectValue = input.contains("Value") ? input.getShort("Value") : (short) 1;
-        entityData.set(DATA_ASPECT, input.contains("Aspect") ? input.getString("Aspect") : TCAspects.AER.location().getPath());
+        entityData.set(
+                DATA_ASPECT,
+                input.contains("Aspect")
+                        ? input.getString("Aspect")
+                        : TCAspects.AER.location().getPath());
     }
 
     @Override

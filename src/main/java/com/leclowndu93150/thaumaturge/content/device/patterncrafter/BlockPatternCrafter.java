@@ -29,9 +29,8 @@ public final class BlockPatternCrafter extends BaseEntityBlock {
 
     public BlockPatternCrafter(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any()
-                .setValue(FACING, Direction.NORTH)
-                .setValue(BlockStateProperties.ENABLED, true));
+        registerDefaultState(
+                stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(BlockStateProperties.ENABLED, true));
     }
 
     @Override
@@ -56,7 +55,8 @@ public final class BlockPatternCrafter extends BaseEntityBlock {
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos fromPos, boolean movedByPiston) {
+    protected void neighborChanged(
+            BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos fromPos, boolean movedByPiston) {
         boolean enabled = !level.hasNeighborSignal(pos);
         if (enabled != state.getValue(BlockStateProperties.ENABLED)) {
             level.setBlock(pos, state.setValue(BlockStateProperties.ENABLED, enabled), 3);
@@ -74,15 +74,17 @@ public final class BlockPatternCrafter extends BaseEntityBlock {
     }
 
     @Override
-    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         return type == TCBlockEntities.PATTERN_CRAFTER.get()
-                ? (tickLevel, pos, tickState, crafter) -> ((BlockEntityPatternCrafter) crafter).tick(tickLevel, pos, tickState)
+                ? (tickLevel, pos, tickState, crafter) ->
+                        ((BlockEntityPatternCrafter) crafter).tick(tickLevel, pos, tickState)
                 : null;
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
-                                               Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof BlockEntityPatternCrafter crafter)) {
             return InteractionResult.PASS;
         }
@@ -90,8 +92,15 @@ public final class BlockPatternCrafter extends BaseEntityBlock {
             return InteractionResult.SUCCESS;
         }
         crafter.cycle();
-        level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                TCSounds.KEY.get(), SoundSource.BLOCKS, 0.5F, 1.0F);
+        level.playSound(
+                null,
+                pos.getX() + 0.5,
+                pos.getY() + 0.5,
+                pos.getZ() + 0.5,
+                TCSounds.KEY.get(),
+                SoundSource.BLOCKS,
+                0.5F,
+                1.0F);
         return InteractionResult.SUCCESS;
     }
 }

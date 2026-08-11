@@ -111,12 +111,32 @@ public final class AuraHudOverlay implements LeftHudStack.Gauge {
             float start = BAR_TOP + (1.0F - vis) * BAR_RANGE;
             int fillHeight = Math.round(vis * BAR_RANGE);
             int y = Math.round(BAR_TOP + BAR_RANGE) - fillHeight;
-            GuiBlend.blitTinted(graphics, HUD,
-                    HUD_X + BAR_X, y, FILL_W, fillHeight, FILL_U, FILL_V,
-                    FILL_W, FILL_H, TEX_SIZE, TEX_SIZE, VIS_FILL_TINT);
-            GuiBlend.blitAdditive(graphics, HUD,
-                    HUD_X + BAR_X, y, VIS_RIPPLE_U, RIPPLE_V_BASE + count % BAR_RANGE,
-                    FILL_W, fillHeight, TEX_SIZE, TEX_SIZE, VIS_RIPPLE_TINT);
+            GuiBlend.blitTinted(
+                    graphics,
+                    HUD,
+                    HUD_X + BAR_X,
+                    y,
+                    FILL_W,
+                    fillHeight,
+                    FILL_U,
+                    FILL_V,
+                    FILL_W,
+                    FILL_H,
+                    TEX_SIZE,
+                    TEX_SIZE,
+                    VIS_FILL_TINT);
+            GuiBlend.blitAdditive(
+                    graphics,
+                    HUD,
+                    HUD_X + BAR_X,
+                    y,
+                    VIS_RIPPLE_U,
+                    RIPPLE_V_BASE + count % BAR_RANGE,
+                    FILL_W,
+                    fillHeight,
+                    TEX_SIZE,
+                    TEX_SIZE,
+                    VIS_RIPPLE_TINT);
             if (player.isShiftKeyDown()) {
                 drawAmount(graphics, AMOUNT_FORMAT.format(snap.vis()), start, VIS_TEXT_COLOR);
             }
@@ -126,23 +146,63 @@ public final class AuraHudOverlay implements LeftHudStack.Gauge {
             float start = BAR_TOP + (1.0F - flux - vis) * BAR_RANGE;
             int fillHeight = Math.round(flux * BAR_RANGE);
             int y = Math.round(start);
-            GuiBlend.blitTinted(graphics, HUD,
-                    HUD_X + BAR_X, y, FILL_W, fillHeight, FILL_U, FILL_V,
-                    FILL_W, FILL_H, TEX_SIZE, TEX_SIZE, FLUX_FILL_TINT);
-            GuiBlend.blitAdditive(graphics, HUD,
-                    HUD_X + BAR_X, y, FLUX_RIPPLE_U, FLUX_RIPPLE_V_BASE - count2 % BAR_RANGE,
-                    FILL_W, fillHeight, TEX_SIZE, TEX_SIZE, FLUX_RIPPLE_TINT);
+            GuiBlend.blitTinted(
+                    graphics,
+                    HUD,
+                    HUD_X + BAR_X,
+                    y,
+                    FILL_W,
+                    fillHeight,
+                    FILL_U,
+                    FILL_V,
+                    FILL_W,
+                    FILL_H,
+                    TEX_SIZE,
+                    TEX_SIZE,
+                    FLUX_FILL_TINT);
+            GuiBlend.blitAdditive(
+                    graphics,
+                    HUD,
+                    HUD_X + BAR_X,
+                    y,
+                    FLUX_RIPPLE_U,
+                    FLUX_RIPPLE_V_BASE - count2 % BAR_RANGE,
+                    FILL_W,
+                    fillHeight,
+                    TEX_SIZE,
+                    TEX_SIZE,
+                    FLUX_RIPPLE_TINT);
             if (player.isShiftKeyDown()) {
                 drawAmount(graphics, AMOUNT_FORMAT.format(snap.flux()), start - 4.0F, FLUX_TEXT_COLOR);
             }
         }
 
-        GuiBlend.blitTinted(graphics, HUD, HUD_X + FRAME_X, FRAME_Y, (float) FRAME_U, (float) FRAME_V,
-                FRAME_W, FRAME_H, TEX_SIZE, TEX_SIZE, 0xFFFFFFFF);
+        GuiBlend.blitTinted(
+                graphics,
+                HUD,
+                HUD_X + FRAME_X,
+                FRAME_Y,
+                (float) FRAME_U,
+                (float) FRAME_V,
+                FRAME_W,
+                FRAME_H,
+                TEX_SIZE,
+                TEX_SIZE,
+                0xFFFFFFFF);
 
         float needleStart = NEEDLE_TOP + (1.0F - base) * BAR_RANGE;
-        GuiBlend.blitTinted(graphics, HUD, HUD_X + NEEDLE_X, Math.round(needleStart), (float) NEEDLE_U, (float) NEEDLE_V,
-                NEEDLE_W, NEEDLE_H, TEX_SIZE, TEX_SIZE, 0xFFFFFFFF);
+        GuiBlend.blitTinted(
+                graphics,
+                HUD,
+                HUD_X + NEEDLE_X,
+                Math.round(needleStart),
+                (float) NEEDLE_U,
+                (float) NEEDLE_V,
+                NEEDLE_W,
+                NEEDLE_H,
+                TEX_SIZE,
+                TEX_SIZE,
+                0xFFFFFFFF);
     }
 
     private static void drawAmount(GuiGraphics graphics, String text, float y, int color) {

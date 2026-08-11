@@ -12,8 +12,8 @@ import com.leclowndu93150.thaumaturge.content.effect.Effects;
 import com.leclowndu93150.thaumaturge.content.focus.FocusRayTrace;
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -55,8 +55,8 @@ public class FocusMediumBolt extends FocusMediumTouch {
     @Override
     protected void onTrajectory(CastContext ctx, Trajectory trajectory) {
         Vec3 end = trajectory.direction().normalize();
-        HitResult ray = FocusRayTrace.pointedEntity(ctx.level(), ctx.caster(),
-                trajectory.source(), end, RAY_MIN_RANGE, BOLT_RANGE, RAY_PADDING, false);
+        HitResult ray = FocusRayTrace.pointedEntity(
+                ctx.level(), ctx.caster(), trajectory.source(), end, RAY_MIN_RANGE, BOLT_RANGE, RAY_PADDING, false);
         if (ray == null) {
             end = end.scale(BOLT_RANGE).add(trajectory.source());
             HitResult blockRay = FocusRayTrace.clipBlocks(ctx.level(), ctx.caster(), trajectory.source(), end);

@@ -7,8 +7,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public record ServerboundUnlockResearchPayload(ResourceLocation research) implements CustomPacketPayload {
-    public static final Type<ServerboundUnlockResearchPayload> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "unlock_research"));
+    public static final Type<ServerboundUnlockResearchPayload> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "unlock_research"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundUnlockResearchPayload> STREAM_CODEC =
             StreamCodec.composite(

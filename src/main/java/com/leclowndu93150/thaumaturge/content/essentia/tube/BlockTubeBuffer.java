@@ -3,7 +3,6 @@ package com.leclowndu93150.thaumaturge.content.essentia.tube;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -55,14 +54,16 @@ public final class BlockTubeBuffer extends BlockEssentiaTransport {
     }
 
     @Override
-    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide()) return null;
-        return createTickerHelper(type, TCBlockEntities.TUBE_BUFFER.get(),
-                (lvl, pos, st, buffer) -> buffer.tickServer(lvl, pos, st));
+        return createTickerHelper(
+                type, TCBlockEntities.TUBE_BUFFER.get(), (lvl, pos, st, buffer) -> buffer.tickServer(lvl, pos, st));
     }
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(
+            Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (level.getBlockEntity(pos) instanceof BlockEntityTubeBuffer buffer) {
             buffer.setFacingForPlacement(placer);
@@ -70,7 +71,8 @@ public final class BlockTubeBuffer extends BlockEssentiaTransport {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!player.isSecondaryUseActive()) return InteractionResult.PASS;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         if (!(level.getBlockEntity(pos) instanceof BlockEntityTubeBuffer buffer)) return InteractionResult.PASS;

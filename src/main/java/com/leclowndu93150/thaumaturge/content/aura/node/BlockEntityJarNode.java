@@ -3,10 +3,9 @@ package com.leclowndu93150.thaumaturge.content.aura.node;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
 import java.util.Optional;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockEntityJarNode extends BlockEntityNode {
@@ -43,7 +42,8 @@ public class BlockEntityJarNode extends BlockEntityNode {
     @Override
     public void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
-        components.set(TCDataComponents.NODE_DATA.get(),
+        components.set(
+                TCDataComponents.NODE_DATA.get(),
                 new NodeData(getNodeType(), Optional.ofNullable(getNodeModifier()), getAspects(), getAspectsBase()));
     }
 

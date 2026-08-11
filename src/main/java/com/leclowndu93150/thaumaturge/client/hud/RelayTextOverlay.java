@@ -48,12 +48,18 @@ public final class RelayTextOverlay {
         }
         Direction facing = mc.level.getBlockState(pos).getValue(DiodeBlock.FACING);
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
-        drawTextInAir(event.getPoseStack(), mc, buffers,
+        drawTextInAir(
+                event.getPoseStack(),
+                mc,
+                buffers,
                 pos.getX() + 0.5 - facing.getStepX() * KNOB_OFFSET,
                 pos.getY() + TEXT_HEIGHT,
                 pos.getZ() + 0.5 - facing.getStepZ() * KNOB_OFFSET,
                 Component.literal(String.valueOf(relay.getOut())));
-        drawTextInAir(event.getPoseStack(), mc, buffers,
+        drawTextInAir(
+                event.getPoseStack(),
+                mc,
+                buffers,
                 pos.getX() + 0.5 + facing.getStepX() * KNOB_OFFSET,
                 pos.getY() + TEXT_HEIGHT,
                 pos.getZ() + 0.5 + facing.getStepZ() * KNOB_OFFSET,
@@ -61,8 +67,14 @@ public final class RelayTextOverlay {
         buffers.endBatch();
     }
 
-    private static void drawTextInAir(PoseStack poseStack, Minecraft mc, MultiBufferSource buffers,
-                                      double x, double y, double z, Component text) {
+    private static void drawTextInAir(
+            PoseStack poseStack,
+            Minecraft mc,
+            MultiBufferSource buffers,
+            double x,
+            double y,
+            double z,
+            Component text) {
         Camera camera = mc.gameRenderer.getMainCamera();
         Vec3 cam = camera.getPosition();
         float yaw = (float) Math.toDegrees(Math.atan2(cam.x - x, cam.z - z));
@@ -71,8 +83,17 @@ public final class RelayTextOverlay {
         poseStack.mulPose(Axis.YP.rotationDegrees(yaw + 180.0F));
         poseStack.scale(-TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
         int width = mc.font.width(text);
-        mc.font.drawInBatch(text, 1 - width / 2, 1.0F, TEXT_COLOR, true,
-                poseStack.last().pose(), buffers, Font.DisplayMode.SEE_THROUGH, 0, LightTexture.FULL_BRIGHT);
+        mc.font.drawInBatch(
+                text,
+                1 - width / 2,
+                1.0F,
+                TEXT_COLOR,
+                true,
+                poseStack.last().pose(),
+                buffers,
+                Font.DisplayMode.SEE_THROUGH,
+                0,
+                LightTexture.FULL_BRIGHT);
         poseStack.popPose();
     }
 }

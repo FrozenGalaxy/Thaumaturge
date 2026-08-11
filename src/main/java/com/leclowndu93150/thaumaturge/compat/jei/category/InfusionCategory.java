@@ -2,23 +2,21 @@ package com.leclowndu93150.thaumaturge.compat.jei.category;
 
 import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
+import com.leclowndu93150.thaumaturge.api.recipe.IInfusionRecipe;
 import com.leclowndu93150.thaumaturge.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumaturge.compat.jei.drawables.AlphaDrawable;
 import com.leclowndu93150.thaumaturge.compat.jei.ingredient.AspectIngredientRenderer;
 import com.leclowndu93150.thaumaturge.compat.jei.ingredient.AspectIngredientType;
 import com.leclowndu93150.thaumaturge.compat.jei.utils.ResearchUtils;
-import com.leclowndu93150.thaumaturge.api.recipe.IInfusionRecipe;
 import com.leclowndu93150.thaumaturge.content.infusion.InfusionEnchantmentRecipe;
-import com.leclowndu93150.thaumaturge.content.infusion.InfusionRunicAugmentRecipe;
 import com.leclowndu93150.thaumaturge.content.infusion.InfusionRecipe;
+import com.leclowndu93150.thaumaturge.content.infusion.InfusionRunicAugmentRecipe;
 import com.leclowndu93150.thaumaturge.content.item.PhialItem;
 import com.leclowndu93150.thaumaturge.content.taint.item.EssentiaCrystalFactory;
 import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.leclowndu93150.thaumaturge.registry.TCRecipeTypes;
-import java.util.List;
 import java.util.Optional;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
-import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -31,7 +29,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -42,9 +39,12 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 public final class InfusionCategory<R extends Recipe<?> & IInfusionRecipe> implements IRecipeCategory<RecipeHolder<R>> {
-    public static final RecipeType<RecipeHolder<InfusionRecipe>> RECIPE_TYPE = RecipeType.createFromVanilla(TCRecipeTypes.INFUSION.get());
-    public static final RecipeType<RecipeHolder<InfusionEnchantmentRecipe>> ENCHANTMENT_RECIPE_TYPE = RecipeType.createFromVanilla(TCRecipeTypes.INFUSION_ENCHANTMENT.get());
-    public static final RecipeType<RecipeHolder<InfusionRunicAugmentRecipe>> RUNIC_RECIPE_TYPE = RecipeType.createFromVanilla(TCRecipeTypes.RUNIC_AUGMENT.get());
+    public static final RecipeType<RecipeHolder<InfusionRecipe>> RECIPE_TYPE =
+            RecipeType.createFromVanilla(TCRecipeTypes.INFUSION.get());
+    public static final RecipeType<RecipeHolder<InfusionEnchantmentRecipe>> ENCHANTMENT_RECIPE_TYPE =
+            RecipeType.createFromVanilla(TCRecipeTypes.INFUSION_ENCHANTMENT.get());
+    public static final RecipeType<RecipeHolder<InfusionRunicAugmentRecipe>> RUNIC_RECIPE_TYPE =
+            RecipeType.createFromVanilla(TCRecipeTypes.RUNIC_AUGMENT.get());
 
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/gui/gui_researchbook_overlay.png");
@@ -64,12 +64,12 @@ public final class InfusionCategory<R extends Recipe<?> & IInfusionRecipe> imple
     private static final int PAGE_TEXT_COLOR = 0xFF504030;
     private static final int INSTABILITY_LEVEL_CAP = 5;
     private static final ChatFormatting[] INSTABILITY_COLORS = {
-            ChatFormatting.DARK_BLUE,
-            ChatFormatting.BLUE,
-            ChatFormatting.DARK_PURPLE,
-            ChatFormatting.YELLOW,
-            ChatFormatting.GOLD,
-            ChatFormatting.DARK_RED
+        ChatFormatting.DARK_BLUE,
+        ChatFormatting.BLUE,
+        ChatFormatting.DARK_PURPLE,
+        ChatFormatting.YELLOW,
+        ChatFormatting.GOLD,
+        ChatFormatting.DARK_RED
     };
 
     private static final IDrawable BACKGROUND = new AlphaDrawable(TEXTURE, 413, 154, 86, 86, 40, 44, 30, 30);
@@ -115,27 +115,35 @@ public final class InfusionCategory<R extends Recipe<?> & IInfusionRecipe> imple
         builder.addInputSlot(CATALYST_X, CATALYST_Y).addIngredients(recipe.catalyst());
         float currentRotation = -90.0F;
         for (Ingredient ingredient : holder.value().components()) {
-            builder.addInputSlot( 30 + (int) (Mth.cos((float) (currentRotation / 180.0F * Math.PI)) * 40.0F) + 35, (int) (Mth.sin(currentRotation / 180.0F * 3.1415927F) * 40.0F) + 75)
+            builder.addInputSlot(
+                            30 + (int) (Mth.cos((float) (currentRotation / 180.0F * Math.PI)) * 40.0F) + 35,
+                            (int) (Mth.sin(currentRotation / 180.0F * 3.1415927F) * 40.0F) + 75)
                     .addIngredients(ingredient);
             currentRotation += (360f / holder.value().components().size());
         }
 
         int center = (recipe.aspects().size() * SPACE) / 2;
         int x = 0;
-        for (AspectInstance aspect : recipe.aspects().sortedByAmount()){
+        for (AspectInstance aspect : recipe.aspects().sortedByAmount()) {
             builder.addInputSlot(30 + ASPECT_X - center + x * SPACE, ASPECT_Y)
-                    .setCustomRenderer(AspectIngredientType.INSTANCE,AspectIngredientRenderer.INSTANCE)
-                    .addIngredient(AspectIngredientType.INSTANCE,aspect);
+                    .setCustomRenderer(AspectIngredientType.INSTANCE, AspectIngredientRenderer.INSTANCE)
+                    .addIngredient(AspectIngredientType.INSTANCE, aspect);
 
-            builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(PhialItem.makeFilled(aspect.aspect()));
-            builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(EssentiaCrystalFactory.of(aspect.aspect()));
+            builder.addInvisibleIngredients(RecipeIngredientRole.INPUT)
+                    .addItemStack(PhialItem.makeFilled(aspect.aspect()));
+            builder.addInvisibleIngredients(RecipeIngredientRole.INPUT)
+                    .addItemStack(EssentiaCrystalFactory.of(aspect.aspect()));
             ++x;
         }
-
     }
 
     @Override
-    public void getTooltip(ITooltipBuilder tooltip, RecipeHolder<R> recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public void getTooltip(
+            ITooltipBuilder tooltip,
+            RecipeHolder<R> recipe,
+            IRecipeSlotsView recipeSlotsView,
+            double mouseX,
+            double mouseY) {
         Optional<ResearchGate> gate = recipe.value().researchGate();
         boolean doesPassGate = recipe.value().doesPassGate(Minecraft.getInstance().player);
         if (!doesPassGate && gate.isPresent() && mouseX > 92 && mouseX < 108 && mouseY > 9 && mouseY < 25) {
@@ -144,7 +152,12 @@ public final class InfusionCategory<R extends Recipe<?> & IInfusionRecipe> imple
     }
 
     @Override
-    public void draw(RecipeHolder<R> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            RecipeHolder<R> recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         Font font = Minecraft.getInstance().font;
         Component header = Component.translatable("recipe.type.infusion");
         BACKGROUND.draw(guiGraphics);

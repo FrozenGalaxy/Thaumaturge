@@ -1,8 +1,8 @@
 package com.leclowndu93150.thaumaturge.api.golems.parts;
 
-import net.minecraft.core.Holder;
 import com.leclowndu93150.thaumaturge.api.golems.GolemTrait;
 import java.util.List;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.Nullable;
 
@@ -20,8 +20,12 @@ public abstract class GolemPart {
     private final List<Holder<GolemTrait>> traits;
     private final GolemPartModel model;
 
-    protected GolemPart(List<ResourceLocation> research, ResourceLocation icon, List<GolemComponent> components,
-                        List<Holder<GolemTrait>> traits, @Nullable GolemPartModel model) {
+    protected GolemPart(
+            List<ResourceLocation> research,
+            ResourceLocation icon,
+            List<GolemComponent> components,
+            List<Holder<GolemTrait>> traits,
+            @Nullable GolemPartModel model) {
         this.research = List.copyOf(research);
         this.icon = icon;
         this.components = List.copyOf(components);

@@ -36,14 +36,14 @@ public final class BlockManaPod extends BaseEntityBlock {
     private static final int GROWTH_CHANCE = 30;
     private static final int MAX_HARDNESS_STEPS = 8;
     private static final VoxelShape[] SHAPES = {
-            box(4.0, 12.0, 4.0, 12.0, 16.0, 12.0),
-            box(4.0, 10.0, 4.0, 12.0, 16.0, 12.0),
-            box(4.0, 8.0, 4.0, 12.0, 16.0, 12.0),
-            box(4.0, 6.0, 4.0, 12.0, 16.0, 12.0),
-            box(4.0, 5.0, 4.0, 12.0, 16.0, 12.0),
-            box(4.0, 4.0, 4.0, 12.0, 16.0, 12.0),
-            box(4.0, 3.0, 4.0, 12.0, 16.0, 12.0),
-            box(4.0, 2.0, 4.0, 12.0, 16.0, 12.0)
+        box(4.0, 12.0, 4.0, 12.0, 16.0, 12.0),
+        box(4.0, 10.0, 4.0, 12.0, 16.0, 12.0),
+        box(4.0, 8.0, 4.0, 12.0, 16.0, 12.0),
+        box(4.0, 6.0, 4.0, 12.0, 16.0, 12.0),
+        box(4.0, 5.0, 4.0, 12.0, 16.0, 12.0),
+        box(4.0, 4.0, 4.0, 12.0, 16.0, 12.0),
+        box(4.0, 3.0, 4.0, 12.0, 16.0, 12.0),
+        box(4.0, 2.0, 4.0, 12.0, 16.0, 12.0)
     };
 
     public BlockManaPod(Properties properties) {
@@ -82,8 +82,13 @@ public final class BlockManaPod extends BaseEntityBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
-                                     LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(
+            BlockState state,
+            Direction direction,
+            BlockState neighborState,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockPos neighborPos) {
         if (direction == Direction.UP && !neighborState.is(BlockTags.LOGS)) {
             level.scheduleTick(pos, this, 1);
         }
@@ -103,16 +108,14 @@ public final class BlockManaPod extends BaseEntityBlock {
             level.destroyBlock(pos, true);
             return;
         }
-        if (random.nextInt(GROWTH_CHANCE) == 0
-                && level.getBlockEntity(pos) instanceof BlockEntityManaPod pod) {
+        if (random.nextInt(GROWTH_CHANCE) == 0 && level.getBlockEntity(pos) instanceof BlockEntityManaPod pod) {
             pod.checkGrowth();
         }
     }
 
     @Override
     protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
-        return super.getDestroyProgress(state, player, level, pos)
-                * (MAX_HARDNESS_STEPS - state.getValue(AGE));
+        return super.getDestroyProgress(state, player, level, pos) * (MAX_HARDNESS_STEPS - state.getValue(AGE));
     }
 
     @Override

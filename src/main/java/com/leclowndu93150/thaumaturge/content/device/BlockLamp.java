@@ -7,9 +7,9 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -23,7 +23,8 @@ public abstract class BlockLamp extends BaseEntityBlock {
 
     protected BlockLamp(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(getStateDefinition().any()
+        registerDefaultState(getStateDefinition()
+                .any()
                 .setValue(BlockStateProperties.FACING, Direction.DOWN)
                 .setValue(BlockStateProperties.ENABLED, false));
     }
@@ -52,7 +53,13 @@ public abstract class BlockLamp extends BaseEntityBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction directionToNeighbour, BlockState neighbourState, LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
+    protected BlockState updateShape(
+            BlockState state,
+            Direction directionToNeighbour,
+            BlockState neighbourState,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockPos neighbourPos) {
         if (!canSurvive(state, level, pos)) {
             return Blocks.AIR.defaultBlockState();
         }

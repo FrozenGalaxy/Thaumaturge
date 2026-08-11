@@ -1,15 +1,13 @@
 package com.leclowndu93150.thaumaturge.content.workbench;
 
-import com.leclowndu93150.thaumaturge.content.research.DeviceGate;
 import com.leclowndu93150.thaumaturge.TCIds;
-import com.leclowndu93150.thaumaturge.content.crucible.BlockCrucible;
+import com.leclowndu93150.thaumaturge.content.research.DeviceGate;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Containers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -32,7 +30,6 @@ public class BlockArcaneWorkbench extends BaseEntityBlock {
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
-
     public static final MapCodec<BlockArcaneWorkbench> CODEC = simpleCodec(BlockArcaneWorkbench::new);
 
     public static final VoxelShape SHAPE = Shapes.or(
@@ -41,9 +38,7 @@ public class BlockArcaneWorkbench extends BaseEntityBlock {
             Shapes.box(0.6875, 0.25, 0.0625, 0.9375, 0.5, 0.3125),
             Shapes.box(0.6875, 0.25, 0.6875, 0.9375, 0.5, 0.9375),
             Shapes.box(0.0625, 0.25, 0.6875, 0.3125, 0.5, 0.9375),
-            Shapes.box(0.0625, 0.25, 0.0625, 0.3125, 0.5, 0.3125)
-    );
-
+            Shapes.box(0.0625, 0.25, 0.0625, 0.3125, 0.5, 0.3125));
 
     public BlockArcaneWorkbench(Properties properties) {
         super(properties);
@@ -65,12 +60,14 @@ public class BlockArcaneWorkbench extends BaseEntityBlock {
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getCollisionShape(
+            BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && !DeviceGate.passes(player, TCIds.rl("gotdream"))) {
             return InteractionResult.CONSUME;
         }

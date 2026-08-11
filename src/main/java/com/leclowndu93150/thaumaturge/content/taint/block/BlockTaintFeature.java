@@ -6,7 +6,6 @@ import com.leclowndu93150.thaumaturge.content.taint.TaintHelper;
 import com.leclowndu93150.thaumaturge.registry.TCBlocks;
 import com.leclowndu93150.thaumaturge.registry.TCEntities;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -94,12 +93,16 @@ public final class BlockTaintFeature extends DirectionalBlock implements ITaintB
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock())) {
-        
+
             if (level.getRandom().nextFloat() < CRAWLER_ON_BREAK_CHANCE) {
                 EntityTaintCrawler crawler = TCEntities.TAINT_CRAWLER.get().create(level);
                 if (crawler != null) {
-                    crawler.moveTo(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                            level.getRandom().nextInt(360), 0.0F);
+                    crawler.moveTo(
+                            pos.getX() + 0.5,
+                            pos.getY() + 0.5,
+                            pos.getZ() + 0.5,
+                            level.getRandom().nextInt(360),
+                            0.0F);
                     level.addFreshEntity(crawler);
                 }
             } else {

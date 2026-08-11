@@ -33,15 +33,19 @@ public final class EldritchCapRenderer<T extends BlockEntity> implements BlockEn
     private final ToIntFunction<T> eyeCount;
     private ItemStack eyeStack = ItemStack.EMPTY;
 
-    public EldritchCapRenderer(BlockEntityRendererProvider.Context context, ResourceLocation texture,
-                               ResourceLocation textureOuter, ToIntFunction<T> eyeCount) {
+    public EldritchCapRenderer(
+            BlockEntityRendererProvider.Context context,
+            ResourceLocation texture,
+            ResourceLocation textureOuter,
+            ToIntFunction<T> eyeCount) {
         this.texture = texture;
         this.textureOuter = textureOuter;
         this.eyeCount = eyeCount;
     }
 
     @Override
-    public void render(T cap, float partialTick, PoseStack poseStack, MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            T cap, float partialTick, PoseStack poseStack, MultiBufferSource buffers, int light, int overlay) {
         boolean outerLands = cap.getLevel() != null && cap.getLevel().dimension() == OuterLands.DIMENSION;
         RenderType type = RenderType.entityTranslucent(outerLands ? textureOuter : texture);
         poseStack.pushPose();

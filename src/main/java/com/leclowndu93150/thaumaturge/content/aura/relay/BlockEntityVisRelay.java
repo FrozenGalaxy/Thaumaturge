@@ -104,8 +104,7 @@ public final class BlockEntityVisRelay extends BlockEntity {
                             bestNodeDistance = distance;
                             bestNode = cursor.immutable();
                         }
-                    } else if (be instanceof BlockEntityVisRelay relay
-                            && relay.isLinked() && relay.depth < HOP_CAP) {
+                    } else if (be instanceof BlockEntityVisRelay relay && relay.isLinked() && relay.depth < HOP_CAP) {
                         double distance = cursor.distSqr(worldPosition);
                         if (relay.depth < bestRelayDepth
                                 || (relay.depth == bestRelayDepth && distance < bestRelayDistance)) {

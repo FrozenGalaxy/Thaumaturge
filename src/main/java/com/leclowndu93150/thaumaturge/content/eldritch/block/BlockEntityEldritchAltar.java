@@ -1,6 +1,5 @@
 package com.leclowndu93150.thaumaturge.content.eldritch.block;
 
-import com.leclowndu93150.thaumaturge.Thaumaturge;
 import com.leclowndu93150.thaumaturge.content.eldritch.maze.MazeSavedData;
 import com.leclowndu93150.thaumaturge.content.entity.EntityCultistCleric;
 import com.leclowndu93150.thaumaturge.content.entity.EntityCultistKnight;
@@ -19,9 +18,8 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -73,25 +71,29 @@ public final class BlockEntityEldritchAltar extends BlockEntity {
     }
 
     private void spawnGuards(ServerLevel level, BlockPos pos) {
-        List<EntityCultistCleric> clerics = level.getEntitiesOfClass(EntityCultistCleric.class,
-                new AABB(pos).inflate(SCAN_RANGE, 16.0, SCAN_RANGE));
+        List<EntityCultistCleric> clerics = level.getEntitiesOfClass(
+                EntityCultistCleric.class, new AABB(pos).inflate(SCAN_RANGE, 16.0, SCAN_RANGE));
         if (clerics.isEmpty()) {
             setSpawner(false);
             return;
         }
-        List<Mob> cultists = level.getEntitiesOfClass(Mob.class,
+        List<Mob> cultists = level.getEntitiesOfClass(
+                Mob.class,
                 new AABB(pos).inflate(SCAN_RANGE, 16.0, SCAN_RANGE),
                 mob -> mob instanceof EntityCultistKnight || mob instanceof EntityCultistCleric);
         if (cultists.size() >= MAX_KNIGHTS) {
             return;
         }
         EntityCultistKnight knight = new EntityCultistKnight(TCEntities.CULTIST_KNIGHT.get(), level);
-        int x = pos.getX() + Mth.randomBetweenInclusive(level.getRandom(), 4, 10)
-                * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
-        int y = pos.getY() + Mth.randomBetweenInclusive(level.getRandom(), 0, 3)
-                * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
-        int z = pos.getZ() + Mth.randomBetweenInclusive(level.getRandom(), 4, 10)
-                * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
+        int x = pos.getX()
+                + Mth.randomBetweenInclusive(level.getRandom(), 4, 10)
+                        * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
+        int y = pos.getY()
+                + Mth.randomBetweenInclusive(level.getRandom(), 0, 3)
+                        * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
+        int z = pos.getZ()
+                + Mth.randomBetweenInclusive(level.getRandom(), 4, 10)
+                        * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
         BlockPos spawnPos = new BlockPos(x, y, z);
         if (!level.getBlockState(spawnPos.below()).isSolidRender(level, spawnPos.below())) {
             return;
@@ -106,18 +108,21 @@ public final class BlockEntityEldritchAltar extends BlockEntity {
 
     private void spawnGuardian(ServerLevel level, BlockPos pos) {
         EntityEldritchGuardian guardian = new EntityEldritchGuardian(TCEntities.ELDRITCH_GUARDIAN.get(), level);
-        int x = pos.getX() + Mth.randomBetweenInclusive(level.getRandom(), 4, 10)
-                * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
-        int y = pos.getY() + Mth.randomBetweenInclusive(level.getRandom(), 0, 3)
-                * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
-        int z = pos.getZ() + Mth.randomBetweenInclusive(level.getRandom(), 4, 10)
-                * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
+        int x = pos.getX()
+                + Mth.randomBetweenInclusive(level.getRandom(), 4, 10)
+                        * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
+        int y = pos.getY()
+                + Mth.randomBetweenInclusive(level.getRandom(), 0, 3)
+                        * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
+        int z = pos.getZ()
+                + Mth.randomBetweenInclusive(level.getRandom(), 4, 10)
+                        * Mth.randomBetweenInclusive(level.getRandom(), -1, 1);
         BlockPos spawnPos = new BlockPos(x, y, z);
         if (!level.getBlockState(spawnPos.below()).isSolidRender(level, spawnPos.below())) {
             return;
         }
-        if (!level.getEntitiesOfClass(EntityEldritchGuardian.class,
-                new AABB(spawnPos).inflate(32.0, 16.0, 32.0)).isEmpty()) {
+        if (!level.getEntitiesOfClass(EntityEldritchGuardian.class, new AABB(spawnPos).inflate(32.0, 16.0, 32.0))
+                .isEmpty()) {
             return;
         }
         guardian.moveTo(x + 0.5, y, z + 0.5, 0.0F, 0.0F);

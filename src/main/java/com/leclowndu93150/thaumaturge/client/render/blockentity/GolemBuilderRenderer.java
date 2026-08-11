@@ -10,10 +10,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -25,8 +25,8 @@ import net.minecraft.world.phys.AABB;
 public final class GolemBuilderRenderer implements BlockEntityRenderer<BlockEntityGolemBuilder> {
     public static final ResourceLocation MODEL = TCIds.rl("models/mesh/golembuilder.tcmesh");
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/golembuilder.png");
-    private static final Material LAVA_MATERIAL = new Material(TextureAtlas.LOCATION_BLOCKS,
-            ResourceLocation.withDefaultNamespace("block/lava_still"));
+    private static final Material LAVA_MATERIAL =
+            new Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation.withDefaultNamespace("block/lava_still"));
     private static final String PRESS_PART = "press";
     private static final float PRESS_DROP = 0.625F;
     private static final float LAVA_OFFSET_X = -0.3125F;
@@ -38,8 +38,13 @@ public final class GolemBuilderRenderer implements BlockEntityRenderer<BlockEnti
     public GolemBuilderRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(BlockEntityGolemBuilder builder, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityGolemBuilder builder,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         Direction facing = builder.getBlockState().getValue(BlockGolemBuilder.FACING);
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.0F, 0.5F);

@@ -40,17 +40,24 @@ public final class TCModelsHandlers {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            ItemProperties.register(TCItems.WAND.get(), WAND_IS_STAFF_PROPERTY_ID,
-                    (stack, level, entity, seed) -> WandVisHelper.getParts(stack).rod().staff() ? 1.0F : 0.0F);
+            ItemProperties.register(
+                    TCItems.WAND.get(),
+                    WAND_IS_STAFF_PROPERTY_ID,
+                    (stack, level, entity, seed) ->
+                            WandVisHelper.getParts(stack).rod().staff() ? 1.0F : 0.0F);
             registerComponentFlag(TCItems.MIRROR.get(), LINKED_PROPERTY_ID, TCDataComponents.MIRROR_LINK.get());
-            registerComponentFlag(TCItems.MIRROR_ESSENTIA.get(), LINKED_PROPERTY_ID, TCDataComponents.MIRROR_LINK.get());
+            registerComponentFlag(
+                    TCItems.MIRROR_ESSENTIA.get(), LINKED_PROPERTY_ID, TCDataComponents.MIRROR_LINK.get());
             registerComponentFlag(TCItems.GRAPPLE_GUN.get(), LOADED_PROPERTY_ID, TCDataComponents.GRAPPLE_LOADED.get());
-            registerComponentFlag(TCItems.RESEARCH_NOTE.get(), NOTE_COMPLETE_PROPERTY_ID, TCDataComponents.NOTE_COMPLETE.get());
+            registerComponentFlag(
+                    TCItems.RESEARCH_NOTE.get(), NOTE_COMPLETE_PROPERTY_ID, TCDataComponents.NOTE_COMPLETE.get());
             registerComponentFlag(TCItems.PHIAL.get(), FILLED_PROPERTY_ID, TCDataComponents.ASPECTS.get());
-            ItemProperties.register(TCItems.VERDANT_CHARM.get(), VERDANT_TYPE_PROPERTY_ID,
+            ItemProperties.register(
+                    TCItems.VERDANT_CHARM.get(),
+                    VERDANT_TYPE_PROPERTY_ID,
                     (stack, level, entity, seed) -> stack.getOrDefault(TCDataComponents.VERDANT_TYPE.get(), 0));
-            ItemProperties.register(TCItems.CELESTIAL_NOTES.get(), CELESTIAL_BODY_PROPERTY_ID,
-                    (stack, level, entity, seed) -> {
+            ItemProperties.register(
+                    TCItems.CELESTIAL_NOTES.get(), CELESTIAL_BODY_PROPERTY_ID, (stack, level, entity, seed) -> {
                         CelestialBody body = stack.get(TCDataComponents.CELESTIAL_BODY.get());
                         return body == null ? 0.0F : body.ordinal();
                     });

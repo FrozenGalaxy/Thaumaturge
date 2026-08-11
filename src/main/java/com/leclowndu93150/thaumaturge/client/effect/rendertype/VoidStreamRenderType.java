@@ -8,7 +8,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
 public final class VoidStreamRenderType {
-    public static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace("textures/entity/end_portal.png");
+    public static final ResourceLocation TEXTURE =
+            ResourceLocation.withDefaultNamespace("textures/entity/end_portal.png");
 
     private static final int BUFFER = 1536;
     private static final RenderStateShard.ShaderStateShard SHADER =
@@ -16,8 +17,13 @@ public final class VoidStreamRenderType {
     private static final RenderStateShard.TextureStateShard TEXTURE_STATE =
             new RenderStateShard.TextureStateShard(TEXTURE, false, false);
 
-    public static final RenderType ADDITIVE = RenderType.create("thaumaturge_void_stream_add",
-            DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, BUFFER, false, false,
+    public static final RenderType ADDITIVE = RenderType.create(
+            "thaumaturge_void_stream_add",
+            DefaultVertexFormat.POSITION_TEX_COLOR,
+            VertexFormat.Mode.QUADS,
+            BUFFER,
+            false,
+            false,
             RenderType.CompositeState.builder()
                     .setShaderState(SHADER)
                     .setTextureState(TEXTURE_STATE)
@@ -27,8 +33,13 @@ public final class VoidStreamRenderType {
                     .setCullState(RenderStateShard.NO_CULL)
                     .createCompositeState(false));
 
-    public static final RenderType TRANSLUCENT = RenderType.create("thaumaturge_void_stream_tr",
-            DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, BUFFER, false, true,
+    public static final RenderType TRANSLUCENT = RenderType.create(
+            "thaumaturge_void_stream_tr",
+            DefaultVertexFormat.POSITION_TEX_COLOR,
+            VertexFormat.Mode.QUADS,
+            BUFFER,
+            false,
+            true,
             RenderType.CompositeState.builder()
                     .setShaderState(SHADER)
                     .setTextureState(TEXTURE_STATE)

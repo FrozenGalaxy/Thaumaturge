@@ -9,9 +9,10 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public record ServerboundClearResearchFlagsPayload(ResourceLocation research, List<ResearchFlag> flags) implements CustomPacketPayload {
-    public static final Type<ServerboundClearResearchFlagsPayload> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "clear_research_flags"));
+public record ServerboundClearResearchFlagsPayload(ResourceLocation research, List<ResearchFlag> flags)
+        implements CustomPacketPayload {
+    public static final Type<ServerboundClearResearchFlagsPayload> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "clear_research_flags"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundClearResearchFlagsPayload> STREAM_CODEC =
             StreamCodec.composite(

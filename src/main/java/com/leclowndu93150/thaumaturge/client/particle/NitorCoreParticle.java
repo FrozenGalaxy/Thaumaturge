@@ -14,7 +14,8 @@ public final class NitorCoreParticle extends SingleQuadParticle {
     private static final float QUAD_RADIUS = 0.1F;
     private final float midBoost;
 
-    private NitorCoreParticle(ClientLevel level, double x, double y, double z, NitorCoreParticleOptions data, ParticleSheet sheet) {
+    private NitorCoreParticle(
+            ClientLevel level, double x, double y, double z, NitorCoreParticleOptions data, ParticleSheet sheet) {
         super(level, x, y, z, 0.0, 0.0, 0.0);
         this.sheet = sheet;
         this.xd = 0.0;
@@ -92,7 +93,15 @@ public final class NitorCoreParticle extends SingleQuadParticle {
         private static final ParticleSheet SHEET = TCParticleSheets.sheet("nitor_core");
 
         @Override
-        public Particle createParticle(NitorCoreParticleOptions options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux) {
+        public Particle createParticle(
+                NitorCoreParticleOptions options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double xAux,
+                double yAux,
+                double zAux) {
             return new NitorCoreParticle(level, x, y, z, options, SHEET);
         }
     }

@@ -8,35 +8,75 @@ import net.minecraft.resources.ResourceLocation;
 public final class GuiBlend {
     private GuiBlend() {}
 
-    public static void blitTinted(GuiGraphics graphics, ResourceLocation texture, int x, int y,
-                                  float u, float v, int width, int height,
-                                  int textureWidth, int textureHeight, int argb) {
+    public static void blitTinted(
+            GuiGraphics graphics,
+            ResourceLocation texture,
+            int x,
+            int y,
+            float u,
+            float v,
+            int width,
+            int height,
+            int textureWidth,
+            int textureHeight,
+            int argb) {
         RenderSystem.enableBlend();
         setColor(graphics, argb);
         graphics.blit(texture, x, y, u, v, width, height, textureWidth, textureHeight);
         graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    public static void blitTinted(GuiGraphics graphics, ResourceLocation texture, int x, int y,
-                                  int width, int height, float u, float v, int regionWidth, int regionHeight,
-                                  int textureWidth, int textureHeight, int argb) {
+    public static void blitTinted(
+            GuiGraphics graphics,
+            ResourceLocation texture,
+            int x,
+            int y,
+            int width,
+            int height,
+            float u,
+            float v,
+            int regionWidth,
+            int regionHeight,
+            int textureWidth,
+            int textureHeight,
+            int argb) {
         RenderSystem.enableBlend();
         setColor(graphics, argb);
         graphics.blit(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
         graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    public static void blitAdditive(GuiGraphics graphics, ResourceLocation texture, int x, int y,
-                                    float u, float v, int width, int height,
-                                    int textureWidth, int textureHeight, int argb) {
+    public static void blitAdditive(
+            GuiGraphics graphics,
+            ResourceLocation texture,
+            int x,
+            int y,
+            float u,
+            float v,
+            int width,
+            int height,
+            int textureWidth,
+            int textureHeight,
+            int argb) {
         beginAdditive(graphics, argb);
         graphics.blit(texture, x, y, u, v, width, height, textureWidth, textureHeight);
         endAdditive(graphics);
     }
 
-    public static void blitAdditive(GuiGraphics graphics, ResourceLocation texture, int x, int y,
-                                    int width, int height, float u, float v, int regionWidth, int regionHeight,
-                                    int textureWidth, int textureHeight, int argb) {
+    public static void blitAdditive(
+            GuiGraphics graphics,
+            ResourceLocation texture,
+            int x,
+            int y,
+            int width,
+            int height,
+            float u,
+            float v,
+            int regionWidth,
+            int regionHeight,
+            int textureWidth,
+            int textureHeight,
+            int argb) {
         beginAdditive(graphics, argb);
         graphics.blit(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
         endAdditive(graphics);

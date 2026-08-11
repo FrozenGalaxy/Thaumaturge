@@ -33,18 +33,18 @@ public final class MirrorRenderer implements BlockEntityRenderer<BlockEntityMirr
     private static final ResourceLocation PANE_TRANS_TEXTURE = TCIds.rl("textures/block/mirrorpanetrans.png");
 
     private static final int[][] WINDOW_ROWS = {
-            {2, 5, 11},
-            {3, 5, 11},
-            {4, 4, 12},
-            {5, 3, 13},
-            {6, 3, 13},
-            {7, 3, 13},
-            {8, 3, 13},
-            {9, 3, 13},
-            {10, 3, 13},
-            {11, 4, 12},
-            {12, 5, 11},
-            {13, 5, 11}
+        {2, 5, 11},
+        {3, 5, 11},
+        {4, 4, 12},
+        {5, 3, 13},
+        {6, 3, 13},
+        {7, 3, 13},
+        {8, 3, 13},
+        {9, 3, 13},
+        {10, 3, 13},
+        {11, 4, 12},
+        {12, 5, 11},
+        {13, 5, 11}
     };
     private static final float PIXEL = 1.0F / 16.0F;
     private static final float PORTAL_PLANE = -0.5F + 0.018F;
@@ -57,25 +57,31 @@ public final class MirrorRenderer implements BlockEntityRenderer<BlockEntityMirr
     public MirrorRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(BlockEntityMirrorBase mirror, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityMirrorBase mirror,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         BlockState state = mirror.getBlockState();
         Direction facing = state.getValue(BlockMirror.FACING);
         boolean linked = mirror.linked;
         var player = Minecraft.getInstance().player;
-        boolean inRange = player != null
-                && player.distanceToSqr(Vec3.atCenterOf(mirror.getBlockPos())) < PORTAL_RANGE_SQ;
+        boolean inRange =
+                player != null && player.distanceToSqr(Vec3.atCenterOf(mirror.getBlockPos())) < PORTAL_RANGE_SQ;
         boolean essentia = state.getBlock() instanceof BlockMirror mirrorBlock && mirrorBlock.isEssentia();
 
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
         float xRot = facing == Direction.UP ? 0.0F : facing == Direction.DOWN ? 180.0F : 90.0F;
-        float yRot = switch (facing) {
-            case EAST -> 90.0F;
-            case SOUTH -> 180.0F;
-            case WEST -> 270.0F;
-            default -> 0.0F;
-        };
+        float yRot =
+                switch (facing) {
+                    case EAST -> 90.0F;
+                    case SOUTH -> 180.0F;
+                    case WEST -> 270.0F;
+                    default -> 0.0F;
+                };
         poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
         poseStack.mulPose(Axis.XP.rotationDegrees(-xRot));
 
@@ -95,13 +101,29 @@ public final class MirrorRenderer implements BlockEntityRenderer<BlockEntityMirr
         poseStack.popPose();
     }
 
-    private void renderFrame(ModelResourceLocation id, BlockState state, PoseStack poseStack,
-                             MultiBufferSource buffers, int light, int overlay) {
+    private void renderFrame(
+            ModelResourceLocation id,
+            BlockState state,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         BakedModel model = Minecraft.getInstance().getModelManager().getModel(id);
-        ModelBlockRenderer modelRenderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
+        ModelBlockRenderer modelRenderer =
+                Minecraft.getInstance().getBlockRenderer().getModelRenderer();
         for (RenderType renderType : model.getRenderTypes(state, random, ModelData.EMPTY)) {
-            modelRenderer.renderModel(poseStack.last(), buffers.getBuffer(renderType), state, model,
-                    1.0F, 1.0F, 1.0F, light, overlay, ModelData.EMPTY, renderType);
+            modelRenderer.renderModel(
+                    poseStack.last(),
+                    buffers.getBuffer(renderType),
+                    state,
+                    model,
+                    1.0F,
+                    1.0F,
+                    1.0F,
+                    light,
+                    overlay,
+                    ModelData.EMPTY,
+                    renderType);
         }
     }
 
@@ -111,11 +133,22 @@ public final class MirrorRenderer implements BlockEntityRenderer<BlockEntityMirr
             float z1 = z0 + PIXEL;
             float x0 = row[1] * PIXEL - 0.5F;
             float x1 = row[2] * PIXEL - 0.5F;
-            EldritchPortalSurface.quad(pose, buffer, worldPos,
-                    x0, PORTAL_PLANE, z0,
-                    x0, PORTAL_PLANE, z1,
-                    x1, PORTAL_PLANE, z1,
-                    x1, PORTAL_PLANE, z0);
+            EldritchPortalSurface.quad(
+                    pose,
+                    buffer,
+                    worldPos,
+                    x0,
+                    PORTAL_PLANE,
+                    z0,
+                    x0,
+                    PORTAL_PLANE,
+                    z1,
+                    x1,
+                    PORTAL_PLANE,
+                    z1,
+                    x1,
+                    PORTAL_PLANE,
+                    z0);
         }
     }
 
@@ -126,7 +159,8 @@ public final class MirrorRenderer implements BlockEntityRenderer<BlockEntityMirr
         paneVertex(buffer, pose, 0.5F, -0.5F, 1.0F, 0.0F, light);
     }
 
-    private static void paneVertex(VertexConsumer buffer, PoseStack.Pose pose, float x, float z, float u, float v, int light) {
+    private static void paneVertex(
+            VertexConsumer buffer, PoseStack.Pose pose, float x, float z, float u, float v, int light) {
         buffer.addVertex(pose, x, PANE_PLANE, z)
                 .setColor(-1)
                 .setUv(u, v)

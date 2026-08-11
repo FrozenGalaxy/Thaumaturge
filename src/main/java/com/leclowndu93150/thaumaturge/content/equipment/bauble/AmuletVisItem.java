@@ -8,9 +8,10 @@ import com.leclowndu93150.thaumaturge.api.items.RechargeAccess;
 import com.leclowndu93150.thaumaturge.compat.curio.ThaumaturgeCuriosCompat;
 import com.leclowndu93150.thaumaturge.content.wands.ItemWand;
 import com.leclowndu93150.thaumaturge.content.wands.WandVisHelper;
-import net.minecraft.resources.ResourceKey;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,8 +19,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-
-import java.util.List;
 import net.neoforged.fml.ModList;
 
 public final class AmuletVisItem extends Item {
@@ -37,21 +36,23 @@ public final class AmuletVisItem extends Item {
             return;
         }
         for (int slot = 0; slot < Inventory.getSelectionSize(); slot++) {
-            if (RechargeAccess.rechargeItem(player.level(), player.getInventory().getItem(slot),
-                    player.blockPosition(), player, 1) > 0.0F) {
+            if (RechargeAccess.rechargeItem(
+                            player.level(), player.getInventory().getItem(slot), player.blockPosition(), player, 1)
+                    > 0.0F) {
                 return;
             }
         }
         if (topUpWand(player)) {
             return;
         }
-        if (ModList.get().isLoaded(TCIds.CURIOS)
-                && ThaumaturgeCuriosCompat.rechargeFirstCurio(player)) {
+        if (ModList.get().isLoaded(TCIds.CURIOS) && ThaumaturgeCuriosCompat.rechargeFirstCurio(player)) {
             return;
         }
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (slot.isArmor() && RechargeAccess.rechargeItem(player.level(),
-                    player.getItemBySlot(slot), player.blockPosition(), player, 1) > 0.0F) {
+            if (slot.isArmor()
+                    && RechargeAccess.rechargeItem(
+                                    player.level(), player.getItemBySlot(slot), player.blockPosition(), player, 1)
+                            > 0.0F) {
                 return;
             }
         }
@@ -85,9 +86,9 @@ public final class AmuletVisItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("item.thaumaturge.amulet_vis.text")
-                .withStyle(ChatFormatting.AQUA));
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(Component.translatable("item.thaumaturge.amulet_vis.text").withStyle(ChatFormatting.AQUA));
         super.appendHoverText(stack, context, tooltip, flag);
     }
 }

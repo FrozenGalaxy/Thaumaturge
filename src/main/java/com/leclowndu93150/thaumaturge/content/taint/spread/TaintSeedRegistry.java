@@ -1,12 +1,11 @@
 package com.leclowndu93150.thaumaturge.content.taint.spread;
 
-import com.leclowndu93150.thaumaturge.TCIds;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import com.mojang.serialization.DataResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -18,13 +17,11 @@ import net.minecraft.world.level.saveddata.SavedData;
 
 public final class TaintSeedRegistry extends SavedData {
     public static final Codec<TaintSeedRegistry> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            BlockPos.CODEC.listOf().fieldOf("seeds").forGetter(reg -> Collections.unmodifiableList(reg.seeds))
-    ).apply(builder, list -> new TaintSeedRegistry(new ArrayList<>(list))));
+                    BlockPos.CODEC.listOf().fieldOf("seeds").forGetter(reg -> Collections.unmodifiableList(reg.seeds)))
+            .apply(builder, list -> new TaintSeedRegistry(new ArrayList<>(list))));
 
-    public static final SavedData.Factory<TaintSeedRegistry> FACTORY = new SavedData.Factory<>(
-            TaintSeedRegistry::new,
-            TaintSeedRegistry::load,
-            DataFixTypes.LEVEL);
+    public static final SavedData.Factory<TaintSeedRegistry> FACTORY =
+            new SavedData.Factory<>(TaintSeedRegistry::new, TaintSeedRegistry::load, DataFixTypes.LEVEL);
 
     private final List<BlockPos> seeds;
 

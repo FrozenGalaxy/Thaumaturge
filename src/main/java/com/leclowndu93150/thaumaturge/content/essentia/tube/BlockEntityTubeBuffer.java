@@ -1,6 +1,5 @@
 package com.leclowndu93150.thaumaturge.content.essentia.tube;
 
-import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
@@ -10,13 +9,14 @@ import com.leclowndu93150.thaumaturge.content.essentia.EssentiaTransportHelper;
 import com.leclowndu93150.thaumaturge.content.essentia.flow.EssentiaFlowHandler;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
+import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import com.mojang.serialization.Codec;
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -33,8 +33,8 @@ public final class BlockEntityTubeBuffer extends BlockEntity implements IEssenti
     private static final Codec<List<Boolean>> OPEN_CODEC = Codec.BOOL.listOf();
 
     private AspectList contents = AspectList.EMPTY;
-    private final int[] chokedSides = new int[]{0, 0, 0, 0, 0, 0};
-    private final boolean[] openSides = new boolean[]{true, true, true, true, true, true};
+    private final int[] chokedSides = new int[] {0, 0, 0, 0, 0, 0};
+    private final boolean[] openSides = new boolean[] {true, true, true, true, true, true};
     private Direction facing = Direction.NORTH;
     private int tickCount;
     private int bellows = -1;
@@ -115,13 +115,25 @@ public final class BlockEntityTubeBuffer extends BlockEntity implements IEssenti
         Direction dir = Direction.values()[subHit];
         if (sneaking) {
             cycleChokedSide(dir);
-            level.playSound(null, getBlockPos(), TCSounds.SQUEEK.get(), SoundSource.BLOCKS, 0.6F, 2.0F + level.getRandom().nextFloat() * 0.2F);
+            level.playSound(
+                    null,
+                    getBlockPos(),
+                    TCSounds.SQUEEK.get(),
+                    SoundSource.BLOCKS,
+                    0.6F,
+                    2.0F + level.getRandom().nextFloat() * 0.2F);
             return true;
         }
         toggleOpenSide(dir);
         BlockEssentiaTransport.refreshConnections(level, getBlockPos());
         BlockEssentiaTransport.refreshConnections(level, getBlockPos().relative(dir));
-        level.playSound(null, getBlockPos(), TCSounds.TOOL.get(), SoundSource.BLOCKS, 0.5F, 0.9F + level.getRandom().nextFloat() * 0.2F);
+        level.playSound(
+                null,
+                getBlockPos(),
+                TCSounds.TOOL.get(),
+                SoundSource.BLOCKS,
+                0.5F,
+                0.9F + level.getRandom().nextFloat() * 0.2F);
         return true;
     }
 
@@ -288,7 +300,8 @@ public final class BlockEntityTubeBuffer extends BlockEntity implements IEssenti
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
         contents = TCNbt.read(input, "Contents", AspectList.CODEC, registries).orElse(AspectList.EMPTY);
-        List<Integer> choked = TCNbt.read(input, "Choked", CHOKED_CODEC, registries).orElse(List.of());
+        List<Integer> choked =
+                TCNbt.read(input, "Choked", CHOKED_CODEC, registries).orElse(List.of());
         for (int i = 0; i < 6 && i < choked.size(); i++) {
             chokedSides[i] = choked.get(i);
         }
@@ -308,9 +321,11 @@ public final class BlockEntityTubeBuffer extends BlockEntity implements IEssenti
     protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
         super.saveAdditional(output, registries);
         TCNbt.store(output, "Contents", AspectList.CODEC, registries, contents);
-        List<Integer> choked = List.of(chokedSides[0], chokedSides[1], chokedSides[2], chokedSides[3], chokedSides[4], chokedSides[5]);
+        List<Integer> choked =
+                List.of(chokedSides[0], chokedSides[1], chokedSides[2], chokedSides[3], chokedSides[4], chokedSides[5]);
         TCNbt.store(output, "Choked", CHOKED_CODEC, registries, choked);
-        List<Boolean> open = List.of(openSides[0], openSides[1], openSides[2], openSides[3], openSides[4], openSides[5]);
+        List<Boolean> open =
+                List.of(openSides[0], openSides[1], openSides[2], openSides[3], openSides[4], openSides[5]);
         TCNbt.store(output, "Open", OPEN_CODEC, registries, open);
         output.putInt("Facing", facing.ordinal());
     }

@@ -23,8 +23,8 @@ public final class SmokeSpiralParticle extends TCParticle {
     private final float startAngle;
     private final int floorY;
 
-    private SmokeSpiralParticle(ClientLevel level, double x, double y, double z,
-                                SmokeSpiralParticleOptions options, ParticleSheet sheet) {
+    private SmokeSpiralParticle(
+            ClientLevel level, double x, double y, double z, SmokeSpiralParticleOptions options, ParticleSheet sheet) {
         super(level, x, y, z, 0.0, 0.0, 0.0, sheet);
         this.lifetime = BASE_LIFETIME + this.random.nextInt(10);
         this.gravity = -0.01F;
@@ -68,9 +68,21 @@ public final class SmokeSpiralParticle extends TCParticle {
         emitVertex(buffer, rotation, px, py, pz, -1.0F, -1.0F, size, getU0(), getV1(), color, light);
     }
 
-    private static void emitVertex(VertexConsumer buffer, Quaternionf rotation, float x, float y, float z,
-                                   float cornerX, float cornerY, float size, float u, float v, int color, int light) {
-        Vector3f pos = new Vector3f(cornerX, cornerY, 0.0F).rotate(rotation).mul(size).add(x, y, z);
+    private static void emitVertex(
+            VertexConsumer buffer,
+            Quaternionf rotation,
+            float x,
+            float y,
+            float z,
+            float cornerX,
+            float cornerY,
+            float size,
+            float u,
+            float v,
+            int color,
+            int light) {
+        Vector3f pos =
+                new Vector3f(cornerX, cornerY, 0.0F).rotate(rotation).mul(size).add(x, y, z);
         buffer.addVertex(pos.x(), pos.y(), pos.z()).setUv(u, v).setColor(color).setLight(light);
     }
 
@@ -78,8 +90,15 @@ public final class SmokeSpiralParticle extends TCParticle {
         private static final ParticleSheet SHEET = TCParticleSheets.sheet("smoke_spiral");
 
         @Override
-        public Particle createParticle(SmokeSpiralParticleOptions options, ClientLevel level, double x, double y, double z,
-                                       double vx, double vy, double vz) {
+        public Particle createParticle(
+                SmokeSpiralParticleOptions options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double vx,
+                double vy,
+                double vz) {
             return new SmokeSpiralParticle(level, x, y, z, options, SHEET);
         }
     }

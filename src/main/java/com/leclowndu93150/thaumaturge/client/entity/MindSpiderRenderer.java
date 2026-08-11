@@ -15,11 +15,11 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
-import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
 
 public final class MindSpiderRenderer extends MobRenderer<EntityMindSpider, SpiderModel<EntityMindSpider>> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace("textures/entity/spider/spider.png");
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.withDefaultNamespace("textures/entity/spider/spider.png");
     private static final float SHADOW = 0.5F;
     private static final float SCALE = 0.6F;
     private static final float MAX_ALPHA = 0.1F;
@@ -31,8 +31,13 @@ public final class MindSpiderRenderer extends MobRenderer<EntityMindSpider, Spid
     }
 
     @Override
-    public void render(EntityMindSpider entity, float entityYaw, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light) {
+    public void render(
+            EntityMindSpider entity,
+            float entityYaw,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light) {
         if (isHiddenFromViewer(entity)) {
             return;
         }
@@ -55,8 +60,8 @@ public final class MindSpiderRenderer extends MobRenderer<EntityMindSpider, Spid
     }
 
     @Override
-    protected @Nullable RenderType getRenderType(EntityMindSpider entity, boolean isBodyVisible,
-                                                 boolean forceTransparent, boolean appearGlowing) {
+    protected @Nullable RenderType getRenderType(
+            EntityMindSpider entity, boolean isBodyVisible, boolean forceTransparent, boolean appearGlowing) {
         return RenderType.itemEntityTranslucentCull(getTextureLocation(entity));
     }
 
@@ -65,7 +70,8 @@ public final class MindSpiderRenderer extends MobRenderer<EntityMindSpider, Spid
         return TEXTURE;
     }
 
-    private static final class GhostSpiderEyesLayer extends RenderLayer<EntityMindSpider, SpiderModel<EntityMindSpider>> {
+    private static final class GhostSpiderEyesLayer
+            extends RenderLayer<EntityMindSpider, SpiderModel<EntityMindSpider>> {
         private static final RenderType SPIDER_EYES =
                 RenderType.eyes(ResourceLocation.withDefaultNamespace("textures/entity/spider/spider_eyes.png"));
 
@@ -74,11 +80,20 @@ public final class MindSpiderRenderer extends MobRenderer<EntityMindSpider, Spid
         }
 
         @Override
-        public void render(PoseStack poseStack, MultiBufferSource buffers, int packedLight, EntityMindSpider entity,
-                           float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks,
-                           float netHeadYaw, float headPitch) {
-            this.getParentModel().renderToBuffer(poseStack, buffers.getBuffer(SPIDER_EYES), packedLight,
-                    OverlayTexture.NO_OVERLAY, -1);
+        public void render(
+                PoseStack poseStack,
+                MultiBufferSource buffers,
+                int packedLight,
+                EntityMindSpider entity,
+                float limbSwing,
+                float limbSwingAmount,
+                float partialTick,
+                float ageInTicks,
+                float netHeadYaw,
+                float headPitch) {
+            this.getParentModel()
+                    .renderToBuffer(
+                            poseStack, buffers.getBuffer(SPIDER_EYES), packedLight, OverlayTexture.NO_OVERLAY, -1);
         }
     }
 }

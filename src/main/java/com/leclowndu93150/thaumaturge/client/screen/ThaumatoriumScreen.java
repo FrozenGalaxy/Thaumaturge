@@ -2,12 +2,13 @@ package com.leclowndu93150.thaumaturge.client.screen;
 
 import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
+import com.leclowndu93150.thaumaturge.client.render.GuiBlend;
 import com.leclowndu93150.thaumaturge.client.render.aspect.AspectTagRenderer;
 import com.leclowndu93150.thaumaturge.content.essentia.thaumatorium.BlockEntityThaumatorium;
 import com.leclowndu93150.thaumaturge.content.essentia.thaumatorium.MenuThaumatorium;
 import com.leclowndu93150.thaumaturge.network.ClientboundThaumatoriumRecipesPayload;
-import com.leclowndu93150.thaumaturge.client.render.GuiBlend;
 import com.leclowndu93150.thaumaturge.network.ServerboundThaumatoriumTogglePayload;
+import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -15,8 +16,6 @@ import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
-
-import java.util.List;
 
 public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThaumatorium> {
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/gui/gui_thaumatorium.png");
@@ -145,7 +144,18 @@ public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThau
             int fill = (int) (machine.essentia().amountOf(entry.aspect()) / (float) entry.amount() * BAR_WIDTH);
             if (fill > 0) {
                 int color = ARGB32.opaque(entry.aspect().value().color());
-                GuiBlend.blitTinted(graphics, TEXTURE, x, y, BAR_U, BAR_FILL_V, Math.min(fill, BAR_WIDTH), BAR_HEIGHT, 256, 256, color);
+                GuiBlend.blitTinted(
+                        graphics,
+                        TEXTURE,
+                        x,
+                        y,
+                        BAR_U,
+                        BAR_FILL_V,
+                        Math.min(fill, BAR_WIDTH),
+                        BAR_HEIGHT,
+                        256,
+                        256,
+                        color);
             }
             count++;
         }
@@ -156,8 +166,13 @@ public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThau
             }
             int px = count % ASPECTS_PER_ROW;
             int py = count / ASPECTS_PER_ROW;
-            AspectTagRenderer.render(graphics, font, k + TAG_X + BAR_SPACING_X * px, l + TAG_Y + BAR_SPACING_Y * py,
-                    entry.aspect(), entry.amount());
+            AspectTagRenderer.render(
+                    graphics,
+                    font,
+                    k + TAG_X + BAR_SPACING_X * px,
+                    l + TAG_Y + BAR_SPACING_Y * py,
+                    entry.aspect(),
+                    entry.amount());
             count++;
         }
     }
@@ -182,14 +197,19 @@ public final class ThaumatoriumScreen extends AbstractTCContainerScreen<MenuThau
             }
         }
         if (recipes.size() > VISIBLE) {
-            if (index > 0 && mx >= leftPos + ARROW_X && my >= topPos + ARROW_UP_Y
-                    && mx < leftPos + ARROW_X + ARROW_W && my < topPos + ARROW_UP_Y + ARROW_H) {
+            if (index > 0
+                    && mx >= leftPos + ARROW_X
+                    && my >= topPos + ARROW_UP_Y
+                    && mx < leftPos + ARROW_X + ARROW_W
+                    && my < topPos + ARROW_UP_Y + ARROW_H) {
                 index--;
                 return true;
             }
             if (index < recipes.size() / (float) COLS - ROWS
-                    && mx >= leftPos + ARROW_X && my >= topPos + ARROW_DOWN_Y
-                    && mx < leftPos + ARROW_X + ARROW_W && my < topPos + ARROW_DOWN_Y + ARROW_H) {
+                    && mx >= leftPos + ARROW_X
+                    && my >= topPos + ARROW_DOWN_Y
+                    && mx < leftPos + ARROW_X + ARROW_W
+                    && my < topPos + ARROW_DOWN_Y + ARROW_H) {
                 index++;
                 return true;
             }

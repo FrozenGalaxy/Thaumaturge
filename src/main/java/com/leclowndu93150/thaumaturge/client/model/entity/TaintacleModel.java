@@ -47,19 +47,24 @@ public final class TaintacleModel extends HierarchicalModel<AbstractTaintacle> {
 
     public static LayerDefinition createLayer(int length) {
         MeshDefinition mesh = new MeshDefinition();
-        PartDefinition base = mesh.getRoot().addOrReplaceChild("base",
-                CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -4.0F, -4.0F, 8.0F, 8.0F, 8.0F),
-                PartPose.offset(0.0F, 12.0F, 0.0F));
+        PartDefinition base = mesh.getRoot()
+                .addOrReplaceChild(
+                        "base",
+                        CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -4.0F, -4.0F, 8.0F, 8.0F, 8.0F),
+                        PartPose.offset(0.0F, 12.0F, 0.0F));
         PartDefinition parent = base;
         for (int k = 0; k < length - 1; k++) {
-            parent = parent.addOrReplaceChild("seg" + k,
+            parent = parent.addOrReplaceChild(
+                    "seg" + k,
                     CubeListBuilder.create().texOffs(0, 16).addBox(-4.0F, -4.0F, -4.0F, 8.0F, 8.0F, 8.0F),
                     PartPose.offset(0.0F, SEGMENT_OFFSET, 0.0F));
         }
-        parent.addOrReplaceChild("orb",
+        parent.addOrReplaceChild(
+                "orb",
                 CubeListBuilder.create().texOffs(0, 56).addBox(-2.0F, -2.0F, -2.0F, 4.0F, 4.0F, 4.0F),
                 PartPose.offset(0.0F, SEGMENT_OFFSET, 0.0F));
-        parent.addOrReplaceChild("end",
+        parent.addOrReplaceChild(
+                "end",
                 CubeListBuilder.create().texOffs(0, 32).addBox(-6.0F, -6.0F, -6.0F, 12.0F, 12.0F, 12.0F),
                 PartPose.offset(0.0F, SEGMENT_OFFSET, 0.0F));
         return LayerDefinition.create(mesh, TEXTURE_SIZE, TEXTURE_SIZE);
@@ -71,8 +76,13 @@ public final class TaintacleModel extends HierarchicalModel<AbstractTaintacle> {
     }
 
     @Override
-    public void setupAnim(AbstractTaintacle entity, float limbSwing, float limbSwingAmount, float ageInTicks,
-                          float netHeadYaw, float headPitch) {
+    public void setupAnim(
+            AbstractTaintacle entity,
+            float limbSwing,
+            float limbSwingAmount,
+            float ageInTicks,
+            float netHeadYaw,
+            float headPitch) {
         float flail = entity.flailIntensity;
         float fs = flail > 1.0F ? 3.0F : 1.0F - ANGLE_MOD;
         float fi = flail + (entity.hurtTime > 0.0F ? ANGLE_MOD : -ANGLE_MOD);

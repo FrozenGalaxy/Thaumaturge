@@ -1,11 +1,11 @@
 package com.leclowndu93150.thaumaturge.content.manabean;
 
-import com.leclowndu93150.thaumaturge.content.legacy.LegacyIds;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumaturge.api.aspect.Aspects;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.aspect.TCAspects;
 import com.leclowndu93150.thaumaturge.content.aspect.AspectCombinations;
+import com.leclowndu93150.thaumaturge.content.legacy.LegacyIds;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
 import com.leclowndu93150.thaumaturge.serialization.TCNbt;
@@ -127,7 +127,8 @@ public final class BlockEntityManaPod extends BlockEntity {
             aspect = TCAspects.HERBA;
         } else {
             List<ResourceKey<IAspect>> primals = registries
-                    .lookupOrThrow(IAspect.REGISTRY_KEY).listElements()
+                    .lookupOrThrow(IAspect.REGISTRY_KEY)
+                    .listElements()
                     .filter(entry -> entry.value().isPrimal())
                     .map(Holder.Reference::key)
                     .toList();

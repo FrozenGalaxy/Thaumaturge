@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
@@ -46,8 +46,13 @@ public final class GrappleRenderer extends EntityRenderer<EntityGrapple> {
     }
 
     @Override
-    public void render(EntityGrapple entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int packedLight) {
+    public void render(
+            EntityGrapple entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
         float yaw = Mth.rotLerp(partialTicks, entity.yRotO, entity.getYRot());
         float pitch = Mth.lerp(partialTicks, entity.xRotO, entity.getXRot());
@@ -57,8 +62,8 @@ public final class GrappleRenderer extends EntityRenderer<EntityGrapple> {
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(yaw - 90.0F));
         poseStack.mulPose(Axis.ZP.rotationDegrees(pitch));
-        model.root.render(poseStack, buffers.getBuffer(RenderType.entityCutout(TEXTURE)),
-                packedLight, OverlayTexture.NO_OVERLAY);
+        model.root.render(
+                poseStack, buffers.getBuffer(RenderType.entityCutout(TEXTURE)), packedLight, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
         poseStack.pushPose();
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
@@ -72,10 +77,26 @@ public final class GrappleRenderer extends EntityRenderer<EntityGrapple> {
         VertexConsumer glowBuffer = buffers.getBuffer(GLOW_TYPE);
         Matrix4f glowMat = poseStack.last().pose();
         float half = GLOW_HALF * glowScale;
-        glowBuffer.addVertex(glowMat, -half, -half, 0.0F).setUv(u0, v1).setColor(glowTint).setLight(EMISSIVE_LIGHT);
-        glowBuffer.addVertex(glowMat, half, -half, 0.0F).setUv(u1, v1).setColor(glowTint).setLight(EMISSIVE_LIGHT);
-        glowBuffer.addVertex(glowMat, half, half, 0.0F).setUv(u1, v0).setColor(glowTint).setLight(EMISSIVE_LIGHT);
-        glowBuffer.addVertex(glowMat, -half, half, 0.0F).setUv(u0, v0).setColor(glowTint).setLight(EMISSIVE_LIGHT);
+        glowBuffer
+                .addVertex(glowMat, -half, -half, 0.0F)
+                .setUv(u0, v1)
+                .setColor(glowTint)
+                .setLight(EMISSIVE_LIGHT);
+        glowBuffer
+                .addVertex(glowMat, half, -half, 0.0F)
+                .setUv(u1, v1)
+                .setColor(glowTint)
+                .setLight(EMISSIVE_LIGHT);
+        glowBuffer
+                .addVertex(glowMat, half, half, 0.0F)
+                .setUv(u1, v0)
+                .setColor(glowTint)
+                .setLight(EMISSIVE_LIGHT);
+        glowBuffer
+                .addVertex(glowMat, -half, half, 0.0F)
+                .setUv(u0, v0)
+                .setColor(glowTint)
+                .setLight(EMISSIVE_LIGHT);
         poseStack.popPose();
         if (points.size() > 2) {
             submitRope(buffers.getBuffer(ROPE_TYPE), poseStack.last().pose(), points, packedLight);
@@ -104,7 +125,13 @@ public final class GrappleRenderer extends EntityRenderer<EntityGrapple> {
                 for (int side = 0; side < ROPE_SIDES; side++) {
                     int nextSide = (side + 1) % ROPE_SIDES;
                     addRopeVertex(buffer, mat, previousRing[side], side / (float) ROPE_SIDES, (float) previousV, light);
-                    addRopeVertex(buffer, mat, previousRing[nextSide], (side + 1) / (float) ROPE_SIDES, (float) previousV, light);
+                    addRopeVertex(
+                            buffer,
+                            mat,
+                            previousRing[nextSide],
+                            (side + 1) / (float) ROPE_SIDES,
+                            (float) previousV,
+                            light);
                     addRopeVertex(buffer, mat, ring[nextSide], (side + 1) / (float) ROPE_SIDES, (float) v, light);
                     addRopeVertex(buffer, mat, ring[side], side / (float) ROPE_SIDES, (float) v, light);
                 }
@@ -115,7 +142,10 @@ public final class GrappleRenderer extends EntityRenderer<EntityGrapple> {
     }
 
     private static void addRopeVertex(VertexConsumer buffer, Matrix4f mat, Vector3f pos, float u, float v, int light) {
-        buffer.addVertex(mat, pos.x(), pos.y(), pos.z()).setUv(u, v).setColor(-1).setLight(light);
+        buffer.addVertex(mat, pos.x(), pos.y(), pos.z())
+                .setUv(u, v)
+                .setColor(-1)
+                .setLight(light);
     }
 
     private static Vector3f[] buildRing(Vec3 center, Vec3 direction) {
@@ -161,7 +191,8 @@ public final class GrappleRenderer extends EntityRenderer<EntityGrapple> {
             float dist = step * (length / steps);
             float damp = 1.0F - step / (steps * 1.25F);
             double dx = (tx - gx) / steps * step + Mth.sin(dist / 10.0F) * grapple.ampl * damp;
-            double dy = (ty - gy + thrower.getBbHeight() / 2.0F) / steps * step + Mth.sin(dist / 8.0F) * grapple.ampl * damp;
+            double dy = (ty - gy + thrower.getBbHeight() / 2.0F) / steps * step
+                    + Mth.sin(dist / 8.0F) * grapple.ampl * damp;
             double dz = (tz - gz) / steps * step + Mth.sin(dist / 6.0F) * grapple.ampl * damp;
             points.add(new Vec3(dx, dy, dz));
         }

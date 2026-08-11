@@ -1,14 +1,13 @@
 package com.leclowndu93150.thaumaturge.content.research.decon;
 
-import com.leclowndu93150.thaumaturge.content.legacy.LegacyIds;
-import com.leclowndu93150.thaumaturge.Thaumaturge;
+import com.leclowndu93150.thaumaturge.api.aspect.AspectIndexAccess;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
-import com.leclowndu93150.thaumaturge.api.aspect.AspectIndexAccess;
+import com.leclowndu93150.thaumaturge.content.legacy.LegacyIds;
 import com.leclowndu93150.thaumaturge.content.research.pool.AspectPools;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
-import java.util.List;
 import com.leclowndu93150.thaumaturge.serialization.TCNbt;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -18,8 +17,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -112,7 +111,12 @@ public final class BlockEntityDeconstructionTable extends BlockEntity implements
         }
         input.shrink(1);
         inventory.setStackInSlot(SLOT_INPUT, input.isEmpty() ? ItemStack.EMPTY : input);
-        level.playSound(null, pos, SoundEvents.WOOD_HIT, SoundSource.BLOCKS, 0.3F,
+        level.playSound(
+                null,
+                pos,
+                SoundEvents.WOOD_HIT,
+                SoundSource.BLOCKS,
+                0.3F,
                 0.9F + level.getRandom().nextFloat() * 0.2F);
         setChanged();
         syncToClient();
@@ -152,7 +156,8 @@ public final class BlockEntityDeconstructionTable extends BlockEntity implements
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
         inventory.deserializeNBT(registries, input.getCompound("inventory"));
-        resultAspect = TCNbt.read(input, "result_aspect", LegacyIds.IDENTIFIER_CODEC, registries).orElse(null);
+        resultAspect = TCNbt.read(input, "result_aspect", LegacyIds.IDENTIFIER_CODEC, registries)
+                .orElse(null);
         breakTime = input.contains("break_time") ? input.getInt("break_time") : BREAK_TIME_TICKS;
     }
 

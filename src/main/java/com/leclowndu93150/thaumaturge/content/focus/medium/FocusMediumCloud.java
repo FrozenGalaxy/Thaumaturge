@@ -14,8 +14,8 @@ import com.leclowndu93150.thaumaturge.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumaturge.content.entity.EntityFocusCloud;
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import org.jspecify.annotations.Nullable;
 
@@ -44,7 +44,8 @@ public final class FocusMediumCloud implements FocusMedium {
 
     @Override
     public int complexity(FocusSettings settings) {
-        return BASE_COMPLEXITY + settings.value("radius") * RADIUS_COMPLEXITY_FACTOR
+        return BASE_COMPLEXITY
+                + settings.value("radius") * RADIUS_COMPLEXITY_FACTOR
                 + settings.value("duration") / DURATION_COMPLEXITY_DIVISOR;
     }
 
@@ -57,8 +58,7 @@ public final class FocusMediumCloud implements FocusMedium {
             int radius = settings.value("radius");
             int duration = settings.value("duration");
             for (Trajectory trajectory : supplied) {
-                caster.level().addFreshEntity(
-                        new EntityFocusCloud(remaining, caster, trajectory, radius, duration));
+                caster.level().addFreshEntity(new EntityFocusCloud(remaining, caster, trajectory, radius, duration));
             }
         }
         return null;

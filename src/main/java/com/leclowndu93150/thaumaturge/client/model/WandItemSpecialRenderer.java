@@ -55,12 +55,19 @@ public final class WandItemSpecialRenderer extends BlockEntityWithoutLevelRender
     private static final float SCEPTRE_CAP_SCALE = 1.3F;
 
     public WandItemSpecialRenderer() {
-        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+        super(
+                Minecraft.getInstance().getBlockEntityRenderDispatcher(),
+                Minecraft.getInstance().getEntityModels());
     }
 
     @Override
-    public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack,
-                             MultiBufferSource buffers, int light, int overlay) {
+    public void renderByItem(
+            ItemStack stack,
+            ItemDisplayContext displayContext,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         WandArg arg = extract(stack);
         poseStack.pushPose();
         poseStack.translate(0.5F, MODEL_LIFT, 0.5F);
@@ -103,8 +110,8 @@ public final class WandItemSpecialRenderer extends BlockEntityWithoutLevelRender
         poseStack.popPose();
     }
 
-    private static void submitRod(WandArg arg, PoseStack poseStack, MultiBufferSource buffers,
-                                  int light, boolean staff, float ticks) {
+    private static void submitRod(
+            WandArg arg, PoseStack poseStack, MultiBufferSource buffers, int light, boolean staff, float ticks) {
         int rodLight = arg.rod().glow() ? (int) (200.0F + Mth.sin((int) ticks) * 5.0F + 5.0F) : light;
         RenderType rodType = TCFlatRenderTypes.entityCutoutFlat(arg.rod().texture());
         poseStack.pushPose();
@@ -133,8 +140,8 @@ public final class WandItemSpecialRenderer extends BlockEntityWithoutLevelRender
         return layout;
     }
 
-    private static void submitCaps(WandArg arg, PoseStack poseStack, MultiBufferSource buffers,
-                                   int light, boolean staff) {
+    private static void submitCaps(
+            WandArg arg, PoseStack poseStack, MultiBufferSource buffers, int light, boolean staff) {
         RenderType capType = TCFlatRenderTypes.entityCutoutFlat(arg.cap().texture());
         poseStack.pushPose();
         if (staff) {
@@ -153,8 +160,8 @@ public final class WandItemSpecialRenderer extends BlockEntityWithoutLevelRender
         poseStack.popPose();
     }
 
-    private static void submitFocus(WandArg arg, PoseStack poseStack, MultiBufferSource buffers,
-                                    boolean staff, float ticks) {
+    private static void submitFocus(
+            WandArg arg, PoseStack poseStack, MultiBufferSource buffers, boolean staff, float ticks) {
         RenderType focusType = TCFlatRenderTypes.entityTranslucentFlat(WAND_TEXTURE);
         poseStack.pushPose();
         if (staff) {
@@ -173,16 +180,24 @@ public final class WandItemSpecialRenderer extends BlockEntityWithoutLevelRender
         List<RuneSpot> spots = new ArrayList<>();
         if (arg.sceptre()) {
             for (int i = 0; i < SCEPTRE_RUNE_COUNT; i++) {
-                spots.add(new RuneSpot(360.0F / SCEPTRE_RUNE_COUNT * i + ticks,
-                        SCEPTRE_RUNE_DISTANCE, RUNE_HEIGHT, SCEPTRE_RUNE_DEPTH, i));
+                spots.add(new RuneSpot(
+                        360.0F / SCEPTRE_RUNE_COUNT * i + ticks,
+                        SCEPTRE_RUNE_DISTANCE,
+                        RUNE_HEIGHT,
+                        SCEPTRE_RUNE_DEPTH,
+                        i));
             }
         }
         if (arg.rod().runes()) {
             for (int side = 0; side < STAFF_RUNE_SIDES; side++) {
                 float yaw = 360.0F / STAFF_RUNE_SIDES * (side + 1);
                 for (int step = 0; step < STAFF_RUNE_LENGTH; step++) {
-                    spots.add(new RuneSpot(yaw, STAFF_RUNE_START + step * STAFF_RUNE_STEP,
-                            RUNE_HEIGHT, STAFF_RUNE_DEPTH, (step + side * 3) % SCRIPT_GLYPHS));
+                    spots.add(new RuneSpot(
+                            yaw,
+                            STAFF_RUNE_START + step * STAFF_RUNE_STEP,
+                            RUNE_HEIGHT,
+                            STAFF_RUNE_DEPTH,
+                            (step + side * 3) % SCRIPT_GLYPHS));
                 }
             }
         }
@@ -208,7 +223,9 @@ public final class WandItemSpecialRenderer extends BlockEntityWithoutLevelRender
 
     private static float clientTicks() {
         LocalPlayer player = Minecraft.getInstance().player;
-        return player == null ? 0.0F : player.tickCount + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
+        return player == null
+                ? 0.0F
+                : player.tickCount + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
     }
 
     private static final int[][] RUNE_QUAD_SIGNS = {{-1, 1}, {1, 1}, {1, -1}, {-1, -1}};
@@ -235,19 +252,47 @@ public final class WandItemSpecialRenderer extends BlockEntityWithoutLevelRender
             float u = corner[1] > 0 ? glyphU + glyphWidth : glyphU;
             float v = corner[0] < 0 ? 1.0F : 0.0F;
             buffer.addVertex(pose, corner[0] * half, corner[1] * half, 0.0F)
-                    .setColor(tint).setUv(u, v)
-                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RUNE_LIGHT)
+                    .setColor(tint)
+                    .setUv(u, v)
+                    .setOverlay(OverlayTexture.NO_OVERLAY)
+                    .setLight(RUNE_LIGHT)
                     .setNormal(pose, 0.0F, 0.0F, 1.0F);
         }
         poseStack.popPose();
     }
 
-    private static void box(PoseStack.Pose pose, VertexConsumer buffer, float x, float y, float z,
-                            int dx, int dy, int dz, int u, int v, int tint, int light) {
-        BoxGeometry.box(pose, buffer,
-                x * PX, y * PX, z * PX,
-                (x + dx) * PX, (y + dy) * PX, (z + dz) * PX,
-                u, v, dx, dy, dz, TEX_W, TEX_H, tint, light, true);
+    private static void box(
+            PoseStack.Pose pose,
+            VertexConsumer buffer,
+            float x,
+            float y,
+            float z,
+            int dx,
+            int dy,
+            int dz,
+            int u,
+            int v,
+            int tint,
+            int light) {
+        BoxGeometry.box(
+                pose,
+                buffer,
+                x * PX,
+                y * PX,
+                z * PX,
+                (x + dx) * PX,
+                (y + dy) * PX,
+                (z + dz) * PX,
+                u,
+                v,
+                dx,
+                dy,
+                dz,
+                TEX_W,
+                TEX_H,
+                tint,
+                light,
+                true);
     }
 
     public static WandArg extract(ItemStack stack) {

@@ -60,8 +60,7 @@ public class EntityCultistCleric extends EntityCultist implements RangedAttackMo
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return createCultistAttributes()
-                .add(Attributes.MAX_HEALTH, 24.0);
+        return createCultistAttributes().add(Attributes.MAX_HEALTH, 24.0);
     }
 
     @Override
@@ -116,7 +115,8 @@ public class EntityCultistCleric extends EntityCultist implements RangedAttackMo
     @Override
     public void performRangedAttack(LivingEntity target, float velocity) {
         double dx = target.getX() - this.getX();
-        double dy = target.getBoundingBox().minY + target.getBbHeight() / 2.0F - (this.getY() + this.getBbHeight() / 2.0F);
+        double dy =
+                target.getBoundingBox().minY + target.getBbHeight() / 2.0F - (this.getY() + this.getBbHeight() / 2.0F);
         double dz = target.getZ() - this.getZ();
         this.swing(this.getUsedItemHand());
         if (this.random.nextFloat() > 1.0F - ORB_CHANCE) {
@@ -133,8 +133,8 @@ public class EntityCultistCleric extends EntityCultist implements RangedAttackMo
             float spread = Mth.sqrt(velocity) * 0.5F;
             this.level().levelEvent(null, FIREBALL_LEVEL_EVENT, this.blockPosition(), 0);
             for (int i = 0; i < FIREBALL_COUNT; i++) {
-                Vec3 shot = new Vec3(dx + this.random.nextGaussian() * spread, dy,
-                        dz + this.random.nextGaussian() * spread);
+                Vec3 shot = new Vec3(
+                        dx + this.random.nextGaussian() * spread, dy, dz + this.random.nextGaussian() * spread);
                 SmallFireball fireball = new SmallFireball(this.level(), this, shot.normalize());
                 fireball.setPos(fireball.getX(), this.getY() + this.getBbHeight() / 2.0F + 0.5, fireball.getZ());
                 this.level().addFreshEntity(fireball);

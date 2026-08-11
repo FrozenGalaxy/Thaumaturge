@@ -119,7 +119,8 @@ public final class PechTradeBootstrap {
         return new PechTrade(tier, stack);
     }
 
-    private static PechTrade book(HolderGetter<Enchantment> enchantments, int tier, ResourceKey<Enchantment> enchantment) {
+    private static PechTrade book(
+            HolderGetter<Enchantment> enchantments, int tier, ResourceKey<Enchantment> enchantment) {
         ItemEnchantments.Mutable stored = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
         stored.set(enchantments.getOrThrow(enchantment), 1);
         ItemStack stack = new ItemStack(Items.ENCHANTED_BOOK);

@@ -30,8 +30,13 @@ public final class HungryChestRenderer implements BlockEntityRenderer<BlockEntit
     }
 
     @Override
-    public void render(BlockEntityHungryChest chest, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityHungryChest chest,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         float yRot = chest.getBlockState().getValue(ChestBlock.FACING).toYRot();
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);

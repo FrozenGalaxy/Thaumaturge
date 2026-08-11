@@ -39,8 +39,13 @@ public final class ManaPodRenderer implements BlockEntityRenderer<BlockEntityMan
     }
 
     @Override
-    public void render(BlockEntityManaPod pod, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityManaPod pod,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         int age = pod.getBlockState().getValue(BlockManaPod.AGE);
         if (age < SHELL_MIN_AGE) {
             return;
@@ -51,8 +56,8 @@ public final class ManaPodRenderer implements BlockEntityRenderer<BlockEntityMan
         float b = HERBA_B;
         if (aspect != null) {
             int aspectColor = aspect.value().color();
-            float progress = Mth.clamp((age - SHELL_MIN_AGE)
-                    / (float) (BlockEntityManaPod.MAX_AGE - SHELL_MIN_AGE), 0.0F, 1.0F);
+            float progress =
+                    Mth.clamp((age - SHELL_MIN_AGE) / (float) (BlockEntityManaPod.MAX_AGE - SHELL_MIN_AGE), 0.0F, 1.0F);
             r = Mth.lerp(progress, HERBA_R, ARGB32.red(aspectColor) / 255.0F);
             g = Mth.lerp(progress, HERBA_G, ARGB32.green(aspectColor) / 255.0F);
             b = Mth.lerp(progress, HERBA_B, ARGB32.blue(aspectColor) / 255.0F);
@@ -63,13 +68,21 @@ public final class ManaPodRenderer implements BlockEntityRenderer<BlockEntityMan
         if (age > CORE_MIN_AGE - 1) {
             poseStack.pushPose();
             poseStack.translate(0.0F, CORE_LIFT, 0.0F);
-            model.core.render(poseStack, buffers.getBuffer(RenderType.entityCutout(CORE_TEXTURE)),
-                    FULLBRIGHT, OverlayTexture.NO_OVERLAY, -1);
+            model.core.render(
+                    poseStack,
+                    buffers.getBuffer(RenderType.entityCutout(CORE_TEXTURE)),
+                    FULLBRIGHT,
+                    OverlayTexture.NO_OVERLAY,
+                    -1);
             poseStack.popPose();
         }
         int shellColor = ARGB32.colorFromFloat(SHELL_ALPHA, r, g, b);
-        model.shell.render(poseStack, buffers.getBuffer(RenderType.entityTranslucent(SHELL_TEXTURE)),
-                light, OverlayTexture.NO_OVERLAY, shellColor);
+        model.shell.render(
+                poseStack,
+                buffers.getBuffer(RenderType.entityTranslucent(SHELL_TEXTURE)),
+                light,
+                OverlayTexture.NO_OVERLAY,
+                shellColor);
         poseStack.popPose();
     }
 }

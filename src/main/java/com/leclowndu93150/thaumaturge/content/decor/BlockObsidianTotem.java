@@ -34,8 +34,13 @@ public class BlockObsidianTotem extends Block {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction directionToNeighbour, BlockState neighbourState,
-            LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
+    protected BlockState updateShape(
+            BlockState state,
+            Direction directionToNeighbour,
+            BlockState neighbourState,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockPos neighbourPos) {
         if (directionToNeighbour == Direction.UP) {
             return state.setValue(UP, isTotem(neighbourState));
         }

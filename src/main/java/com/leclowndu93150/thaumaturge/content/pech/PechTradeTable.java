@@ -9,17 +9,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public record PechTradeTable(List<PechTrade> trades) {
-    public static final ResourceKey<Registry<PechTradeTable>> REGISTRY_KEY = ResourceKey.createRegistryKey(
-            ResourceLocation.fromNamespaceAndPath("thaumaturge", "pech_trade"));
+    public static final ResourceKey<Registry<PechTradeTable>> REGISTRY_KEY =
+            ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("thaumaturge", "pech_trade"));
 
     public static final Codec<PechTradeTable> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            PechTrade.CODEC.listOf().fieldOf("trades").forGetter(PechTradeTable::trades)
-    ).apply(instance, PechTradeTable::new));
+                    PechTrade.CODEC.listOf().fieldOf("trades").forGetter(PechTradeTable::trades))
+            .apply(instance, PechTradeTable::new));
 
     public record PechTrade(int tier, ItemStack result) {
         public static final Codec<PechTrade> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.intRange(1, 5).fieldOf("tier").forGetter(PechTrade::tier),
-                ItemStack.CODEC.fieldOf("result").forGetter(PechTrade::result)
-        ).apply(instance, PechTrade::new));
+                        Codec.intRange(1, 5).fieldOf("tier").forGetter(PechTrade::tier),
+                        ItemStack.CODEC.fieldOf("result").forGetter(PechTrade::result))
+                .apply(instance, PechTrade::new));
     }
 }

@@ -12,8 +12,7 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-public final class VoidRobeArmorItem extends ArmorItem
-        implements IVisDiscountGear, IWarpingGear, IGoggles, IRevealer {
+public final class VoidRobeArmorItem extends ArmorItem implements IVisDiscountGear, IWarpingGear, IGoggles, IRevealer {
     private static final int VIS_DISCOUNT = 5;
     private static final int WARP = 3;
 

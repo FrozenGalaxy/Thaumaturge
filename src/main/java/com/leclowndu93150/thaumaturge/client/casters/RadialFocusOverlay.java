@@ -2,25 +2,25 @@ package com.leclowndu93150.thaumaturge.client.casters;
 
 import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.casters.ICaster;
+import com.leclowndu93150.thaumaturge.client.render.GuiBlend;
 import com.leclowndu93150.thaumaturge.compat.curio.ThaumaturgeCuriosCompat;
 import com.leclowndu93150.thaumaturge.content.casters.CasterManager;
 import com.leclowndu93150.thaumaturge.content.casters.FocusPouchItem;
 import com.leclowndu93150.thaumaturge.content.casters.ItemFocus;
 import com.leclowndu93150.thaumaturge.network.ServerboundFocusChangePayload;
-import com.leclowndu93150.thaumaturge.client.render.GuiBlend;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.math.Axis;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import net.minecraft.Util;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
+import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.Util;
-import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -109,8 +109,7 @@ public final class RadialFocusOverlay implements LayeredDraw.Layer {
 
             if (time > lastTime) {
                 if (centerHover && !CasterKeyHandler.radialActive && !CasterKeyHandler.radialLock) {
-                    PacketDistributor.sendToServer(
-                            new ServerboundFocusChangePayload(CasterManager.REMOVE_FOCUS));
+                    PacketDistributor.sendToServer(new ServerboundFocusChangePayload(CasterManager.REMOVE_FOCUS));
                     CasterKeyHandler.radialLock = true;
                 }
                 for (String key : fociHover.keySet()) {
@@ -120,12 +119,15 @@ public final class RadialFocusOverlay implements LayeredDraw.Layer {
                             CasterKeyHandler.radialLock = true;
                         }
                         if (fociScale.get(key) < HOVER_SCALE_MAX) {
-                            fociScale.put(key, Math.min(HOVER_SCALE_MAX,
-                                    fociScale.get(key) + radialChange(time, lastTime, SCALE_UP_MS)));
+                            fociScale.put(
+                                    key,
+                                    Math.min(
+                                            HOVER_SCALE_MAX,
+                                            fociScale.get(key) + radialChange(time, lastTime, SCALE_UP_MS)));
                         }
                     } else if (fociScale.get(key) > 1.0F) {
-                        fociScale.put(key, Math.max(1.0F,
-                                fociScale.get(key) - radialChange(time, lastTime, SCALE_DOWN_MS)));
+                        fociScale.put(
+                                key, Math.max(1.0F, fociScale.get(key) - radialChange(time, lastTime, SCALE_DOWN_MS)));
                     }
                 }
                 if (!CasterKeyHandler.radialActive) {
@@ -222,9 +224,11 @@ public final class RadialFocusOverlay implements LayeredDraw.Layer {
             return;
         }
         int mouseX = (int) (mc.mouseHandler.xpos()
-                * mc.getWindow().getGuiScaledWidth() / mc.getWindow().getScreenWidth());
+                * mc.getWindow().getGuiScaledWidth()
+                / mc.getWindow().getScreenWidth());
         int mouseY = (int) (mc.mouseHandler.ypos()
-                * mc.getWindow().getGuiScaledHeight() / mc.getWindow().getScreenHeight());
+                * mc.getWindow().getGuiScaledHeight()
+                / mc.getWindow().getScreenHeight());
         int cx = graphics.guiWidth() / 2;
         int cy = graphics.guiHeight() / 2;
         ItemStack tooltipStack = ItemStack.EMPTY;
@@ -246,8 +250,7 @@ public final class RadialFocusOverlay implements LayeredDraw.Layer {
                     if (pendingClick) {
                         CasterKeyHandler.radialActive = false;
                         CasterKeyHandler.radialLock = true;
-                        PacketDistributor.sendToServer(
-                                new ServerboundFocusChangePayload(CasterManager.REMOVE_FOCUS));
+                        PacketDistributor.sendToServer(new ServerboundFocusChangePayload(CasterManager.REMOVE_FOCUS));
                         if (mc.isWindowActive() && !mc.mouseHandler.isMouseGrabbed()) {
                             mc.mouseHandler.grabMouse();
                         }
@@ -302,8 +305,8 @@ public final class RadialFocusOverlay implements LayeredDraw.Layer {
         }
     }
 
-    private static void drawRing(GuiGraphics graphics, ResourceLocation texture,
-                                 int cx, int cy, float angleDeg, float size) {
+    private static void drawRing(
+            GuiGraphics graphics, ResourceLocation texture, int cx, int cy, float angleDeg, float size) {
         if (size <= 0.0F) {
             return;
         }
@@ -312,9 +315,18 @@ public final class RadialFocusOverlay implements LayeredDraw.Layer {
         graphics.pose().mulPose(Axis.ZP.rotationDegrees(angleDeg - 90.0F));
         graphics.pose().translate(-size / 2.0F, -size / 2.0F, 0.0F);
         graphics.pose().scale(size / RADIAL_TEX_SIZE, size / RADIAL_TEX_SIZE, 1.0F);
-        GuiBlend.blitTinted(graphics, texture,
-                0, 0, 0.0F, 0.0F, RADIAL_TEX_SIZE, RADIAL_TEX_SIZE,
-                RADIAL_TEX_SIZE, RADIAL_TEX_SIZE, RING_TINT);
+        GuiBlend.blitTinted(
+                graphics,
+                texture,
+                0,
+                0,
+                0.0F,
+                0.0F,
+                RADIAL_TEX_SIZE,
+                RADIAL_TEX_SIZE,
+                RADIAL_TEX_SIZE,
+                RADIAL_TEX_SIZE,
+                RING_TINT);
         graphics.pose().popPose();
     }
 }

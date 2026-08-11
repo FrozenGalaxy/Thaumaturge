@@ -20,9 +20,9 @@ import net.minecraft.world.item.Items;
 
 public final class PechRenderer extends MobRenderer<EntityPech, PechModel> {
     private static final ResourceLocation[] TEXTURES = {
-            TCIds.rl("textures/entity/pech_forage.png"),
-            TCIds.rl("textures/entity/pech_thaum.png"),
-            TCIds.rl("textures/entity/pech_stalker.png")
+        TCIds.rl("textures/entity/pech_forage.png"),
+        TCIds.rl("textures/entity/pech_thaum.png"),
+        TCIds.rl("textures/entity/pech_stalker.png")
     };
     private static final float SHADOW = 0.5F;
     private static final float ITEM_LIFT = -0.1F;
@@ -38,22 +38,48 @@ public final class PechRenderer extends MobRenderer<EntityPech, PechModel> {
     }
 
     @Override
-    public void render(EntityPech entity, float entityYaw, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light) {
+    public void render(
+            EntityPech entity,
+            float entityYaw,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light) {
         super.render(entity, entityYaw, partialTick, poseStack, buffers, light);
         boolean holdingBow = entity.getMainHandItem().is(Items.BOW);
         HumanoidArm mainArm = entity.getMainArm();
         float bodyRot = Mth.rotLerp(partialTick, entity.yBodyRotO, entity.yBodyRot);
         ItemStack rightItem = mainArm == HumanoidArm.RIGHT ? entity.getMainHandItem() : entity.getOffhandItem();
         ItemStack leftItem = mainArm == HumanoidArm.LEFT ? entity.getMainHandItem() : entity.getOffhandItem();
-        renderHandItem(rightItem, HumanoidArm.RIGHT, this.model.rightArm,
-                mainArm == HumanoidArm.RIGHT && holdingBow, bodyRot, poseStack, buffers, light);
-        renderHandItem(leftItem, HumanoidArm.LEFT, this.model.leftArm,
-                mainArm == HumanoidArm.LEFT && holdingBow, bodyRot, poseStack, buffers, light);
+        renderHandItem(
+                rightItem,
+                HumanoidArm.RIGHT,
+                this.model.rightArm,
+                mainArm == HumanoidArm.RIGHT && holdingBow,
+                bodyRot,
+                poseStack,
+                buffers,
+                light);
+        renderHandItem(
+                leftItem,
+                HumanoidArm.LEFT,
+                this.model.leftArm,
+                mainArm == HumanoidArm.LEFT && holdingBow,
+                bodyRot,
+                poseStack,
+                buffers,
+                light);
     }
 
-    private void renderHandItem(ItemStack item, HumanoidArm arm, ModelPart armPart, boolean bow, float bodyRot,
-                                PoseStack poseStack, MultiBufferSource buffers, int light) {
+    private void renderHandItem(
+            ItemStack item,
+            HumanoidArm arm,
+            ModelPart armPart,
+            boolean bow,
+            float bodyRot,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light) {
         if (item.isEmpty()) {
             return;
         }
@@ -68,8 +94,8 @@ public final class PechRenderer extends MobRenderer<EntityPech, PechModel> {
         }
         poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
-        poseStack.translate(arm == HumanoidArm.LEFT ? -HAND_SIDE_OFFSET : HAND_SIDE_OFFSET,
-                HAND_DOWN_OFFSET, HAND_OUT_OFFSET);
+        poseStack.translate(
+                arm == HumanoidArm.LEFT ? -HAND_SIDE_OFFSET : HAND_SIDE_OFFSET, HAND_DOWN_OFFSET, HAND_OUT_OFFSET);
         ItemDisplayContext context = arm == HumanoidArm.RIGHT
                 ? ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
                 : ItemDisplayContext.THIRD_PERSON_LEFT_HAND;

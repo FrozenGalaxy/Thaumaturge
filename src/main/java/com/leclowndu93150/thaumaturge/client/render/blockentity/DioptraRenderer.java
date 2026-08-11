@@ -35,8 +35,13 @@ public final class DioptraRenderer implements BlockEntityRenderer<BlockEntityDio
     public DioptraRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(BlockEntityDioptra dioptra, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityDioptra dioptra,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         boolean enabled = dioptra.getBlockState().getValue(BlockStateProperties.ENABLED);
         float t = (Minecraft.getInstance().player == null ? 0 : Minecraft.getInstance().player.tickCount) + partialTick;
         float rc = Mth.sin(t / 12.0F) * 0.05F + 0.85F;
@@ -118,8 +123,8 @@ public final class DioptraRenderer implements BlockEntityRenderer<BlockEntityDio
         }
     }
 
-    private static void sideQuad(VertexConsumer buffer, PoseStack.Pose pose,
-                                 float x0, float z0, float x1, float z1, int color) {
+    private static void sideQuad(
+            VertexConsumer buffer, PoseStack.Pose pose, float x0, float z0, float x1, float z1, int color) {
         float yBottom = 1.0F;
         float yTop = 2.0F;
         vertex(buffer, pose, x0, yBottom, z0, 0.0F, 0.0F, color);
@@ -129,12 +134,12 @@ public final class DioptraRenderer implements BlockEntityRenderer<BlockEntityDio
     }
 
     private static int cellColor(float r, float g, float b, float lum, float alpha) {
-        return ARGB32.colorFromFloat(alpha,
-                Math.min(1.0F, r * 0.8F * lum), Math.min(1.0F, g * lum), Math.min(1.0F, b * lum));
+        return ARGB32.colorFromFloat(
+                alpha, Math.min(1.0F, r * 0.8F * lum), Math.min(1.0F, g * lum), Math.min(1.0F, b * lum));
     }
 
-    private static void vertex(VertexConsumer buffer, PoseStack.Pose pose,
-                               float x, float y, float z, float u, float v, int color) {
+    private static void vertex(
+            VertexConsumer buffer, PoseStack.Pose pose, float x, float y, float z, float u, float v, int color) {
         buffer.addVertex(pose, x, y, z).setUv(u, v).setColor(color);
     }
 
@@ -146,7 +151,12 @@ public final class DioptraRenderer implements BlockEntityRenderer<BlockEntityDio
     @Override
     public AABB getRenderBoundingBox(BlockEntityDioptra blockEntity) {
         BlockPos pos = blockEntity.getBlockPos();
-        return new AABB(pos.getX() - 0.3, pos.getY() - 0.3, pos.getZ() - 0.3,
-                pos.getX() + 1.3, pos.getY() + 2.3, pos.getZ() + 1.3);
+        return new AABB(
+                pos.getX() - 0.3,
+                pos.getY() - 0.3,
+                pos.getZ() - 0.3,
+                pos.getX() + 1.3,
+                pos.getY() + 2.3,
+                pos.getZ() + 1.3);
     }
 }

@@ -26,17 +26,25 @@ public final class JarBrainItemSpecialRenderer extends BlockEntityWithoutLevelRe
     private final JarBrineModel brine;
 
     public JarBrainItemSpecialRenderer() {
-        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+        super(
+                Minecraft.getInstance().getBlockEntityRenderDispatcher(),
+                Minecraft.getInstance().getEntityModels());
         EntityModelSet models = Minecraft.getInstance().getEntityModels();
         this.brain = new BrainModel(models.bakeLayer(TCModelLayers.BRAIN));
         this.brine = new JarBrineModel(models.bakeLayer(TCModelLayers.JAR_BRINE));
     }
 
     @Override
-    public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack,
-                             MultiBufferSource buffers, int light, int overlay) {
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
-                TCBlocks.JAR_BRAIN.get().defaultBlockState(), poseStack, buffers, light, overlay);
+    public void renderByItem(
+            ItemStack stack,
+            ItemDisplayContext displayContext,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
+        Minecraft.getInstance()
+                .getBlockRenderer()
+                .renderSingleBlock(TCBlocks.JAR_BRAIN.get().defaultBlockState(), poseStack, buffers, light, overlay);
 
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.01F, 0.5F);

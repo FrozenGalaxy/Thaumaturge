@@ -37,8 +37,13 @@ public final class EldritchOrbRenderer extends EntityRenderer<EntityEldritchOrb>
     }
 
     @Override
-    public void render(EntityEldritchOrb entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int packedLight) {
+    public void render(
+            EntityEldritchOrb entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
         float ticks = entity.tickCount + partialTicks;
         float spin = ticks / 80.0F * 360.0F;

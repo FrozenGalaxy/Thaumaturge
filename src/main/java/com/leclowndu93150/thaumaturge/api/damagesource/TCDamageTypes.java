@@ -2,8 +2,8 @@ package com.leclowndu93150.thaumaturge.api.damagesource;
 
 import com.leclowndu93150.thaumaturge.TCIds;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageType;
 
 /**

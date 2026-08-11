@@ -1,7 +1,5 @@
 package com.leclowndu93150.thaumaturge.content.golem.seals;
 
-import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
-import com.leclowndu93150.thaumaturge.config.ThaumaturgeCommonConfig;
 import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.golems.GolemHelper;
 import com.leclowndu93150.thaumaturge.api.golems.GolemTrait;
@@ -11,8 +9,10 @@ import com.leclowndu93150.thaumaturge.api.golems.seals.ISealConfigToggles;
 import com.leclowndu93150.thaumaturge.api.golems.seals.ISealEntity;
 import com.leclowndu93150.thaumaturge.api.golems.tasks.Task;
 import com.leclowndu93150.thaumaturge.api.items.InvHelper;
+import com.leclowndu93150.thaumaturge.config.ThaumaturgeCommonConfig;
 import com.leclowndu93150.thaumaturge.content.golem.EntityThaumaturgeGolem;
 import com.leclowndu93150.thaumaturge.content.golem.tasks.TaskHandler;
+import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,10 +33,10 @@ public class SealPickup extends SealFiltered implements ISealConfigArea {
     private static final byte EVENT_EMOTE_TASK = 5;
 
     protected final ISealConfigToggles.SealToggle[] props = {
-            new ISealConfigToggles.SealToggle(true, "pmeta", "golem.prop.meta"),
-            new ISealConfigToggles.SealToggle(true, "pnbt", "golem.prop.nbt"),
-            new ISealConfigToggles.SealToggle(false, "pore", "golem.prop.ore"),
-            new ISealConfigToggles.SealToggle(false, "pmod", "golem.prop.mod")
+        new ISealConfigToggles.SealToggle(true, "pmeta", "golem.prop.meta"),
+        new ISealConfigToggles.SealToggle(true, "pnbt", "golem.prop.nbt"),
+        new ISealConfigToggles.SealToggle(false, "pore", "golem.prop.ore"),
+        new ISealConfigToggles.SealToggle(false, "pmod", "golem.prop.mod")
     };
 
     private int delay = System.identityHashCode(this) % 100;
@@ -55,10 +55,12 @@ public class SealPickup extends SealFiltered implements ISealConfigArea {
         AABB area = GolemHelper.getBoundsForArea(seal);
         List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, area);
         for (ItemEntity item : items) {
-            if (item.onGround() && !item.hasPickUpDelay() && !item.getItem().isEmpty()
+            if (item.onGround()
+                    && !item.hasPickUpDelay()
+                    && !item.getItem().isEmpty()
                     && !itemEntities.containsValue(item.getId())) {
-                ItemStack match = InvHelper.findFirstMatchFromFilter(filter, filterSize, isBlacklist(),
-                        List.of(item.getItem()), filterFlags(props));
+                ItemStack match = InvHelper.findFirstMatchFromFilter(
+                        filter, filterSize, isBlacklist(), List.of(item.getItem()), filterFlags(props));
                 if (!match.isEmpty()) {
                     Task task = new Task(seal.getSealPos(), item);
                     task.setPriority(seal.getPriority());
@@ -81,8 +83,8 @@ public class SealPickup extends SealFiltered implements ISealConfigArea {
     public boolean onTaskCompletion(Level level, IGolemAPI golem, Task task) {
         ItemEntity item = getItemEntity(level, task);
         if (item != null && !item.getItem().isEmpty()) {
-            ItemStack match = InvHelper.findFirstMatchFromFilter(filter, filterSize, isBlacklist(),
-                    List.of(item.getItem()), filterFlags(props));
+            ItemStack match = InvHelper.findFirstMatchFromFilter(
+                    filter, filterSize, isBlacklist(), List.of(item.getItem()), filterFlags(props));
             if (!match.isEmpty()) {
                 ItemStack remainder = golem.holdItem(item.getItem());
                 if (!remainder.isEmpty()) {
@@ -90,8 +92,16 @@ public class SealPickup extends SealFiltered implements ISealConfigArea {
                 } else {
                     item.discard();
                 }
-                golem.getGolemEntity().playSound(SoundEvents.ITEM_PICKUP, 0.125F,
-                        ((level.getRandom().nextFloat() - level.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
+                golem.getGolemEntity()
+                        .playSound(
+                                SoundEvents.ITEM_PICKUP,
+                                0.125F,
+                                ((level.getRandom().nextFloat()
+                                                                - level.getRandom()
+                                                                        .nextFloat())
+                                                        * 0.7F
+                                                + 1.0F)
+                                        * 2.0F);
                 golem.swingArm();
             }
         }
@@ -146,7 +156,7 @@ public class SealPickup extends SealFiltered implements ISealConfigArea {
 
     @Override
     public int[] getGuiCategories() {
-        return new int[]{CAT_AREA, CAT_FILTER, CAT_PRIORITY, CAT_TAGS};
+        return new int[] {CAT_AREA, CAT_FILTER, CAT_PRIORITY, CAT_TAGS};
     }
 
     @Override
@@ -156,18 +166,15 @@ public class SealPickup extends SealFiltered implements ISealConfigArea {
 
     @Override
     public GolemTrait[] getForbiddenTags() {
-        return new GolemTrait[]{TCGolemTraits.CLUMSY.get()};
+        return new GolemTrait[] {TCGolemTraits.CLUMSY.get()};
     }
 
     @Override
-    public void onTaskStarted(Level level, IGolemAPI golem, Task task) {
-    }
+    public void onTaskStarted(Level level, IGolemAPI golem, Task task) {}
 
     @Override
-    public void onTaskSuspension(Level level, Task task) {
-    }
+    public void onTaskSuspension(Level level, Task task) {}
 
     @Override
-    public void onRemoval(Level level, BlockPos pos, Direction side) {
-    }
+    public void onRemoval(Level level, BlockPos pos, Direction side) {}
 }

@@ -8,28 +8,31 @@ import com.leclowndu93150.thaumaturge.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumaturge.content.recipe.workbench.ArcaneCraftingRecipe;
 import com.leclowndu93150.thaumaturge.content.recipe.workbench.ArcaneShapedCraftingRecipe;
 import com.leclowndu93150.thaumaturge.content.recipe.workbench.ArcaneShapedRecipePattern;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-public class ArcaneWorkbenchShapedRecipeBuilder extends ArcaneWorkbenchRecipeBuilder<ArcaneWorkbenchShapedRecipeBuilder>{
+public class ArcaneWorkbenchShapedRecipeBuilder
+        extends ArcaneWorkbenchRecipeBuilder<ArcaneWorkbenchShapedRecipeBuilder> {
 
     private final HolderGetter<Item> items;
     private final List<String> rows;
     private final Map<Character, Ingredient> key;
 
-
-    public ArcaneWorkbenchShapedRecipeBuilder(RecipeCategory category, ItemStack result, HolderGetter<Item> items, HolderGetter<IAspect> aspects, int vis) {
-        super(category, result,aspects,vis);
+    public ArcaneWorkbenchShapedRecipeBuilder(
+            RecipeCategory category,
+            ItemStack result,
+            HolderGetter<Item> items,
+            HolderGetter<IAspect> aspects,
+            int vis) {
+        super(category, result, aspects, vis);
         this.items = items;
         this.rows = Lists.newArrayList();
         this.key = Maps.newLinkedHashMap();
@@ -64,8 +67,9 @@ public class ArcaneWorkbenchShapedRecipeBuilder extends ArcaneWorkbenchRecipeBui
     }
 
     @Override
-    protected ArcaneCraftingRecipe makeRecipe(String group, ItemStack result, AspectList aspects, Optional<ResearchGate> gate, int vis) {
-        ArcaneShapedRecipePattern pattern = ArcaneShapedRecipePattern.of(key,rows);
+    protected ArcaneCraftingRecipe makeRecipe(
+            String group, ItemStack result, AspectList aspects, Optional<ResearchGate> gate, int vis) {
+        ArcaneShapedRecipePattern pattern = ArcaneShapedRecipePattern.of(key, rows);
         return new ArcaneShapedCraftingRecipe(group, vis, gate, aspects, pattern, result);
     }
 }

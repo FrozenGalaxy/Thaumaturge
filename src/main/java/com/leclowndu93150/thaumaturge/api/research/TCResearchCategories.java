@@ -1,8 +1,8 @@
 package com.leclowndu93150.thaumaturge.api.research;
 
 import com.leclowndu93150.thaumaturge.TCIds;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Typed registry keys for the built-in research categories shipped by Thaumaturge.
@@ -24,6 +24,7 @@ public final class TCResearchCategories {
     private TCResearchCategories() {}
 
     private static ResourceKey<IResearchCategory> key(String path) {
-        return ResourceKey.create(IResearchCategory.REGISTRY_KEY, ResourceLocation.fromNamespaceAndPath(TCIds.MODID, path));
+        return ResourceKey.create(
+                IResearchCategory.REGISTRY_KEY, ResourceLocation.fromNamespaceAndPath(TCIds.MODID, path));
     }
 }

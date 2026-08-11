@@ -1,8 +1,6 @@
 package com.leclowndu93150.thaumaturge.client.golem;
 
-import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
 import com.leclowndu93150.thaumaturge.TCIds;
-import com.leclowndu93150.thaumaturge.api.golems.GolemTrait;
 import com.leclowndu93150.thaumaturge.api.golems.ISealDisplayer;
 import com.leclowndu93150.thaumaturge.api.golems.parts.GolemPartModel;
 import com.leclowndu93150.thaumaturge.client.model.mesh.TCMesh;
@@ -11,6 +9,7 @@ import com.leclowndu93150.thaumaturge.client.render.ItemRenderHelper;
 import com.leclowndu93150.thaumaturge.client.render.TCRenderTypes;
 import com.leclowndu93150.thaumaturge.content.golem.EntityThaumaturgeGolem;
 import com.leclowndu93150.thaumaturge.content.golem.GolemProperties;
+import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -51,8 +50,13 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumaturgeGolem> 
     }
 
     @Override
-    public void render(EntityThaumaturgeGolem entity, float entityYaw, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light) {
+    public void render(
+            EntityThaumaturgeGolem entity,
+            float entityYaw,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light) {
         GolemRenderState state = build(entity, partialTick, light);
         if (state.props != null) {
             poseStack.pushPose();
@@ -95,9 +99,10 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumaturgeGolem> 
         LocalPlayer player = Minecraft.getInstance().player;
         state.invisible = entity.isInvisible();
         state.ghost = state.invisible && player != null && !entity.isInvisibleTo(player);
-        state.xray = player != null && player.isShiftKeyDown()
+        state.xray = player != null
+                && player.isShiftKeyDown()
                 && (player.getMainHandItem().getItem() instanceof ISealDisplayer
-                || player.getOffhandItem().getItem() instanceof ISealDisplayer)
+                        || player.getOffhandItem().getItem() instanceof ISealDisplayer)
                 && !player.hasLineOfSight(entity);
         ItemStack held = entity.getMainHandItem();
         state.holdingItem = !held.isEmpty();
@@ -112,8 +117,8 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumaturgeGolem> 
         return state;
     }
 
-    private void renderParts(GolemRenderState state, PoseStack poseStack, MultiBufferSource buffers,
-                             boolean xray, int color) {
+    private void renderParts(
+            GolemRenderState state, PoseStack poseStack, MultiBufferSource buffers, boolean xray, int color) {
         GolemProperties props = state.props;
         ResourceLocation matTexture = props.getMaterial().texture();
         boolean holding = state.holdingItem;
@@ -252,8 +257,14 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumaturgeGolem> 
             if (!state.heldItemIsBlock) {
                 poseStack.translate(0.0F, -0.6F, 0.0F);
             }
-            ItemRenderHelper.render(state.heldItem, ItemDisplayContext.HEAD, poseStack, buffers,
-                    state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+            ItemRenderHelper.render(
+                    state.heldItem,
+                    ItemDisplayContext.HEAD,
+                    poseStack,
+                    buffers,
+                    state.lightCoords,
+                    OverlayTexture.NO_OVERLAY,
+                    0);
             poseStack.popPose();
         }
     }
@@ -273,15 +284,22 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumaturgeGolem> 
         }
     }
 
-    private void renderPartModel(GolemRenderState state, GolemPartModel part, GolemPartModel.LimbSide side,
-                                 PoseStack poseStack, MultiBufferSource buffers, ResourceLocation matTexture,
-                                 boolean xray, int color) {
+    private void renderPartModel(
+            GolemRenderState state,
+            GolemPartModel part,
+            GolemPartModel.LimbSide side,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            ResourceLocation matTexture,
+            boolean xray,
+            int color) {
         TCMesh mesh = GolemMeshes.get(part.objModel());
         GolemPartRenderHook hook = GolemPartRenderHooks.hookFor(part);
         for (TCMeshPart objectPart : mesh.parts()) {
             poseStack.pushPose();
             ResourceLocation texture = part.useMaterialTextureForObjectPart(objectPart.name()) || part.texture() == null
-                    ? matTexture : part.texture();
+                    ? matTexture
+                    : part.texture();
             hook.preRenderObjectPart(objectPart.name(), state, poseStack, side, 0.0F);
             renderMeshPart(mesh, objectPart, poseStack, buffers, texture, xray, color, state);
             hook.postRenderObjectPart(objectPart.name(), state, poseStack, buffers, side);
@@ -289,8 +307,15 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumaturgeGolem> 
         }
     }
 
-    private static void renderNamedPart(TCMesh mesh, String name, PoseStack poseStack, MultiBufferSource buffers,
-                                        ResourceLocation texture, boolean xray, int color, GolemRenderState state) {
+    private static void renderNamedPart(
+            TCMesh mesh,
+            String name,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            ResourceLocation texture,
+            boolean xray,
+            int color,
+            GolemRenderState state) {
         for (TCMeshPart part : mesh.parts()) {
             if (name.equals(part.name())) {
                 renderMeshPart(mesh, part, poseStack, buffers, texture, xray, color, state);
@@ -298,9 +323,17 @@ public final class GolemRenderer extends EntityRenderer<EntityThaumaturgeGolem> 
         }
     }
 
-    private static void renderMeshPart(TCMesh mesh, TCMeshPart part, PoseStack poseStack, MultiBufferSource buffers,
-                                       ResourceLocation texture, boolean xray, int color, GolemRenderState state) {
-        RenderType type = xray ? TCRenderTypes.entityTranslucentNoDepth(texture)
+    private static void renderMeshPart(
+            TCMesh mesh,
+            TCMeshPart part,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            ResourceLocation texture,
+            boolean xray,
+            int color,
+            GolemRenderState state) {
+        RenderType type = xray
+                ? TCRenderTypes.entityTranslucentNoDepth(texture)
                 : ARGB32.alpha(color) < 255 ? RenderType.entityTranslucent(texture) : RenderType.entityCutout(texture);
         VertexConsumer buffer = buffers.getBuffer(type);
         GolemMeshes.renderPart(part, poseStack.last(), buffer, state.lightCoords, color);

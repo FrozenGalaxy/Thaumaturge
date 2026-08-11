@@ -27,17 +27,38 @@ public final class CultistArmorClientExtensions {
 
     @SubscribeEvent
     public static void onRegisterClientExtensions(RegisterClientExtensionsEvent event) {
-        event.registerItem(new CustomArmorExtension(KnightArmorModel::new,
-                        TCModelLayers.KNIGHT_ARMOR_HEAD, TCModelLayers.KNIGHT_ARMOR_CHEST, TCModelLayers.KNIGHT_ARMOR_LEGS),
-                TCItems.CRIMSON_PLATE_HELM.get(), TCItems.CRIMSON_PLATE_CHEST.get(), TCItems.CRIMSON_PLATE_LEGS.get());
-        event.registerItem(new CustomArmorExtension(RobeArmorModel::new,
-                        TCModelLayers.ROBE_ARMOR_HEAD, TCModelLayers.ROBE_ARMOR_CHEST, TCModelLayers.ROBE_ARMOR_LEGS),
-                TCItems.CRIMSON_ROBE_HELM.get(), TCItems.CRIMSON_ROBE_CHEST.get(), TCItems.CRIMSON_ROBE_LEGS.get());
-        event.registerItem(new CustomArmorExtension(RobeArmorModel::new,
-                        TCModelLayers.ROBE_ARMOR_HEAD, TCModelLayers.ROBE_ARMOR_CHEST, TCModelLayers.ROBE_ARMOR_LEGS),
-                TCItems.VOID_ROBE_HELM.get(), TCItems.VOID_ROBE_CHEST.get(), TCItems.VOID_ROBE_LEGS.get());
-        event.registerItem(new FortressArmorExtension(),
-                TCItems.FORTRESS_HELM.get(), TCItems.FORTRESS_CHEST.get(), TCItems.FORTRESS_LEGS.get());
+        event.registerItem(
+                new CustomArmorExtension(
+                        KnightArmorModel::new,
+                        TCModelLayers.KNIGHT_ARMOR_HEAD,
+                        TCModelLayers.KNIGHT_ARMOR_CHEST,
+                        TCModelLayers.KNIGHT_ARMOR_LEGS),
+                TCItems.CRIMSON_PLATE_HELM.get(),
+                TCItems.CRIMSON_PLATE_CHEST.get(),
+                TCItems.CRIMSON_PLATE_LEGS.get());
+        event.registerItem(
+                new CustomArmorExtension(
+                        RobeArmorModel::new,
+                        TCModelLayers.ROBE_ARMOR_HEAD,
+                        TCModelLayers.ROBE_ARMOR_CHEST,
+                        TCModelLayers.ROBE_ARMOR_LEGS),
+                TCItems.CRIMSON_ROBE_HELM.get(),
+                TCItems.CRIMSON_ROBE_CHEST.get(),
+                TCItems.CRIMSON_ROBE_LEGS.get());
+        event.registerItem(
+                new CustomArmorExtension(
+                        RobeArmorModel::new,
+                        TCModelLayers.ROBE_ARMOR_HEAD,
+                        TCModelLayers.ROBE_ARMOR_CHEST,
+                        TCModelLayers.ROBE_ARMOR_LEGS),
+                TCItems.VOID_ROBE_HELM.get(),
+                TCItems.VOID_ROBE_CHEST.get(),
+                TCItems.VOID_ROBE_LEGS.get());
+        event.registerItem(
+                new FortressArmorExtension(),
+                TCItems.FORTRESS_HELM.get(),
+                TCItems.FORTRESS_CHEST.get(),
+                TCItems.FORTRESS_LEGS.get());
     }
 
     private static final class FortressArmorExtension implements IClientItemExtensions {
@@ -46,8 +67,8 @@ public final class CultistArmorClientExtensions {
         private FortressArmorModel legs;
 
         @Override
-        public HumanoidModel<?> getHumanoidArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot,
-                                                      HumanoidModel<?> original) {
+        public HumanoidModel<?> getHumanoidArmorModel(
+                LivingEntity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original) {
             if (slot == EquipmentSlot.LEGS) {
                 if (legs == null) {
                     legs = bake(TCModelLayers.FORTRESS_ARMOR_LEGS);
@@ -69,7 +90,8 @@ public final class CultistArmorClientExtensions {
         }
 
         private FortressArmorModel bake(ModelLayerLocation layer) {
-            return new FortressArmorModel(Minecraft.getInstance().getEntityModels().bakeLayer(layer));
+            return new FortressArmorModel(
+                    Minecraft.getInstance().getEntityModels().bakeLayer(layer));
         }
     }
 
@@ -82,9 +104,11 @@ public final class CultistArmorClientExtensions {
         private HumanoidModel<LivingEntity> chest;
         private HumanoidModel<LivingEntity> legs;
 
-        private CustomArmorExtension(Function<ModelPart, HumanoidModel<LivingEntity>> factory,
-                                     ModelLayerLocation headLayer, ModelLayerLocation chestLayer,
-                                     ModelLayerLocation legsLayer) {
+        private CustomArmorExtension(
+                Function<ModelPart, HumanoidModel<LivingEntity>> factory,
+                ModelLayerLocation headLayer,
+                ModelLayerLocation chestLayer,
+                ModelLayerLocation legsLayer) {
             this.factory = factory;
             this.headLayer = headLayer;
             this.chestLayer = chestLayer;
@@ -92,8 +116,8 @@ public final class CultistArmorClientExtensions {
         }
 
         @Override
-        public HumanoidModel<?> getHumanoidArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot,
-                                                      HumanoidModel<?> original) {
+        public HumanoidModel<?> getHumanoidArmorModel(
+                LivingEntity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original) {
             if (slot == EquipmentSlot.LEGS) {
                 if (legs == null) {
                     legs = bake(legsLayer);

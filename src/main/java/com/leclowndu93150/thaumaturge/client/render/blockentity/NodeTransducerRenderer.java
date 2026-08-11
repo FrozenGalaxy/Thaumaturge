@@ -13,8 +13,13 @@ public final class NodeTransducerRenderer implements BlockEntityRenderer<BlockEn
     public NodeTransducerRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(BlockEntityNodeTransducer transducer, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityNodeTransducer transducer,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         float chargeFraction = transducer.getCount() / (float) BlockEntityNodeTransducer.CHARGE_TARGET;
         LocalPlayer player = Minecraft.getInstance().player;
         float ticks = player == null ? 0.0F : player.tickCount + partialTick;

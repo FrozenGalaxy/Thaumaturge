@@ -21,10 +21,23 @@ public final class InfusionCrumbsParticle extends SeekerParticle {
     private final float patchU;
     private final float patchV;
 
-    private InfusionCrumbsParticle(ClientLevel level, double x, double y, double z,
-                                   InfusionCrumbsParticleOptions options, TextureAtlasSprite sprite) {
-        super(level, x, y, z, sprite, NO_ENTITY, new Vec3(options.tx(), options.ty(), options.tz()),
-                new Vec3(options.sx(), options.sy(), options.sz()), DRIFT);
+    private InfusionCrumbsParticle(
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            InfusionCrumbsParticleOptions options,
+            TextureAtlasSprite sprite) {
+        super(
+                level,
+                x,
+                y,
+                z,
+                sprite,
+                NO_ENTITY,
+                new Vec3(options.tx(), options.ty(), options.tz()),
+                new Vec3(options.sx(), options.sy(), options.sz()),
+                DRIFT);
         setColor(TINT, TINT, TINT);
         this.alpha = 0.3F;
         this.quadSize = (MIN_SCALE + this.random.nextFloat() * SCALE_RANGE) * 0.1F;
@@ -33,8 +46,7 @@ public final class InfusionCrumbsParticle extends SeekerParticle {
     }
 
     @Override
-    protected void update() {
-    }
+    protected void update() {}
 
     @Override
     public ParticleRenderType getRenderType() {
@@ -63,8 +75,15 @@ public final class InfusionCrumbsParticle extends SeekerParticle {
 
     public static final class Provider implements ParticleProvider<InfusionCrumbsParticleOptions> {
         @Override
-        public @Nullable Particle createParticle(InfusionCrumbsParticleOptions options, ClientLevel level, double x, double y, double z,
-                                                 double vx, double vy, double vz) {
+        public @Nullable Particle createParticle(
+                InfusionCrumbsParticleOptions options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double vx,
+                double vy,
+                double vz) {
             TextureAtlasSprite sprite = resolveSprite(options, level);
             if (sprite == null) {
                 return null;
@@ -76,10 +95,16 @@ public final class InfusionCrumbsParticle extends SeekerParticle {
             if (options.stack().getItem() instanceof BlockItem blockItem) {
                 BlockState state = blockItem.getBlock().defaultBlockState();
                 if (!state.isAir()) {
-                    return Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getParticleIcon(state);
+                    return Minecraft.getInstance()
+                            .getBlockRenderer()
+                            .getBlockModelShaper()
+                            .getParticleIcon(state);
                 }
             }
-            return Minecraft.getInstance().getItemRenderer().getModel(options.stack(), level, null, 0).getParticleIcon();
+            return Minecraft.getInstance()
+                    .getItemRenderer()
+                    .getModel(options.stack(), level, null, 0)
+                    .getParticleIcon();
         }
     }
 }

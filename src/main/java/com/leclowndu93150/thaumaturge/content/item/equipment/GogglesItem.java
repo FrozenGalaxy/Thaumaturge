@@ -57,5 +57,4 @@ public final class GogglesItem extends Item implements IGoggles, IRevealer, IVis
     public int getEnchantmentValue() {
         return TCItems.GOGGLES_ENCHANTMENT_VALUE;
     }
-
 }

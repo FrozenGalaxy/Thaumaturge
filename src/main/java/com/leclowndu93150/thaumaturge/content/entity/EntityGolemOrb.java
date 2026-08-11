@@ -78,7 +78,8 @@ public class EntityGolemOrb extends ThrowableProjectile implements ISidedHurt {
             double distSq = this.distanceToSqr(this.target);
             if (distSq > 0.0) {
                 double dx = (this.target.getX() - this.getX()) / distSq;
-                double dy = (this.target.getBoundingBox().minY + this.target.getBbHeight() * 0.6 - this.getY()) / distSq;
+                double dy =
+                        (this.target.getBoundingBox().minY + this.target.getBbHeight() * 0.6 - this.getY()) / distSq;
                 double dz = (this.target.getZ() - this.getZ()) / distSq;
                 Vec3 movement = this.getDeltaMovement().add(dx * HOMING_ACCEL, dy * HOMING_ACCEL, dz * HOMING_ACCEL);
                 this.setDeltaMovement(
@@ -97,8 +98,8 @@ public class EntityGolemOrb extends ThrowableProjectile implements ISidedHurt {
                         * (this.isRed() ? RED_DAMAGE_FACTOR : WHITE_DAMAGE_FACTOR);
                 entityHit.getEntity().hurt(this.damageSources().indirectMagic(this, owner), damage);
             }
-            this.playSound(TCSounds.SHOCK.get(), 1.0F,
-                    1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
+            this.playSound(
+                    TCSounds.SHOCK.get(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
             this.discard();
         }
     }
@@ -113,8 +114,7 @@ public class EntityGolemOrb extends ThrowableProjectile implements ISidedHurt {
         if (source.getEntity() != null) {
             Vec3 look = source.getEntity().getLookAngle();
             this.setDeltaMovement(look.scale(0.9));
-            this.playSound(TCSounds.ZAP.get(), 1.0F,
-                    1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
+            this.playSound(TCSounds.ZAP.get(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
             return true;
         }
         return false;
@@ -124,5 +124,4 @@ public class EntityGolemOrb extends ThrowableProjectile implements ISidedHurt {
     public boolean hurtClient(DamageSource source, float amount) {
         return false;
     }
-
 }

@@ -7,20 +7,20 @@ import com.leclowndu93150.thaumaturge.registry.TCBlocks;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
 import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.mojang.serialization.Codec;
-import java.util.Map;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
@@ -29,21 +29,19 @@ import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public final class BlockCondenserLattice extends Block {
-    public static final MapCodec<BlockCondenserLattice> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.BOOL.fieldOf("dirty").forGetter(block -> block.dirty),
-            propertiesCodec()
-    ).apply(instance, BlockCondenserLattice::new));
+    public static final MapCodec<BlockCondenserLattice> CODEC = RecordCodecBuilder.mapCodec(
+            instance -> instance.group(Codec.BOOL.fieldOf("dirty").forGetter(block -> block.dirty), propertiesCodec())
+                    .apply(instance, BlockCondenserLattice::new));
 
     private static final VoxelShape CORE = box(5.0, 5.0, 5.0, 11.0, 11.0, 11.0);
-    private static final Map<Direction, VoxelShape> ARMS = DeviceShapes.facingShapesFromDown(
-            box(6.0, 0.0, 6.0, 10.0, 5.0, 10.0));
+    private static final Map<Direction, VoxelShape> ARMS =
+            DeviceShapes.facingShapesFromDown(box(6.0, 0.0, 6.0, 10.0, 5.0, 10.0));
 
     private final boolean dirty;
     private final VoxelShape[] shapeCache = new VoxelShape[64];
@@ -78,7 +76,13 @@ public final class BlockCondenserLattice extends Block {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction directionToNeighbour, BlockState neighbourState, LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
+    protected BlockState updateShape(
+            BlockState state,
+            Direction directionToNeighbour,
+            BlockState neighbourState,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockPos neighbourPos) {
         boolean connects = connectsTo(neighbourState, directionToNeighbour);
         return state.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(directionToNeighbour), connects);
     }
@@ -118,8 +122,14 @@ public final class BlockCondenserLattice extends Block {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
-                                          Player player, InteractionHand hand, BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
         if (!dirty || !stack.is(TCItems.FILTER.get())) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
@@ -129,15 +139,24 @@ public final class BlockCondenserLattice extends Block {
         stack.consume(1, player);
         if (level.getRandom().nextBoolean()) {
             ItemStack crystal = new ItemStack(TCItems.ESSENTIA_CRYSTAL.get());
-            crystal.set(TCDataComponents.CRYSTAL_ASPECT.get(), new AspectInstance(
-                    level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).getOrThrow(TCAspects.VITIUM), 1));
+            crystal.set(
+                    TCDataComponents.CRYSTAL_ASPECT.get(),
+                    new AspectInstance(
+                            level.registryAccess()
+                                    .lookupOrThrow(IAspect.REGISTRY_KEY)
+                                    .getOrThrow(TCAspects.VITIUM),
+                            1));
             Direction face = hit.getDirection();
-            level.addFreshEntity(new ItemEntity(level,
-                    pos.getX() + 0.5 + face.getStepX() / 3.0, pos.getY() + 0.5, pos.getZ() + 0.5 + face.getStepZ() / 3.0,
+            level.addFreshEntity(new ItemEntity(
+                    level,
+                    pos.getX() + 0.5 + face.getStepX() / 3.0,
+                    pos.getY() + 0.5,
+                    pos.getZ() + 0.5 + face.getStepZ() / 3.0,
                     crystal));
         }
         level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.5F, 1.0F);
-        level.setBlock(pos, connected(level, pos, TCBlocks.CONDENSER_LATTICE.get().defaultBlockState()), Block.UPDATE_ALL);
+        level.setBlock(
+                pos, connected(level, pos, TCBlocks.CONDENSER_LATTICE.get().defaultBlockState()), Block.UPDATE_ALL);
         return ItemInteractionResult.SUCCESS;
     }
 }

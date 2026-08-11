@@ -19,7 +19,11 @@ public abstract class AbstractTCScreen extends Screen {
         this(title, background, 256, 256);
     }
 
-    protected AbstractTCScreen(Component title, @Nullable ResourceLocation background, int backgroundTextureWidth, int backgroundTextureHeight) {
+    protected AbstractTCScreen(
+            Component title,
+            @Nullable ResourceLocation background,
+            int backgroundTextureWidth,
+            int backgroundTextureHeight) {
         super(title);
         this.background = background;
         this.backgroundTextureWidth = backgroundTextureWidth;

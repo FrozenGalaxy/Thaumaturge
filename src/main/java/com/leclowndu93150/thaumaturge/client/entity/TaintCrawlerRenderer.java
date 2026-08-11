@@ -10,7 +10,8 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 public final class TaintCrawlerRenderer extends MobRenderer<EntityTaintCrawler, SilverfishModel<EntityTaintCrawler>> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/entity/taint_crawler.png");
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/entity/taint_crawler.png");
     private static final float CRAWLER_SCALE = 0.7F;
 
     public TaintCrawlerRenderer(EntityRendererProvider.Context context) {

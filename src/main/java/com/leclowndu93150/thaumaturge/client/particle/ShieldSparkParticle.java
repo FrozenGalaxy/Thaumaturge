@@ -1,11 +1,10 @@
 package com.leclowndu93150.thaumaturge.client.particle;
-import net.minecraft.client.particle.ParticleRenderType;
 
 import com.leclowndu93150.thaumaturge.content.particle.ShieldSparkParticleOptions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.util.RandomSource;
 
 public final class ShieldSparkParticle extends TCParticle {
@@ -14,8 +13,16 @@ public final class ShieldSparkParticle extends TCParticle {
     private final float startAlpha;
     private final boolean additive;
 
-    private ShieldSparkParticle(ClientLevel level, double x, double y, double z,
-                                double vx, double vy, double vz, ShieldSparkParticleOptions options, ParticleSheet sheet) {
+    private ShieldSparkParticle(
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            double vx,
+            double vy,
+            double vz,
+            ShieldSparkParticleOptions options,
+            ParticleSheet sheet) {
         super(level, x, y, z, vx, vy, vz, sheet);
         setColor(options.color());
         this.startAlpha = options.alpha();
@@ -42,8 +49,15 @@ public final class ShieldSparkParticle extends TCParticle {
         private static final ParticleSheet SHEET = TCParticleSheets.sheet("shield_spark");
 
         @Override
-        public Particle createParticle(ShieldSparkParticleOptions options, ClientLevel level, double x, double y, double z,
-                                       double vx, double vy, double vz) {
+        public Particle createParticle(
+                ShieldSparkParticleOptions options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double vx,
+                double vy,
+                double vz) {
             RandomSource random = level.getRandom();
             return new ShieldSparkParticle(level, x, y, z, vx, vy, vz, options, SHEET);
         }

@@ -13,14 +13,14 @@ public final class RecipeDisplayCache {
         if (mc.level == null) {
             return List.of();
         }
-        return mc.level.getRecipeManager().byKey(id)
+        return mc.level
+                .getRecipeManager()
+                .byKey(id)
                 .<List<RecipeHolder<?>>>map(List::of)
                 .orElseGet(List::of);
     }
 
-    public static void ensureRequested(ResourceLocation id) {
-    }
+    public static void ensureRequested(ResourceLocation id) {}
 
-    public static void clear() {
-    }
+    public static void clear() {}
 }

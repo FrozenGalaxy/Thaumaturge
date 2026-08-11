@@ -37,8 +37,13 @@ public final class EldritchObeliskRenderer implements BlockEntityRenderer<BlockE
     public EldritchObeliskRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(BlockEntityEldritchObelisk obelisk, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityEldritchObelisk obelisk,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         var viewEntity = Minecraft.getInstance().getCameraEntity();
         float animationTime = viewEntity == null ? partialTick : viewEntity.tickCount + partialTick;
         boolean outerLands = obelisk.getLevel() != null && obelisk.getLevel().dimension() == OuterLands.DIMENSION;
@@ -48,18 +53,70 @@ public final class EldritchObeliskRenderer implements BlockEntityRenderer<BlockE
 
         VertexConsumer surface = buffers.getBuffer(EldritchPortalSurface.SURFACE);
         PoseStack.Pose surfacePose = poseStack.last();
-        EldritchPortalSurface.quad(surfacePose, surface, obelisk.getBlockPos(),
-                0.0F, base, PLANE_INSET, 0.0F, top, PLANE_INSET,
-                1.0F, top, PLANE_INSET, 1.0F, base, PLANE_INSET);
-        EldritchPortalSurface.quad(surfacePose, surface, obelisk.getBlockPos(),
-                0.0F, base, 1.0F - PLANE_INSET, 0.0F, top, 1.0F - PLANE_INSET,
-                1.0F, top, 1.0F - PLANE_INSET, 1.0F, base, 1.0F - PLANE_INSET);
-        EldritchPortalSurface.quad(surfacePose, surface, obelisk.getBlockPos(),
-                PLANE_INSET, base, 0.0F, PLANE_INSET, top, 0.0F,
-                PLANE_INSET, top, 1.0F, PLANE_INSET, base, 1.0F);
-        EldritchPortalSurface.quad(surfacePose, surface, obelisk.getBlockPos(),
-                1.0F - PLANE_INSET, base, 0.0F, 1.0F - PLANE_INSET, top, 0.0F,
-                1.0F - PLANE_INSET, top, 1.0F, 1.0F - PLANE_INSET, base, 1.0F);
+        EldritchPortalSurface.quad(
+                surfacePose,
+                surface,
+                obelisk.getBlockPos(),
+                0.0F,
+                base,
+                PLANE_INSET,
+                0.0F,
+                top,
+                PLANE_INSET,
+                1.0F,
+                top,
+                PLANE_INSET,
+                1.0F,
+                base,
+                PLANE_INSET);
+        EldritchPortalSurface.quad(
+                surfacePose,
+                surface,
+                obelisk.getBlockPos(),
+                0.0F,
+                base,
+                1.0F - PLANE_INSET,
+                0.0F,
+                top,
+                1.0F - PLANE_INSET,
+                1.0F,
+                top,
+                1.0F - PLANE_INSET,
+                1.0F,
+                base,
+                1.0F - PLANE_INSET);
+        EldritchPortalSurface.quad(
+                surfacePose,
+                surface,
+                obelisk.getBlockPos(),
+                PLANE_INSET,
+                base,
+                0.0F,
+                PLANE_INSET,
+                top,
+                0.0F,
+                PLANE_INSET,
+                top,
+                1.0F,
+                PLANE_INSET,
+                base,
+                1.0F);
+        EldritchPortalSurface.quad(
+                surfacePose,
+                surface,
+                obelisk.getBlockPos(),
+                1.0F - PLANE_INSET,
+                base,
+                0.0F,
+                1.0F - PLANE_INSET,
+                top,
+                0.0F,
+                1.0F - PLANE_INSET,
+                top,
+                1.0F,
+                1.0F - PLANE_INSET,
+                base,
+                1.0F);
 
         RenderType sideType = RenderType.entityTranslucent(outerLands ? SIDE_TEXTURE_OUTER : SIDE_TEXTURE);
         VertexConsumer sideBuffer = buffers.getBuffer(sideType);
@@ -102,7 +159,8 @@ public final class EldritchObeliskRenderer implements BlockEntityRenderer<BlockE
         sideVertex(buffer, pose, -0.5F, 0.0F, 0.0F, 0.0F, light);
     }
 
-    private static void sideVertex(VertexConsumer buffer, PoseStack.Pose pose, float x, float y, float u, float v, int light) {
+    private static void sideVertex(
+            VertexConsumer buffer, PoseStack.Pose pose, float x, float y, float u, float v, int light) {
         buffer.addVertex(pose, x, y, 0.0F)
                 .setColor(-1)
                 .setUv(u, v)

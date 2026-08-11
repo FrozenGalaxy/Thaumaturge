@@ -1,13 +1,13 @@
 package com.leclowndu93150.thaumaturge.content.device.mirror;
 
-import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
+import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -107,9 +107,10 @@ public final class BlockEntityMirror extends BlockEntityMirrorBase {
             return false;
         }
         Direction face = getBlockState().getValue(BlockMirror.FACING);
-        ItemEntity entity = new ItemEntity(level,
-                worldPosition.getX() + 0.5, worldPosition.getY() + 0.25, worldPosition.getZ() + 0.5, stack);
-        entity.setDeltaMovement(face.getStepX() * EJECT_SPEED, face.getStepY() * EJECT_SPEED, face.getStepZ() * EJECT_SPEED);
+        ItemEntity entity = new ItemEntity(
+                level, worldPosition.getX() + 0.5, worldPosition.getY() + 0.25, worldPosition.getZ() + 0.5, stack);
+        entity.setDeltaMovement(
+                face.getStepX() * EJECT_SPEED, face.getStepY() * EJECT_SPEED, face.getStepZ() * EJECT_SPEED);
         entity.setPortalCooldown(ITEM_PORTAL_COOLDOWN);
         return level.addFreshEntity(entity);
     }
@@ -117,13 +118,15 @@ public final class BlockEntityMirror extends BlockEntityMirrorBase {
     @Override
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
-        outputStacks = new ArrayList<>(TCNbt.read(input, "Items", ItemStack.CODEC.listOf(), registries).orElse(List.of()));
+        outputStacks = new ArrayList<>(
+                TCNbt.read(input, "Items", ItemStack.CODEC.listOf(), registries).orElse(List.of()));
     }
 
     @Override
     protected void saveAdditional(CompoundTag output, HolderLookup.Provider registries) {
         super.saveAdditional(output, registries);
-        List<ItemStack> filtered = outputStacks.stream().filter(stack -> !stack.isEmpty()).toList();
+        List<ItemStack> filtered =
+                outputStacks.stream().filter(stack -> !stack.isEmpty()).toList();
         TCNbt.store(output, "Items", ItemStack.CODEC.listOf(), registries, filtered);
     }
 }

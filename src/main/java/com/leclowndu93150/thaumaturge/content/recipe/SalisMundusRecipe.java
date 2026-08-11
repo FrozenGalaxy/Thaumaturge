@@ -1,26 +1,24 @@
 package com.leclowndu93150.thaumaturge.content.recipe;
 
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.core.HolderLookup;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
 import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.leclowndu93150.thaumaturge.registry.TCRecipeSerializers;
 import com.mojang.serialization.MapCodec;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 
 public final class SalisMundusRecipe extends CustomRecipe {
     public static final SalisMundusRecipe INSTANCE = new SalisMundusRecipe();
@@ -65,7 +63,8 @@ public final class SalisMundusRecipe extends CustomRecipe {
                 if (!stack.is(TCItems.ESSENTIA_CRYSTAL.get()) || aspect == null) {
                     return false;
                 }
-                if (crystals.size() >= REQUIRED_CRYSTALS || !crystals.add(aspect.aspect().getKey().location())) {
+                if (crystals.size() >= REQUIRED_CRYSTALS
+                        || !crystals.add(aspect.aspect().getKey().location())) {
                     return false;
                 }
             }
@@ -105,7 +104,7 @@ public final class SalisMundusRecipe extends CustomRecipe {
         return result;
     }
 
-        @Override
+    @Override
     public RecipeSerializer<SalisMundusRecipe> getSerializer() {
         return TCRecipeSerializers.SALIS_MUNDUS.get();
     }

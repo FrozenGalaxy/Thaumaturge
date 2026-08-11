@@ -32,8 +32,8 @@ public final class BoltParticle extends TCParticle {
     private final float[] waveY;
     private final float[] waveZ;
 
-    private BoltParticle(ClientLevel level, double x, double y, double z,
-                         BoltParticleOptions options, ParticleSheet sheet) {
+    private BoltParticle(
+            ClientLevel level, double x, double y, double z, BoltParticleOptions options, ParticleSheet sheet) {
         super(level, x, y, z, 0.0, 0.0, 0.0, sheet);
         setColor(options.r(), options.g(), options.b());
         this.setSize(0.02F, 0.02F);
@@ -87,20 +87,31 @@ public final class BoltParticle extends TCParticle {
                 py = (float) this.delta.y;
                 pz = (float) this.delta.z;
             } else {
-                px = (float) (this.delta.x * step / this.steps) + this.waveX[step] * amplitude
+                px = (float) (this.delta.x * step / this.steps)
+                        + this.waveX[step] * amplitude
                         + (jitter.nextFloat() - jitter.nextFloat()) * JITTER;
-                py = (float) (this.delta.y * step / this.steps) + this.waveY[step] * amplitude
+                py = (float) (this.delta.y * step / this.steps)
+                        + this.waveY[step] * amplitude
                         + (jitter.nextFloat() - jitter.nextFloat()) * JITTER;
-                pz = (float) (this.delta.z * step / this.steps) + this.waveZ[step] * amplitude
+                pz = (float) (this.delta.z * step / this.steps)
+                        + this.waveZ[step] * amplitude
                         + (jitter.nextFloat() - jitter.nextFloat()) * JITTER;
             }
             for (int sub = 0; sub < SUBDIVISIONS; sub++) {
                 float t = (sub + 1.0F) / SUBDIVISIONS;
-                emitQuad(buffer, rotation,
+                emitQuad(
+                        buffer,
+                        rotation,
                         baseX + Mth.lerp(t, prevX, px),
                         baseY + Mth.lerp(t, prevY, py),
                         baseZ + Mth.lerp(t, prevZ, pz),
-                        this.beadSize, u0, u1, v0, v1, color, EMISSIVE_LIGHT);
+                        this.beadSize,
+                        u0,
+                        u1,
+                        v0,
+                        v1,
+                        color,
+                        EMISSIVE_LIGHT);
             }
             prevX = px;
             prevY = py;
@@ -108,17 +119,40 @@ public final class BoltParticle extends TCParticle {
         }
     }
 
-    private static void emitQuad(VertexConsumer buffer, Quaternionf rotation, float x, float y, float z,
-                                 float size, float u0, float u1, float v0, float v1, int color, int light) {
+    private static void emitQuad(
+            VertexConsumer buffer,
+            Quaternionf rotation,
+            float x,
+            float y,
+            float z,
+            float size,
+            float u0,
+            float u1,
+            float v0,
+            float v1,
+            int color,
+            int light) {
         emitVertex(buffer, rotation, x, y, z, 1.0F, -1.0F, size, u1, v1, color, light);
         emitVertex(buffer, rotation, x, y, z, 1.0F, 1.0F, size, u1, v0, color, light);
         emitVertex(buffer, rotation, x, y, z, -1.0F, 1.0F, size, u0, v0, color, light);
         emitVertex(buffer, rotation, x, y, z, -1.0F, -1.0F, size, u0, v1, color, light);
     }
 
-    private static void emitVertex(VertexConsumer buffer, Quaternionf rotation, float x, float y, float z,
-                                   float cornerX, float cornerY, float size, float u, float v, int color, int light) {
-        Vector3f pos = new Vector3f(cornerX, cornerY, 0.0F).rotate(rotation).mul(size).add(x, y, z);
+    private static void emitVertex(
+            VertexConsumer buffer,
+            Quaternionf rotation,
+            float x,
+            float y,
+            float z,
+            float cornerX,
+            float cornerY,
+            float size,
+            float u,
+            float v,
+            int color,
+            int light) {
+        Vector3f pos =
+                new Vector3f(cornerX, cornerY, 0.0F).rotate(rotation).mul(size).add(x, y, z);
         buffer.addVertex(pos.x(), pos.y(), pos.z()).setUv(u, v).setColor(color).setLight(light);
     }
 
@@ -131,8 +165,15 @@ public final class BoltParticle extends TCParticle {
         private static final ParticleSheet SHEET = TCParticleSheets.sheet("bolt");
 
         @Override
-        public Particle createParticle(BoltParticleOptions options, ClientLevel level, double x, double y, double z,
-                                       double vx, double vy, double vz) {
+        public Particle createParticle(
+                BoltParticleOptions options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double vx,
+                double vy,
+                double vz) {
             return new BoltParticle(level, x, y, z, options, SHEET);
         }
     }

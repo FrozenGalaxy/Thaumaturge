@@ -57,7 +57,8 @@ public final class EssentiaSources {
                     && source.takeFromContainer(aspect, 1)) {
                 BlockEntity be = level.getBlockEntity(sourcePos);
                 if (be != null) be.setChanged();
-                EffectDispatch.spawnEssentiaStream(level,
+                EffectDispatch.spawnEssentiaStream(
+                        level,
                         Vec3.atCenterOf(sourcePos),
                         drainEffectTarget != null ? drainEffectTarget : Vec3.atCenterOf(center.below()),
                         aspect.value().color(),
@@ -89,7 +90,8 @@ public final class EssentiaSources {
                     && source.addToContainer(aspect, 1) == 0) {
                 BlockEntity be = level.getBlockEntity(sourcePos);
                 if (be != null) be.setChanged();
-                EffectDispatch.spawnEssentiaStream(level,
+                EffectDispatch.spawnEssentiaStream(
+                        level,
                         Vec3.atCenterOf(center),
                         Vec3.atCenterOf(sourcePos),
                         aspect.value().color(),

@@ -1,10 +1,10 @@
 package com.leclowndu93150.thaumaturge.client.particle;
 
-import net.minecraft.client.particle.ParticleRenderType;
 import com.leclowndu93150.thaumaturge.content.particle.EssentiaDropParticleOptions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.RandomSource;
@@ -14,8 +14,13 @@ public final class EssentiaDropParticle extends SingleQuadParticle {
     private final float baseAlpha;
     private final float baseScale;
 
-    private EssentiaDropParticle(ClientLevel level, double x, double y, double z, EssentiaDropParticleOptions data, ParticleSheet sheet) {
-        super(level, x, y, z,
+    private EssentiaDropParticle(
+            ClientLevel level, double x, double y, double z, EssentiaDropParticleOptions data, ParticleSheet sheet) {
+        super(
+                level,
+                x,
+                y,
+                z,
                 level.getRandom().nextGaussian() * 0.005,
                 level.getRandom().nextGaussian() * 0.005,
                 level.getRandom().nextGaussian() * 0.005);
@@ -47,7 +52,7 @@ public final class EssentiaDropParticle extends SingleQuadParticle {
         this.xd *= this.friction;
         this.yd *= this.friction;
         this.zd *= this.friction;
-        float fade = 1.0F - (float)this.age / this.lifetime;
+        float fade = 1.0F - (float) this.age / this.lifetime;
         this.alpha = this.baseAlpha * fade;
         this.quadSize = this.baseScale * (0.5F + fade * 0.5F);
     }
@@ -81,7 +86,15 @@ public final class EssentiaDropParticle extends SingleQuadParticle {
         private static final ParticleSheet SHEET = TCParticleSheets.sheet("essentia_drop");
 
         @Override
-        public Particle createParticle(EssentiaDropParticleOptions options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux) {
+        public Particle createParticle(
+                EssentiaDropParticleOptions options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double xAux,
+                double yAux,
+                double zAux) {
             RandomSource random = level.getRandom();
             return new EssentiaDropParticle(level, x, y, z, options, SHEET);
         }

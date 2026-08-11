@@ -1,10 +1,10 @@
 package com.leclowndu93150.thaumaturge.client.particle;
-import net.minecraft.client.particle.ParticleRenderType;
 
 import com.leclowndu93150.thaumaturge.content.particle.TaintFumeParticleOptions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.util.RandomSource;
 
 public final class TaintFumeParticle extends TCParticle {
@@ -17,8 +17,16 @@ public final class TaintFumeParticle extends TCParticle {
     private final float startSize;
     private final float endSize;
 
-    private TaintFumeParticle(ClientLevel level, double x, double y, double z,
-                              double vx, double vy, double vz, TaintFumeParticleOptions options, ParticleSheet sheet) {
+    private TaintFumeParticle(
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            double vx,
+            double vy,
+            double vz,
+            TaintFumeParticleOptions options,
+            ParticleSheet sheet) {
         super(level, x, y, z, vx, vy, vz, sheet);
         if (options.color() == TaintFumeParticleOptions.RANDOM_COLOR) {
             this.rCol = 0.4F + this.random.nextFloat() * 0.2F;
@@ -55,8 +63,15 @@ public final class TaintFumeParticle extends TCParticle {
         private static final ParticleSheet SHEET = TCParticleSheets.sheet("taint_fume");
 
         @Override
-        public Particle createParticle(TaintFumeParticleOptions options, ClientLevel level, double x, double y, double z,
-                                       double vx, double vy, double vz) {
+        public Particle createParticle(
+                TaintFumeParticleOptions options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double vx,
+                double vy,
+                double vz) {
             RandomSource random = level.getRandom();
             return new TaintFumeParticle(level, x, y, z, vx, vy, vz, options, SHEET);
         }

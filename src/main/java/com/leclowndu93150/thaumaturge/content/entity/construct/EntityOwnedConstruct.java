@@ -189,9 +189,8 @@ public abstract class EntityOwnedConstruct extends PathfinderMob implements Owna
         }
         if (!level().isClientSide() && !isOwner(player)) {
             if (player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(
-                        Component.translatable("tc.notowned")
-                                .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC)));
+                serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(Component.translatable("tc.notowned")
+                        .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC)));
             }
             return InteractionResult.SUCCESS;
         }

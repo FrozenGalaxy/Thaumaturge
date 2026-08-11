@@ -14,7 +14,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.jspecify.annotations.Nullable;
@@ -37,12 +36,20 @@ final class ChampionEffects {
     }
 
     static float spined(LivingEntity mob, @Nullable LivingEntity target, @Nullable DamageSource source, float amount) {
-        if (target != null && source != null && !source.is(DamageTypes.THORNS)
+        if (target != null
+                && source != null
+                && !source.is(DamageTypes.THORNS)
                 && mob.level() instanceof ServerLevel server) {
-            target.hurt(mob.damageSources().thorns(mob),
-                    1 + mob.getRandom().nextInt(3));
-            server.playSound(null, target.getX(), target.getY(), target.getZ(),
-                    SoundEvents.THORNS_HIT, SoundSource.HOSTILE, 0.5F, 1.0F);
+            target.hurt(mob.damageSources().thorns(mob), 1 + mob.getRandom().nextInt(3));
+            server.playSound(
+                    null,
+                    target.getX(),
+                    target.getY(),
+                    target.getZ(),
+                    SoundEvents.THORNS_HIT,
+                    SoundSource.HOSTILE,
+                    0.5F,
+                    1.0F);
         }
         return amount;
     }
@@ -99,24 +106,31 @@ final class ChampionEffects {
         return amount;
     }
 
-    static float venomous(LivingEntity mob, @Nullable LivingEntity target, @Nullable DamageSource source, float amount) {
+    static float venomous(
+            LivingEntity mob, @Nullable LivingEntity target, @Nullable DamageSource source, float amount) {
         if (target != null && mob.getRandom().nextFloat() < PROC_CHANCE) {
             target.addEffect(new MobEffectInstance(MobEffects.POISON, POISON_TICKS));
         }
         return amount;
     }
 
-    static float vampiric(LivingEntity mob, @Nullable LivingEntity target, @Nullable DamageSource source, float amount) {
+    static float vampiric(
+            LivingEntity mob, @Nullable LivingEntity target, @Nullable DamageSource source, float amount) {
         mob.heal(Math.max(2.0F, amount / 2.0F));
         return amount;
     }
 
-    static float infested(LivingEntity mob, @Nullable LivingEntity target, @Nullable DamageSource source, float amount) {
+    static float infested(
+            LivingEntity mob, @Nullable LivingEntity target, @Nullable DamageSource source, float amount) {
         if (mob.getRandom().nextFloat() < PROC_CHANCE && mob.level() instanceof ServerLevel server) {
             EntityTaintCrawler crawler = TCEntities.TAINT_CRAWLER.get().create(server);
             if (crawler != null) {
-                crawler.moveTo(mob.getX(), mob.getY() + mob.getBbHeight() / 2.0F, mob.getZ(),
-                        mob.getRandom().nextFloat() * 360.0F, 0.0F);
+                crawler.moveTo(
+                        mob.getX(),
+                        mob.getY() + mob.getBbHeight() / 2.0F,
+                        mob.getZ(),
+                        mob.getRandom().nextFloat() * 360.0F,
+                        0.0F);
                 server.addFreshEntity(crawler);
                 mob.playSound(TCSounds.GORE.get(), 0.5F, 1.0F);
             }

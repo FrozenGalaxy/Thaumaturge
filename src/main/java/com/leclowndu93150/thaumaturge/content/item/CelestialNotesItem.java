@@ -6,6 +6,7 @@ import com.leclowndu93150.thaumaturge.api.aspect.TCAspects;
 import com.leclowndu93150.thaumaturge.content.research.pool.AspectPools;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
 import com.leclowndu93150.thaumaturge.registry.TCItems;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -18,8 +19,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-
-import java.util.List;
 
 public final class CelestialNotesItem extends Item {
     private static final int STUDY_POINTS = 2;
@@ -48,8 +47,8 @@ public final class CelestialNotesItem extends Item {
                     AspectPools.grant(serverPlayer, holder, STUDY_POINTS);
                 }
             }
-            serverPlayer.sendSystemMessage(Component.translatable("tc.celestial.studied")
-                    .withStyle(ChatFormatting.DARK_PURPLE));
+            serverPlayer.sendSystemMessage(
+                    Component.translatable("tc.celestial.studied").withStyle(ChatFormatting.DARK_PURPLE));
             if (!player.getAbilities().instabuild) {
                 stack.shrink(1);
             }
@@ -69,8 +68,10 @@ public final class CelestialNotesItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("item.thaumaturge.celestial_notes." + bodyOf(stack).getSerializedName() + ".text")
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(Component.translatable(
+                        "item.thaumaturge.celestial_notes." + bodyOf(stack).getSerializedName() + ".text")
                 .withStyle(ChatFormatting.AQUA));
     }
 }

@@ -30,8 +30,13 @@ public abstract class CrucibleEvent extends BlockEvent {
         private final ItemStack craftedStack;
         private final AspectList consumedAspects;
 
-        public CrucibleCraftedEvent(Player player, BlockPos pos, BlockState state, BlockEntityCrucible crucible,
-                                    ItemStack stack, AspectList consumedAspects) {
+        public CrucibleCraftedEvent(
+                Player player,
+                BlockPos pos,
+                BlockState state,
+                BlockEntityCrucible crucible,
+                ItemStack stack,
+                AspectList consumedAspects) {
             super(player, pos, state, crucible);
             this.craftedStack = stack;
             this.consumedAspects = consumedAspects;
@@ -50,8 +55,13 @@ public abstract class CrucibleEvent extends BlockEvent {
         private final ItemStack stack;
         private AspectList aspects;
 
-        public CrucibleDecomposeItemEvent(Player player, BlockPos pos, BlockState state, BlockEntityCrucible crucible,
-                                          ItemStack stack, AspectList aspects) {
+        public CrucibleDecomposeItemEvent(
+                Player player,
+                BlockPos pos,
+                BlockState state,
+                BlockEntityCrucible crucible,
+                ItemStack stack,
+                AspectList aspects) {
             super(player, pos, state, crucible);
             this.stack = stack;
             this.aspects = aspects;

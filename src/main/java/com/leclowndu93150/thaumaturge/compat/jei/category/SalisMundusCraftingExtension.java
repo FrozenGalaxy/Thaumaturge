@@ -23,8 +23,11 @@ public final class SalisMundusCraftingExtension implements ICraftingCategoryExte
     private SalisMundusCraftingExtension() {}
 
     @Override
-    public void setRecipe(RecipeHolder<SalisMundusRecipe> recipeHolder, IRecipeLayoutBuilder builder,
-                          ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
+    public void setRecipe(
+            RecipeHolder<SalisMundusRecipe> recipeHolder,
+            IRecipeLayoutBuilder builder,
+            ICraftingGridHelper craftingGridHelper,
+            IFocusGroup focuses) {
         List<ItemStack> crystals = crystalStacks();
         List<List<ItemStack>> inputs = new ArrayList<>();
         inputs.add(List.of(new ItemStack(Items.FLINT)));

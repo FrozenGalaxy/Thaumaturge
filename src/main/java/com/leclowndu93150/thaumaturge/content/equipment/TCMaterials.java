@@ -25,19 +25,34 @@ public final class TCMaterials {
             DeferredRegister.create(Registries.ARMOR_MATERIAL, TCIds.MODID);
 
     public static final Tier TOOL_THAUMIUM = new SimpleTier(
-            BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 500, 7.0F, 2.5F, 22,
-            () -> Ingredient.of(TCItemTags.INGOTS_THAUMIUM));
+            BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 500, 7.0F, 2.5F, 22, () -> Ingredient.of(TCItemTags.INGOTS_THAUMIUM));
     public static final Tier TOOL_VOID = new SimpleTier(
-            BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 150, 8.0F, 3.0F, 10,
+            BlockTags.INCORRECT_FOR_NETHERITE_TOOL,
+            150,
+            8.0F,
+            3.0F,
+            10,
             () -> Ingredient.of(TCItemTags.INGOTS_VOID_METAL));
     public static final Tier TOOL_ELEMENTAL = new SimpleTier(
-            BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 1500, 9.0F, 3.0F, 18,
+            BlockTags.INCORRECT_FOR_DIAMOND_TOOL,
+            1500,
+            9.0F,
+            3.0F,
+            18,
             () -> Ingredient.of(TCItemTags.INGOTS_THAUMIUM));
     public static final Tier TOOL_PRIMAL_VOID = new SimpleTier(
-            BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 500, 8.0F, 4.0F, 20,
+            BlockTags.INCORRECT_FOR_NETHERITE_TOOL,
+            500,
+            8.0F,
+            4.0F,
+            20,
             () -> Ingredient.of(TCItemTags.INGOTS_VOID_METAL));
     public static final Tier TOOL_CRIMSON_VOID = new SimpleTier(
-            BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 200, 8.0F, 3.5F, 20,
+            BlockTags.INCORRECT_FOR_NETHERITE_TOOL,
+            200,
+            8.0F,
+            3.5F,
+            20,
             () -> Ingredient.of(TCItemTags.INGOTS_VOID_METAL));
 
     public static final int DURABILITY_THAUMIUM = 25;
@@ -51,47 +66,121 @@ public final class TCMaterials {
     public static final int DURABILITY_CULTIST_BOOTS = 15;
     public static final int DURABILITY_CULTIST_LEADER = 30;
 
-    public static final Holder<ArmorMaterial> ARMOR_THAUMIUM = register("thaumium",
-            defense(2, 5, 6, 2), 25, SoundEvents.ARMOR_EQUIP_IRON, 1.0F, 0.0F,
-            () -> Ingredient.of(TCItemTags.INGOTS_THAUMIUM), false);
-    public static final Holder<ArmorMaterial> ARMOR_ROBES = register("robes",
-            defense(1, 2, 3, 1), 25, SoundEvents.ARMOR_EQUIP_LEATHER, 1.0F, 0.0F,
-            () -> Ingredient.of(ItemTags.WOOL), true);
-    public static final Holder<ArmorMaterial> ARMOR_TRAVELLER = register("traveller",
-            defense(1, 2, 3, 1), 25, SoundEvents.ARMOR_EQUIP_LEATHER, 1.0F, 0.0F,
-            () -> Ingredient.of(Tags.Items.LEATHERS), false);
-    public static final Holder<ArmorMaterial> ARMOR_VOID = register("void",
-            defense(3, 6, 8, 3), 10, SoundEvents.ARMOR_EQUIP_CHAIN, 1.0F, 0.0F,
-            () -> Ingredient.of(TCItemTags.INGOTS_VOID_METAL), false);
-    public static final Holder<ArmorMaterial> ARMOR_VOID_ROBE = register("void_robe",
-            defense(4, 7, 9, 4), 10, SoundEvents.ARMOR_EQUIP_LEATHER, 2.0F, 0.0F,
-            () -> Ingredient.of(TCItemTags.INGOTS_VOID_METAL), true);
-    public static final Holder<ArmorMaterial> ARMOR_FORTRESS = register("fortress",
-            defense(3, 6, 7, 3), 25, SoundEvents.ARMOR_EQUIP_IRON, 3.0F, 0.0F,
-            () -> Ingredient.of(TCItemTags.INGOTS_THAUMIUM), false);
-    public static final Holder<ArmorMaterial> ARMOR_CULTIST_PLATE = register("cultist_plate",
-            defense(2, 5, 6, 2), 13, SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.0F,
-            () -> Ingredient.of(Tags.Items.INGOTS_IRON), false);
-    public static final Holder<ArmorMaterial> ARMOR_CULTIST_ROBE = register("cultist_robe",
-            defense(2, 4, 5, 2), 13, SoundEvents.ARMOR_EQUIP_CHAIN, 0.0F, 0.0F,
-            () -> Ingredient.of(ItemTags.WOOL), false);
-    public static final Holder<ArmorMaterial> ARMOR_CULTIST_BOOTS = register("cultist_boots",
-            defense(2, 5, 6, 2), 9, SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.0F,
-            () -> Ingredient.of(Tags.Items.INGOTS_IRON), false);
-    public static final Holder<ArmorMaterial> ARMOR_CULTIST_LEADER = register("cultist_leader",
-            defense(3, 6, 7, 3), 20, SoundEvents.ARMOR_EQUIP_IRON, 1.0F, 0.0F,
-            () -> Ingredient.of(Tags.Items.INGOTS_IRON), false);
+    public static final Holder<ArmorMaterial> ARMOR_THAUMIUM = register(
+            "thaumium",
+            defense(2, 5, 6, 2),
+            25,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            1.0F,
+            0.0F,
+            () -> Ingredient.of(TCItemTags.INGOTS_THAUMIUM),
+            false);
+    public static final Holder<ArmorMaterial> ARMOR_ROBES = register(
+            "robes",
+            defense(1, 2, 3, 1),
+            25,
+            SoundEvents.ARMOR_EQUIP_LEATHER,
+            1.0F,
+            0.0F,
+            () -> Ingredient.of(ItemTags.WOOL),
+            true);
+    public static final Holder<ArmorMaterial> ARMOR_TRAVELLER = register(
+            "traveller",
+            defense(1, 2, 3, 1),
+            25,
+            SoundEvents.ARMOR_EQUIP_LEATHER,
+            1.0F,
+            0.0F,
+            () -> Ingredient.of(Tags.Items.LEATHERS),
+            false);
+    public static final Holder<ArmorMaterial> ARMOR_VOID = register(
+            "void",
+            defense(3, 6, 8, 3),
+            10,
+            SoundEvents.ARMOR_EQUIP_CHAIN,
+            1.0F,
+            0.0F,
+            () -> Ingredient.of(TCItemTags.INGOTS_VOID_METAL),
+            false);
+    public static final Holder<ArmorMaterial> ARMOR_VOID_ROBE = register(
+            "void_robe",
+            defense(4, 7, 9, 4),
+            10,
+            SoundEvents.ARMOR_EQUIP_LEATHER,
+            2.0F,
+            0.0F,
+            () -> Ingredient.of(TCItemTags.INGOTS_VOID_METAL),
+            true);
+    public static final Holder<ArmorMaterial> ARMOR_FORTRESS = register(
+            "fortress",
+            defense(3, 6, 7, 3),
+            25,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            3.0F,
+            0.0F,
+            () -> Ingredient.of(TCItemTags.INGOTS_THAUMIUM),
+            false);
+    public static final Holder<ArmorMaterial> ARMOR_CULTIST_PLATE = register(
+            "cultist_plate",
+            defense(2, 5, 6, 2),
+            13,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            0.0F,
+            0.0F,
+            () -> Ingredient.of(Tags.Items.INGOTS_IRON),
+            false);
+    public static final Holder<ArmorMaterial> ARMOR_CULTIST_ROBE = register(
+            "cultist_robe",
+            defense(2, 4, 5, 2),
+            13,
+            SoundEvents.ARMOR_EQUIP_CHAIN,
+            0.0F,
+            0.0F,
+            () -> Ingredient.of(ItemTags.WOOL),
+            false);
+    public static final Holder<ArmorMaterial> ARMOR_CULTIST_BOOTS = register(
+            "cultist_boots",
+            defense(2, 5, 6, 2),
+            9,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            0.0F,
+            0.0F,
+            () -> Ingredient.of(Tags.Items.INGOTS_IRON),
+            false);
+    public static final Holder<ArmorMaterial> ARMOR_CULTIST_LEADER = register(
+            "cultist_leader",
+            defense(3, 6, 7, 3),
+            20,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            1.0F,
+            0.0F,
+            () -> Ingredient.of(Tags.Items.INGOTS_IRON),
+            false);
 
-    private static Holder<ArmorMaterial> register(String name, Map<ArmorItem.Type, Integer> defense,
-                                                  int enchantmentValue, Holder<SoundEvent> equipSound,
-                                                  float toughness, float knockbackResistance,
-                                                  Supplier<Ingredient> repairIngredient, boolean dyeable) {
+    private static Holder<ArmorMaterial> register(
+            String name,
+            Map<ArmorItem.Type, Integer> defense,
+            int enchantmentValue,
+            Holder<SoundEvent> equipSound,
+            float toughness,
+            float knockbackResistance,
+            Supplier<Ingredient> repairIngredient,
+            boolean dyeable) {
         List<ArmorMaterial.Layer> layers = dyeable
-                ? List.of(new ArmorMaterial.Layer(TCIds.rl(name), "", true),
-                          new ArmorMaterial.Layer(TCIds.rl(name), "_over", false))
+                ? List.of(
+                        new ArmorMaterial.Layer(TCIds.rl(name), "", true),
+                        new ArmorMaterial.Layer(TCIds.rl(name), "_over", false))
                 : List.of(new ArmorMaterial.Layer(TCIds.rl(name)));
-        return ARMOR_MATERIALS.register(name, () -> new ArmorMaterial(
-                defense, enchantmentValue, equipSound, repairIngredient, layers, toughness, knockbackResistance));
+        return ARMOR_MATERIALS.register(
+                name,
+                () -> new ArmorMaterial(
+                        defense,
+                        enchantmentValue,
+                        equipSound,
+                        repairIngredient,
+                        layers,
+                        toughness,
+                        knockbackResistance));
     }
 
     private static Map<ArmorItem.Type, Integer> defense(int boots, int leggings, int chestplate, int helmet) {

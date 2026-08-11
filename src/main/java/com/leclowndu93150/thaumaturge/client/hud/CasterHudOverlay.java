@@ -2,28 +2,27 @@ package com.leclowndu93150.thaumaturge.client.hud;
 
 import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
+import com.leclowndu93150.thaumaturge.api.aspect.TCAspects;
+import com.leclowndu93150.thaumaturge.api.casters.ICaster;
+import com.leclowndu93150.thaumaturge.client.render.GuiBlend;
+import com.leclowndu93150.thaumaturge.config.ThaumaturgeClientConfig;
+import com.leclowndu93150.thaumaturge.content.casters.ItemFocus;
 import com.leclowndu93150.thaumaturge.content.wands.WandEconomy;
 import com.leclowndu93150.thaumaturge.content.wands.WandVisHelper;
-import com.leclowndu93150.thaumaturge.api.aspect.TCAspects;
-import net.minecraft.resources.ResourceKey;
-import com.leclowndu93150.thaumaturge.api.casters.ICaster;
-import com.leclowndu93150.thaumaturge.config.ThaumaturgeClientConfig;
-import com.leclowndu93150.thaumaturge.client.render.GuiBlend;
-import com.leclowndu93150.thaumaturge.content.casters.ItemFocus;
 import com.mojang.math.Axis;
 import java.text.DecimalFormat;
+import net.minecraft.Util;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.NonNullList;
-import net.minecraft.Util;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-
 
 public final class CasterHudOverlay implements LayeredDraw.Layer {
     private static final ResourceLocation HUD = TCIds.rl("textures/gui/hud.png");
@@ -124,8 +123,8 @@ public final class CasterHudOverlay implements LayeredDraw.Layer {
         }
         ICaster wand = (ICaster) casterStack.getItem();
 
-        graphics.blit(HUD_WAND, 0, dialY, DIAL_SIZE, DIAL_SIZE, 0.0F, 0.0F,
-                DIAL_SRC_SIZE, DIAL_SRC_SIZE, TEX_SIZE, TEX_SIZE);
+        graphics.blit(
+                HUD_WAND, 0, dialY, DIAL_SIZE, DIAL_SIZE, 0.0F, 0.0F, DIAL_SRC_SIZE, DIAL_SRC_SIZE, TEX_SIZE, TEX_SIZE);
 
         int max = WandVisHelper.getMaxVis(casterStack);
         ItemStack focusStack = wand.getFocusStack(casterStack);
@@ -133,7 +132,8 @@ public final class CasterHudOverlay implements LayeredDraw.Layer {
         float perAspectCost = 0.0F;
         if (hasFocus && focusStack.getItem() instanceof ItemFocus focus && focus.getVisCost(focusStack) > 0.0F) {
             perAspectCost = focus.getVisCost(focusStack)
-                    * wand.getConsumptionModifier(casterStack, player, false) / WandEconomy.PRIMAL_COUNT;
+                    * wand.getConsumptionModifier(casterStack, player, false)
+                    / WandEconomy.PRIMAL_COUNT;
         }
         boolean sneak = player.isShiftKeyDown();
         long now = Util.getMillis();
@@ -157,25 +157,65 @@ public final class CasterHudOverlay implements LayeredDraw.Layer {
             int loc = max > 0 ? (int) (BAR_MAX_HEIGHT * (float) amt / max) : 0;
             if (loc > 0) {
                 int color = primalColor(mc, primal);
-                GuiBlend.blitTinted(graphics, HUD_WAND,
-                        -BAR_FILL_W / 2, BAR_BOTTOM - loc, BAR_FILL_U, 0.0F,
-                        BAR_FILL_W, loc, TEX_SIZE, TEX_SIZE,
+                GuiBlend.blitTinted(
+                        graphics,
+                        HUD_WAND,
+                        -BAR_FILL_W / 2,
+                        BAR_BOTTOM - loc,
+                        BAR_FILL_U,
+                        0.0F,
+                        BAR_FILL_W,
+                        loc,
+                        TEX_SIZE,
+                        TEX_SIZE,
                         ARGB32.color(Math.round(BAR_FILL_ALPHA * 255.0F), color));
             }
-            graphics.blit(HUD_WAND, BAR_FRAME_X, BAR_FRAME_Y, BAR_FRAME_U, 0.0F,
-                    BAR_FRAME_W, BAR_FRAME_H, TEX_SIZE, TEX_SIZE);
+            graphics.blit(
+                    HUD_WAND,
+                    BAR_FRAME_X,
+                    BAR_FRAME_Y,
+                    BAR_FRAME_U,
+                    0.0F,
+                    BAR_FRAME_W,
+                    BAR_FRAME_H,
+                    TEX_SIZE,
+                    TEX_SIZE);
             int markerShift = 0;
             if (perAspectCost > 0.0F) {
-                graphics.blit(HUD_WAND, -MARKER_HALF, -MARKER_SIZE, COST_MARKER_U, 0.0F,
-                        MARKER_SIZE, MARKER_SIZE, TEX_SIZE, TEX_SIZE);
+                graphics.blit(
+                        HUD_WAND,
+                        -MARKER_HALF,
+                        -MARKER_SIZE,
+                        COST_MARKER_U,
+                        0.0F,
+                        MARKER_SIZE,
+                        MARKER_SIZE,
+                        TEX_SIZE,
+                        TEX_SIZE);
                 markerShift = MARKER_SIZE;
             }
             if (previousVis[count] > amt) {
-                graphics.blit(HUD_WAND, -MARKER_HALF, -MARKER_SIZE - markerShift, FALL_MARKER_U, 0.0F,
-                        MARKER_SIZE, MARKER_SIZE, TEX_SIZE, TEX_SIZE);
+                graphics.blit(
+                        HUD_WAND,
+                        -MARKER_HALF,
+                        -MARKER_SIZE - markerShift,
+                        FALL_MARKER_U,
+                        0.0F,
+                        MARKER_SIZE,
+                        MARKER_SIZE,
+                        TEX_SIZE,
+                        TEX_SIZE);
             } else if (previousVis[count] < amt) {
-                graphics.blit(HUD_WAND, -MARKER_HALF, -MARKER_SIZE - markerShift, RISE_MARKER_U, 0.0F,
-                        MARKER_SIZE, MARKER_SIZE, TEX_SIZE, TEX_SIZE);
+                graphics.blit(
+                        HUD_WAND,
+                        -MARKER_HALF,
+                        -MARKER_SIZE - markerShift,
+                        RISE_MARKER_U,
+                        0.0F,
+                        MARKER_SIZE,
+                        MARKER_SIZE,
+                        TEX_SIZE,
+                        TEX_SIZE);
             }
             if (snapshot) {
                 previousVis[count] = amt;
@@ -183,14 +223,19 @@ public final class CasterHudOverlay implements LayeredDraw.Layer {
             if (sneak) {
                 graphics.pose().pushPose();
                 graphics.pose().mulPose(Axis.ZP.rotationDegrees(-90.0F));
-                graphics.drawString(mc.font, AMOUNT_FORMAT.format(amt / (float) WandEconomy.CENTIVIS_PER_VIS),
-                        AMOUNT_TEXT_X, AMOUNT_TEXT_Y, WHITE, false);
+                graphics.drawString(
+                        mc.font,
+                        AMOUNT_FORMAT.format(amt / (float) WandEconomy.CENTIVIS_PER_VIS),
+                        AMOUNT_TEXT_X,
+                        AMOUNT_TEXT_Y,
+                        WHITE,
+                        false);
                 graphics.pose().popPose();
                 if (perAspectCost > 0.0F) {
                     graphics.pose().pushPose();
                     graphics.pose().mulPose(Axis.ZP.rotationDegrees(-90.0F));
-                    graphics.drawString(mc.font, AMOUNT_FORMAT.format(perAspectCost),
-                            COST_TEXT_X, AMOUNT_TEXT_Y, WHITE, false);
+                    graphics.drawString(
+                            mc.font, AMOUNT_FORMAT.format(perAspectCost), COST_TEXT_X, AMOUNT_TEXT_Y, WHITE, false);
                     graphics.pose().popPose();
                 }
             }
@@ -201,7 +246,9 @@ public final class CasterHudOverlay implements LayeredDraw.Layer {
 
         if (hasFocus) {
             BlockState picked = wand.getPickedBlock(player.getMainHandItem());
-            ItemStack pickedStack = picked == null ? ItemStack.EMPTY : new ItemStack(picked.getBlock().asItem());
+            ItemStack pickedStack = picked == null
+                    ? ItemStack.EMPTY
+                    : new ItemStack(picked.getBlock().asItem());
             if (!pickedStack.isEmpty()) {
                 renderTradeHud(graphics, mc, player, pickedStack, dialY);
             } else {
@@ -214,12 +261,16 @@ public final class CasterHudOverlay implements LayeredDraw.Layer {
         if (mc.level == null) {
             return DEFAULT_ENERGY_COLOR;
         }
-        return mc.level.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY)
-                .getOrThrow(primal).value().color();
+        return mc.level
+                .registryAccess()
+                .lookupOrThrow(IAspect.REGISTRY_KEY)
+                .getOrThrow(primal)
+                .value()
+                .color();
     }
 
-    private static void renderTradeHud(GuiGraphics graphics, Minecraft mc, LocalPlayer player,
-                                       ItemStack picked, int dialY) {
+    private static void renderTradeHud(
+            GuiGraphics graphics, Minecraft mc, LocalPlayer player, ItemStack picked, int dialY) {
         int amount = 0;
         NonNullList<ItemStack> main = player.getInventory().items;
         for (ItemStack stack : main) {
@@ -236,12 +287,12 @@ public final class CasterHudOverlay implements LayeredDraw.Layer {
         for (int a = -1; a <= 1; a++) {
             for (int b = -1; b <= 1; b++) {
                 if ((a == 0 || b == 0) && (a != 0 || b != 0)) {
-                    graphics.drawString(mc.font, text, a + COUNT_TEXT_X - width, b + COUNT_TEXT_Y, OUTLINE_BLACK, false);
+                    graphics.drawString(
+                            mc.font, text, a + COUNT_TEXT_X - width, b + COUNT_TEXT_Y, OUTLINE_BLACK, false);
                 }
             }
         }
         graphics.drawString(mc.font, text, COUNT_TEXT_X - width, COUNT_TEXT_Y, WHITE, false);
         graphics.pose().popPose();
     }
-
 }

@@ -1,8 +1,9 @@
 package com.leclowndu93150.thaumaturge.content.device;
 
-import com.leclowndu93150.thaumaturge.Thaumaturge;
 import com.leclowndu93150.thaumaturge.api.aura.AuraHelper;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -19,14 +20,10 @@ import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public final class BlockEntityEverfullUrn extends BlockEntity {
     public static final int CAPACITY = 1000;
@@ -94,8 +91,7 @@ public final class BlockEntityEverfullUrn extends BlockEntity {
             int zz = urn.handlers.get(i);
             BlockPos target = urn.zonePos(zz);
             BlockState targetState = server.getBlockState(target);
-            IFluidHandler handler =
-                    server.getCapability(Capabilities.FluidHandler.BLOCK, target, Direction.UP);
+            IFluidHandler handler = server.getCapability(Capabilities.FluidHandler.BLOCK, target, Direction.UP);
             if (handler == null) {
                 if (!targetState.is(Blocks.CAULDRON) && !targetState.is(Blocks.WATER_CAULDRON)
                         || urn.waterAmount() < CAULDRON_COST) {
@@ -117,8 +113,7 @@ public final class BlockEntityEverfullUrn extends BlockEntity {
                 int moved;
                 {
                     moved = handler.fill(new FluidStack(Fluids.WATER, PUSH_AMOUNT), IFluidHandler.FluidAction.EXECUTE);
-                    if (moved > 0) {
-                    }
+                    if (moved > 0) {}
                 }
                 if (moved > 0) {
                     urn.drainWater(moved);
@@ -156,8 +151,16 @@ public final class BlockEntityEverfullUrn extends BlockEntity {
     }
 
     private void splashAt(ServerLevel server, BlockPos target) {
-        server.sendParticles(ParticleTypes.SPLASH,
-                target.getX() + 0.5, target.getY() + 1.0, target.getZ() + 0.5, 4, 0.2, 0.1, 0.2, 0.0);
+        server.sendParticles(
+                ParticleTypes.SPLASH,
+                target.getX() + 0.5,
+                target.getY() + 1.0,
+                target.getZ() + 0.5,
+                4,
+                0.2,
+                0.1,
+                0.2,
+                0.0);
     }
 
     @Override

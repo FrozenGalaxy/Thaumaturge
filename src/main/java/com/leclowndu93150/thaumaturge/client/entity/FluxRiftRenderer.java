@@ -23,12 +23,21 @@ import org.joml.Vector3f;
 public final class FluxRiftRenderer extends EntityRenderer<EntityFluxRift> {
     private static final ResourceLocation END_PORTAL = TheEndPortalRenderer.END_PORTAL_LOCATION;
 
-    private static final RenderType RIFT_GLOW_TYPE = riftType("tc_rift_glow",
-            RenderStateShard.ADDITIVE_TRANSPARENCY, RenderStateShard.LEQUAL_DEPTH_TEST, RenderStateShard.COLOR_WRITE);
-    private static final RenderType RIFT_GLOW_NO_DEPTH_TYPE = riftType("tc_rift_glow_no_depth",
-            RenderStateShard.ADDITIVE_TRANSPARENCY, RenderStateShard.NO_DEPTH_TEST, RenderStateShard.COLOR_WRITE);
-    private static final RenderType RIFT_SOLID_TYPE = riftType("tc_rift_solid",
-            RenderStateShard.TRANSLUCENT_TRANSPARENCY, RenderStateShard.LEQUAL_DEPTH_TEST, RenderStateShard.COLOR_DEPTH_WRITE);
+    private static final RenderType RIFT_GLOW_TYPE = riftType(
+            "tc_rift_glow",
+            RenderStateShard.ADDITIVE_TRANSPARENCY,
+            RenderStateShard.LEQUAL_DEPTH_TEST,
+            RenderStateShard.COLOR_WRITE);
+    private static final RenderType RIFT_GLOW_NO_DEPTH_TYPE = riftType(
+            "tc_rift_glow_no_depth",
+            RenderStateShard.ADDITIVE_TRANSPARENCY,
+            RenderStateShard.NO_DEPTH_TEST,
+            RenderStateShard.COLOR_WRITE);
+    private static final RenderType RIFT_SOLID_TYPE = riftType(
+            "tc_rift_solid",
+            RenderStateShard.TRANSLUCENT_TRANSPARENCY,
+            RenderStateShard.LEQUAL_DEPTH_TEST,
+            RenderStateShard.COLOR_DEPTH_WRITE);
 
     private static final int TUBE_SIDES = 6;
     private static final int GLOW_PASSES = 3;
@@ -48,10 +57,18 @@ public final class FluxRiftRenderer extends EntityRenderer<EntityFluxRift> {
         this.shadowRadius = 0.0F;
     }
 
-    private static RenderType riftType(String name, RenderStateShard.TransparencyStateShard transparency,
-                                       RenderStateShard.DepthTestStateShard depthTest,
-                                       RenderStateShard.WriteMaskStateShard writeMask) {
-        return RenderType.create(name, DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS, 1536, false, false,
+    private static RenderType riftType(
+            String name,
+            RenderStateShard.TransparencyStateShard transparency,
+            RenderStateShard.DepthTestStateShard depthTest,
+            RenderStateShard.WriteMaskStateShard writeMask) {
+        return RenderType.create(
+                name,
+                DefaultVertexFormat.POSITION,
+                VertexFormat.Mode.QUADS,
+                1536,
+                false,
+                false,
                 RenderType.CompositeState.builder()
                         .setShaderState(new RenderStateShard.ShaderStateShard(TCShaders::ender))
                         .setTextureState(RenderStateShard.MultiTextureStateShard.builder()
@@ -66,16 +83,21 @@ public final class FluxRiftRenderer extends EntityRenderer<EntityFluxRift> {
     }
 
     @Override
-    public void render(EntityFluxRift entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int packedLight) {
+    public void render(
+            EntityFluxRift entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
         int count = entity.points.size();
         if (count <= 2) {
             return;
         }
         float animationTime = entity.tickCount + partialTicks;
-        boolean goggles = Minecraft.getInstance().player != null
-                && GogglesAccess.wearsGoggles(Minecraft.getInstance().player);
+        boolean goggles =
+                Minecraft.getInstance().player != null && GogglesAccess.wearsGoggles(Minecraft.getInstance().player);
         float stab = Mth.clamp(1.0F - entity.getRiftStability() / STAB_DIVISOR, 0.0F, MAX_STAB_FACTOR);
         Vec3[] centers = new Vec3[count];
         float[] radii = new float[count];
@@ -113,8 +135,8 @@ public final class FluxRiftRenderer extends EntityRenderer<EntityFluxRift> {
         return END_PORTAL;
     }
 
-    private static void renderTube(VertexConsumer buffer, Matrix4f pose, Vec3[] centers, float[] radii,
-                                   float radiusScale) {
+    private static void renderTube(
+            VertexConsumer buffer, Matrix4f pose, Vec3[] centers, float[] radii, float radiusScale) {
         Vector3f[] previousRing = null;
         for (int a = 0; a < centers.length; a++) {
             Vec3 direction = segmentDirection(centers, a);
@@ -158,9 +180,8 @@ public final class FluxRiftRenderer extends EntityRenderer<EntityFluxRift> {
             double cos = Math.cos(angle) * radius;
             double sin = Math.sin(angle) * radius;
             ring[side] = new Vector3f(
-                    (float) (center.x + u.x * cos + v.x * sin),
-                    (float) (center.y + u.y * cos + v.y * sin),
-                    (float) (center.z + u.z * cos + v.z * sin));
+                    (float) (center.x + u.x * cos + v.x * sin), (float) (center.y + u.y * cos + v.y * sin), (float)
+                            (center.z + u.z * cos + v.z * sin));
         }
         return ring;
     }

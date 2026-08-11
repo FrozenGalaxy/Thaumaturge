@@ -56,8 +56,10 @@ public class EntityTurretCrossbowAdvanced extends EntityTurretCrossbow {
         goalSelector.addGoal(1, new RangedAttackGoal(this, 0.0, 20, 40, 24.0F));
         goalSelector.addGoal(2, new WatchTargetGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 5, true, false,
-                entity -> isValidTarget(entity)));
+        targetSelector.addGoal(
+                2,
+                new NearestAttackableTargetGoal<>(
+                        this, LivingEntity.class, 5, true, false, entity -> isValidTarget(entity)));
         setTargetMob(true);
     }
 
@@ -101,7 +103,9 @@ public class EntityTurretCrossbowAdvanced extends EntityTurretCrossbow {
             return true;
         }
         if (entity instanceof Player && getTargetPlayer()) {
-            if (level() instanceof ServerLevel serverLevel && !serverLevel.getServer().isPvpAllowed() && !getTargetFriendly()) {
+            if (level() instanceof ServerLevel serverLevel
+                    && !serverLevel.getServer().isPvpAllowed()
+                    && !getTargetFriendly()) {
                 setTargetPlayer(false);
                 return false;
             }
@@ -145,7 +149,8 @@ public class EntityTurretCrossbowAdvanced extends EntityTurretCrossbow {
     }
 
     private boolean sameOwner(OwnableEntity ownable) {
-        return getOwnerUUID() != null && ownable.getOwnerUUID() != null
+        return getOwnerUUID() != null
+                && ownable.getOwnerUUID() != null
                 && getOwnerUUID().equals(ownable.getOwnerUUID());
     }
 
@@ -160,8 +165,10 @@ public class EntityTurretCrossbowAdvanced extends EntityTurretCrossbow {
     @Override
     public void tick() {
         super.tick();
-        if (level() instanceof ServerLevel serverLevel && !serverLevel.getServer().isPvpAllowed()
-                && getTarget() instanceof Player && getTarget() != getOwner()) {
+        if (level() instanceof ServerLevel serverLevel
+                && !serverLevel.getServer().isPvpAllowed()
+                && getTarget() instanceof Player
+                && getTarget() != getOwner()) {
             setTarget(null);
         }
     }

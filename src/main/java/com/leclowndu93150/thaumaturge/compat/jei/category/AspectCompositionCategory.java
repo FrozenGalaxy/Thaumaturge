@@ -4,7 +4,6 @@ import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectComponents;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
-import com.leclowndu93150.thaumaturge.client.render.aspect.AspectTagRenderer;
 import com.leclowndu93150.thaumaturge.compat.jei.ingredient.AspectIngredientRenderer;
 import com.leclowndu93150.thaumaturge.compat.jei.ingredient.AspectIngredientType;
 import com.leclowndu93150.thaumaturge.registry.TCItems;
@@ -16,8 +15,8 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -46,7 +45,8 @@ public final class AspectCompositionCategory implements IRecipeCategory<AspectCo
 
     public AspectCompositionCategory(IGuiHelper guiHelper, @Nullable Holder<IAspect> iconAspect) {
         if (iconAspect != null) {
-            this.icon = guiHelper.createDrawableIngredient(AspectIngredientType.INSTANCE, new AspectInstance(iconAspect,1));
+            this.icon = guiHelper.createDrawableIngredient(
+                    AspectIngredientType.INSTANCE, new AspectInstance(iconAspect, 1));
         } else {
             this.icon = guiHelper.createDrawableItemStack(new ItemStack(TCItems.SALIS_MUNDUS.get()));
         }
@@ -81,39 +81,73 @@ public final class AspectCompositionCategory implements IRecipeCategory<AspectCo
     public void setRecipe(IRecipeLayoutBuilder builder, Composition recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, LEFT_X, LEFT_Y)
                 .setCustomRenderer(AspectIngredientType.INSTANCE, AspectIngredientRenderer.INSTANCE)
-                .addIngredient(AspectIngredientType.INSTANCE, new AspectInstance(recipe.left(),1));
+                .addIngredient(AspectIngredientType.INSTANCE, new AspectInstance(recipe.left(), 1));
         builder.addSlot(RecipeIngredientRole.INPUT, RIGHT_X, RIGHT_Y)
                 .setCustomRenderer(AspectIngredientType.INSTANCE, AspectIngredientRenderer.INSTANCE)
-                .addIngredient(AspectIngredientType.INSTANCE, new AspectInstance(recipe.right(),1));
+                .addIngredient(AspectIngredientType.INSTANCE, new AspectInstance(recipe.right(), 1));
         builder.addSlot(RecipeIngredientRole.OUTPUT, RESULT_X, RESULT_Y)
                 .setCustomRenderer(AspectIngredientType.INSTANCE, AspectIngredientRenderer.INSTANCE)
-                .addIngredient(AspectIngredientType.INSTANCE, new AspectInstance(recipe.result(),1));
+                .addIngredient(AspectIngredientType.INSTANCE, new AspectInstance(recipe.result(), 1));
     }
 
     @Override
-    public void draw(Composition recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(
+            Composition recipe,
+            IRecipeSlotsView recipeSlotsView,
+            GuiGraphics guiGraphics,
+            double mouseX,
+            double mouseY) {
         Font font = Minecraft.getInstance().font;
 
-        guiGraphics.drawString(font,"+",((LEFT_X + 16) + RIGHT_X) / 2 - 3,10, 0xFF000000 | ChatFormatting.DARK_GRAY.getColor(), false);
-        guiGraphics.drawString(font,"=",((RIGHT_X + 16) + RESULT_X) / 2 - 3,10, 0xFF000000 | ChatFormatting.DARK_GRAY.getColor(),false);
+        guiGraphics.drawString(
+                font,
+                "+",
+                ((LEFT_X + 16) + RIGHT_X) / 2 - 3,
+                10,
+                0xFF000000 | ChatFormatting.DARK_GRAY.getColor(),
+                false);
+        guiGraphics.drawString(
+                font,
+                "=",
+                ((RIGHT_X + 16) + RESULT_X) / 2 - 3,
+                10,
+                0xFF000000 | ChatFormatting.DARK_GRAY.getColor(),
+                false);
 
         guiGraphics.pose().pushPose();
         guiGraphics.pose().scale(0.5F, 0.5F, 1F);
         Component left = AspectComponents.name(recipe.left());
         int leftWidth = font.width(left) / 2;
-        guiGraphics.drawString(font,left,(LEFT_X + 8 - (leftWidth / 2)) * 2,45, 0xFF000000 | ChatFormatting.DARK_GRAY.getColor(), false);
+        guiGraphics.drawString(
+                font,
+                left,
+                (LEFT_X + 8 - (leftWidth / 2)) * 2,
+                45,
+                0xFF000000 | ChatFormatting.DARK_GRAY.getColor(),
+                false);
 
         Component right = AspectComponents.name(recipe.right());
         int rightWidth = font.width(right) / 2;
-        guiGraphics.drawString(font,right,(RIGHT_X  + 8  - (rightWidth / 2)) * 2,45, 0xFF000000 | ChatFormatting.DARK_GRAY.getColor(), false);
+        guiGraphics.drawString(
+                font,
+                right,
+                (RIGHT_X + 8 - (rightWidth / 2)) * 2,
+                45,
+                0xFF000000 | ChatFormatting.DARK_GRAY.getColor(),
+                false);
 
         Component result = AspectComponents.name(recipe.result());
         int resultWidth = font.width(result) / 2;
-        guiGraphics.drawString(font,result,(RESULT_X  + 8  - (resultWidth / 2)) * 2,45, 0xFF000000 | ChatFormatting.DARK_GRAY.getColor(), false);
+        guiGraphics.drawString(
+                font,
+                result,
+                (RESULT_X + 8 - (resultWidth / 2)) * 2,
+                45,
+                0xFF000000 | ChatFormatting.DARK_GRAY.getColor(),
+                false);
 
         guiGraphics.pose().popPose();
     }
-
 
     public static List<Composition> collect(Iterable<Holder.Reference<IAspect>> all) {
         ArrayList<Composition> out = new ArrayList<>();

@@ -29,7 +29,8 @@ public class InfusionRecipeBuilder extends SimpleRecipeBuilder {
     private @Nullable ResearchGate gate;
     private @Nullable DataComponentPatch catalystPatch;
 
-    public InfusionRecipeBuilder(HolderGetter<IAspect> aspectsGetter, RecipeCategory category, ItemStack result, Ingredient catalyst) {
+    public InfusionRecipeBuilder(
+            HolderGetter<IAspect> aspectsGetter, RecipeCategory category, ItemStack result, Ingredient catalyst) {
         super(result, category);
         this.aspectsGetter = aspectsGetter;
         this.catalyst = catalyst;
@@ -66,10 +67,15 @@ public class InfusionRecipeBuilder extends SimpleRecipeBuilder {
     public void save(RecipeOutput output, ResourceLocation id) {
         Preconditions.checkState(!components.isEmpty(), "Infusion recipe has no components");
         InfusionRecipe recipe = catalystPatch != null
-                ? new InfusionRecipe(catalyst, components, aspects, instability, Optional.empty(),
-                        Optional.of(catalystPatch), Optional.ofNullable(gate))
-                : new InfusionRecipe(catalyst, components, aspects, instability, result,
-                        Optional.ofNullable(gate));
+                ? new InfusionRecipe(
+                        catalyst,
+                        components,
+                        aspects,
+                        instability,
+                        Optional.empty(),
+                        Optional.of(catalystPatch),
+                        Optional.ofNullable(gate))
+                : new InfusionRecipe(catalyst, components, aspects, instability, result, Optional.ofNullable(gate));
         output.accept(id, recipe, buildAdvancement(output, id));
     }
 

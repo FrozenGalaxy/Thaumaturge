@@ -8,8 +8,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 
 public final class GuardianSpawner {
     private static final int SPAWN_ATTEMPTS = 50;
@@ -32,8 +32,7 @@ public final class GuardianSpawner {
             if (!level.getBlockState(pos.below()).isCollisionShapeFullBlock(level, pos.below())) {
                 continue;
             }
-            EntityEldritchGuardian guardian =
-                    TCEntities.ELDRITCH_GUARDIAN.get().create(level);
+            EntityEldritchGuardian guardian = TCEntities.ELDRITCH_GUARDIAN.get().create(level);
             if (guardian == null) {
                 return;
             }
@@ -66,8 +65,7 @@ public final class GuardianSpawner {
                 portal.discard();
                 continue;
             }
-            portal.finalizeSpawn(level, level.getCurrentDifficultyAt(portal.blockPosition()),
-                    MobSpawnType.EVENT, null);
+            portal.finalizeSpawn(level, level.getCurrentDifficultyAt(portal.blockPosition()), MobSpawnType.EVENT, null);
             level.addFreshEntity(portal);
             WarpManager.sendActionBar(player, "warp.thaumaturge.text.16");
             return;

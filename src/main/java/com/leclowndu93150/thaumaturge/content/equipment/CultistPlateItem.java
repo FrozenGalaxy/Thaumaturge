@@ -21,8 +21,8 @@ public final class CultistPlateItem extends ArmorItem {
     }
 
     @Override
-    public ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot,
-                                            ArmorMaterial.Layer layer, boolean innerModel) {
+    public ResourceLocation getArmorTexture(
+            ItemStack stack, Entity entity, EquipmentSlot slot, ArmorMaterial.Layer layer, boolean innerModel) {
         if (entity instanceof EntityInhabitedZombie) {
             return innerModel ? ZOMBIE_PLATE_INNER : ZOMBIE_PLATE_OUTER;
         }

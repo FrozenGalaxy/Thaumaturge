@@ -67,8 +67,15 @@ public final class DustTriggerFx {
         }
     }
 
-    public static void emitTriggerSparkles(ServerLevel level, ServerPlayer player, BlockPos triggerPos, DustTrigger trigger, Vec3 hitStart, @Nullable DustTriggerPlacement placement) {
-        List<BlockPos> sparkles = trigger.sparkle(level, player, triggerPos, placement == null ? DustTriggerPlacement.origin() : placement);
+    public static void emitTriggerSparkles(
+            ServerLevel level,
+            ServerPlayer player,
+            BlockPos triggerPos,
+            DustTrigger trigger,
+            Vec3 hitStart,
+            @Nullable DustTriggerPlacement placement) {
+        List<BlockPos> sparkles = trigger.sparkle(
+                level, player, triggerPos, placement == null ? DustTriggerPlacement.origin() : placement);
         if (sparkles == null || sparkles.isEmpty()) {
             return;
         }
@@ -94,7 +101,8 @@ public final class DustTriggerFx {
         for (Direction face : Direction.values()) {
             BlockPos neighbor = p.relative(face);
             BlockState neighborState = level.getBlockState(neighbor);
-            if (neighborState.isSolidRender(level, neighbor) && neighborState.isFaceSturdy(level, neighbor, face.getOpposite())) {
+            if (neighborState.isSolidRender(level, neighbor)
+                    && neighborState.isFaceSturdy(level, neighbor, face.getOpposite())) {
                 continue;
             }
             boolean rx = face.getStepX() == 0;

@@ -44,11 +44,14 @@ public final class AspectJeiSync {
         }
         Player player = Minecraft.getInstance().player;
         if (player != null) {
-            player.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).listElements().forEach(ref -> {
-                if (AspectPools.isDiscovered(player, ref)) {
-                    discoveredAspects.add(AspectPools.idOf(ref));
-                }
-            });
+            player.registryAccess()
+                    .lookupOrThrow(IAspect.REGISTRY_KEY)
+                    .listElements()
+                    .forEach(ref -> {
+                        if (AspectPools.isDiscovered(player, ref)) {
+                            discoveredAspects.add(AspectPools.idOf(ref));
+                        }
+                    });
         }
         PacketDistributor.sendToServer(new ServerboundRequestSyncAspectPoolPayload());
     }
@@ -78,24 +81,27 @@ public final class AspectJeiSync {
         IIngredientManager ingredients = current.getIngredientManager();
         List<AspectInstance> changedAspects = new ArrayList<>();
         List<ItemStack> changedStacks = new ArrayList<>();
-        player.registryAccess().lookupOrThrow(IAspect.REGISTRY_KEY).listElements().forEach(ref -> {
-            ResourceLocation id = ref.key().location();
-            boolean discovered = AspectPools.isDiscovered(player, ref);
-            boolean known = discoveredAspects.contains(id);
-            if (discovered == known) {
-                return;
-            }
-            if (discovered) {
-                discoveredAspects.add(id);
-            } else {
-                discoveredAspects.remove(id);
-            }
-            changedAspects.add(new AspectInstance(ref, 1));
-            List<ItemStack> stacks = gatedStacks.get(id);
-            if (stacks != null) {
-                changedStacks.addAll(stacks);
-            }
-        });
+        player.registryAccess()
+                .lookupOrThrow(IAspect.REGISTRY_KEY)
+                .listElements()
+                .forEach(ref -> {
+                    ResourceLocation id = ref.key().location();
+                    boolean discovered = AspectPools.isDiscovered(player, ref);
+                    boolean known = discoveredAspects.contains(id);
+                    if (discovered == known) {
+                        return;
+                    }
+                    if (discovered) {
+                        discoveredAspects.add(id);
+                    } else {
+                        discoveredAspects.remove(id);
+                    }
+                    changedAspects.add(new AspectInstance(ref, 1));
+                    List<ItemStack> stacks = gatedStacks.get(id);
+                    if (stacks != null) {
+                        changedStacks.addAll(stacks);
+                    }
+                });
         if (!changedAspects.isEmpty()) {
             ingredients.removeIngredientsAtRuntime(AspectIngredientType.INSTANCE, changedAspects);
             ingredients.addIngredientsAtRuntime(AspectIngredientType.INSTANCE, changedAspects);

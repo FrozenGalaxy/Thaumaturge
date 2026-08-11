@@ -25,15 +25,22 @@ public final class DeconTableItemSpecialRenderer extends BlockEntityWithoutLevel
     private final ItemStack thaumometer;
 
     public DeconTableItemSpecialRenderer() {
-        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+        super(
+                Minecraft.getInstance().getBlockEntityRenderDispatcher(),
+                Minecraft.getInstance().getEntityModels());
         this.model = new DeconTableModel(
                 Minecraft.getInstance().getEntityModels().bakeLayer(TCModelLayers.DECONSTRUCTION_TABLE));
         this.thaumometer = new ItemStack(TCItems.THAUMOMETER.get());
     }
 
     @Override
-    public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack,
-                             MultiBufferSource buffers, int light, int overlay) {
+    public void renderByItem(
+            ItemStack stack,
+            ItemDisplayContext displayContext,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         poseStack.pushPose();
         poseStack.translate(0.5F, 1.0F, 0.5F);
         poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));

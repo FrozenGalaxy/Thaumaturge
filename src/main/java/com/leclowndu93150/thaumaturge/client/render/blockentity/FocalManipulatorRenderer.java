@@ -49,8 +49,13 @@ public final class FocalManipulatorRenderer implements BlockEntityRenderer<Block
     public FocalManipulatorRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(BlockEntityFocalManipulator table, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityFocalManipulator table,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         var viewEntity = Minecraft.getInstance().getCameraEntity();
         float ticks = viewEntity == null ? partialTick : viewEntity.tickCount + partialTick;
         var camera = Minecraft.getInstance().gameRenderer.getMainCamera();
@@ -59,7 +64,10 @@ public final class FocalManipulatorRenderer implements BlockEntityRenderer<Block
         if (!focus.isEmpty()) {
             float lift = LegacyItemLift.centerLift(focus, ItemDisplayContext.GROUND);
             poseStack.pushPose();
-            poseStack.translate(0.5F, FOCUS_HEIGHT + Mth.sin(ticks / FOCUS_BOB_PERIOD) * FOCUS_BOB_SCALE * 0.5F + FOCUS_BOB_SCALE * 0.5F, 0.5F);
+            poseStack.translate(
+                    0.5F,
+                    FOCUS_HEIGHT + Mth.sin(ticks / FOCUS_BOB_PERIOD) * FOCUS_BOB_SCALE * 0.5F + FOCUS_BOB_SCALE * 0.5F,
+                    0.5F);
             poseStack.mulPose(Axis.YP.rotationDegrees(ticks % 360.0F));
             poseStack.translate(0.0F, lift, 0.0F);
             ItemRenderHelper.render(focus, ItemDisplayContext.GROUND, poseStack, buffers, light, overlay, 0);
@@ -103,8 +111,8 @@ public final class FocalManipulatorRenderer implements BlockEntityRenderer<Block
         }
     }
 
-    private static void drawGlow(MultiBufferSource buffers, PoseStack poseStack, float ticks,
-                                 float r, float g, float b) {
+    private static void drawGlow(
+            MultiBufferSource buffers, PoseStack poseStack, float ticks, float r, float g, float b) {
         int frame = GLOW_FRAME_START + (int) ticks % GLOW_FRAMES;
         float texFrame = 1.0F / GLOW_GRID;
         float u0 = (frame % GLOW_GRID) * texFrame;
@@ -114,14 +122,33 @@ public final class FocalManipulatorRenderer implements BlockEntityRenderer<Block
         int tint = ARGB32.colorFromFloat(GLOW_ALPHA, r, g, b);
         VertexConsumer buffer = buffers.getBuffer(GLOW_TYPE);
         Matrix4f mat = poseStack.last().pose();
-        buffer.addVertex(mat, -GLOW_HALF, -GLOW_HALF, 0.0F).setUv(u1, v1).setColor(tint).setLight(EMISSIVE_LIGHT);
-        buffer.addVertex(mat, -GLOW_HALF, GLOW_HALF, 0.0F).setUv(u1, v0).setColor(tint).setLight(EMISSIVE_LIGHT);
-        buffer.addVertex(mat, GLOW_HALF, GLOW_HALF, 0.0F).setUv(u0, v0).setColor(tint).setLight(EMISSIVE_LIGHT);
-        buffer.addVertex(mat, GLOW_HALF, -GLOW_HALF, 0.0F).setUv(u0, v1).setColor(tint).setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, -GLOW_HALF, -GLOW_HALF, 0.0F)
+                .setUv(u1, v1)
+                .setColor(tint)
+                .setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, -GLOW_HALF, GLOW_HALF, 0.0F)
+                .setUv(u1, v0)
+                .setColor(tint)
+                .setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, GLOW_HALF, GLOW_HALF, 0.0F)
+                .setUv(u0, v0)
+                .setColor(tint)
+                .setLight(EMISSIVE_LIGHT);
+        buffer.addVertex(mat, GLOW_HALF, -GLOW_HALF, 0.0F)
+                .setUv(u0, v1)
+                .setColor(tint)
+                .setLight(EMISSIVE_LIGHT);
     }
 
-    private void drawRay(PoseStack poseStack, MultiBufferSource buffers, float angle, int num,
-                         float r, float g, float b, float ticks) {
+    private void drawRay(
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            float angle,
+            int num,
+            float r,
+            float g,
+            float b,
+            float ticks) {
         rayRandom.setSeed(RAY_SEED + (long) num * num);
         float pan = Mth.sin((ticks + num * 10) / 15.0F) * 15.0F;
         float aperture = Mth.sin((ticks + num * 10) / 14.0F) * 2.0F;

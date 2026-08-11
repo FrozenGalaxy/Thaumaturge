@@ -5,7 +5,6 @@ import java.util.List;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -44,8 +43,8 @@ public final class ElementalAxeItem extends AxeItem {
     @Override
     public void onUseTick(Level level, LivingEntity player, ItemStack stack, int ticksRemaining) {
         super.onUseTick(level, player, stack, ticksRemaining);
-        List<ItemEntity> stuff = level.getEntitiesOfClass(ItemEntity.class,
-                player.getBoundingBox().inflate(MAGNET_RANGE));
+        List<ItemEntity> stuff = level.getEntitiesOfClass(
+                ItemEntity.class, player.getBoundingBox().inflate(MAGNET_RANGE));
         for (ItemEntity e : stuff) {
             if (!e.isAlive()) {
                 continue;
@@ -63,10 +62,21 @@ public final class ElementalAxeItem extends AxeItem {
             double mz = Mth.clamp(motion.z - dz * MAGNET_STRENGTH, -MAGNET_SPEED_CAP, MAGNET_SPEED_CAP);
             e.setDeltaMovement(mx, my, mz);
             if (level.isClientSide()) {
-                ClientEffects.followingBubble(level,
-                        e.getX() + (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * 0.2F,
-                        e.getY() + e.getBbHeight() + (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * 0.2F,
-                        e.getZ() + (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * 0.2F);
+                ClientEffects.followingBubble(
+                        level,
+                        e.getX()
+                                + (level.getRandom().nextFloat()
+                                                - level.getRandom().nextFloat())
+                                        * 0.2F,
+                        e.getY()
+                                + e.getBbHeight()
+                                + (level.getRandom().nextFloat()
+                                                - level.getRandom().nextFloat())
+                                        * 0.2F,
+                        e.getZ()
+                                + (level.getRandom().nextFloat()
+                                                - level.getRandom().nextFloat())
+                                        * 0.2F);
             }
         }
     }

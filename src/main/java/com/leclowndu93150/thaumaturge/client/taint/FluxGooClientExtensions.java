@@ -1,12 +1,12 @@
 package com.leclowndu93150.thaumaturge.client.taint;
 
 import com.leclowndu93150.thaumaturge.TCIds;
+import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.blaze3d.shaders.FogShape;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import org.joml.Vector3f;
 
@@ -30,14 +30,25 @@ public final class FluxGooClientExtensions implements IClientFluidTypeExtensions
     }
 
     @Override
-    public Vector3f modifyFogColor(Camera camera, float partialTick, ClientLevel level,
-                                    int renderDistance, float darkenWorldAmount, Vector3f fluidFogColor) {
+    public Vector3f modifyFogColor(
+            Camera camera,
+            float partialTick,
+            ClientLevel level,
+            int renderDistance,
+            float darkenWorldAmount,
+            Vector3f fluidFogColor) {
         return fluidFogColor.set(FOG_R, FOG_G, FOG_B);
     }
 
     @Override
-    public void modifyFogRender(Camera camera, FogRenderer.FogMode mode, float renderDistance,
-                                 float partialTick, float nearDistance, float farDistance, FogShape shape) {
+    public void modifyFogRender(
+            Camera camera,
+            FogRenderer.FogMode mode,
+            float renderDistance,
+            float partialTick,
+            float nearDistance,
+            float farDistance,
+            FogShape shape) {
         RenderSystem.setShaderFogStart(FOG_START);
         RenderSystem.setShaderFogEnd(FOG_END);
         RenderSystem.setShaderFogShape(shape);

@@ -13,7 +13,8 @@ public final class InhabitedZombieRenderer
     private static final ResourceLocation TEXTURE = TCIds.rl("textures/entity/czombie.png");
 
     public InhabitedZombieRenderer(EntityRendererProvider.Context context) {
-        super(context,
+        super(
+                context,
                 new ZombieModel<>(context.bakeLayer(ModelLayers.ZOMBIE)),
                 new ZombieModel<>(context.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
                 new ZombieModel<>(context.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)));

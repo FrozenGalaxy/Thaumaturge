@@ -9,7 +9,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
 
 public class EntityFollowingItem extends EntitySpecialItem implements IEntityWithComplexSpawn {
@@ -46,7 +45,8 @@ public class EntityFollowingItem extends EntitySpecialItem implements IEntityWit
         this.noPhysics = true;
     }
 
-    public EntityFollowingItem(Level level, double x, double y, double z, ItemStack stack, double tx, double ty, double tz) {
+    public EntityFollowingItem(
+            Level level, double x, double y, double z, ItemStack stack, double tx, double ty, double tz) {
         this(level, x, y, z, stack);
         this.targetX = tx;
         this.targetY = ty;
@@ -92,8 +92,14 @@ public class EntityFollowingItem extends EntitySpecialItem implements IEntityWit
                 double fy = this.yo + h + (this.random.nextFloat() - this.random.nextFloat()) * 0.125F;
                 double fz = this.zo + (this.random.nextFloat() - this.random.nextFloat()) * 0.125F;
                 if (this.type != BUBBLE_TYPE) {
-                    ClientEffects.nitorCore(this.level(), fx, fy, fz,
-                            this.random.nextGaussian() * 0.01, this.random.nextGaussian() * 0.01, this.random.nextGaussian() * 0.01,
+                    ClientEffects.nitorCore(
+                            this.level(),
+                            fx,
+                            fy,
+                            fz,
+                            this.random.nextGaussian() * 0.01,
+                            this.random.nextGaussian() * 0.01,
+                            this.random.nextGaussian() * 0.01,
                             0xFFFFFF);
                 } else {
                     ClientEffects.followingBubble(this.level(), fx, fy, fz);

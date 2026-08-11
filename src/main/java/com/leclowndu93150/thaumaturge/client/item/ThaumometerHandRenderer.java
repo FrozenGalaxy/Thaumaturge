@@ -45,7 +45,8 @@ public final class ThaumometerHandRenderer {
         if (player == null || !event.getItemStack().is(TCItems.THAUMOMETER.get())) {
             return;
         }
-        if (event.getHand() != InteractionHand.MAIN_HAND || !player.getOffhandItem().isEmpty()) {
+        if (event.getHand() != InteractionHand.MAIN_HAND
+                || !player.getOffhandItem().isEmpty()) {
             return;
         }
         event.setCanceled(true);
@@ -58,8 +59,7 @@ public final class ThaumometerHandRenderer {
         int light = event.getPackedLight();
         float partial = mc.getTimer().getGameTimeDeltaPartialTick(false);
         float equip = event.getEquipProgress();
-        boolean scanning = player.isUsingItem()
-                && player.getUseItem().is(TCItems.THAUMOMETER.get());
+        boolean scanning = player.isUsingItem() && player.getUseItem().is(TCItems.THAUMOMETER.get());
         float swing = scanning ? 0.0F : event.getSwingProgress();
         float sqrtSwing = Mth.sqrt(swing);
         float ySwing = -0.2F * Mth.sin(swing * (float) Math.PI) * SWING_SCALE;
@@ -89,15 +89,32 @@ public final class ThaumometerHandRenderer {
         poseStack.popPose();
     }
 
-    private static void renderScanner(Minecraft mc, AbstractClientPlayer player, ItemStack stack,
-                                      PoseStack poseStack, MultiBufferSource buffers, int light) {
-        ItemRenderHelper.render(stack, ItemDisplayContext.HEAD, poseStack, buffers, light,
-                OverlayTexture.NO_OVERLAY, player.getId() + ItemDisplayContext.HEAD.ordinal());
+    private static void renderScanner(
+            Minecraft mc,
+            AbstractClientPlayer player,
+            ItemStack stack,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light) {
+        ItemRenderHelper.render(
+                stack,
+                ItemDisplayContext.HEAD,
+                poseStack,
+                buffers,
+                light,
+                OverlayTexture.NO_OVERLAY,
+                player.getId() + ItemDisplayContext.HEAD.ordinal());
     }
 
-    private static void renderMapHand(Minecraft mc, AbstractClientPlayer player, PoseStack poseStack,
-                                      MultiBufferSource buffers, int light, HumanoidArm arm) {
-        PlayerRenderer renderer = (PlayerRenderer) mc.getEntityRenderDispatcher().getRenderer(player);
+    private static void renderMapHand(
+            Minecraft mc,
+            AbstractClientPlayer player,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            HumanoidArm arm) {
+        PlayerRenderer renderer =
+                (PlayerRenderer) mc.getEntityRenderDispatcher().getRenderer(player);
         poseStack.pushPose();
         float invert = arm == HumanoidArm.RIGHT ? 1.0F : -1.0F;
         poseStack.mulPose(Axis.YP.rotationDegrees(HAND_YAW));

@@ -1,23 +1,22 @@
 package com.leclowndu93150.thaumaturge.content.essentia.tube;
 
-import com.leclowndu93150.thaumaturge.content.legacy.LegacyIds;
-import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.essentia.EssentiaCapabilities;
 import com.leclowndu93150.thaumaturge.api.essentia.IEssentiaTransport;
 import com.leclowndu93150.thaumaturge.content.essentia.EssentiaTransportHelper;
 import com.leclowndu93150.thaumaturge.content.essentia.flow.EssentiaFlowHandler;
+import com.leclowndu93150.thaumaturge.content.legacy.LegacyIds;
 import com.leclowndu93150.thaumaturge.network.ClientboundTubeCreakPayload;
 import com.leclowndu93150.thaumaturge.network.ClientboundTubeVentPayload;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
+import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import com.mojang.serialization.Codec;
-import java.nio.ByteBuffer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -48,7 +47,7 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
     protected int venting;
     protected int ventColor = DEFAULT_GREY;
     protected Direction facing = Direction.NORTH;
-    protected final boolean[] openSides = new boolean[]{true, true, true, true, true, true};
+    protected final boolean[] openSides = new boolean[] {true, true, true, true, true, true};
 
     public BlockEntityTube(BlockPos pos, BlockState state) {
         this(TCBlockEntities.TUBE.get(), pos, state);
@@ -66,7 +65,8 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
             return;
         }
         if ((tickCount & 1) == 0) {
-            EssentiaFlowHandler.recalculateSuction(level, pos, this, suctionFilter(), restrictiveSuction(), directionalSuction());
+            EssentiaFlowHandler.recalculateSuction(
+                    level, pos, this, suctionFilter(), restrictiveSuction(), directionalSuction());
             checkVenting(level, pos);
             if (essentiaType != null && essentiaAmount == 0) {
                 essentiaType = null;
@@ -114,13 +114,25 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
 
     public void broadcastVent(Level level, BlockPos pos, int color) {
         if (!(level instanceof ServerLevel server)) return;
-        PacketDistributor.sendToPlayersNear(server, null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, PARTICLE_RADIUS,
+        PacketDistributor.sendToPlayersNear(
+                server,
+                null,
+                pos.getX() + 0.5,
+                pos.getY() + 0.5,
+                pos.getZ() + 0.5,
+                PARTICLE_RADIUS,
                 new ClientboundTubeVentPayload(pos.immutable(), color));
     }
 
     public void broadcastCreak(Level level, BlockPos pos) {
         if (!(level instanceof ServerLevel server)) return;
-        PacketDistributor.sendToPlayersNear(server, null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, PARTICLE_RADIUS,
+        PacketDistributor.sendToPlayersNear(
+                server,
+                null,
+                pos.getX() + 0.5,
+                pos.getY() + 0.5,
+                pos.getZ() + 0.5,
+                PARTICLE_RADIUS,
                 new ClientboundTubeCreakPayload(pos.immutable()));
     }
 
@@ -248,7 +260,13 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
     }
 
     public void playToolSound(Level level, BlockPos pos) {
-        level.playSound(null, pos, TCSounds.TOOL.get(), SoundSource.BLOCKS, 0.5F, 0.9F + level.getRandom().nextFloat() * 0.2F);
+        level.playSound(
+                null,
+                pos,
+                TCSounds.TOOL.get(),
+                SoundSource.BLOCKS,
+                0.5F,
+                0.9F + level.getRandom().nextFloat() * 0.2F);
     }
 
     @Override
@@ -341,9 +359,11 @@ public class BlockEntityTube extends BlockEntity implements IEssentiaTransport {
     @Override
     protected void loadAdditional(CompoundTag input, HolderLookup.Provider registries) {
         super.loadAdditional(input, registries);
-        essentiaType = TCNbt.read(input, "EssentiaType", ASPECT_KEY_CODEC, registries).orElse(null);
+        essentiaType =
+                TCNbt.read(input, "EssentiaType", ASPECT_KEY_CODEC, registries).orElse(null);
         essentiaAmount = input.getInt("EssentiaAmount");
-        suctionType = TCNbt.read(input, "SuctionType", ASPECT_KEY_CODEC, registries).orElse(null);
+        suctionType =
+                TCNbt.read(input, "SuctionType", ASPECT_KEY_CODEC, registries).orElse(null);
         suction = input.getInt("Suction");
         int facingOrdinal = (input.contains("Facing") ? input.getInt("Facing") : Direction.NORTH.ordinal());
         if (facingOrdinal >= 0 && facingOrdinal < 6) {

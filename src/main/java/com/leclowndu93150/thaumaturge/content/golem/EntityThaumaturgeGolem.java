@@ -1,45 +1,41 @@
 package com.leclowndu93150.thaumaturge.content.golem;
-import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
 
-import net.minecraft.world.item.DyeItem;
-import com.leclowndu93150.thaumaturge.serialization.TCNbt;
-import com.leclowndu93150.thaumaturge.api.golems.GolemTrait;
-import com.leclowndu93150.thaumaturge.api.golems.accessory.GolemAccessories;
-import com.leclowndu93150.thaumaturge.api.golems.accessory.GolemAccessory;
-import com.leclowndu93150.thaumaturge.config.ThaumaturgeCommonConfig;
 import com.leclowndu93150.thaumaturge.api.golems.IGolemAPI;
 import com.leclowndu93150.thaumaturge.api.golems.IGolemProperties;
+import com.leclowndu93150.thaumaturge.api.golems.accessory.GolemAccessories;
+import com.leclowndu93150.thaumaturge.api.golems.accessory.GolemAccessory;
 import com.leclowndu93150.thaumaturge.api.golems.parts.IGolemFunction;
 import com.leclowndu93150.thaumaturge.api.golems.tasks.Task;
+import com.leclowndu93150.thaumaturge.config.ThaumaturgeCommonConfig;
 import com.leclowndu93150.thaumaturge.content.entity.construct.ConstructFollowOwnerGoal;
 import com.leclowndu93150.thaumaturge.content.entity.construct.ConstructOwnerHurtByTargetGoal;
 import com.leclowndu93150.thaumaturge.content.entity.construct.ConstructOwnerHurtTargetGoal;
 import com.leclowndu93150.thaumaturge.content.entity.construct.EntityOwnedConstruct;
-import com.leclowndu93150.thaumaturge.content.particle.GolemEmoteParticleOptions;
-import net.minecraft.util.FastColor.ARGB32;
 import com.leclowndu93150.thaumaturge.content.golem.ai.GotoBlockGoal;
 import com.leclowndu93150.thaumaturge.content.golem.ai.GotoEntityGoal;
 import com.leclowndu93150.thaumaturge.content.golem.ai.GotoHomeGoal;
-import com.leclowndu93150.thaumaturge.content.golem.tasks.TaskHandler;
+import com.leclowndu93150.thaumaturge.content.particle.GolemEmoteParticleOptions;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
 import com.leclowndu93150.thaumaturge.registry.TCEntityDataSerializers;
+import com.leclowndu93150.thaumaturge.registry.TCGolemTraits;
 import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
+import com.leclowndu93150.thaumaturge.serialization.TCNbt;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
@@ -47,11 +43,11 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -69,6 +65,7 @@ import net.minecraft.world.entity.ai.navigation.WallClimberNavigation;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -166,8 +163,7 @@ public class EntityThaumaturgeGolem extends EntityOwnedConstruct implements IGol
             }
         }
         String joined = entityData.get(ACCESSORIES);
-        entityData.set(ACCESSORIES, joined.isEmpty() ? accessory.id().toString()
-                : joined + "," + accessory.id());
+        entityData.set(ACCESSORIES, joined.isEmpty() ? accessory.id().toString() : joined + "," + accessory.id());
         updateEntityAttributes();
         return true;
     }
@@ -282,10 +278,10 @@ public class EntityThaumaturgeGolem extends EntityOwnedConstruct implements IGol
         getAttribute(Attributes.STEP_HEIGHT).setBaseValue(props.hasTrait(TCGolemTraits.WHEELED.get()) ? 0.5 : 0.6);
         getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(BASE_MOVEMENT_SPEED * speedFactor);
         int homeRange = props.hasTrait(TCGolemTraits.SCOUT.get()) ? HOME_RANGE_SCOUT : HOME_RANGE;
-        restrictTo(getRestrictCenter().equals(BlockPos.ZERO) ? blockPosition() : getRestrictCenter(),
-                (int) (homeRange * rangeFactor));
-        getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(
-                (props.hasTrait(TCGolemTraits.SCOUT.get()) ? 56.0 : 40.0) * rangeFactor);
+        restrictTo(getRestrictCenter().equals(BlockPos.ZERO) ? blockPosition() : getRestrictCenter(), (int)
+                (homeRange * rangeFactor));
+        getAttribute(Attributes.FOLLOW_RANGE)
+                .setBaseValue((props.hasTrait(TCGolemTraits.SCOUT.get()) ? 56.0 : 40.0) * rangeFactor);
         getAttribute(Attributes.ARMOR).setBaseValue(computeArmor(props) + accessoryArmor);
         this.navigation = createGolemNavigation();
         if (props.hasTrait(TCGolemTraits.FLYER.get())) {
@@ -331,7 +327,8 @@ public class EntityThaumaturgeGolem extends EntityOwnedConstruct implements IGol
             if (navigation instanceof GroundPathNavigation) {
                 goalSelector.addGoal(0, new FloatGoal(this));
             }
-            if (props().hasTrait(TCGolemTraits.RANGED.get()) && props().getArms().function() != null) {
+            if (props().hasTrait(TCGolemTraits.RANGED.get())
+                    && props().getArms().function() != null) {
                 Goal rangedGoal = props().getArms().function().createRangedAttackGoal(this);
                 if (rangedGoal != null) {
                     goalSelector.addGoal(1, rangedGoal);
@@ -383,8 +380,11 @@ public class EntityThaumaturgeGolem extends EntityOwnedConstruct implements IGol
     }
 
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                  MobSpawnType spawnReason, @Nullable SpawnGroupData spawnGroupData) {
+    public @Nullable SpawnGroupData finalizeSpawn(
+            ServerLevelAccessor level,
+            DifficultyInstance difficulty,
+            MobSpawnType spawnReason,
+            @Nullable SpawnGroupData spawnGroupData) {
         restrictTo(blockPosition(), HOME_RANGE);
         updateEntityAttributes();
         return spawnGroupData;
@@ -425,11 +425,13 @@ public class EntityThaumaturgeGolem extends EntityOwnedConstruct implements IGol
             if (getTarget() != null && !getTarget().isAlive()) {
                 setTarget(null);
             }
-            if (getTarget() != null && props.hasTrait(TCGolemTraits.RANGED.get())
+            if (getTarget() != null
+                    && props.hasTrait(TCGolemTraits.RANGED.get())
                     && distanceToSqr(getTarget()) > RANGED_TARGET_FORGET_DIST_SQR) {
                 setTarget(null);
             }
-            if (level() instanceof ServerLevel serverLevel && !serverLevel.getServer().isPvpAllowed()
+            if (level() instanceof ServerLevel serverLevel
+                    && !serverLevel.getServer().isPvpAllowed()
                     && getTarget() instanceof Player) {
                 setTarget(null);
             }
@@ -546,7 +548,8 @@ public class EntityThaumaturgeGolem extends EntityOwnedConstruct implements IGol
             }
             return InteractionResult.CONSUME;
         }
-        DyeColor dyeColor = player.getItemInHand(hand).getItem() instanceof DyeItem dyeItem ? dyeItem.getDyeColor() : null;
+        DyeColor dyeColor =
+                player.getItemInHand(hand).getItem() instanceof DyeItem dyeItem ? dyeItem.getDyeColor() : null;
         if (dyeColor != null) {
             playSound(TCSounds.ZAP.get(), 1.0F, 1.0F);
             setGolemColor((byte) (1 + dyeColor.getId()));
@@ -765,7 +768,8 @@ public class EntityThaumaturgeGolem extends EntityOwnedConstruct implements IGol
         if (props().hasTrait(TCGolemTraits.HAULER.get())
                 && getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()
                 && !getItemBySlot(EquipmentSlot.OFFHAND).isEmpty()) {
-            setItemSlot(EquipmentSlot.MAINHAND, getItemBySlot(EquipmentSlot.OFFHAND).copy());
+            setItemSlot(
+                    EquipmentSlot.MAINHAND, getItemBySlot(EquipmentSlot.OFFHAND).copy());
             setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
         }
         return out;
@@ -837,15 +841,24 @@ public class EntityThaumaturgeGolem extends EntityOwnedConstruct implements IGol
         switch (id) {
             case EVENT_EMOTE_TASK -> emote(0.0, 1.0F, 1.0F, 1.0F, GolemEmoteParticleOptions.ICON_TASK, 6, 2.0F);
             case EVENT_EMOTE_FAIL -> emote(0.025, 0.1F, 1.0F, 1.0F, GolemEmoteParticleOptions.ICON_FAIL, 10, 2.0F);
-            case EVENT_EMOTE_CONFUSED -> emote(0.05, 1.0F, 1.0F, 1.0F, GolemEmoteParticleOptions.ICON_CONFUSED, 10, 2.0F);
+            case EVENT_EMOTE_CONFUSED ->
+                emote(0.05, 1.0F, 1.0F, 1.0F, GolemEmoteParticleOptions.ICON_CONFUSED, 10, 2.0F);
             case EVENT_EMOTE_STAY -> emote(0.01, 1.0F, 1.0F, 0.1F, GolemEmoteParticleOptions.ICON_STAY, 20, 2.0F);
             case EVENT_EMOTE_RANKUP -> {
                 for (int i = 0; i < 5; i++) {
                     GolemEmoteParticleOptions data = new GolemEmoteParticleOptions(
-                            0xFFFFFF, GolemEmoteParticleOptions.ICON_HEART,
-                            20 + random.nextInt(20), 0.3F + random.nextFloat() * 0.4F);
-                    level().addParticle(data, getX(), getY() + getBbHeight(), getZ(),
-                            random.nextGaussian() * 0.01F, random.nextFloat() * 0.02, random.nextGaussian() * 0.01F);
+                            0xFFFFFF,
+                            GolemEmoteParticleOptions.ICON_HEART,
+                            20 + random.nextInt(20),
+                            0.3F + random.nextFloat() * 0.4F);
+                    level().addParticle(
+                                    data,
+                                    getX(),
+                                    getY() + getBbHeight(),
+                                    getZ(),
+                                    random.nextGaussian() * 0.01F,
+                                    random.nextFloat() * 0.02,
+                                    random.nextGaussian() * 0.01F);
                 }
             }
             default -> super.handleEntityEvent(id);
@@ -853,8 +866,8 @@ public class EntityThaumaturgeGolem extends EntityOwnedConstruct implements IGol
     }
 
     private void emote(double vy, float r, float g, float b, int icon, int age, float scale) {
-        GolemEmoteParticleOptions data = new GolemEmoteParticleOptions(
-                ARGB32.colorFromFloat(1.0F, r, g, b), icon, age, scale);
+        GolemEmoteParticleOptions data =
+                new GolemEmoteParticleOptions(ARGB32.colorFromFloat(1.0F, r, g, b), icon, age, scale);
         level().addParticle(data, getX(), getY() + getBbHeight() + 0.1, getZ(), 0.0, vy, 0.0);
     }
 
@@ -873,7 +886,8 @@ public class EntityThaumaturgeGolem extends EntityOwnedConstruct implements IGol
     public void readAdditionalSaveData(CompoundTag input) {
         super.readAdditionalSaveData(input);
         TCNbt.read(input, "props", GolemProperties.CODEC, registryAccess()).ifPresent(this::setProperties);
-        restrictTo(TCNbt.read(input, "homepos", BlockPos.CODEC, registryAccess()).orElse(BlockPos.ZERO), HOME_RANGE);
+        restrictTo(
+                TCNbt.read(input, "homepos", BlockPos.CODEC, registryAccess()).orElse(BlockPos.ZERO), HOME_RANGE);
         entityData.set(FLAGS, input.getByte("gflags"));
         rankXp = input.getInt("rankXP");
         setGolemColor(input.getByte("color"));
@@ -903,7 +917,9 @@ public class EntityThaumaturgeGolem extends EntityOwnedConstruct implements IGol
                 golem.setDeltaMovement(golem.getDeltaMovement().scale(0.5));
             } else {
                 Vec3 motion = golem.getDeltaMovement();
-                golem.setDeltaMovement(motion.add(dx / dist * 0.033 * speedModifier, dy / dist * 0.0125 * speedModifier,
+                golem.setDeltaMovement(motion.add(
+                        dx / dist * 0.033 * speedModifier,
+                        dy / dist * 0.0125 * speedModifier,
                         dz / dist * 0.033 * speedModifier));
                 if (golem.getTarget() == null) {
                     golem.setYRot(-((float) Mth.atan2(golem.getDeltaMovement().x, golem.getDeltaMovement().z))

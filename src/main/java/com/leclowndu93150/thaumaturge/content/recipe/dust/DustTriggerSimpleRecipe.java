@@ -1,16 +1,16 @@
 package com.leclowndu93150.thaumaturge.content.recipe.dust;
 
-import net.minecraft.core.HolderLookup;
-import com.leclowndu93150.thaumaturge.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumaturge.api.recipe.DustTrigger;
 import com.leclowndu93150.thaumaturge.api.recipe.DustTriggerInput;
 import com.leclowndu93150.thaumaturge.api.recipe.DustTriggerPlacement;
 import com.leclowndu93150.thaumaturge.api.recipe.ResearchGate;
+import com.leclowndu93150.thaumaturge.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumaturge.registry.TCRecipeTypes;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -28,20 +28,21 @@ public final class DustTriggerSimpleRecipe implements DustTrigger {
     public static final MapCodec<DustTriggerSimpleRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("target").forGetter(r -> r.target),
                     ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
-                    ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research)
-            ).apply(i, DustTriggerSimpleRecipe::new));
+                    ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research))
+            .apply(i, DustTriggerSimpleRecipe::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, DustTriggerSimpleRecipe> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.registry(Registries.BLOCK),
-            r -> r.target,
-            ItemStack.STREAM_CODEC,
-            r -> r.result,
-            ByteBufCodecs.optional(ResearchGate.STREAM_CODEC),
-            r -> r.research,
-            DustTriggerSimpleRecipe::new
-    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, DustTriggerSimpleRecipe> STREAM_CODEC =
+            StreamCodec.composite(
+                    ByteBufCodecs.registry(Registries.BLOCK),
+                    r -> r.target,
+                    ItemStack.STREAM_CODEC,
+                    r -> r.result,
+                    ByteBufCodecs.optional(ResearchGate.STREAM_CODEC),
+                    r -> r.research,
+                    DustTriggerSimpleRecipe::new);
 
-    public static final RecipeSerializer<DustTriggerSimpleRecipe> SERIALIZER = new SimpleRecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+    public static final RecipeSerializer<DustTriggerSimpleRecipe> SERIALIZER =
+            new SimpleRecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     private final Block target;
     private final ItemStack result;
@@ -77,7 +78,11 @@ public final class DustTriggerSimpleRecipe implements DustTrigger {
     }
 
     @Override
-    public void execute(DustTriggerInput input, Player player, @org.jspecify.annotations.Nullable DustTriggerPlacement placement, Direction useFace) {
+    public void execute(
+            DustTriggerInput input,
+            Player player,
+            @org.jspecify.annotations.Nullable DustTriggerPlacement placement,
+            Direction useFace) {
         if (!(input.level() instanceof ServerLevel serverLevel)) {
             return;
         }
@@ -103,5 +108,4 @@ public final class DustTriggerSimpleRecipe implements DustTrigger {
     public RecipeType<DustTrigger> getType() {
         return TCRecipeTypes.DUST_TRIGGER.get();
     }
-
-        }
+}

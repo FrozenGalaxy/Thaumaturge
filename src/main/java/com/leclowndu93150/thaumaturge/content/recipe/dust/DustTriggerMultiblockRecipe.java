@@ -1,7 +1,5 @@
 package com.leclowndu93150.thaumaturge.content.recipe.dust;
 
-import net.minecraft.core.HolderLookup;
-import com.leclowndu93150.thaumaturge.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumaturge.api.recipe.Blueprint;
 import com.leclowndu93150.thaumaturge.api.recipe.BlueprintPart;
 import com.leclowndu93150.thaumaturge.api.recipe.BlueprintTarget;
@@ -9,6 +7,7 @@ import com.leclowndu93150.thaumaturge.api.recipe.DustTrigger;
 import com.leclowndu93150.thaumaturge.api.recipe.DustTriggerInput;
 import com.leclowndu93150.thaumaturge.api.recipe.DustTriggerPlacement;
 import com.leclowndu93150.thaumaturge.api.recipe.ResearchGate;
+import com.leclowndu93150.thaumaturge.content.recipe.SimpleRecipeSerializer;
 import com.leclowndu93150.thaumaturge.registry.TCRecipeTypes;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -17,12 +16,12 @@ import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -38,26 +37,28 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
     public static final MapCodec<DustTriggerMultiblockRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
                     ResourceLocation.CODEC.fieldOf("blueprint").forGetter(r -> r.blueprintId),
                     ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
-                    ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research)
-            ).apply(i, DustTriggerMultiblockRecipe::new));
+                    ResearchGate.CODEC.optionalFieldOf("research").forGetter(r -> r.research))
+            .apply(i, DustTriggerMultiblockRecipe::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, DustTriggerMultiblockRecipe> STREAM_CODEC = StreamCodec.composite(
-            ResourceLocation.STREAM_CODEC,
-            r -> r.blueprintId,
-            ItemStack.STREAM_CODEC,
-            r -> r.result,
-            ByteBufCodecs.optional(ResearchGate.STREAM_CODEC),
-            r -> r.research,
-            DustTriggerMultiblockRecipe::new
-    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, DustTriggerMultiblockRecipe> STREAM_CODEC =
+            StreamCodec.composite(
+                    ResourceLocation.STREAM_CODEC,
+                    r -> r.blueprintId,
+                    ItemStack.STREAM_CODEC,
+                    r -> r.result,
+                    ByteBufCodecs.optional(ResearchGate.STREAM_CODEC),
+                    r -> r.research,
+                    DustTriggerMultiblockRecipe::new);
 
-    public static final RecipeSerializer<DustTriggerMultiblockRecipe> SERIALIZER = new SimpleRecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+    public static final RecipeSerializer<DustTriggerMultiblockRecipe> SERIALIZER =
+            new SimpleRecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     private final ResourceLocation blueprintId;
     private final ItemStack result;
     private final Optional<ResearchGate> research;
 
-    public DustTriggerMultiblockRecipe(ResourceLocation blueprintId, ItemStack result, Optional<ResearchGate> research) {
+    public DustTriggerMultiblockRecipe(
+            ResourceLocation blueprintId, ItemStack result, Optional<ResearchGate> research) {
         this.blueprintId = blueprintId;
         this.result = result;
         this.research = research;
@@ -127,7 +128,8 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
     }
 
     @Override
-    public void execute(DustTriggerInput input, Player player, @Nullable DustTriggerPlacement placement, Direction useFace) {
+    public void execute(
+            DustTriggerInput input, Player player, @Nullable DustTriggerPlacement placement, Direction useFace) {
         Level level = input.level();
         if (!(level instanceof ServerLevel serverLevel)) {
             return;
@@ -160,7 +162,15 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
         }
     }
 
-    private static void enqueueForPart(ServerLevel level, BlockPos pos, BlockState original, BlueprintPart part, Direction placementFacing, Direction useFace, Player player, int delay) {
+    private static void enqueueForPart(
+            ServerLevel level,
+            BlockPos pos,
+            BlockState original,
+            BlueprintPart part,
+            Direction placementFacing,
+            Direction useFace,
+            Player player,
+            int delay) {
         BlueprintTarget target = part.target();
         if (target instanceof BlueprintTarget.Keep) {
             return;
@@ -173,7 +183,9 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
             BlockState placed = blockTarget.block().defaultBlockState();
             Direction facing;
             if (blockTarget.applyPlayerFacing()) {
-                Direction side2 = useFace.getAxis().isHorizontal() ? useFace : player.getDirection().getOpposite();
+                Direction side2 = useFace.getAxis().isHorizontal()
+                        ? useFace
+                        : player.getDirection().getOpposite();
                 facing = side2;
             } else if (blockTarget.opposite()) {
                 facing = placementFacing.getOpposite();
@@ -199,7 +211,8 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
 
     private @Nullable Blueprint lookupBlueprint(Level level) {
         ResourceKey<Blueprint> key = ResourceKey.create(Blueprint.REGISTRY_KEY, this.blueprintId);
-        HolderLookup.RegistryLookup<Blueprint> registry = level.registryAccess().lookup(Blueprint.REGISTRY_KEY).orElse(null);
+        HolderLookup.RegistryLookup<Blueprint> registry =
+                level.registryAccess().lookup(Blueprint.REGISTRY_KEY).orElse(null);
         if (registry == null) {
             return null;
         }
@@ -225,5 +238,4 @@ public final class DustTriggerMultiblockRecipe implements DustTrigger {
     public RecipeType<DustTrigger> getType() {
         return TCRecipeTypes.DUST_TRIGGER.get();
     }
-
-        }
+}

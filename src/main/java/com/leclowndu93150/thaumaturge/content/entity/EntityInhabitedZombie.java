@@ -6,31 +6,30 @@ import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.phys.AABB;
 import org.jspecify.annotations.Nullable;
 
 public class EntityInhabitedZombie extends Zombie implements IEldritchMob {
@@ -51,10 +50,14 @@ public class EntityInhabitedZombie extends Zombie implements IEldritchMob {
                 .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE, 0.0);
     }
 
-    public static boolean checkInhabitedSpawnRules(EntityType<EntityInhabitedZombie> type, ServerLevelAccessor level,
-                                                   MobSpawnType reason, BlockPos pos, RandomSource random) {
-        boolean alone = level.getEntitiesOfClass(EntityInhabitedZombie.class,
-                new AABB(pos).inflate(32.0, 16.0, 32.0)).isEmpty();
+    public static boolean checkInhabitedSpawnRules(
+            EntityType<EntityInhabitedZombie> type,
+            ServerLevelAccessor level,
+            MobSpawnType reason,
+            BlockPos pos,
+            RandomSource random) {
+        boolean alone = level.getEntitiesOfClass(EntityInhabitedZombie.class, new AABB(pos).inflate(32.0, 16.0, 32.0))
+                .isEmpty();
         return alone && Monster.checkMonsterSpawnRules(type, level, reason, pos, random);
     }
 
@@ -69,8 +72,11 @@ public class EntityInhabitedZombie extends Zombie implements IEldritchMob {
     }
 
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                  MobSpawnType reason, @Nullable SpawnGroupData groupData) {
+    public @Nullable SpawnGroupData finalizeSpawn(
+            ServerLevelAccessor level,
+            DifficultyInstance difficulty,
+            MobSpawnType reason,
+            @Nullable SpawnGroupData groupData) {
         float gearChance = level.getDifficulty() == Difficulty.HARD ? GEAR_CHANCE_HARD : GEAR_CHANCE;
         this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(TCItems.CRIMSON_PLATE_HELM.get()));
         if (this.random.nextFloat() <= gearChance) {
@@ -87,18 +93,24 @@ public class EntityInhabitedZombie extends Zombie implements IEldritchMob {
         if (this.level() instanceof ServerLevel server) {
             EntityEldritchCrab crab = TCEntities.ELDRITCH_CRAB.get().create(server);
             if (crab != null) {
-                crab.moveTo(this.getX(), this.getY() + this.getEyeHeight(), this.getZ(),
-                        this.getYRot(), this.getXRot());
+                crab.moveTo(
+                        this.getX(), this.getY() + this.getEyeHeight(), this.getZ(), this.getYRot(), this.getXRot());
                 crab.setHelm(true);
                 server.addFreshEntity(crab);
             }
             if (server.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT) && this.shouldDropExperience()) {
-                ExperienceOrb.award(server, this.position(),
-                        this.getExperienceReward(server, this.lastHurtByPlayer));
+                ExperienceOrb.award(server, this.position(), this.getExperienceReward(server, this.lastHurtByPlayer));
             }
-            server.sendParticles(ParticleTypes.POOF,
-                    this.getX(), this.getY() + this.getBbHeight() / 2.0, this.getZ(),
-                    BURST_PARTICLES, this.getBbWidth() / 2.0, this.getBbHeight() / 4.0, this.getBbWidth() / 2.0, 0.02);
+            server.sendParticles(
+                    ParticleTypes.POOF,
+                    this.getX(),
+                    this.getY() + this.getBbHeight() / 2.0,
+                    this.getZ(),
+                    BURST_PARTICLES,
+                    this.getBbWidth() / 2.0,
+                    this.getBbHeight() / 4.0,
+                    this.getBbWidth() / 2.0,
+                    0.02);
         }
         this.discard();
     }

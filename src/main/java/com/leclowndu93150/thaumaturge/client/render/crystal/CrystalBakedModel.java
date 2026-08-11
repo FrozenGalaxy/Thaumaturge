@@ -54,8 +54,12 @@ public final class CrystalBakedModel implements IDynamicBakedModel {
     }
 
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource random,
-                                    ModelData data, @Nullable RenderType renderType) {
+    public List<BakedQuad> getQuads(
+            @Nullable BlockState state,
+            @Nullable Direction side,
+            RandomSource random,
+            ModelData data,
+            @Nullable RenderType renderType) {
         if (side != null || state == null) {
             return Collections.emptyList();
         }
@@ -80,7 +84,7 @@ public final class CrystalBakedModel implements IDynamicBakedModel {
             }
         }
         if (!any) {
-            int unsupportedSeed = (int)(seed & 0x7);
+            int unsupportedSeed = (int) (seed & 0x7);
             Matrix4f transform = CrystalFaceTransforms.forFace(Direction.DOWN);
             TCMeshPart part = mesh.parts().get(unsupportedSeed % PART_COUNT);
             CrystalQuadBaker.bakePart(part, particle, 0, transform, quads);

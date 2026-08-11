@@ -19,12 +19,25 @@ public final class CultistPortalGreaterRenderer extends EntityRenderer<EntityCul
     }
 
     @Override
-    public void render(EntityCultistPortalGreater entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int packedLight) {
+    public void render(
+            EntityCultistPortalGreater entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
-        CultistPortalRenderer.renderPortal(poseStack, buffers, true, entity.tickCount + partialTicks, entity.hurtTime,
-                entity.pulse, entity.getHealth() / entity.getMaxHealth(), entity.getBbHeight() / 2.0F,
-                BASE_SCALE_Y, SCALE_FACTOR);
+        CultistPortalRenderer.renderPortal(
+                poseStack,
+                buffers,
+                true,
+                entity.tickCount + partialTicks,
+                entity.hurtTime,
+                entity.pulse,
+                entity.getHealth() / entity.getMaxHealth(),
+                entity.getBbHeight() / 2.0F,
+                BASE_SCALE_Y,
+                SCALE_FACTOR);
     }
 
     @Override

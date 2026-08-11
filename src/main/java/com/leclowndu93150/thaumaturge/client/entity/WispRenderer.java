@@ -44,8 +44,13 @@ public final class WispRenderer extends EntityRenderer<WispEntity> {
     }
 
     @Override
-    public void render(WispEntity entity, float entityYaw, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light) {
+    public void render(
+            WispEntity entity,
+            float entityYaw,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light) {
         if (entity.isDeadOrDying()) {
             return;
         }
@@ -55,12 +60,25 @@ public final class WispRenderer extends EntityRenderer<WispEntity> {
         poseStack.pushPose();
         poseStack.translate(0.0F, CENTER_Y, 0.0F);
         poseStack.mulPose(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());
-        drawQuad(buffers, poseStack, PARTICLES_TYPE, PARTICLE_GRID, CORE_FRAME_START + frame,
-                CORE_SCALE, 0xFFFFFF, 1.0F);
-        drawQuad(buffers, poseStack, PARTICLES_TYPE, PARTICLE_GRID, HALO_FRAME_START + frame,
-                HALO_SCALE, 0xFFFFFF, HALO_ALPHA);
-        drawQuad(buffers, poseStack, NODES_TYPE, NODE_GRID, NODE_FRAME_START + frame,
-                NODE_SCALE, color, NODE_ALPHA);
+        drawQuad(
+                buffers,
+                poseStack,
+                PARTICLES_TYPE,
+                PARTICLE_GRID,
+                CORE_FRAME_START + frame,
+                CORE_SCALE,
+                0xFFFFFF,
+                1.0F);
+        drawQuad(
+                buffers,
+                poseStack,
+                PARTICLES_TYPE,
+                PARTICLE_GRID,
+                HALO_FRAME_START + frame,
+                HALO_SCALE,
+                0xFFFFFF,
+                HALO_ALPHA);
+        drawQuad(buffers, poseStack, NODES_TYPE, NODE_GRID, NODE_FRAME_START + frame, NODE_SCALE, color, NODE_ALPHA);
         poseStack.popPose();
     }
 
@@ -69,16 +87,23 @@ public final class WispRenderer extends EntityRenderer<WispEntity> {
         return NODES;
     }
 
-    private static void drawQuad(MultiBufferSource buffers, PoseStack poseStack, RenderType type,
-                                 int grid, int frame, float scale, int color, float alpha) {
+    private static void drawQuad(
+            MultiBufferSource buffers,
+            PoseStack poseStack,
+            RenderType type,
+            int grid,
+            int frame,
+            float scale,
+            int color,
+            float alpha) {
         float texFrame = 1.0F / grid;
         float u0 = (frame % grid) * texFrame;
         float v0 = (frame / grid) * texFrame;
         float u1 = u0 + texFrame;
         float v1 = v0 + texFrame;
         float half = scale * QUAD_HALF_FACTOR;
-        int tint = ARGB32.colorFromFloat(alpha,
-                ARGB32.red(color) / 255.0F, ARGB32.green(color) / 255.0F, ARGB32.blue(color) / 255.0F);
+        int tint = ARGB32.colorFromFloat(
+                alpha, ARGB32.red(color) / 255.0F, ARGB32.green(color) / 255.0F, ARGB32.blue(color) / 255.0F);
         VertexConsumer buffer = buffers.getBuffer(type);
         Matrix4f mat = poseStack.last().pose();
         buffer.addVertex(mat, -half, -half, 0.0F).setUv(u1, v1).setColor(tint).setLight(EMISSIVE_LIGHT);

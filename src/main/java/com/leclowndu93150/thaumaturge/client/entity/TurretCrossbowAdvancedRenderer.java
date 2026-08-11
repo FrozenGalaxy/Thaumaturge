@@ -9,9 +9,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
@@ -34,8 +34,13 @@ public final class TurretCrossbowAdvancedRenderer extends EntityRenderer<EntityT
     }
 
     @Override
-    public void render(EntityTurretCrossbowAdvanced entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int packedLight) {
+    public void render(
+            EntityTurretCrossbowAdvanced entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
         TCMesh mesh = GolemMeshes.get(MODEL);
         VertexConsumer buffer = buffers.getBuffer(RenderType.entityCutout(TEXTURE));
@@ -58,8 +63,10 @@ public final class TurretCrossbowAdvancedRenderer extends EntityRenderer<EntityT
         if (hurtTime > 0) {
             color = HURT_TINT;
             float jiggle = hurtTime / HURT_JIGGLE_DIVISOR;
-            poseStack.translate(jiggleRandom.nextGaussian() * jiggle,
-                    jiggleRandom.nextGaussian() * jiggle, jiggleRandom.nextGaussian() * jiggle);
+            poseStack.translate(
+                    jiggleRandom.nextGaussian() * jiggle,
+                    jiggleRandom.nextGaussian() * jiggle,
+                    jiggleRandom.nextGaussian() * jiggle);
         }
         poseStack.mulPose(Axis.YN.rotationDegrees(headYaw));
         poseStack.mulPose(Axis.XP.rotationDegrees(headPitch));
@@ -90,8 +97,8 @@ public final class TurretCrossbowAdvancedRenderer extends EntityRenderer<EntityT
         return TEXTURE;
     }
 
-    private static void renderPart(TCMesh mesh, String name, PoseStack poseStack,
-                                   VertexConsumer buffer, int light, int color) {
+    private static void renderPart(
+            TCMesh mesh, String name, PoseStack poseStack, VertexConsumer buffer, int light, int color) {
         for (TCMeshPart part : mesh.parts()) {
             if (name.equals(part.name())) {
                 GolemMeshes.renderPart(part, poseStack.last(), buffer, light, color);

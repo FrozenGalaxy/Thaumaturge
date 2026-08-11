@@ -32,12 +32,25 @@ public final class CultistPortalRenderer extends EntityRenderer<EntityCultistPor
     }
 
     @Override
-    public void render(EntityCultistPortalLesser entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int packedLight) {
+    public void render(
+            EntityCultistPortalLesser entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
-        renderPortal(poseStack, buffers, entity.isActive(), entity.activeCounter + partialTicks, entity.hurtTime,
-                entity.pulse, entity.getHealth() / entity.getMaxHealth(), entity.getBbHeight() / 2.0F,
-                BASE_SCALE_Y, SCALE_FACTOR);
+        renderPortal(
+                poseStack,
+                buffers,
+                entity.isActive(),
+                entity.activeCounter + partialTicks,
+                entity.hurtTime,
+                entity.pulse,
+                entity.getHealth() / entity.getMaxHealth(),
+                entity.getBbHeight() / 2.0F,
+                BASE_SCALE_Y,
+                SCALE_FACTOR);
     }
 
     @Override
@@ -45,9 +58,17 @@ public final class CultistPortalRenderer extends EntityRenderer<EntityCultistPor
         return TEXTURE;
     }
 
-    static void renderPortal(PoseStack poseStack, MultiBufferSource buffers, boolean active, float activeCounter,
-                             int hurtTime, int pulse, float healthFraction, float halfHeight,
-                             float baseScaleY, float scaleFactor) {
+    static void renderPortal(
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            boolean active,
+            float activeCounter,
+            int hurtTime,
+            int pulse,
+            float healthFraction,
+            float halfHeight,
+            float baseScaleY,
+            float scaleFactor) {
         if (!active) {
             return;
         }

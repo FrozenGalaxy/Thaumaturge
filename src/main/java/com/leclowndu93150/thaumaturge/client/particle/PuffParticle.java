@@ -1,9 +1,9 @@
 package com.leclowndu93150.thaumaturge.client.particle;
-import net.minecraft.client.particle.ParticleRenderType;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.util.RandomSource;
 
@@ -16,8 +16,16 @@ public final class PuffParticle extends TCParticle {
 
     private final float endSize;
 
-    private PuffParticle(ClientLevel level, double x, double y, double z,
-                         double vx, double vy, double vz, ColorParticleOption options, ParticleSheet sheet) {
+    private PuffParticle(
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            double vx,
+            double vy,
+            double vz,
+            ColorParticleOption options,
+            ParticleSheet sheet) {
         super(level, x, y, z, vx, vy, vz, sheet);
         setColor(options.getRed(), options.getGreen(), options.getBlue());
         this.lifetime = BASE_LIFETIME + this.random.nextInt(15);
@@ -45,8 +53,15 @@ public final class PuffParticle extends TCParticle {
         private static final ParticleSheet SHEET = TCParticleSheets.sheet("puff");
 
         @Override
-        public Particle createParticle(ColorParticleOption options, ClientLevel level, double x, double y, double z,
-                                       double vx, double vy, double vz) {
+        public Particle createParticle(
+                ColorParticleOption options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double vx,
+                double vy,
+                double vz) {
             RandomSource random = level.getRandom();
             return new PuffParticle(level, x, y, z, vx, vy, vz, options, SHEET);
         }

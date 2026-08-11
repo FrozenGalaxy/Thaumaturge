@@ -19,10 +19,10 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -92,7 +92,9 @@ public final class ThaumicSlime extends Slime implements ITaintedMob {
             if (this.distanceToSqr(target) < reachSq && this.hasLineOfSight(target)) {
                 DamageSource source = this.damageSources().mobAttack(this);
                 if (target.hurt(source, this.getAttackDamage())) {
-                    this.playSound(SoundEvents.SLIME_ATTACK, 1.0F,
+                    this.playSound(
+                            SoundEvents.SLIME_ATTACK,
+                            1.0F,
                             (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
                     EnchantmentHelper.doPostAttackEffects(server, target, source);
                 }
@@ -113,7 +115,9 @@ public final class ThaumicSlime extends Slime implements ITaintedMob {
             if (this.level().isClientSide()) {
                 spawnGooParticles(size, size * 2);
             }
-            this.playSound(getJumpSound(), getSoundVolume(),
+            this.playSound(
+                    getJumpSound(),
+                    getSoundVolume(),
                     ((this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F) * 0.8F);
             this.targetSquish = -0.5F;
         }
@@ -136,8 +140,15 @@ public final class ThaumicSlime extends Slime implements ITaintedMob {
             float ox = Mth.sin(angle) * size * 0.5F * radius;
             float oz = Mth.cos(angle) * size * 0.5F * radius;
             int lifetime = (int) (66.0F / (this.random.nextFloat() * 0.9F + 0.1F));
-            this.level().addParticle(new FluxGooDropletParticleOptions(PARTICLE_COLOR, PARTICLE_ALPHA, lifetime),
-                    this.getX() + ox, midY, this.getZ() + oz, 0.0, 0.0, 0.0);
+            this.level()
+                    .addParticle(
+                            new FluxGooDropletParticleOptions(PARTICLE_COLOR, PARTICLE_ALPHA, lifetime),
+                            this.getX() + ox,
+                            midY,
+                            this.getZ() + oz,
+                            0.0,
+                            0.0,
+                            0.0);
         }
     }
 
@@ -159,8 +170,12 @@ public final class ThaumicSlime extends Slime implements ITaintedMob {
                 ThaumicSlime child = TCEntities.THAUMIC_SLIME.get().create(server);
                 if (child != null) {
                     child.setSize(1, true);
-                    child.moveTo(this.getX() + xd, this.getY() + 0.5, this.getZ() + zd,
-                            this.random.nextFloat() * 360.0F, 0.0F);
+                    child.moveTo(
+                            this.getX() + xd,
+                            this.getY() + 0.5,
+                            this.getZ() + zd,
+                            this.random.nextFloat() * 360.0F,
+                            0.0F);
                     server.addFreshEntity(child);
                 }
             }
@@ -178,17 +193,23 @@ public final class ThaumicSlime extends Slime implements ITaintedMob {
     }
 
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                   MobSpawnType reason, @Nullable SpawnGroupData groupData) {
+    public @Nullable SpawnGroupData finalizeSpawn(
+            ServerLevelAccessor level,
+            DifficultyInstance difficulty,
+            MobSpawnType reason,
+            @Nullable SpawnGroupData groupData) {
         int sizeBits = 1 + level.getRandom().nextInt(3);
         int size = 1 << sizeBits;
         this.setSize(size, true);
         return groupData;
     }
 
-    public static boolean checkSpawnRules(EntityType<ThaumicSlime> type, LevelAccessor level,
-                                          MobSpawnType reason, BlockPos pos,
-                                          RandomSource random) {
+    public static boolean checkSpawnRules(
+            EntityType<ThaumicSlime> type,
+            LevelAccessor level,
+            MobSpawnType reason,
+            BlockPos pos,
+            RandomSource random) {
         return false;
     }
 

@@ -2,9 +2,9 @@ package com.leclowndu93150.thaumaturge.client.tooltip;
 
 import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectChipsTooltip;
+import com.leclowndu93150.thaumaturge.api.aspect.AspectIndexAccess;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.config.ThaumaturgeClientConfig;
-import com.leclowndu93150.thaumaturge.api.aspect.AspectIndexAccess;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;

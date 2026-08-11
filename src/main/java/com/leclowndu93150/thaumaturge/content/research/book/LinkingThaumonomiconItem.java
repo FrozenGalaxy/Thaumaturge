@@ -31,7 +31,8 @@ public final class LinkingThaumonomiconItem extends Item {
         }
         LinkBinding binding = stack.get(TCDataComponents.LINK_BINDING.get());
         if (binding == null) {
-            stack.set(TCDataComponents.LINK_BINDING.get(),
+            stack.set(
+                    TCDataComponents.LINK_BINDING.get(),
                     new LinkBinding(player.getUUID(), player.getGameProfile().getName()));
             player.playSound(TCSounds.WRITE.get(), 1.0F, 1.0F);
             TCActionBar.sendPurple(player, "tc.thaumonomicon.sharing.bound");
@@ -48,7 +49,9 @@ public final class LinkingThaumonomiconItem extends Item {
         TCActionBar.sendPurple(player, "tc.thaumonomicon.sharing.linked", binding.name());
         ServerPlayer partner = serverPlayer.level().getServer().getPlayerList().getPlayer(binding.player());
         if (partner != null) {
-            TCActionBar.sendPurple(partner, "tc.thaumonomicon.sharing.linked",
+            TCActionBar.sendPurple(
+                    partner,
+                    "tc.thaumonomicon.sharing.linked",
                     player.getGameProfile().getName());
         }
         stack.shrink(1);
@@ -56,14 +59,13 @@ public final class LinkingThaumonomiconItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
-            TooltipFlag flag) {
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         LinkBinding binding = stack.get(TCDataComponents.LINK_BINDING.get());
         if (binding != null) {
             tooltip.add(Component.translatable("tooltip.thaumaturge.sharing.bound", binding.name())
                     .withStyle(ChatFormatting.GRAY));
         }
-        tooltip.add(Component.translatable("tooltip.thaumaturge.sharing.hint")
-                .withStyle(ChatFormatting.DARK_GRAY));
+        tooltip.add(Component.translatable("tooltip.thaumaturge.sharing.hint").withStyle(ChatFormatting.DARK_GRAY));
     }
 }

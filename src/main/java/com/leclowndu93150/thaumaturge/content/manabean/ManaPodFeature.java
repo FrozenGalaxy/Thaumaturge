@@ -28,13 +28,15 @@ public final class ManaPodFeature extends Feature<NoneFeatureConfiguration> {
         int baseZ = context.origin().getZ();
         int y = Math.max(START_Y, level.getMinBuildHeight() + 1);
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos(baseX, y, baseZ);
-        while (cursor.getY() < Math.min(level.getMaxBuildHeight() - 1,
-                level.getHeight(Heightmap.Types.MOTION_BLOCKING, cursor.getX(), cursor.getZ()))) {
+        while (cursor.getY()
+                < Math.min(
+                        level.getMaxBuildHeight() - 1,
+                        level.getHeight(Heightmap.Types.MOTION_BLOCKING, cursor.getX(), cursor.getZ()))) {
             if (level.isEmptyBlock(cursor) && level.isEmptyBlock(cursor.below())) {
                 if (BlockManaPod.canGrowAt(level, cursor)) {
                     int age = MIN_START_AGE + random.nextInt(START_AGE_SPREAD);
-                    level.setBlock(cursor, TCBlocks.MANA_POD.get().defaultBlockState()
-                            .setValue(BlockManaPod.AGE, age), 2);
+                    level.setBlock(
+                            cursor, TCBlocks.MANA_POD.get().defaultBlockState().setValue(BlockManaPod.AGE, age), 2);
                     if (level.getBlockEntity(cursor) instanceof BlockEntityManaPod pod) {
                         pod.assignWildAspect(level.registryAccess(), random);
                     }

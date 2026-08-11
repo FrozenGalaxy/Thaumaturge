@@ -8,15 +8,16 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public record ClientboundInfusionSourcePayload(BlockPos matrixPos, BlockPos sourcePos) implements CustomPacketPayload {
-    public static final Type<ClientboundInfusionSourcePayload> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "fx_infusion_source"));
+    public static final Type<ClientboundInfusionSourcePayload> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "fx_infusion_source"));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundInfusionSourcePayload> STREAM_CODEC = StreamCodec.of(
-            (buf, data) -> {
-                buf.writeBlockPos(data.matrixPos);
-                buf.writeBlockPos(data.sourcePos);
-            },
-            buf -> new ClientboundInfusionSourcePayload(buf.readBlockPos(), buf.readBlockPos()));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundInfusionSourcePayload> STREAM_CODEC =
+            StreamCodec.of(
+                    (buf, data) -> {
+                        buf.writeBlockPos(data.matrixPos);
+                        buf.writeBlockPos(data.sourcePos);
+                    },
+                    buf -> new ClientboundInfusionSourcePayload(buf.readBlockPos(), buf.readBlockPos()));
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

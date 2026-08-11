@@ -27,8 +27,13 @@ public final class EldritchPortalRenderer implements BlockEntityRenderer<BlockEn
     public EldritchPortalRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(BlockEntityEldritchPortal portal, float partialTick, PoseStack poseStack,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(
+            BlockEntityEldritchPortal portal,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
         float openCount = portal.opencount + partialTick;
         if (openCount < 0.0F) {
             return;

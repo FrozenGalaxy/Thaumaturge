@@ -1,10 +1,10 @@
 package com.leclowndu93150.thaumaturge.client.particle;
-import net.minecraft.client.particle.ParticleRenderType;
 
 import com.leclowndu93150.thaumaturge.content.particle.BubbleParticleOptions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.util.RandomSource;
 
 public final class BubbleParticle extends TCParticle {
@@ -20,8 +20,16 @@ public final class BubbleParticle extends TCParticle {
     private final float startSize;
     private final float endSize;
 
-    private BubbleParticle(ClientLevel level, double x, double y, double z,
-                           double vx, double vy, double vz, BubbleParticleOptions options, ParticleSheet sheet) {
+    private BubbleParticle(
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            double vx,
+            double vy,
+            double vz,
+            BubbleParticleOptions options,
+            ParticleSheet sheet) {
         super(level, x, y, z, vx, vy, vz, sheet);
         setColor(options.color());
         this.alpha = options.alpha();
@@ -57,8 +65,15 @@ public final class BubbleParticle extends TCParticle {
         private static final ParticleSheet SHEET = TCParticleSheets.sheet("bubble");
 
         @Override
-        public Particle createParticle(BubbleParticleOptions options, ClientLevel level, double x, double y, double z,
-                                       double vx, double vy, double vz) {
+        public Particle createParticle(
+                BubbleParticleOptions options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double vx,
+                double vy,
+                double vz) {
             RandomSource random = level.getRandom();
             return new BubbleParticle(level, x, y, z, vx, vy, vz, options, SHEET);
         }

@@ -14,8 +14,8 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -37,9 +37,8 @@ public final class BlockLevitator extends BaseEntityBlock {
 
     public BlockLevitator(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any()
-                .setValue(FACING, Direction.UP)
-                .setValue(BlockStateProperties.ENABLED, true));
+        registerDefaultState(
+                stateDefinition.any().setValue(FACING, Direction.UP).setValue(BlockStateProperties.ENABLED, true));
     }
 
     private static Map<Direction, VoxelShape> buildShapes() {
@@ -78,7 +77,8 @@ public final class BlockLevitator extends BaseEntityBlock {
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos fromPos, boolean movedByPiston) {
+    protected void neighborChanged(
+            BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos fromPos, boolean movedByPiston) {
         boolean enabled = !level.hasNeighborSignal(pos);
         if (enabled != state.getValue(BlockStateProperties.ENABLED)) {
             level.setBlock(pos, state.setValue(BlockStateProperties.ENABLED, enabled), 3);
@@ -91,13 +91,21 @@ public final class BlockLevitator extends BaseEntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+            BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof BlockEntityLevitator levitator)) {
             return InteractionResult.PASS;
         }
         levitator.increaseRange(player);
-        level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                TCSounds.KEY.get(), SoundSource.BLOCKS, 0.5F, 1.0F);
+        level.playSound(
+                null,
+                pos.getX() + 0.5,
+                pos.getY() + 0.5,
+                pos.getZ() + 0.5,
+                TCSounds.KEY.get(),
+                SoundSource.BLOCKS,
+                0.5F,
+                1.0F);
         return InteractionResult.SUCCESS;
     }
 
@@ -107,7 +115,8 @@ public final class BlockLevitator extends BaseEntityBlock {
     }
 
     @Override
-    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
         return createTickerHelper(type, TCBlockEntities.LEVITATOR.get(), BlockEntityLevitator::tick);
     }
 

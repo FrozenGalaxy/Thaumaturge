@@ -10,8 +10,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record ServerboundRequestSyncAspectPoolPayload() implements CustomPacketPayload {
-    public static final Type<ServerboundRequestSyncAspectPoolPayload> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "request_aspect_pool"));
+    public static final Type<ServerboundRequestSyncAspectPoolPayload> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "request_aspect_pool"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundRequestSyncAspectPoolPayload> STREAM_CODEC =
             StreamCodec.unit(new ServerboundRequestSyncAspectPoolPayload());

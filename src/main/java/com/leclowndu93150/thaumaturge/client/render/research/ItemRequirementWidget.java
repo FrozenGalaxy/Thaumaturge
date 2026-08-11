@@ -7,7 +7,6 @@ import com.leclowndu93150.thaumaturge.client.screen.TCTooltips;
 import com.leclowndu93150.thaumaturge.client.screen.tooltip.DeferredTooltip;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -84,7 +83,8 @@ public final class ItemRequirementWidget {
                 SECTION_HEADER_TINT);
     }
 
-    public static void renderObtainHeaderTooltip(GuiGraphics graphics, Font font, int x, int y, int mouseX, int mouseY) {
+    public static void renderObtainHeaderTooltip(
+            GuiGraphics graphics, Font font, int x, int y, int mouseX, int mouseY) {
         renderSectionTooltip(graphics, font, x, y, mouseX, mouseY, "obtain");
     }
 
@@ -92,9 +92,13 @@ public final class ItemRequirementWidget {
         renderSectionTooltip(graphics, font, x, y, mouseX, mouseY, "craft");
     }
 
-    private static void renderSectionTooltip(GuiGraphics graphics, Font font, int x, int y, int mouseX, int mouseY, String which) {
+    private static void renderSectionTooltip(
+            GuiGraphics graphics, Font font, int x, int y, int mouseX, int mouseY, String which) {
         int popupX = x + SECTION_POPUP_OFFSET_X;
-        if (mouseX >= popupX && mouseY >= y && mouseX < popupX + SECTION_POPUP_WIDTH && mouseY < y + SECTION_POPUP_HEIGHT) {
+        if (mouseX >= popupX
+                && mouseY >= y
+                && mouseX < popupX + SECTION_POPUP_WIDTH
+                && mouseY < y + SECTION_POPUP_HEIGHT) {
             DeferredTooltip.set(TCTooltips.need(which), mouseX, mouseY);
         }
     }

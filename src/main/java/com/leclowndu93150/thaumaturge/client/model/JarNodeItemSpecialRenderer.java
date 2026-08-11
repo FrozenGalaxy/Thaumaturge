@@ -23,14 +23,22 @@ public final class JarNodeItemSpecialRenderer extends BlockEntityWithoutLevelRen
     private static final float TICKS_WRAP = 1000000.0F;
 
     public JarNodeItemSpecialRenderer() {
-        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+        super(
+                Minecraft.getInstance().getBlockEntityRenderDispatcher(),
+                Minecraft.getInstance().getEntityModels());
     }
 
     @Override
-    public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack,
-                             MultiBufferSource buffers, int light, int overlay) {
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
-                TCBlocks.JAR_NODE.get().defaultBlockState(), poseStack, buffers, light, overlay);
+    public void renderByItem(
+            ItemStack stack,
+            ItemDisplayContext displayContext,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light,
+            int overlay) {
+        Minecraft.getInstance()
+                .getBlockRenderer()
+                .renderSingleBlock(TCBlocks.JAR_NODE.get().defaultBlockState(), poseStack, buffers, light, overlay);
 
         NodeData data = stack.get(TCDataComponents.NODE_DATA.get());
         if (data == null || data.aspects().isEmpty()) {

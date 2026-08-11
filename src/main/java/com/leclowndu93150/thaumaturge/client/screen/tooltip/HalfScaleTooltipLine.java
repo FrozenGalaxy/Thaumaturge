@@ -32,7 +32,6 @@ public final class HalfScaleTooltipLine implements ClientTooltipComponent {
     @Override
     public void renderText(Font font, int x, int y, Matrix4f matrix, MultiBufferSource.BufferSource bufferSource) {
         Matrix4f scaled = new Matrix4f(matrix).translate(x, y, 0.0F).scale(SCALE);
-        font.drawInBatch(text, 0.0F, 0.0F, WHITE, true, scaled, bufferSource,
-                Font.DisplayMode.NORMAL, 0, FULL_BRIGHT);
+        font.drawInBatch(text, 0.0F, 0.0F, WHITE, true, scaled, bufferSource, Font.DisplayMode.NORMAL, 0, FULL_BRIGHT);
     }
 }

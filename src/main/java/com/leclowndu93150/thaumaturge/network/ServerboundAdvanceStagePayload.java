@@ -7,8 +7,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public record ServerboundAdvanceStagePayload(ResourceLocation research) implements CustomPacketPayload {
-    public static final Type<ServerboundAdvanceStagePayload> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "advance_stage"));
+    public static final Type<ServerboundAdvanceStagePayload> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "advance_stage"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundAdvanceStagePayload> STREAM_CODEC =
             StreamCodec.composite(

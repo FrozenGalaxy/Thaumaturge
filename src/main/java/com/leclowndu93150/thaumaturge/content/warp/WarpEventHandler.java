@@ -9,8 +9,8 @@ import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.leclowndu93150.thaumaturge.registry.TCMobEffects;
 import java.util.Set;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
@@ -46,7 +46,8 @@ public final class WarpEventHandler {
         if (!entity.isUsingItem() || !entity.getUseItem().is(Items.MILK_BUCKET)) {
             return;
         }
-        ResourceLocation id = event.getEffect().unwrapKey().map(ResourceKey::location).orElse(null);
+        ResourceLocation id =
+                event.getEffect().unwrapKey().map(ResourceKey::location).orElse(null);
         if (id != null && MILK_PROOF_EFFECTS.contains(id)) {
             event.setCanceled(true);
         }
@@ -70,8 +71,7 @@ public final class WarpEventHandler {
 
     @SubscribeEvent
     public static void onItemCrafted(PlayerEvent.ItemCraftedEvent event) {
-        if (ThaumaturgeCommonConfig.WUSS_MODE.get()
-                || !(event.getEntity() instanceof ServerPlayer player)) {
+        if (ThaumaturgeCommonConfig.WUSS_MODE.get() || !(event.getEntity() instanceof ServerPlayer player)) {
             return;
         }
         ItemWarp warp = event.getCrafting().getItem().builtInRegistryHolder().getData(TCDataMaps.ITEM_WARP);

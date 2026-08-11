@@ -7,15 +7,12 @@ import com.leclowndu93150.thaumaturge.content.entity.ai.LongRangeAttackGoal;
 import com.leclowndu93150.thaumaturge.network.ClientboundWarpFXPayload;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -23,6 +20,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
@@ -36,6 +34,8 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jspecify.annotations.Nullable;
@@ -71,10 +71,14 @@ public class EntityEldritchGuardian extends Monster implements RangedAttackMob, 
                 .add(Attributes.ARMOR, 4.0);
     }
 
-    public static boolean checkGuardianSpawnRules(EntityType<EntityEldritchGuardian> type, ServerLevelAccessor level,
-                                                  MobSpawnType reason, BlockPos pos, RandomSource random) {
-        boolean alone = level.getEntitiesOfClass(EntityEldritchGuardian.class,
-                new AABB(pos).inflate(32.0, 16.0, 32.0)).isEmpty();
+    public static boolean checkGuardianSpawnRules(
+            EntityType<EntityEldritchGuardian> type,
+            ServerLevelAccessor level,
+            MobSpawnType reason,
+            BlockPos pos,
+            RandomSource random) {
+        boolean alone = level.getEntitiesOfClass(EntityEldritchGuardian.class, new AABB(pos).inflate(32.0, 16.0, 32.0))
+                .isEmpty();
         return alone && Monster.checkAnyLightMonsterSpawnRules(type, level, reason, pos, random);
     }
 
@@ -143,9 +147,7 @@ public class EntityEldritchGuardian extends Monster implements RangedAttackMob, 
         boolean result = super.doHurtTarget(target);
         if (result) {
             int difficultyId = this.level().getDifficulty().getId();
-            if (this.getMainHandItem().isEmpty()
-                    && this.isOnFire()
-                    && this.random.nextFloat() < difficultyId * 0.3F) {
+            if (this.getMainHandItem().isEmpty() && this.isOnFire() && this.random.nextFloat() < difficultyId * 0.3F) {
                 target.igniteForSeconds(2 * difficultyId);
             }
         }

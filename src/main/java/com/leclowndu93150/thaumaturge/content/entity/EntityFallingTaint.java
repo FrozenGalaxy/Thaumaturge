@@ -5,13 +5,13 @@ import com.leclowndu93150.thaumaturge.registry.TCEntities;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
@@ -105,8 +105,8 @@ public final class EntityFallingTaint extends Entity implements IEntityWithCompl
                 return;
             }
         } else {
-            this.setDeltaMovement(this.getDeltaMovement().multiply(LANDING_DAMP_HORIZONTAL,
-                    LANDING_DAMP_VERTICAL, LANDING_DAMP_HORIZONTAL));
+            this.setDeltaMovement(this.getDeltaMovement()
+                    .multiply(LANDING_DAMP_HORIZONTAL, LANDING_DAMP_VERTICAL, LANDING_DAMP_HORIZONTAL));
             server.playSound(null, here, TCSounds.GORE.get(), SoundSource.BLOCKS, 0.5F, 1.0F);
             this.discard();
             BlockState landingState = server.getBlockState(here);
@@ -163,5 +163,4 @@ public final class EntityFallingTaint extends Entity implements IEntityWithCompl
     public boolean hurtClient(DamageSource source, float damage) {
         return false;
     }
-
 }

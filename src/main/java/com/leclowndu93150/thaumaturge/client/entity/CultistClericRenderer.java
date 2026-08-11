@@ -32,15 +32,21 @@ public final class CultistClericRenderer
 
     public CultistClericRenderer(EntityRendererProvider.Context context) {
         super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)), SHADOW);
-        this.addLayer(new HumanoidArmorLayer<>(this,
+        this.addLayer(new HumanoidArmorLayer<>(
+                this,
                 new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)),
                 new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)),
                 context.getModelManager()));
     }
 
     @Override
-    public void render(EntityCultistCleric entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int light) {
+    public void render(
+            EntityCultistCleric entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int light) {
         if (!entity.isRitualist()) {
             super.render(entity, entityYaw, partialTicks, poseStack, buffers, light);
             return;

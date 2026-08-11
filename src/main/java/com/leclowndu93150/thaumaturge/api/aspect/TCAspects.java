@@ -1,7 +1,6 @@
 package com.leclowndu93150.thaumaturge.api.aspect;
 
 import java.util.List;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 

@@ -69,7 +69,8 @@ public final class TCBiomes {
         BiomeDefaultFeatures.addSurfaceFreezing(generation);
     }
 
-    private static Biome magicalForest(HolderGetter<PlacedFeature> placed, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
+    private static Biome magicalForest(
+            HolderGetter<PlacedFeature> placed, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
         MobSpawnSettings.Builder mobs = new MobSpawnSettings.Builder();
         BiomeDefaultFeatures.farmAnimals(mobs);
         BiomeDefaultFeatures.commonSpawns(mobs);
@@ -120,9 +121,11 @@ public final class TCBiomes {
         mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(EntityType.WITCH, 8, 1, 1));
         mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(EntityType.ENDERMAN, 4, 1, 1));
         mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.BRAINY_ZOMBIE.get(), 32, 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.GIANT_BRAINY_ZOMBIE.get(), 8, 1, 1));
+        mobs.addSpawn(
+                MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.GIANT_BRAINY_ZOMBIE.get(), 8, 1, 1));
         mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.WISP.get(), 3, 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.ELDRITCH_GUARDIAN.get(), 1, 1, 1));
+        mobs.addSpawn(
+                MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.ELDRITCH_GUARDIAN.get(), 1, 1, 1));
 
         BiomeGenerationSettings.Builder generation = new BiomeGenerationSettings.Builder(placed, carvers);
         globalGeneration(generation);
@@ -152,8 +155,10 @@ public final class TCBiomes {
 
     private static Biome eldritch(HolderGetter<PlacedFeature> placed, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
         MobSpawnSettings.Builder mobs = new MobSpawnSettings.Builder();
-        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.INHABITED_ZOMBIE.get(), 1, 1, 1));
-        mobs.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.ELDRITCH_GUARDIAN.get(), 1, 1, 1));
+        mobs.addSpawn(
+                MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.INHABITED_ZOMBIE.get(), 1, 1, 1));
+        mobs.addSpawn(
+                MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TCEntities.ELDRITCH_GUARDIAN.get(), 1, 1, 1));
         BiomeGenerationSettings.Builder generation = new BiomeGenerationSettings.Builder(placed, carvers);
         globalGeneration(generation);
 

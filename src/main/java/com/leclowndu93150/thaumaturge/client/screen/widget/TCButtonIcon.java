@@ -26,7 +26,8 @@ public sealed interface TCButtonIcon {
 
         @Override
         public void draw(GuiGraphics graphics, int x, int y, int size, int tintColor) {
-            WidgetRender.blitTinted(graphics, texture, x, y, 0.0F, 0.0F, size, size, textureWidth, textureHeight, tintColor);
+            WidgetRender.blitTinted(
+                    graphics, texture, x, y, 0.0F, 0.0F, size, size, textureWidth, textureHeight, tintColor);
         }
     }
 

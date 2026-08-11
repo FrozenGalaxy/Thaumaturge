@@ -17,8 +17,13 @@ public final class FocusProjectileRenderer extends EntityRenderer<EntityFocusPro
     }
 
     @Override
-    public void render(EntityFocusProjectile entity, float entityYaw, float partialTicks, PoseStack poseStack,
-                       MultiBufferSource buffers, int packedLight) {
+    public void render(
+            EntityFocusProjectile entity,
+            float entityYaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffers, packedLight);
         entity.renderParticle(partialTicks);
     }

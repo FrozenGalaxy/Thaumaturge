@@ -24,29 +24,40 @@ public final class FocusSettingSpinner extends AbstractWidget {
     private final Runnable onChange;
     private int index;
 
-    public FocusSettingSpinner(int x, int y, int width, SettingDefinition definition,
-            Map<String, Integer> values, Runnable onChange) {
+    public FocusSettingSpinner(
+            int x, int y, int width, SettingDefinition definition, Map<String, Integer> values, Runnable onChange) {
         super(x, y, width + ARROW_SIZE, ARROW_SIZE, Component.empty());
         this.definition = definition;
         this.values = values;
         this.onChange = onChange;
-        this.index = definition.values().indexOf(
-                values.getOrDefault(definition.key(), definition.defaultValue()));
+        this.index = definition.values().indexOf(values.getOrDefault(definition.key(), definition.defaultValue()));
         setTooltip(Tooltip.create(Component.translatable(definition.nameKey())));
     }
 
     @Override
     protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         int bodyWidth = this.width - ARROW_SIZE;
-        graphics.blit(TCScreenTextures.GUI_BASE,
-                getX(), getY(), U_MINUS, V_ARROWS, ARROW_SIZE, ARROW_SIZE, ATLAS, ATLAS);
-        graphics.blit(TCScreenTextures.GUI_BASE,
-                getX() + bodyWidth, getY(), U_PLUS, V_ARROWS, ARROW_SIZE, ARROW_SIZE, ATLAS, ATLAS);
+        graphics.blit(
+                TCScreenTextures.GUI_BASE, getX(), getY(), U_MINUS, V_ARROWS, ARROW_SIZE, ARROW_SIZE, ATLAS, ATLAS);
+        graphics.blit(
+                TCScreenTextures.GUI_BASE,
+                getX() + bodyWidth,
+                getY(),
+                U_PLUS,
+                V_ARROWS,
+                ARROW_SIZE,
+                ARROW_SIZE,
+                ATLAS,
+                ATLAS);
         Component value = definition.values().labelAt(index);
         var font = Minecraft.getInstance().font;
-        graphics.drawString(font, value,
+        graphics.drawString(
+                font,
+                value,
                 getX() + (bodyWidth + ARROW_SIZE) / 2 - font.width(value) / 2,
-                getY() + 1, TEXT_COLOR, true);
+                getY() + 1,
+                TEXT_COLOR,
+                true);
     }
 
     @Override

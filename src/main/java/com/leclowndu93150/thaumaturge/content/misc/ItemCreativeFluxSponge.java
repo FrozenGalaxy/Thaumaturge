@@ -9,7 +9,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -28,21 +27,34 @@ public final class ItemCreativeFluxSponge extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
-        tooltip.add(Component.translatable("tooltip.thaumaturge.flux_sponge.drain.0").withStyle(ChatFormatting.GREEN));
-        tooltip.add(Component.translatable("tooltip.thaumaturge.flux_sponge.drain.1").withStyle(ChatFormatting.GREEN));
-        tooltip.add(Component.translatable("tooltip.thaumaturge.flux_sponge.rifts.0").withStyle(ChatFormatting.DARK_AQUA));
-        tooltip.add(Component.translatable("tooltip.thaumaturge.flux_sponge.rifts.1").withStyle(ChatFormatting.DARK_AQUA));
-        tooltip.add(Component.translatable("tooltip.thaumaturge.flux_sponge.creative").withStyle(ChatFormatting.DARK_PURPLE));
+        tooltip.add(Component.translatable("tooltip.thaumaturge.flux_sponge.drain.0")
+                .withStyle(ChatFormatting.GREEN));
+        tooltip.add(Component.translatable("tooltip.thaumaturge.flux_sponge.drain.1")
+                .withStyle(ChatFormatting.GREEN));
+        tooltip.add(Component.translatable("tooltip.thaumaturge.flux_sponge.rifts.0")
+                .withStyle(ChatFormatting.DARK_AQUA));
+        tooltip.add(Component.translatable("tooltip.thaumaturge.flux_sponge.rifts.1")
+                .withStyle(ChatFormatting.DARK_AQUA));
+        tooltip.add(Component.translatable("tooltip.thaumaturge.flux_sponge.creative")
+                .withStyle(ChatFormatting.DARK_PURPLE));
     }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (level.isClientSide()) {
             player.swing(hand);
-            level.playLocalSound(player.getX(), player.getY(), player.getZ(),
-                    TCSounds.CRAFTSTART.get(), SoundSource.PLAYERS, 0.15F, 1.0F, false);
+            level.playLocalSound(
+                    player.getX(),
+                    player.getY(),
+                    player.getZ(),
+                    TCSounds.CRAFTSTART.get(),
+                    SoundSource.PLAYERS,
+                    0.15F,
+                    1.0F,
+                    false);
             return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
         }
         int drained = 0;
@@ -52,16 +64,16 @@ public final class ItemCreativeFluxSponge extends Item {
                 drained += (int) AuraHelper.drainFlux(level, pos.offset(16 * x, 0, 16 * z), DRAIN_PER_CHUNK, false);
             }
         }
-        player.sendSystemMessage(Component.translatable("tc.flux_sponge.drained", drained)
-                .withStyle(ChatFormatting.GREEN));
+        player.sendSystemMessage(
+                Component.translatable("tc.flux_sponge.drained", drained).withStyle(ChatFormatting.GREEN));
         if (player.isShiftKeyDown()) {
-            List<EntityFluxRift> rifts = level.getEntitiesOfClass(EntityFluxRift.class,
-                    new AABB(player.blockPosition()).inflate(RIFT_RANGE));
+            List<EntityFluxRift> rifts = level.getEntitiesOfClass(
+                    EntityFluxRift.class, new AABB(player.blockPosition()).inflate(RIFT_RANGE));
             for (EntityFluxRift rift : rifts) {
                 rift.discard();
             }
-            player.sendSystemMessage(Component.translatable("tc.flux_sponge.rifts", rifts.size())
-                    .withStyle(ChatFormatting.DARK_AQUA));
+            player.sendSystemMessage(
+                    Component.translatable("tc.flux_sponge.rifts", rifts.size()).withStyle(ChatFormatting.DARK_AQUA));
         }
         return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }

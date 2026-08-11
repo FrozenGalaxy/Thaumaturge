@@ -2,9 +2,9 @@ package com.leclowndu93150.thaumaturge.compat.jei.ingredient;
 
 import com.leclowndu93150.thaumaturge.api.aspect.AspectComponents;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
+import com.leclowndu93150.thaumaturge.api.aspect.AspectKnowledgeAccess;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.client.render.aspect.AspectTagRenderer;
-import com.leclowndu93150.thaumaturge.api.aspect.AspectKnowledgeAccess;
 import java.util.ArrayList;
 import java.util.List;
 import mezz.jei.api.ingredients.IIngredientRenderer;
@@ -26,8 +26,9 @@ public final class AspectIngredientRenderer implements IIngredientRenderer<Aspec
             AspectTagRenderer.renderUnknownChip(guiGraphics, 0, 0, ingredient.aspect());
             return;
         }
-        if (ingredient.amount() > 1){
-            AspectTagRenderer.render(guiGraphics, Minecraft.getInstance().font, 0, 0, ingredient.aspect(),ingredient.amount());
+        if (ingredient.amount() > 1) {
+            AspectTagRenderer.render(
+                    guiGraphics, Minecraft.getInstance().font, 0, 0, ingredient.aspect(), ingredient.amount());
         } else {
             AspectTagRenderer.render(guiGraphics, 0, 0, ingredient.aspect());
         }

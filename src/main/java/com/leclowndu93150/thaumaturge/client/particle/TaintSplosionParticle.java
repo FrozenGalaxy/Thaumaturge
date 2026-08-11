@@ -23,8 +23,15 @@ public final class TaintSplosionParticle extends SingleQuadParticle {
     private final float vo;
     private final float baseAlpha;
 
-    private TaintSplosionParticle(ClientLevel level, double x, double y, double z,
-                                  double xd, double yd, double zd, TextureAtlasSprite sprite) {
+    private TaintSplosionParticle(
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            double xd,
+            double yd,
+            double zd,
+            TextureAtlasSprite sprite) {
         super(level, x, y, z, xd, yd, zd);
         this.sprite = sprite;
         this.uo = this.random.nextFloat() * 3.0F;
@@ -99,11 +106,19 @@ public final class TaintSplosionParticle extends SingleQuadParticle {
 
     public static final class Provider implements ParticleProvider<SimpleParticleType> {
         @Override
-        public @Nullable Particle createParticle(SimpleParticleType options, ClientLevel level,
-                                                 double x, double y, double z,
-                                                 double xd, double yd, double zd) {
-            TextureAtlasSprite sprite = Minecraft.getInstance().getItemRenderer()
-                    .getModel(new ItemStack(Items.SLIME_BALL), level, null, 0).getParticleIcon();
+        public @Nullable Particle createParticle(
+                SimpleParticleType options,
+                ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double xd,
+                double yd,
+                double zd) {
+            TextureAtlasSprite sprite = Minecraft.getInstance()
+                    .getItemRenderer()
+                    .getModel(new ItemStack(Items.SLIME_BALL), level, null, 0)
+                    .getParticleIcon();
             return new TaintSplosionParticle(level, x, y, z, xd, yd, zd, sprite);
         }
     }

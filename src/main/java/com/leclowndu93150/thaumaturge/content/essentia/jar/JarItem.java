@@ -24,7 +24,6 @@ import net.minecraft.world.level.block.Block;
 
 public class JarItem extends BlockItem implements IEssentiaContainerItem {
 
-
     public JarItem(Block block, Properties properties) {
         super(block, properties);
     }
@@ -62,7 +61,7 @@ public class JarItem extends BlockItem implements IEssentiaContainerItem {
         }
         int amount = list.totalAmount();
         int max = BlockEntityJar.CAPACITY;
-        return Mth.clamp(Math.round((float)amount * 13.0F / (float)max), 0, 13);
+        return Mth.clamp(Math.round((float) amount * 13.0F / (float) max), 0, 13);
     }
 
     @Override
@@ -92,7 +91,8 @@ public class JarItem extends BlockItem implements IEssentiaContainerItem {
         }
         AspectList aspects = getAspects(stack);
         Holder<IAspect> aspect = EssentiaTransportHelper.resolve(level, alembic.aspectKey());
-        if (aspect == null || (!aspects.isEmpty() && aspect != aspects.entries().getFirst().aspect())) {
+        if (aspect == null
+                || (!aspects.isEmpty() && aspect != aspects.entries().getFirst().aspect())) {
             return super.useOn(context);
         }
         int available = Math.min(alembic.amount(), BlockEntityJar.CAPACITY - aspects.totalAmount());

@@ -1,11 +1,12 @@
 package com.leclowndu93150.thaumaturge.content.device;
 
-import com.leclowndu93150.thaumaturge.Thaumaturge;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.aspect.TCAspects;
 import com.leclowndu93150.thaumaturge.api.essentia.IEssentiaTransport;
 import com.leclowndu93150.thaumaturge.content.essentia.flow.EssentiaFlowHandler;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -21,9 +22,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public final class BlockEntityLampFertility extends BlockEntity implements IEssentiaTransport {
     private static final int MAX_CHARGES = 10;
@@ -68,7 +66,8 @@ public final class BlockEntityLampFertility extends BlockEntity implements IEsse
             return;
         }
         BlockPos pos = getBlockPos();
-        List<Animal> animals = level.getEntitiesOfClass(Animal.class,
+        List<Animal> animals = level.getEntitiesOfClass(
+                Animal.class,
                 new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1)
                         .inflate(RANGE));
         for (Animal candidate : animals) {
@@ -105,7 +104,8 @@ public final class BlockEntityLampFertility extends BlockEntity implements IEsse
             return false;
         }
         Direction facing = getBlockState().getValue(BlockStateProperties.FACING);
-        IEssentiaTransport ic = EssentiaFlowHandler.transport(level, getBlockPos().relative(facing), facing.getOpposite());
+        IEssentiaTransport ic =
+                EssentiaFlowHandler.transport(level, getBlockPos().relative(facing), facing.getOpposite());
         if (ic == null || !ic.canOutputTo(facing.getOpposite())) {
             return false;
         }

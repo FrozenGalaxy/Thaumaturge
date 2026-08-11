@@ -39,8 +39,10 @@ public final class SharingThaumonomiconItem extends Item {
         }
         AspectPoolData discoveredAspects = AspectPools.data(player);
         if (binding == null) {
-            stack.set(TCDataComponents.SHARE_BINDING.get(),
-                    new ShareBinding(player.getUUID(), player.getGameProfile().getName(), discoveredAspects, knowledge));
+            stack.set(
+                    TCDataComponents.SHARE_BINDING.get(),
+                    new ShareBinding(
+                            player.getUUID(), player.getGameProfile().getName(), discoveredAspects, knowledge));
             player.playSound(TCSounds.WRITE.get(), 1.0F, 1.0F);
             TCActionBar.sendPurple(player, "tc.thaumonomicon.sharing.bound");
             return InteractionResultHolder.consume(stack);
@@ -62,14 +64,13 @@ public final class SharingThaumonomiconItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
-            TooltipFlag flag) {
+    public void appendHoverText(
+            ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         ShareBinding binding = stack.get(TCDataComponents.SHARE_BINDING.get());
         if (binding != null) {
             tooltip.add(Component.translatable("tooltip.thaumaturge.sharing.bound", binding.name())
                     .withStyle(ChatFormatting.GRAY));
         }
-        tooltip.add(Component.translatable("tooltip.thaumaturge.sharing.hint")
-                .withStyle(ChatFormatting.DARK_GRAY));
+        tooltip.add(Component.translatable("tooltip.thaumaturge.sharing.hint").withStyle(ChatFormatting.DARK_GRAY));
     }
 }

@@ -21,8 +21,7 @@ import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 
-public final class TaintedSwirlLayer<T extends LivingEntity, M extends EntityModel<T>>
-        extends RenderLayer<T, M> {
+public final class TaintedSwirlLayer<T extends LivingEntity, M extends EntityModel<T>> extends RenderLayer<T, M> {
     private static final ResourceLocation TAINT_FIBRES =
             ResourceLocation.fromNamespaceAndPath(TCIds.MODID, "textures/models/taint_fibres.png");
     private static final float ALPHA = 0.66F;
@@ -37,9 +36,17 @@ public final class TaintedSwirlLayer<T extends LivingEntity, M extends EntityMod
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource buffers, int packedLight, T entity,
-                       float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks,
-                       float netHeadYaw, float headPitch) {
+    public void render(
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            int packedLight,
+            T entity,
+            float limbSwing,
+            float limbSwingAmount,
+            float partialTick,
+            float ageInTicks,
+            float netHeadYaw,
+            float headPitch) {
         if (ChampionHelper.championType(entity) != ChampionModifier.TAINTED) {
             return;
         }
@@ -52,8 +59,13 @@ public final class TaintedSwirlLayer<T extends LivingEntity, M extends EntityMod
     private record Key(float u, float v, boolean invisible) {}
 
     private static RenderType create(Key key) {
-        return RenderType.create("thaumaturge_tainted_swirl",
-                DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 1536, false, true,
+        return RenderType.create(
+                "thaumaturge_tainted_swirl",
+                DefaultVertexFormat.NEW_ENTITY,
+                VertexFormat.Mode.QUADS,
+                1536,
+                false,
+                true,
                 RenderType.CompositeState.builder()
                         .setShaderState(RenderStateShard.RENDERTYPE_ENERGY_SWIRL_SHADER)
                         .setTextureState(new RenderStateShard.TextureStateShard(TAINT_FIBRES, false, false))
@@ -63,8 +75,8 @@ public final class TaintedSwirlLayer<T extends LivingEntity, M extends EntityMod
                         .setLightmapState(RenderStateShard.LIGHTMAP)
                         .setOverlayState(new RenderStateShard.OverlayStateShard(true))
                         .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
-                        .setWriteMaskState(key.invisible
-                                ? RenderStateShard.COLOR_WRITE : RenderStateShard.COLOR_DEPTH_WRITE)
+                        .setWriteMaskState(
+                                key.invisible ? RenderStateShard.COLOR_WRITE : RenderStateShard.COLOR_DEPTH_WRITE)
                         .createCompositeState(false));
     }
 

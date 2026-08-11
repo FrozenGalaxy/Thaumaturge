@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.leclowndu93150.thaumaturge.TCIds;
 import com.leclowndu93150.thaumaturge.content.decor.BlockObsidianTotem;
 import com.leclowndu93150.thaumaturge.content.device.BlockInlay;
-import com.leclowndu93150.thaumaturge.content.manabean.BlockManaPod;
 import com.leclowndu93150.thaumaturge.content.device.BlockVisBattery;
 import com.leclowndu93150.thaumaturge.content.eldritch.block.BlockEldritchCrabSpawner;
 import com.leclowndu93150.thaumaturge.content.eldritch.block.BlockEldritchInset;
@@ -14,6 +13,7 @@ import com.leclowndu93150.thaumaturge.content.essentia.smeltery.BlockSmelter;
 import com.leclowndu93150.thaumaturge.content.essentia.tube.BlockEssentiaTransport;
 import com.leclowndu93150.thaumaturge.content.item.CelestialBody;
 import com.leclowndu93150.thaumaturge.content.item.PrimordialPearlItem;
+import com.leclowndu93150.thaumaturge.content.manabean.BlockManaPod;
 import com.leclowndu93150.thaumaturge.content.taint.block.BlockTaintFibre;
 import com.leclowndu93150.thaumaturge.data.model.crystal.CrystalBlockstateGenerator;
 import com.leclowndu93150.thaumaturge.data.model.crystal.CrystalItemModelGenerator;
@@ -50,10 +50,9 @@ import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.data.models.model.TextureMapping;
 import net.minecraft.data.models.model.TextureSlot;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DirectionalBlock;
@@ -68,7 +67,9 @@ public final class TCModelProvider implements DataProvider {
     private static final ModelTemplate THREE_LAYERED_ITEM = new ModelTemplate(
             Optional.of(ResourceLocation.withDefaultNamespace("item/generated")),
             Optional.empty(),
-            TextureSlot.LAYER0, TextureSlot.LAYER1, TextureSlot.LAYER2);
+            TextureSlot.LAYER0,
+            TextureSlot.LAYER1,
+            TextureSlot.LAYER2);
 
     private static final ResourceLocation GENERATED_PARENT = ResourceLocation.withDefaultNamespace("item/generated");
     private static final ResourceLocation BEWLR_BLOCK_PARENT = TCIds.rl("item/bewlr_block");
@@ -110,8 +111,8 @@ public final class TCModelProvider implements DataProvider {
         registerModels(blockModels);
         autoBlockItems();
         List<CompletableFuture<?>> futures = new ArrayList<>();
-        blockStates.forEach((block, generator) -> futures.add(DataProvider.saveStable(cache,
-                generator.get(), blockStatePath.json(BuiltInRegistries.BLOCK.getKey(block)))));
+        blockStates.forEach((block, generator) -> futures.add(DataProvider.saveStable(
+                cache, generator.get(), blockStatePath.json(BuiltInRegistries.BLOCK.getKey(block)))));
         models.forEach((id, json) -> futures.add(DataProvider.saveStable(cache, json.get(), modelPath.json(id))));
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
@@ -122,8 +123,7 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private static final Set<String> CHECKED_IN_ITEM_MODELS = Set.of(
-            "bellows", "leaves_greatwood", "leaves_silverwood",
-            "plank_greatwood", "plank_silverwood", "thaumometer");
+            "bellows", "leaves_greatwood", "leaves_silverwood", "plank_greatwood", "plank_silverwood", "thaumometer");
 
     private void autoBlockItems() {
         for (Item item : BuiltInRegistries.ITEM) {
@@ -181,7 +181,8 @@ public final class TCModelProvider implements DataProvider {
         simpleBlock(TCBlocks.JAR_NODE.get(), TCIds.rl("block/jar_normal"));
         delegateItem(TCBlocks.JAR_NODE.get().asItem(), BEWLR_BLOCK_PARENT);
         horizontalBlock(TCBlocks.INFERNAL_FURNACE.get(), "infernal_furnace");
-        simpleBlock(TCBlocks.NETHER_BRICKS_PLACEHOLDER.get(), ModelLocationUtils.getModelLocation(Blocks.NETHER_BRICKS));
+        simpleBlock(
+                TCBlocks.NETHER_BRICKS_PLACEHOLDER.get(), ModelLocationUtils.getModelLocation(Blocks.NETHER_BRICKS));
         simpleBlock(TCBlocks.OBSIDIAN_PLACEHOLDER.get(), ModelLocationUtils.getModelLocation(Blocks.OBSIDIAN));
         registerAlembic(TCBlocks.ALEMBIC.get());
         registerBellows();
@@ -291,8 +292,10 @@ public final class TCModelProvider implements DataProvider {
         registerCelestialNotes();
         registerBaubleItems();
 
-        ModelTemplates.TWO_LAYERED_ITEM.create(TCIds.rl("item/nitor"),
-                TextureMapping.layered(TCIds.rl("block/nitor"), TCIds.rl("block/nitor_core")), modelOutput);
+        ModelTemplates.TWO_LAYERED_ITEM.create(
+                TCIds.rl("item/nitor"),
+                TextureMapping.layered(TCIds.rl("block/nitor"), TCIds.rl("block/nitor_core")),
+                modelOutput);
         for (DyeColor dye : DyeColor.values()) {
             registerNitor(dye);
         }
@@ -395,8 +398,11 @@ public final class TCModelProvider implements DataProvider {
         Block pod = TCBlocks.MANA_POD.get();
         ResourceLocation[] stems = new ResourceLocation[3];
         for (int i = 0; i < 3; i++) {
-            stems[i] = ModelTemplates.CROSS.createWithSuffix(pod, "_stage" + i,
-                    TextureMapping.cross(TextureMapping.getBlockTexture(pod, "_stem_" + i)), modelOutput);
+            stems[i] = ModelTemplates.CROSS.createWithSuffix(
+                    pod,
+                    "_stage" + i,
+                    TextureMapping.cross(TextureMapping.getBlockTexture(pod, "_stem_" + i)),
+                    modelOutput);
         }
         PropertyDispatch ages = PropertyDispatch.property(BlockManaPod.AGE)
                 .select(0, v(stems[0]))
@@ -409,8 +415,10 @@ public final class TCModelProvider implements DataProvider {
                 .select(7, v(stems[2]));
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(pod).with(ages));
 
-        ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(TCItems.MANA_BEAN.get()),
-                TextureMapping.layer0(TCIds.rl("item/mana_bean")), modelOutput);
+        ModelTemplates.FLAT_ITEM.create(
+                ModelLocationUtils.getModelLocation(TCItems.MANA_BEAN.get()),
+                TextureMapping.layer0(TCIds.rl("item/mana_bean")),
+                modelOutput);
     }
 
     private static Variant v(ResourceLocation model) {
@@ -426,7 +434,9 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void translucentCube(Block block) {
-        ResourceLocation model = ModelTemplates.CUBE_ALL.create(block, TextureMapping.cube(block),
+        ResourceLocation model = ModelTemplates.CUBE_ALL.create(
+                block,
+                TextureMapping.cube(block),
                 (id, json) -> modelOutput.accept(id, () -> {
                     JsonElement element = json.get();
                     element.getAsJsonObject().addProperty("render_type", "minecraft:translucent");
@@ -444,19 +454,20 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void flatItem(Item item) {
-        ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(item),
-                TextureMapping.layer0(item), modelOutput);
+        ModelTemplates.FLAT_ITEM.create(
+                ModelLocationUtils.getModelLocation(item), TextureMapping.layer0(item), modelOutput);
     }
 
     private void handheldItem(Item item) {
-        ModelTemplates.FLAT_HANDHELD_ITEM.create(ModelLocationUtils.getModelLocation(item),
-                TextureMapping.layer0(item), modelOutput);
+        ModelTemplates.FLAT_HANDHELD_ITEM.create(
+                ModelLocationUtils.getModelLocation(item), TextureMapping.layer0(item), modelOutput);
     }
 
     private record ItemOverride(ResourceLocation predicate, float threshold, ResourceLocation model) {}
 
-    private record OverridesModel(Optional<ResourceLocation> parent, Map<String, ResourceLocation> layers,
-                                  List<ItemOverride> overrides) implements Supplier<JsonElement> {
+    private record OverridesModel(
+            Optional<ResourceLocation> parent, Map<String, ResourceLocation> layers, List<ItemOverride> overrides)
+            implements Supplier<JsonElement> {
         @Override
         public JsonElement get() {
             JsonObject root = new JsonObject();
@@ -481,21 +492,26 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void overridesItem(Item item, ResourceLocation parent, List<ItemOverride> overrides) {
-        modelOutput.accept(ModelLocationUtils.getModelLocation(item),
+        modelOutput.accept(
+                ModelLocationUtils.getModelLocation(item),
                 new OverridesModel(Optional.of(parent), Map.of(), overrides));
     }
 
     private void generatedOverridesItem(Item item, Map<String, ResourceLocation> layers, List<ItemOverride> overrides) {
-        modelOutput.accept(ModelLocationUtils.getModelLocation(item),
-                new OverridesModel(Optional.empty(), layers, overrides));
+        modelOutput.accept(
+                ModelLocationUtils.getModelLocation(item), new OverridesModel(Optional.empty(), layers, overrides));
     }
 
     private static PropertyDispatch horizontalDispatch() {
         return PropertyDispatch.property(BlockStateProperties.HORIZONTAL_FACING)
                 .select(Direction.NORTH, Variant.variant())
                 .select(Direction.EAST, Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
-                .select(Direction.SOUTH, Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
-                .select(Direction.WEST, Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270));
+                .select(
+                        Direction.SOUTH,
+                        Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
+                .select(
+                        Direction.WEST,
+                        Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270));
     }
 
     private static Variant facingRotation(Direction direction) {
@@ -503,12 +519,18 @@ public final class TCModelProvider implements DataProvider {
             case UP -> Variant.variant();
             case DOWN -> Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R180);
             case NORTH -> Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90);
-            case SOUTH -> Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180);
-            case WEST -> Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270);
-            case EAST -> Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
+            case SOUTH ->
+                Variant.variant()
+                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180);
+            case WEST ->
+                Variant.variant()
+                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270);
+            case EAST ->
+                Variant.variant()
+                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
         };
     }
 
@@ -525,12 +547,18 @@ public final class TCModelProvider implements DataProvider {
             case DOWN -> Variant.variant();
             case UP -> Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R180);
             case SOUTH -> Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90);
-            case NORTH -> Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180);
-            case EAST -> Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270);
-            case WEST -> Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
+            case NORTH ->
+                Variant.variant()
+                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180);
+            case EAST ->
+                Variant.variant()
+                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270);
+            case WEST ->
+                Variant.variant()
+                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
         };
     }
 
@@ -543,7 +571,8 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void horizontalBlock(Block block, String modelName) {
-        blockStateOutput.accept(MultiVariantGenerator.multiVariant(block, vName(modelName)).with(horizontalDispatch()));
+        blockStateOutput.accept(
+                MultiVariantGenerator.multiVariant(block, vName(modelName)).with(horizontalDispatch()));
         delegateItem(block.asItem(), TCIds.rl("block/" + modelName));
     }
 
@@ -553,8 +582,12 @@ public final class TCModelProvider implements DataProvider {
                 .select(Direction.UP, Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
                 .select(Direction.NORTH, Variant.variant())
                 .select(Direction.EAST, Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
-                .select(Direction.SOUTH, Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
-                .select(Direction.WEST, Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270));
+                .select(
+                        Direction.SOUTH,
+                        Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
+                .select(
+                        Direction.WEST,
+                        Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270));
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.BELLOWS.get(), vName("bellows"))
                 .with(rotations));
     }
@@ -567,8 +600,8 @@ public final class TCModelProvider implements DataProvider {
         ResourceLocation dyedItemModel = TCIds.rl("item/banner_dyed");
         ResourceLocation cultistItemModel = TCIds.rl("item/banner_cultist");
         THREE_LAYERED_ITEM.create(dyedItemModel, TextureMapping.layered(stand, cloth, symbol), modelOutput);
-        ModelTemplates.TWO_LAYERED_ITEM.create(cultistItemModel,
-                TextureMapping.layered(stand, cultistItemModel), modelOutput);
+        ModelTemplates.TWO_LAYERED_ITEM.create(
+                cultistItemModel, TextureMapping.layered(stand, cultistItemModel), modelOutput);
         for (DyeColor dye : DyeColor.values()) {
             simpleBlock(TCBlocks.BANNERS.get(dye).get(), bannerModel);
             simpleBlock(TCBlocks.WALL_BANNERS.get(dye).get(), bannerModel);
@@ -647,8 +680,10 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void registerVoidRobePiece(Item item, String name) {
-        ModelTemplates.TWO_LAYERED_ITEM.create(TCIds.rl("item/" + name),
-                TextureMapping.layered(TCIds.rl("item/" + name + "_over"), TCIds.rl("item/" + name)), modelOutput);
+        ModelTemplates.TWO_LAYERED_ITEM.create(
+                TCIds.rl("item/" + name),
+                TextureMapping.layered(TCIds.rl("item/" + name + "_over"), TCIds.rl("item/" + name)),
+                modelOutput);
     }
 
     private void registerCelestialNotes() {
@@ -667,7 +702,9 @@ public final class TCModelProvider implements DataProvider {
     private void registerWandItem() {
         ResourceLocation staffModel = TCIds.rl("item/wand_staff");
         modelOutput.accept(staffModel, new DelegatedModel(TCIds.rl("item/wand_staff_base")));
-        overridesItem(TCItems.WAND.get(), TCIds.rl("item/wand_base"),
+        overridesItem(
+                TCItems.WAND.get(),
+                TCIds.rl("item/wand_base"),
                 List.of(new ItemOverride(PROPERTY_WAND_IS_STAFF, 1.0F, staffModel)));
     }
 
@@ -694,10 +731,12 @@ public final class TCModelProvider implements DataProvider {
             case UP -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R180);
             case NORTH -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270);
             case SOUTH -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R90);
-            case WEST -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
-                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270);
-            case EAST -> variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
-                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
+            case WEST ->
+                variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
+                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270);
+            case EAST ->
+                variant.with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
+                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
         };
     }
 
@@ -723,12 +762,14 @@ public final class TCModelProvider implements DataProvider {
 
     private void registerResearchNote() {
         ResourceLocation complete = ModelLocationUtils.getModelLocation(TCItems.RESEARCH_NOTE.get(), "_complete");
-        ModelTemplates.TWO_LAYERED_ITEM.create(complete,
-                TextureMapping.layered(TCIds.rl("item/research_note_complete"),
-                        TCIds.rl("item/research_note_complete_overlay")), modelOutput);
-        generatedOverridesItem(TCItems.RESEARCH_NOTE.get(),
-                Map.of("layer0", TCIds.rl("item/research_note"),
-                        "layer1", TCIds.rl("item/research_note_overlay")),
+        ModelTemplates.TWO_LAYERED_ITEM.create(
+                complete,
+                TextureMapping.layered(
+                        TCIds.rl("item/research_note_complete"), TCIds.rl("item/research_note_complete_overlay")),
+                modelOutput);
+        generatedOverridesItem(
+                TCItems.RESEARCH_NOTE.get(),
+                Map.of("layer0", TCIds.rl("item/research_note"), "layer1", TCIds.rl("item/research_note_overlay")),
                 List.of(new ItemOverride(PROPERTY_NOTE_COMPLETE, 1.0F, complete)));
     }
 
@@ -759,7 +800,8 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void registerPillar(Block block, String modelName) {
-        blockStateOutput.accept(MultiVariantGenerator.multiVariant(block, vName(modelName)).with(horizontalDispatch()));
+        blockStateOutput.accept(
+                MultiVariantGenerator.multiVariant(block, vName(modelName)).with(horizontalDispatch()));
         delegateItem(block.asItem(), TCIds.rl("block/" + modelName));
     }
 
@@ -821,23 +863,29 @@ public final class TCModelProvider implements DataProvider {
         MultiPartGenerator inlayGenerator = MultiPartGenerator.multiPart(TCBlocks.INLAY.get())
                 .with(v(inlayDot))
                 .with(Condition.condition().term(BlockInlay.NORTH, true), v(inlaySide))
-                .with(Condition.condition().term(BlockInlay.EAST, true),
+                .with(
+                        Condition.condition().term(BlockInlay.EAST, true),
                         v(inlaySide).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
-                .with(Condition.condition().term(BlockInlay.SOUTH, true),
+                .with(
+                        Condition.condition().term(BlockInlay.SOUTH, true),
                         v(inlaySide).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
-                .with(Condition.condition().term(BlockInlay.WEST, true),
+                .with(
+                        Condition.condition().term(BlockInlay.WEST, true),
                         v(inlaySide).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270));
         blockStateOutput.accept(inlayGenerator);
-        ModelTemplates.TWO_LAYERED_ITEM.create(ModelLocationUtils.getModelLocation(TCItems.INLAY.get()),
+        ModelTemplates.TWO_LAYERED_ITEM.create(
+                ModelLocationUtils.getModelLocation(TCItems.INLAY.get()),
                 TextureMapping.layered(TCIds.rl("block/inlay_connect_under"), TCIds.rl("block/inlay_connect1")),
                 modelOutput);
 
         ResourceLocation patternCrafterModel = TCIds.rl("block/pattern_crafter");
-        blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.PATTERN_CRAFTER.get(),
-                v(patternCrafterModel)).with(horizontalDispatch()));
+        blockStateOutput.accept(
+                MultiVariantGenerator.multiVariant(TCBlocks.PATTERN_CRAFTER.get(), v(patternCrafterModel))
+                        .with(horizontalDispatch()));
         delegateItem(TCItems.PATTERN_CRAFTER.get(), patternCrafterModel);
 
-        ResourceLocation sprayerModel = ModelTemplates.CUBE_BOTTOM_TOP.create(TCBlocks.POTION_SPRAYER.get(),
+        ResourceLocation sprayerModel = ModelTemplates.CUBE_BOTTOM_TOP.create(
+                TCBlocks.POTION_SPRAYER.get(),
                 new TextureMapping()
                         .put(TextureSlot.TOP, TCIds.rl("block/potion_sprayer_top"))
                         .put(TextureSlot.BOTTOM, TCIds.rl("block/potion_sprayer_bottom"))
@@ -851,8 +899,8 @@ public final class TCModelProvider implements DataProvider {
         ResourceLocation levitatorOff = TCIds.rl("block/levitator_off");
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.LEVITATOR.get())
                 .with(PropertyDispatch.properties(BlockStateProperties.ENABLED, BlockStateProperties.FACING)
-                        .generate((enabled, facing) -> Variant.merge(v(enabled ? levitatorOn : levitatorOff),
-                                facingRotation(facing)))));
+                        .generate((enabled, facing) ->
+                                Variant.merge(v(enabled ? levitatorOn : levitatorOff), facingRotation(facing)))));
         delegateItem(TCItems.LEVITATOR.get(), levitatorOff);
 
         registerInvisibleBlock(TCBlocks.GOLEM_BUILDER.get());
@@ -871,7 +919,9 @@ public final class TCModelProvider implements DataProvider {
         flatItem(TCItems.GRAPPLE_GUN_SPOOL.get());
         flatItem(TCItems.ELDRITCH_EYE.get());
         flatItem(TCItems.RUNED_TABLET.get());
-        overridesItem(TCItems.GRAPPLE_GUN.get(), TCIds.rl("item/grapple_gun_1"),
+        overridesItem(
+                TCItems.GRAPPLE_GUN.get(),
+                TCIds.rl("item/grapple_gun_1"),
                 List.of(new ItemOverride(PROPERTY_LOADED, 1.0F, TCIds.rl("item/grapple_gun_2"))));
         registerActivatorRail();
     }
@@ -879,26 +929,34 @@ public final class TCModelProvider implements DataProvider {
     private void registerActivatorRail() {
         Block block = TCBlocks.ACTIVATOR_RAIL.get();
         ResourceLocation flat = ModelTemplates.RAIL_FLAT.create(block, TextureMapping.rail(block), modelOutput);
-        ResourceLocation risingNE = ModelTemplates.RAIL_RAISED_NE.create(block, TextureMapping.rail(block), modelOutput);
-        ResourceLocation risingSW = ModelTemplates.RAIL_RAISED_SW.create(block, TextureMapping.rail(block), modelOutput);
-        ResourceLocation flatOn = ModelTemplates.RAIL_FLAT.createWithSuffix(block, "_on",
-                TextureMapping.rail(TextureMapping.getBlockTexture(block, "_on")), modelOutput);
-        ResourceLocation risingNEOn = ModelTemplates.RAIL_RAISED_NE.createWithSuffix(block, "_on",
-                TextureMapping.rail(TextureMapping.getBlockTexture(block, "_on")), modelOutput);
-        ResourceLocation risingSWOn = ModelTemplates.RAIL_RAISED_SW.createWithSuffix(block, "_on",
-                TextureMapping.rail(TextureMapping.getBlockTexture(block, "_on")), modelOutput);
-        ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(block.asItem()),
-                TextureMapping.layer0(TextureMapping.getBlockTexture(block)), modelOutput);
+        ResourceLocation risingNE =
+                ModelTemplates.RAIL_RAISED_NE.create(block, TextureMapping.rail(block), modelOutput);
+        ResourceLocation risingSW =
+                ModelTemplates.RAIL_RAISED_SW.create(block, TextureMapping.rail(block), modelOutput);
+        ResourceLocation flatOn = ModelTemplates.RAIL_FLAT.createWithSuffix(
+                block, "_on", TextureMapping.rail(TextureMapping.getBlockTexture(block, "_on")), modelOutput);
+        ResourceLocation risingNEOn = ModelTemplates.RAIL_RAISED_NE.createWithSuffix(
+                block, "_on", TextureMapping.rail(TextureMapping.getBlockTexture(block, "_on")), modelOutput);
+        ResourceLocation risingSWOn = ModelTemplates.RAIL_RAISED_SW.createWithSuffix(
+                block, "_on", TextureMapping.rail(TextureMapping.getBlockTexture(block, "_on")), modelOutput);
+        ModelTemplates.FLAT_ITEM.create(
+                ModelLocationUtils.getModelLocation(block.asItem()),
+                TextureMapping.layer0(TextureMapping.getBlockTexture(block)),
+                modelOutput);
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(block)
-                .with(PropertyDispatch.properties(BlockStateProperties.POWERED, BlockStateProperties.RAIL_SHAPE_STRAIGHT)
+                .with(PropertyDispatch.properties(
+                                BlockStateProperties.POWERED, BlockStateProperties.RAIL_SHAPE_STRAIGHT)
                         .generate((powered, railShape) -> switch (railShape) {
                             case NORTH_SOUTH -> v(powered ? flatOn : flat);
-                            case EAST_WEST -> v(powered ? flatOn : flat)
-                                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
-                            case ASCENDING_EAST -> v(powered ? risingNEOn : risingNE)
-                                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
-                            case ASCENDING_WEST -> v(powered ? risingSWOn : risingSW)
-                                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
+                            case EAST_WEST ->
+                                v(powered ? flatOn : flat)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
+                            case ASCENDING_EAST ->
+                                v(powered ? risingNEOn : risingNE)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
+                            case ASCENDING_WEST ->
+                                v(powered ? risingSWOn : risingSW)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
                             case ASCENDING_NORTH -> v(powered ? risingNEOn : risingNE);
                             case ASCENDING_SOUTH -> v(powered ? risingSWOn : risingSW);
                             default -> throw new UnsupportedOperationException();
@@ -912,8 +970,10 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void registerRobeItem(Item item, String name) {
-        ModelTemplates.TWO_LAYERED_ITEM.create(TCIds.rl("item/" + name),
-                TextureMapping.layered(TCIds.rl("item/" + name), TCIds.rl("item/" + name + "_over")), modelOutput);
+        ModelTemplates.TWO_LAYERED_ITEM.create(
+                TCIds.rl("item/" + name),
+                TextureMapping.layered(TCIds.rl("item/" + name), TCIds.rl("item/" + name + "_over")),
+                modelOutput);
     }
 
     private void registerJarBrain() {
@@ -923,7 +983,8 @@ public final class TCModelProvider implements DataProvider {
 
     private void registerNoiseDevices() {
         registerEnabledFacingDevice(TCBlocks.ARCANE_EAR.get(), "arcane_ear_on", "arcane_ear_off", false);
-        registerEnabledFacingDevice(TCBlocks.ARCANE_EAR_TOGGLE.get(), "arcane_ear_toggle_on", "arcane_ear_toggle_off", false);
+        registerEnabledFacingDevice(
+                TCBlocks.ARCANE_EAR_TOGGLE.get(), "arcane_ear_toggle_on", "arcane_ear_toggle_off", false);
 
         registerEnabledFacingDevice(TCBlocks.LAMP_ARCANE.get(), "lamp_arcane_on", "lamp_arcane_off", true);
         registerEnabledFacingDevice(TCBlocks.LAMP_GROWTH.get(), "lamp_growth_on", "lamp_growth_off", true);
@@ -943,17 +1004,22 @@ public final class TCModelProvider implements DataProvider {
 
         ResourceLocation thaumatoriumModel = TCIds.rl("block/thaumatorium");
         PropertyDispatch thaumatoriumFacing = PropertyDispatch.property(BlockStateProperties.HORIZONTAL_FACING)
-                .select(Direction.WEST, Variant.variant()
-                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-                .select(Direction.SOUTH, Variant.variant()
-                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
-                .select(Direction.NORTH, Variant.variant()
-                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
-                .select(Direction.EAST, Variant.variant()
-                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180));
+                .select(Direction.WEST, Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
+                .select(
+                        Direction.SOUTH,
+                        Variant.variant()
+                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
+                .select(
+                        Direction.NORTH,
+                        Variant.variant()
+                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
+                .select(
+                        Direction.EAST,
+                        Variant.variant()
+                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180));
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.THAUMATORIUM.get(), v(thaumatoriumModel))
                 .with(thaumatoriumFacing));
         delegateItem(TCItems.THAUMATORIUM.get(), thaumatoriumModel);
@@ -961,19 +1027,27 @@ public final class TCModelProvider implements DataProvider {
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.BRAIN_BOX.get(), vName("brain_box"))
                 .with(PropertyDispatch.property(BlockStateProperties.FACING)
                         .select(Direction.DOWN, Variant.variant())
-                        .select(Direction.UP, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R180))
-                        .select(Direction.SOUTH, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-                        .select(Direction.NORTH, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
-                        .select(Direction.WEST, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
-                        .select(Direction.EAST, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))));
+                        .select(
+                                Direction.UP,
+                                Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R180))
+                        .select(
+                                Direction.SOUTH,
+                                Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
+                        .select(
+                                Direction.NORTH,
+                                Variant.variant()
+                                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
+                        .select(
+                                Direction.WEST,
+                                Variant.variant()
+                                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
+                        .select(
+                                Direction.EAST,
+                                Variant.variant()
+                                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))));
         delegateItem(TCItems.BRAIN_BOX.get(), TCIds.rl("block/brain_box"));
 
         registerInvisibleBlock(TCBlocks.CENTRIFUGE.get());
@@ -994,10 +1068,10 @@ public final class TCModelProvider implements DataProvider {
                 new LatticeFace(BlockStateProperties.SOUTH, Direction.SOUTH),
                 new LatticeFace(BlockStateProperties.NORTH, Direction.NORTH),
                 new LatticeFace(BlockStateProperties.WEST, Direction.WEST),
-                new LatticeFace(BlockStateProperties.EAST, Direction.EAST)
-        );
+                new LatticeFace(BlockStateProperties.EAST, Direction.EAST));
         for (LatticeFace face : faces) {
-            generator = generator.with(Condition.condition().term(face.property(), true),
+            generator = generator.with(
+                    Condition.condition().term(face.property(), true),
                     Variant.merge(v(side), hangingRotation(face.direction())));
         }
         blockStateOutput.accept(generator);
@@ -1030,7 +1104,8 @@ public final class TCModelProvider implements DataProvider {
     private void registerEnabledFacingDevice(Block block, String onModel, String offModel, boolean hanging) {
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(block)
                 .with(PropertyDispatch.properties(BlockStateProperties.ENABLED, BlockStateProperties.FACING)
-                        .generate((enabled, facing) -> Variant.merge(vName(enabled ? onModel : offModel),
+                        .generate((enabled, facing) -> Variant.merge(
+                                vName(enabled ? onModel : offModel),
                                 hanging ? hangingRotation(facing) : facingRotation(facing)))));
         delegateItem(block.asItem(), TCIds.rl("block/" + offModel));
     }
@@ -1045,11 +1120,10 @@ public final class TCModelProvider implements DataProvider {
             batteryModels[i] = ModelTemplates.CUBE_ALL.create(textureId, TextureMapping.cube(textureId), modelOutput);
         }
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.VIS_BATTERY.get())
-                .with(PropertyDispatch.property(BlockVisBattery.CHARGE)
-                        .generate(charge -> {
-                            int tier = charge == 0 ? 0 : charge >= 10 ? 4 : (charge + 2) / 3;
-                            return v(batteryModels[tier]);
-                        })));
+                .with(PropertyDispatch.property(BlockVisBattery.CHARGE).generate(charge -> {
+                    int tier = charge == 0 ? 0 : charge >= 10 ? 4 : (charge + 2) / 3;
+                    return v(batteryModels[tier]);
+                })));
         delegateItem(TCItems.VIS_BATTERY.get(), batteryModels[0]);
 
         ResourceLocation dioptraOn = TCIds.rl("block/dioptra_on");
@@ -1064,16 +1138,20 @@ public final class TCModelProvider implements DataProvider {
     private void registerMirrorItem(Item item, String frameTexture) {
         ResourceLocation base = ModelLocationUtils.getModelLocation(item, "_off");
         ResourceLocation linked = ModelLocationUtils.getModelLocation(item, "_on");
-        ModelTemplates.TWO_LAYERED_ITEM.create(base,
-                TextureMapping.layered(TCIds.rl("block/" + frameTexture), TCIds.rl("block/mirrorpane")), modelOutput);
-        ModelTemplates.TWO_LAYERED_ITEM.create(linked,
-                TextureMapping.layered(TCIds.rl("block/" + frameTexture), TCIds.rl("block/mirrorpaneopen")), modelOutput);
+        ModelTemplates.TWO_LAYERED_ITEM.create(
+                base,
+                TextureMapping.layered(TCIds.rl("block/" + frameTexture), TCIds.rl("block/mirrorpane")),
+                modelOutput);
+        ModelTemplates.TWO_LAYERED_ITEM.create(
+                linked,
+                TextureMapping.layered(TCIds.rl("block/" + frameTexture), TCIds.rl("block/mirrorpaneopen")),
+                modelOutput);
         overridesItem(item, base, List.of(new ItemOverride(PROPERTY_LINKED, 1.0F, linked)));
     }
 
     private void mirrorBlockState(Block block) {
-        ResourceLocation model = ModelTemplates.PARTICLE_ONLY.createWithSuffix(block, "_state",
-                TextureMapping.particle(TCIds.rl("block/mirrorframe")), modelOutput);
+        ResourceLocation model = ModelTemplates.PARTICLE_ONLY.createWithSuffix(
+                block, "_state", TextureMapping.particle(TCIds.rl("block/mirrorframe")), modelOutput);
         simpleBlock(block, model);
     }
 
@@ -1089,18 +1167,25 @@ public final class TCModelProvider implements DataProvider {
         simpleFromExisting(TCBlocks.STONE_POROUS.get(), "stone_porous");
 
         stairsFromModels(TCBlocks.STAIRS_ARCANE.get(), "arcane_stairs", "arcane_inner_stairs", "arcane_outer_stairs");
-        stairsFromModels(TCBlocks.STAIRS_ARCANE_BRICK.get(), "arcane_brick_stairs", "arcane_brick_inner_stairs", "arcane_brick_outer_stairs");
-        stairsFromModels(TCBlocks.STAIRS_ANCIENT.get(), "ancient_stairs", "ancient_inner_stairs", "ancient_outer_stairs");
+        stairsFromModels(
+                TCBlocks.STAIRS_ARCANE_BRICK.get(),
+                "arcane_brick_stairs",
+                "arcane_brick_inner_stairs",
+                "arcane_brick_outer_stairs");
+        stairsFromModels(
+                TCBlocks.STAIRS_ANCIENT.get(), "ancient_stairs", "ancient_inner_stairs", "ancient_outer_stairs");
     }
 
     private void stairsFromModels(Block block, String straightName, String innerName, String outerName) {
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(block)
-                .with(stairsDispatch(TCIds.rl("block/" + straightName), TCIds.rl("block/" + innerName),
+                .with(stairsDispatch(
+                        TCIds.rl("block/" + straightName),
+                        TCIds.rl("block/" + innerName),
                         TCIds.rl("block/" + outerName))));
     }
 
-    private static Variant stairVariant(ResourceLocation model, VariantProperties.Rotation xRot,
-                                        VariantProperties.Rotation yRot) {
+    private static Variant stairVariant(
+            ResourceLocation model, VariantProperties.Rotation xRot, VariantProperties.Rotation yRot) {
         Variant variant = v(model);
         if (xRot != VariantProperties.Rotation.R0) {
             variant = variant.with(VariantProperties.X_ROT, xRot);
@@ -1114,14 +1199,16 @@ public final class TCModelProvider implements DataProvider {
         return variant;
     }
 
-    private static PropertyDispatch stairsDispatch(ResourceLocation straight, ResourceLocation inner,
-                                                   ResourceLocation outer) {
+    private static PropertyDispatch stairsDispatch(
+            ResourceLocation straight, ResourceLocation inner, ResourceLocation outer) {
         VariantProperties.Rotation r0 = VariantProperties.Rotation.R0;
         VariantProperties.Rotation r90 = VariantProperties.Rotation.R90;
         VariantProperties.Rotation r180 = VariantProperties.Rotation.R180;
         VariantProperties.Rotation r270 = VariantProperties.Rotation.R270;
-        return PropertyDispatch.properties(BlockStateProperties.HORIZONTAL_FACING,
-                        BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE)
+        return PropertyDispatch.properties(
+                        BlockStateProperties.HORIZONTAL_FACING,
+                        BlockStateProperties.HALF,
+                        BlockStateProperties.STAIRS_SHAPE)
                 .select(Direction.EAST, Half.BOTTOM, StairsShape.STRAIGHT, stairVariant(straight, r0, r0))
                 .select(Direction.WEST, Half.BOTTOM, StairsShape.STRAIGHT, stairVariant(straight, r0, r180))
                 .select(Direction.SOUTH, Half.BOTTOM, StairsShape.STRAIGHT, stairVariant(straight, r0, r90))
@@ -1196,11 +1283,14 @@ public final class TCModelProvider implements DataProvider {
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(block)
                 .with(PropertyDispatch.property(BlockStateProperties.AXIS)
                         .select(Direction.Axis.Y, v(vertical))
-                        .select(Direction.Axis.Z, v(horizontal)
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-                        .select(Direction.Axis.X, v(horizontal)
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))));
+                        .select(
+                                Direction.Axis.Z,
+                                v(horizontal).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
+                        .select(
+                                Direction.Axis.X,
+                                v(horizontal)
+                                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))));
     }
 
     private void plantModels() {
@@ -1218,8 +1308,10 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void flatItemFromBlock(Item item, Block block) {
-        ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(item),
-                TextureMapping.layer0(TextureMapping.getBlockTexture(block)), modelOutput);
+        ModelTemplates.FLAT_ITEM.create(
+                ModelLocationUtils.getModelLocation(item),
+                TextureMapping.layer0(TextureMapping.getBlockTexture(block)),
+                modelOutput);
     }
 
     private void cross(Block block) {
@@ -1228,12 +1320,15 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void taintModels() {
-        blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.TAINT_ROCK.get(),
-                rotatedWeighted(new String[]{"taint_rock"}, new int[]{1})));
-        blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.TAINT_SOIL.get(),
-                rotatedWeighted(new String[]{"taint_soil_0", "taint_soil_1", "taint_soil_2"}, new int[]{16, 1, 1})));
-        blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.TAINT_CRUST.get(),
-                rotatedWeighted(new String[]{"taint_crust_0", "taint_crust_1", "taint_crust_2"}, new int[]{8, 1, 1})));
+        blockStateOutput.accept(MultiVariantGenerator.multiVariant(
+                TCBlocks.TAINT_ROCK.get(), rotatedWeighted(new String[] {"taint_rock"}, new int[] {1})));
+        blockStateOutput.accept(MultiVariantGenerator.multiVariant(
+                TCBlocks.TAINT_SOIL.get(),
+                rotatedWeighted(new String[] {"taint_soil_0", "taint_soil_1", "taint_soil_2"}, new int[] {16, 1, 1})));
+        blockStateOutput.accept(MultiVariantGenerator.multiVariant(
+                TCBlocks.TAINT_CRUST.get(),
+                rotatedWeighted(
+                        new String[] {"taint_crust_0", "taint_crust_1", "taint_crust_2"}, new int[] {8, 1, 1})));
 
         simpleFromExisting(TCBlocks.FLUX_GOO.get(), "flux_goo");
         simpleFromExisting(TCBlocks.TAINT_GEYSER.get(), "taint_geyser");
@@ -1253,19 +1348,22 @@ public final class TCModelProvider implements DataProvider {
     private void registerTaintLog() {
         List<Variant> barks = new ArrayList<>();
         for (int tex = 1; tex <= 2; tex++) {
-            for (String face : new String[]{"north", "south", "east", "west"}) {
+            for (String face : new String[] {"north", "south", "east", "west"}) {
                 barks.add(vName("taint_log_" + face + tex));
             }
         }
-        blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.TAINT_LOG.get(),
-                        barks.toArray(Variant[]::new))
+        blockStateOutput.accept(MultiVariantGenerator.multiVariant(
+                        TCBlocks.TAINT_LOG.get(), barks.toArray(Variant[]::new))
                 .with(PropertyDispatch.property(BlockStateProperties.AXIS)
                         .select(Direction.Axis.Y, Variant.variant())
-                        .select(Direction.Axis.Z, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-                        .select(Direction.Axis.X, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))));
+                        .select(
+                                Direction.Axis.Z,
+                                Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
+                        .select(
+                                Direction.Axis.X,
+                                Variant.variant()
+                                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))));
     }
 
     private Variant[] rotatedWeighted(String[] models, int[] weights) {
@@ -1285,37 +1383,49 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void registerTaintFeature() {
-        Variant[] orbs = new Variant[]{vName("taint_orb_0"), vName("taint_orb_1"), vName("taint_orb_2")};
+        Variant[] orbs = new Variant[] {vName("taint_orb_0"), vName("taint_orb_1"), vName("taint_orb_2")};
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.TAINT_FEATURE.get(), orbs)
                 .with(PropertyDispatch.property(DirectionalBlock.FACING)
                         .select(Direction.UP, Variant.variant())
-                        .select(Direction.DOWN, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R180))
-                        .select(Direction.NORTH, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
-                        .select(Direction.SOUTH, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-                        .select(Direction.WEST, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
-                        .select(Direction.EAST, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))));
+                        .select(
+                                Direction.DOWN,
+                                Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R180))
+                        .select(
+                                Direction.NORTH,
+                                Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
+                        .select(
+                                Direction.SOUTH,
+                                Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
+                        .select(
+                                Direction.WEST,
+                                Variant.variant()
+                                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
+                        .select(
+                                Direction.EAST,
+                                Variant.variant()
+                                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))));
     }
 
     private void registerTaintFibre() {
         ResourceLocation fibre = TCIds.rl("block/taint_fibre");
         MultiPartGenerator generator = MultiPartGenerator.multiPart(TCBlocks.TAINT_FIBRE.get())
                 .with(Condition.condition().term(BlockTaintFibre.NORTH, true), v(fibre))
-                .with(Condition.condition().term(BlockTaintFibre.EAST, true),
+                .with(
+                        Condition.condition().term(BlockTaintFibre.EAST, true),
                         v(fibre).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
-                .with(Condition.condition().term(BlockTaintFibre.SOUTH, true),
+                .with(
+                        Condition.condition().term(BlockTaintFibre.SOUTH, true),
                         v(fibre).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
-                .with(Condition.condition().term(BlockTaintFibre.WEST, true),
+                .with(
+                        Condition.condition().term(BlockTaintFibre.WEST, true),
                         v(fibre).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
-                .with(Condition.condition().term(BlockTaintFibre.UP, true),
+                .with(
+                        Condition.condition().term(BlockTaintFibre.UP, true),
                         v(fibre).with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
-                .with(Condition.condition().term(BlockTaintFibre.DOWN, true),
+                .with(
+                        Condition.condition().term(BlockTaintFibre.DOWN, true),
                         v(fibre).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
                 .with(Condition.condition().term(BlockTaintFibre.GROWTH1, true), vName("taint_growth_1"))
                 .with(Condition.condition().term(BlockTaintFibre.GROWTH2, true), vName("taint_growth_2"))
@@ -1325,18 +1435,42 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void decorModels() {
-        slab(TCBlocks.SLAB_GREATWOOD.get(), TCBlocks.PLANK_GREATWOOD.get(),
-                blockTexture("plank_greatwood"), blockTexture("plank_greatwood"), blockTexture("plank_greatwood"));
-        slab(TCBlocks.SLAB_SILVERWOOD.get(), TCBlocks.PLANK_SILVERWOOD.get(),
-                blockTexture("plank_silverwood"), blockTexture("plank_silverwood"), blockTexture("plank_silverwood"));
-        slab(TCBlocks.SLAB_ARCANE_STONE.get(), TCBlocks.STONE_ARCANE.get(),
-                blockTexture("arcane_stone_1"), blockTexture("arcane_stone_2"), blockTexture("arcane_stone_3"));
-        slab(TCBlocks.SLAB_ARCANE_BRICK.get(), TCBlocks.STONE_ARCANE_BRICK.get(),
-                blockTexture("arcane_brick_stone"), blockTexture("arcane_brick_stone"), blockTexture("arcane_brick_stone"));
-        slab(TCBlocks.SLAB_ANCIENT.get(), TCBlocks.STONE_ANCIENT.get(),
-                blockTexture("ancient_stone_1"), blockTexture("ancient_stone_2"), blockTexture("ancient_stone_3"));
-        slab(TCBlocks.SLAB_ELDRITCH.get(), TCBlocks.STONE_ELDRITCH_TILE.get(),
-                blockTexture("eldritch_stone_1"), blockTexture("eldritch_stone_2"), blockTexture("eldritch_stone_3"));
+        slab(
+                TCBlocks.SLAB_GREATWOOD.get(),
+                TCBlocks.PLANK_GREATWOOD.get(),
+                blockTexture("plank_greatwood"),
+                blockTexture("plank_greatwood"),
+                blockTexture("plank_greatwood"));
+        slab(
+                TCBlocks.SLAB_SILVERWOOD.get(),
+                TCBlocks.PLANK_SILVERWOOD.get(),
+                blockTexture("plank_silverwood"),
+                blockTexture("plank_silverwood"),
+                blockTexture("plank_silverwood"));
+        slab(
+                TCBlocks.SLAB_ARCANE_STONE.get(),
+                TCBlocks.STONE_ARCANE.get(),
+                blockTexture("arcane_stone_1"),
+                blockTexture("arcane_stone_2"),
+                blockTexture("arcane_stone_3"));
+        slab(
+                TCBlocks.SLAB_ARCANE_BRICK.get(),
+                TCBlocks.STONE_ARCANE_BRICK.get(),
+                blockTexture("arcane_brick_stone"),
+                blockTexture("arcane_brick_stone"),
+                blockTexture("arcane_brick_stone"));
+        slab(
+                TCBlocks.SLAB_ANCIENT.get(),
+                TCBlocks.STONE_ANCIENT.get(),
+                blockTexture("ancient_stone_1"),
+                blockTexture("ancient_stone_2"),
+                blockTexture("ancient_stone_3"));
+        slab(
+                TCBlocks.SLAB_ELDRITCH.get(),
+                TCBlocks.STONE_ELDRITCH_TILE.get(),
+                blockTexture("eldritch_stone_1"),
+                blockTexture("eldritch_stone_2"),
+                blockTexture("eldritch_stone_3"));
         stairsFromTexture(TCBlocks.STAIRS_GREATWOOD.get(), blockTexture("plank_greatwood"));
         stairsFromTexture(TCBlocks.STAIRS_SILVERWOOD.get(), blockTexture("plank_silverwood"));
         existingModelWithItem(TCBlocks.TABLE_WOOD.get(), "table_wood");
@@ -1349,8 +1483,8 @@ public final class TCModelProvider implements DataProvider {
         return TCIds.rl("block/" + name);
     }
 
-    private void slab(Block slab, Block fullBlock, ResourceLocation bottom, ResourceLocation top,
-                      ResourceLocation side) {
+    private void slab(
+            Block slab, Block fullBlock, ResourceLocation bottom, ResourceLocation top, ResourceLocation side) {
         TextureMapping mapping = new TextureMapping()
                 .put(TextureSlot.BOTTOM, bottom)
                 .put(TextureSlot.TOP, top)
@@ -1374,8 +1508,7 @@ public final class TCModelProvider implements DataProvider {
         ResourceLocation straight = ModelTemplates.STAIRS_STRAIGHT.create(block, mapping, modelOutput);
         ResourceLocation inner = ModelTemplates.STAIRS_INNER.create(block, mapping, modelOutput);
         ResourceLocation outer = ModelTemplates.STAIRS_OUTER.create(block, mapping, modelOutput);
-        blockStateOutput.accept(MultiVariantGenerator.multiVariant(block)
-                .with(stairsDispatch(straight, inner, outer)));
+        blockStateOutput.accept(MultiVariantGenerator.multiVariant(block).with(stairsDispatch(straight, inner, outer)));
         delegateItem(block.asItem(), straight);
     }
 
@@ -1418,14 +1551,15 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void cube(Block block, String textureName) {
-        ResourceLocation model = ModelTemplates.CUBE_ALL.create(block,
-                new TextureMapping().put(TextureSlot.ALL, blockTexture(textureName)), modelOutput);
+        ResourceLocation model = ModelTemplates.CUBE_ALL.create(
+                block, new TextureMapping().put(TextureSlot.ALL, blockTexture(textureName)), modelOutput);
         simpleBlock(block, model);
         delegateItem(block.asItem(), model);
     }
 
     private void eldritchLock() {
-        ResourceLocation model = ModelTemplates.CUBE_ORIENTABLE.create(TCBlocks.ELDRITCH_LOCK.get(),
+        ResourceLocation model = ModelTemplates.CUBE_ORIENTABLE.create(
+                TCBlocks.ELDRITCH_LOCK.get(),
                 new TextureMapping()
                         .put(TextureSlot.FRONT, blockTexture("eldritch_lock_face"))
                         .put(TextureSlot.SIDE, blockTexture("eldritch_lock_side"))
@@ -1433,17 +1567,22 @@ public final class TCModelProvider implements DataProvider {
                 modelOutput);
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(TCBlocks.ELDRITCH_LOCK.get(), v(model))
                 .with(PropertyDispatch.property(BlockStateProperties.FACING)
-                        .select(Direction.DOWN, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-                        .select(Direction.UP, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
+                        .select(
+                                Direction.DOWN,
+                                Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
+                        .select(
+                                Direction.UP,
+                                Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
                         .select(Direction.NORTH, Variant.variant())
-                        .select(Direction.SOUTH, Variant.variant()
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
-                        .select(Direction.WEST, Variant.variant()
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
-                        .select(Direction.EAST, Variant.variant()
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))));
+                        .select(
+                                Direction.SOUTH,
+                                Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
+                        .select(
+                                Direction.WEST,
+                                Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
+                        .select(
+                                Direction.EAST,
+                                Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))));
         delegateItem(TCBlocks.ELDRITCH_LOCK.get().asItem(), model);
     }
 
@@ -1478,14 +1617,18 @@ public final class TCModelProvider implements DataProvider {
         textures.addProperty("all", texture.toString());
         root.add("textures", textures);
         JsonObject element = new JsonObject();
-        element.add("from", insetCoords(
-                insetExposed(mask, Direction.WEST) ? INSET_DEPTH : 0,
-                insetExposed(mask, Direction.DOWN) ? INSET_DEPTH : 0,
-                insetExposed(mask, Direction.NORTH) ? INSET_DEPTH : 0));
-        element.add("to", insetCoords(
-                insetExposed(mask, Direction.EAST) ? 16 - INSET_DEPTH : 16,
-                insetExposed(mask, Direction.UP) ? 16 - INSET_DEPTH : 16,
-                insetExposed(mask, Direction.SOUTH) ? 16 - INSET_DEPTH : 16));
+        element.add(
+                "from",
+                insetCoords(
+                        insetExposed(mask, Direction.WEST) ? INSET_DEPTH : 0,
+                        insetExposed(mask, Direction.DOWN) ? INSET_DEPTH : 0,
+                        insetExposed(mask, Direction.NORTH) ? INSET_DEPTH : 0));
+        element.add(
+                "to",
+                insetCoords(
+                        insetExposed(mask, Direction.EAST) ? 16 - INSET_DEPTH : 16,
+                        insetExposed(mask, Direction.UP) ? 16 - INSET_DEPTH : 16,
+                        insetExposed(mask, Direction.SOUTH) ? 16 - INSET_DEPTH : 16));
         JsonObject faces = new JsonObject();
         for (Direction dir : Direction.values()) {
             JsonObject face = new JsonObject();
@@ -1511,7 +1654,8 @@ public final class TCModelProvider implements DataProvider {
     }
 
     private void column(Block block, String side, String end) {
-        ResourceLocation model = ModelTemplates.CUBE_COLUMN.create(block,
+        ResourceLocation model = ModelTemplates.CUBE_COLUMN.create(
+                block,
                 new TextureMapping().put(TextureSlot.SIDE, blockTexture(side)).put(TextureSlot.END, blockTexture(end)),
                 modelOutput);
         simpleBlock(block, model);
@@ -1520,17 +1664,29 @@ public final class TCModelProvider implements DataProvider {
 
     private void obsidianTotem() {
         Block block = TCBlocks.OBSIDIAN_TOTEM.get();
-        ResourceLocation baseModel = ModelTemplates.CUBE_COLUMN.createWithSuffix(block, "_base",
-                new TextureMapping().put(TextureSlot.SIDE, blockTexture("obsidian_totem_base"))
-                        .put(TextureSlot.END, blockTexture("obsidian_tile")), modelOutput);
-        ResourceLocation shadedModel = ModelTemplates.CUBE_COLUMN.createWithSuffix(block, "_shaded",
-                new TextureMapping().put(TextureSlot.SIDE, blockTexture("obsidian_totem_base_shaded"))
-                        .put(TextureSlot.END, blockTexture("obsidian_tile")), modelOutput);
+        ResourceLocation baseModel = ModelTemplates.CUBE_COLUMN.createWithSuffix(
+                block,
+                "_base",
+                new TextureMapping()
+                        .put(TextureSlot.SIDE, blockTexture("obsidian_totem_base"))
+                        .put(TextureSlot.END, blockTexture("obsidian_tile")),
+                modelOutput);
+        ResourceLocation shadedModel = ModelTemplates.CUBE_COLUMN.createWithSuffix(
+                block,
+                "_shaded",
+                new TextureMapping()
+                        .put(TextureSlot.SIDE, blockTexture("obsidian_totem_base_shaded"))
+                        .put(TextureSlot.END, blockTexture("obsidian_tile")),
+                modelOutput);
         List<Variant> carved = new ArrayList<>();
         for (int i = 1; i <= 4; i++) {
-            ResourceLocation model = ModelTemplates.CUBE_COLUMN.createWithSuffix(block, "_carved_" + i,
-                    new TextureMapping().put(TextureSlot.SIDE, blockTexture("obsidian_totem_" + i))
-                            .put(TextureSlot.END, blockTexture("obsidian_tile")), modelOutput);
+            ResourceLocation model = ModelTemplates.CUBE_COLUMN.createWithSuffix(
+                    block,
+                    "_carved_" + i,
+                    new TextureMapping()
+                            .put(TextureSlot.SIDE, blockTexture("obsidian_totem_" + i))
+                            .put(TextureSlot.END, blockTexture("obsidian_tile")),
+                    modelOutput);
             carved.add(v(model));
             carved.add(v(model).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90));
             carved.add(v(model).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180));
@@ -1551,8 +1707,11 @@ public final class TCModelProvider implements DataProvider {
         Block block = TCBlocks.ELDRITCH_TRAP.get();
         List<Variant> variants = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            ResourceLocation model = ModelTemplates.CUBE_ALL.createWithSuffix(block, "_" + i,
-                    new TextureMapping().put(TextureSlot.ALL, blockTexture("eldritch_trap_" + i)), modelOutput);
+            ResourceLocation model = ModelTemplates.CUBE_ALL.createWithSuffix(
+                    block,
+                    "_" + i,
+                    new TextureMapping().put(TextureSlot.ALL, blockTexture("eldritch_trap_" + i)),
+                    modelOutput);
             variants.add(v(model));
         }
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(block, variants.toArray(Variant[]::new)));
@@ -1565,41 +1724,49 @@ public final class TCModelProvider implements DataProvider {
         blockStateOutput.accept(MultiVariantGenerator.multiVariant(block, v(model))
                 .with(PropertyDispatch.property(BlockEldritchCrabSpawner.FACING)
                         .select(Direction.UP, Variant.variant())
-                        .select(Direction.DOWN, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R180))
-                        .select(Direction.NORTH, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-                        .select(Direction.EAST, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
-                        .select(Direction.SOUTH, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
-                        .select(Direction.WEST, Variant.variant()
-                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))));
+                        .select(
+                                Direction.DOWN,
+                                Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R180))
+                        .select(
+                                Direction.NORTH,
+                                Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
+                        .select(
+                                Direction.EAST,
+                                Variant.variant()
+                                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
+                        .select(
+                                Direction.SOUTH,
+                                Variant.variant()
+                                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
+                        .select(
+                                Direction.WEST,
+                                Variant.variant()
+                                        .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                        .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))));
         delegateItem(block.asItem(), model);
     }
 
     private void invisibleWithCubeItem(Block block, String textureName) {
-        ResourceLocation itemModel = ModelTemplates.CUBE_ALL.createWithSuffix(block, "_inventory",
-                new TextureMapping().put(TextureSlot.ALL, blockTexture(textureName)), modelOutput);
+        ResourceLocation itemModel = ModelTemplates.CUBE_ALL.createWithSuffix(
+                block, "_inventory", new TextureMapping().put(TextureSlot.ALL, blockTexture(textureName)), modelOutput);
         delegateItem(block.asItem(), itemModel);
-        ResourceLocation model = ModelTemplates.PARTICLE_ONLY.create(block,
-                TextureMapping.particle(blockTexture(textureName)), modelOutput);
+        ResourceLocation model = ModelTemplates.PARTICLE_ONLY.create(
+                block, TextureMapping.particle(blockTexture(textureName)), modelOutput);
         simpleBlock(block, model);
     }
 
     private void invisibleWithMeshItem(Block block, String textureName, String itemModelName) {
         delegateItem(block.asItem(), TCIds.rl("block/" + itemModelName));
-        ResourceLocation model = ModelTemplates.PARTICLE_ONLY.create(block,
-                TextureMapping.particle(blockTexture(textureName)), modelOutput);
+        ResourceLocation model = ModelTemplates.PARTICLE_ONLY.create(
+                block, TextureMapping.particle(blockTexture(textureName)), modelOutput);
         simpleBlock(block, model);
     }
 
     private void invisible(Block block) {
-        ResourceLocation model = ModelTemplates.PARTICLE_ONLY.create(block,
-                TextureMapping.particle(blockTexture("eldritch_stone")), modelOutput);
+        ResourceLocation model = ModelTemplates.PARTICLE_ONLY.create(
+                block, TextureMapping.particle(blockTexture("eldritch_stone")), modelOutput);
         simpleBlock(block, model);
     }
 
@@ -1610,10 +1777,14 @@ public final class TCModelProvider implements DataProvider {
 
     private void registerPhial() {
         ResourceLocation filled = ModelLocationUtils.getModelLocation(TCItems.PHIAL.get(), "_filled");
-        ModelTemplates.TWO_LAYERED_ITEM.create(filled,
-                TextureMapping.layered(TextureMapping.getItemTexture(TCItems.PHIAL.get()),
-                        TextureMapping.getItemTexture(TCItems.PHIAL.get(), "_overlay")), modelOutput);
-        generatedOverridesItem(TCItems.PHIAL.get(),
+        ModelTemplates.TWO_LAYERED_ITEM.create(
+                filled,
+                TextureMapping.layered(
+                        TextureMapping.getItemTexture(TCItems.PHIAL.get()),
+                        TextureMapping.getItemTexture(TCItems.PHIAL.get(), "_overlay")),
+                modelOutput);
+        generatedOverridesItem(
+                TCItems.PHIAL.get(),
                 Map.of("layer0", TextureMapping.getItemTexture(TCItems.PHIAL.get())),
                 List.of(new ItemOverride(PROPERTY_FILLED, 1.0F, filled)));
     }
@@ -1622,15 +1793,19 @@ public final class TCModelProvider implements DataProvider {
         Item item = TCItems.PRIMORDIAL_PEARL.get();
         ResourceLocation nodule = ModelLocationUtils.getModelLocation(item, "_nodule");
         ResourceLocation mote = ModelLocationUtils.getModelLocation(item, "_mote");
-        ModelTemplates.FLAT_ITEM.create(nodule, TextureMapping.layer0(TextureMapping.getItemTexture(item, "_nodule")),
-                modelOutput);
-        ModelTemplates.FLAT_ITEM.create(mote, TextureMapping.layer0(TextureMapping.getItemTexture(item, "_mote")),
-                modelOutput);
-        float noduleThreshold = (float) (PrimordialPearlItem.PEARL_MAX_DAMAGE + 1) / (float) PrimordialPearlItem.MAX_DAMAGE;
-        float moteThreshold = (float) (PrimordialPearlItem.NODULE_MAX_DAMAGE + 1) / (float) PrimordialPearlItem.MAX_DAMAGE;
-        generatedOverridesItem(item,
+        ModelTemplates.FLAT_ITEM.create(
+                nodule, TextureMapping.layer0(TextureMapping.getItemTexture(item, "_nodule")), modelOutput);
+        ModelTemplates.FLAT_ITEM.create(
+                mote, TextureMapping.layer0(TextureMapping.getItemTexture(item, "_mote")), modelOutput);
+        float noduleThreshold =
+                (float) (PrimordialPearlItem.PEARL_MAX_DAMAGE + 1) / (float) PrimordialPearlItem.MAX_DAMAGE;
+        float moteThreshold =
+                (float) (PrimordialPearlItem.NODULE_MAX_DAMAGE + 1) / (float) PrimordialPearlItem.MAX_DAMAGE;
+        generatedOverridesItem(
+                item,
                 Map.of("layer0", TextureMapping.getItemTexture(item)),
-                List.of(new ItemOverride(PROPERTY_DAMAGE, noduleThreshold, nodule),
+                List.of(
+                        new ItemOverride(PROPERTY_DAMAGE, noduleThreshold, nodule),
                         new ItemOverride(PROPERTY_DAMAGE, moteThreshold, mote)));
     }
 }

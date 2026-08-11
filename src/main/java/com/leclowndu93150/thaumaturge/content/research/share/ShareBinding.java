@@ -12,16 +12,23 @@ import net.minecraft.network.codec.StreamCodec;
 
 public record ShareBinding(UUID player, String name, AspectPoolData discoveredAspects, PlayerKnowledge knowledge) {
     public static final Codec<ShareBinding> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            UUIDUtil.CODEC.fieldOf("player").forGetter(ShareBinding::player),
-            Codec.STRING.fieldOf("name").forGetter(ShareBinding::name),
-            AspectPoolData.CODEC.codec().fieldOf("discovered_aspects").forGetter(ShareBinding::discoveredAspects),
-            PlayerKnowledge.CODEC.codec().fieldOf("knowledge").forGetter(ShareBinding::knowledge)
-    ).apply(builder, ShareBinding::new));
+                    UUIDUtil.CODEC.fieldOf("player").forGetter(ShareBinding::player),
+                    Codec.STRING.fieldOf("name").forGetter(ShareBinding::name),
+                    AspectPoolData.CODEC
+                            .codec()
+                            .fieldOf("discovered_aspects")
+                            .forGetter(ShareBinding::discoveredAspects),
+                    PlayerKnowledge.CODEC.codec().fieldOf("knowledge").forGetter(ShareBinding::knowledge))
+            .apply(builder, ShareBinding::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ShareBinding> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC, ShareBinding::player,
-            ByteBufCodecs.STRING_UTF8, ShareBinding::name,
-            AspectPoolData.STREAM_CODEC, ShareBinding::discoveredAspects,
-            PlayerKnowledge.STREAM_CODEC, ShareBinding::knowledge,
+            UUIDUtil.STREAM_CODEC,
+            ShareBinding::player,
+            ByteBufCodecs.STRING_UTF8,
+            ShareBinding::name,
+            AspectPoolData.STREAM_CODEC,
+            ShareBinding::discoveredAspects,
+            PlayerKnowledge.STREAM_CODEC,
+            ShareBinding::knowledge,
             ShareBinding::new);
 }

@@ -6,6 +6,7 @@ import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.recipe.ResearchGate;
 import com.leclowndu93150.thaumaturge.content.recipe.crucible.CrucibleRecipe;
+import java.util.Optional;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.data.recipes.RecipeBuilder;
@@ -17,22 +18,21 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-
 public class CrucibleRecipeBuilder extends SimpleRecipeBuilder {
     private final HolderGetter<IAspect> aspectsGetter;
     private final Ingredient catalyst;
     private @Nullable ResearchGate gate;
     private AspectList aspects = AspectList.EMPTY;
 
-    public CrucibleRecipeBuilder(HolderGetter<IAspect> aspectsGetter, RecipeCategory category, ItemStack result, Ingredient catalyst) {
+    public CrucibleRecipeBuilder(
+            HolderGetter<IAspect> aspectsGetter, RecipeCategory category, ItemStack result, Ingredient catalyst) {
         super(result, category);
         this.aspectsGetter = aspectsGetter;
         this.catalyst = catalyst;
     }
 
     public CrucibleRecipeBuilder aspect(ResourceKey<IAspect> aspect) {
-        return aspect(aspect,1);
+        return aspect(aspect, 1);
     }
 
     public CrucibleRecipeBuilder aspect(ResourceKey<IAspect> aspect, int amount) {
@@ -40,11 +40,11 @@ public class CrucibleRecipeBuilder extends SimpleRecipeBuilder {
     }
 
     public CrucibleRecipeBuilder aspect(Holder<IAspect> aspect) {
-        return aspect(aspect,1);
+        return aspect(aspect, 1);
     }
 
     public CrucibleRecipeBuilder aspect(Holder<IAspect> aspect, int amount) {
-        return aspect(new AspectInstance(aspect,amount));
+        return aspect(new AspectInstance(aspect, amount));
     }
 
     public CrucibleRecipeBuilder aspect(AspectInstance instance) {
@@ -61,11 +61,7 @@ public class CrucibleRecipeBuilder extends SimpleRecipeBuilder {
 
     @Override
     public void save(RecipeOutput output, ResourceLocation id) {
-        CrucibleRecipe recipe = new CrucibleRecipe(
-                this.catalyst,
-                this.aspects,
-                this.result,
-                Optional.ofNullable(gate));
+        CrucibleRecipe recipe = new CrucibleRecipe(this.catalyst, this.aspects, this.result, Optional.ofNullable(gate));
 
         output.accept(id, recipe, buildAdvancement(output, id));
     }

@@ -20,8 +20,7 @@ public abstract class AbstractTCContainerScreen<T extends AbstractContainerMenu>
             Component title,
             ResourceLocation background,
             int imageWidth,
-            int imageHeight
-    ) {
+            int imageHeight) {
         this(menu, inventory, title, background, imageWidth, imageHeight, 256, 256);
     }
 
@@ -33,8 +32,7 @@ public abstract class AbstractTCContainerScreen<T extends AbstractContainerMenu>
             int imageWidth,
             int imageHeight,
             int textureWidth,
-            int textureHeight
-    ) {
+            int textureHeight) {
         super(menu, inventory, title);
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
@@ -61,12 +59,10 @@ public abstract class AbstractTCContainerScreen<T extends AbstractContainerMenu>
                 backgroundWidth,
                 backgroundHeight,
                 backgroundTextureWidth,
-                backgroundTextureHeight
-        );
+                backgroundTextureHeight);
     }
 
-    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-    }
+    protected void renderBackgroundOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {}
 
     protected final ResourceLocation background() {
         return background;

@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -39,18 +39,22 @@ public final class ResearchToastEvents {
             if (!knowledge.hasResearchFlag(research, ResearchFlag.POPUP)) {
                 continue;
             }
-            mc.player.registryAccess().lookup(IResearchEntry.REGISTRY_KEY)
+            mc.player
+                    .registryAccess()
+                    .lookup(IResearchEntry.REGISTRY_KEY)
                     .flatMap(lookup -> lookup.get(ResourceKey.create(IResearchEntry.REGISTRY_KEY, research)))
-                    .ifPresent(holder -> mc.getToasts().addToast(new ResearchToast(research,
-                            Component.translatable("tc.research.complete"),
-                            Component.translatable(holder.value().nameKey()),
-                            EntryIconRenderer.resolveIcon(holder.value(), mc.player.tickCount))));
+                    .ifPresent(holder -> mc.getToasts()
+                            .addToast(new ResearchToast(
+                                    research,
+                                    Component.translatable("tc.research.complete"),
+                                    Component.translatable(holder.value().nameKey()),
+                                    EntryIconRenderer.resolveIcon(holder.value(), mc.player.tickCount))));
             knowledge.clearResearchFlag(research, ResearchFlag.POPUP);
             shown.add(research);
         }
         for (ResourceLocation research : shown) {
-            PacketDistributor.sendToServer(new ServerboundClearResearchFlagsPayload(
-                    research, List.of(ResearchFlag.POPUP)));
+            PacketDistributor.sendToServer(
+                    new ServerboundClearResearchFlagsPayload(research, List.of(ResearchFlag.POPUP)));
         }
     }
 }

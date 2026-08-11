@@ -46,9 +46,12 @@ public final class TCMeshGeometry implements IUnbakedGeometry<TCMeshGeometry> {
     }
 
     @Override
-    public BakedModel bake(IGeometryBakingContext context, ModelBaker baker,
-                           Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState,
-                           ItemOverrides overrides) {
+    public BakedModel bake(
+            IGeometryBakingContext context,
+            ModelBaker baker,
+            Function<Material, TextureAtlasSprite> spriteGetter,
+            ModelState modelState,
+            ItemOverrides overrides) {
         Transformation rootTransform = context.getRootTransform();
         if (!rootTransform.isIdentity()) {
             modelState = UnbakedGeometryHelper.composeRootTransformIntoModelState(modelState, rootTransform);
@@ -63,8 +66,14 @@ public final class TCMeshGeometry implements IUnbakedGeometry<TCMeshGeometry> {
 
         RenderTypeGroup renderTypes = NamedRenderTypeManager.get(renderType);
         TextureAtlasSprite particle = spriteGetter.apply(context.getMaterial(PARTICLE_SLOT));
-        IModelBuilder<?> builder = IModelBuilder.of(context.useAmbientOcclusion(), context.useBlockLight(),
-                context.isGui3d(), context.getTransforms(), overrides, particle, renderTypes);
+        IModelBuilder<?> builder = IModelBuilder.of(
+                context.useAmbientOcclusion(),
+                context.useBlockLight(),
+                context.isGui3d(),
+                context.getTransforms(),
+                overrides,
+                particle,
+                renderTypes);
 
         List<BakedQuad> quads = new ArrayList<>();
         for (TCMeshPart part : mesh.parts()) {
@@ -96,7 +105,8 @@ public final class TCMeshGeometry implements IUnbakedGeometry<TCMeshGeometry> {
         private Loader() {}
 
         @Override
-        public TCMeshGeometry read(JsonObject jsonObject, JsonDeserializationContext context) throws JsonParseException {
+        public TCMeshGeometry read(JsonObject jsonObject, JsonDeserializationContext context)
+                throws JsonParseException {
             ResourceLocation model = ResourceLocation.parse(GsonHelper.getAsString(jsonObject, "model"));
             boolean flipV = GsonHelper.getAsBoolean(jsonObject, "flip_v", false);
             boolean cornerSpace = GsonHelper.getAsBoolean(jsonObject, "corner_space", false);

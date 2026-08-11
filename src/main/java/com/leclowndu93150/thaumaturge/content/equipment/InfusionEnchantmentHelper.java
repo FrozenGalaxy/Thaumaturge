@@ -9,9 +9,9 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Equipable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.Equipable;
 
 public final class InfusionEnchantmentHelper {
     private InfusionEnchantmentHelper() {}
@@ -76,7 +76,8 @@ public final class InfusionEnchantmentHelper {
     }
 
     private static boolean dealsAttackDamage(ItemStack stack) {
-        ItemAttributeModifiers modifiers = stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+        ItemAttributeModifiers modifiers =
+                stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
         for (ItemAttributeModifiers.Entry entry : modifiers.modifiers()) {
             if (entry.attribute().is(Attributes.ATTACK_DAMAGE) && entry.slot().test(EquipmentSlot.MAINHAND)) {
                 return true;

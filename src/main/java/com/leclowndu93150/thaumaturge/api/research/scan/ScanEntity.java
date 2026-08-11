@@ -49,12 +49,17 @@ public class ScanEntity implements IScanThing {
      * @param inheritedClasses whether subclasses and implementors match too
      * @param filter additional predicate an entity must pass to match
      */
-    public ScanEntity(ResourceLocation research, Class<?> entityClass, boolean inheritedClasses, Predicate<Entity> filter) {
+    public ScanEntity(
+            ResourceLocation research, Class<?> entityClass, boolean inheritedClasses, Predicate<Entity> filter) {
         this(research, null, entityClass, inheritedClasses, filter);
     }
 
-    private ScanEntity(ResourceLocation research, @Nullable EntityType<?> entityType, @Nullable Class<?> entityClass,
-                       boolean inheritedClasses, @Nullable Predicate<Entity> filter) {
+    private ScanEntity(
+            ResourceLocation research,
+            @Nullable EntityType<?> entityType,
+            @Nullable Class<?> entityClass,
+            boolean inheritedClasses,
+            @Nullable Predicate<Entity> filter) {
         this.research = research;
         this.entityType = entityType;
         this.entityClass = entityClass;

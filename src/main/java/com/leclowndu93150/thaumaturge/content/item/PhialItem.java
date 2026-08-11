@@ -1,18 +1,15 @@
 package com.leclowndu93150.thaumaturge.content.item;
 
-import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectComponents;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectInstance;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
-import com.leclowndu93150.thaumaturge.api.essentia.EssentiaCapabilities;
 import com.leclowndu93150.thaumaturge.api.essentia.IEssentiaContainerItem;
 import com.leclowndu93150.thaumaturge.api.essentia.IEssentiaTransport;
-import com.leclowndu93150.thaumaturge.content.essentia.smeltery.BlockEntityAlembic;
-import com.leclowndu93150.thaumaturge.content.aspect.Aspect;
-import com.leclowndu93150.thaumaturge.content.essentia.EssentiaTransportHelper;
 import com.leclowndu93150.thaumaturge.content.essentia.jar.BlockEntityJar;
+import com.leclowndu93150.thaumaturge.content.essentia.smeltery.BlockEntityAlembic;
 import com.leclowndu93150.thaumaturge.registry.TCDataComponents;
+import com.leclowndu93150.thaumaturge.registry.TCItems;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,7 +22,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -95,40 +91,46 @@ public final class PhialItem extends Item implements IEssentiaContainerItem {
         return InteractionResult.PASS;
     }
 
-    private InteractionResult interactWith(ItemStack stack, Player player, InteractionHand hand, Level level,
-                                           BlockPos pos, IEssentiaTransport container, boolean canDeposit) {
+    private InteractionResult interactWith(
+            ItemStack stack,
+            Player player,
+            InteractionHand hand,
+            Level level,
+            BlockPos pos,
+            IEssentiaTransport container,
+            boolean canDeposit) {
         AspectList aspects = getAspects(stack);
         // We use Direction.UP to allow insertion/extraction from all faces with fials
-        if (aspects.isEmpty()){
-            if (container.getEssentiaAmount(Direction.UP) >= BASE_AMOUNT){
-                if (level.isClientSide()){
+        if (aspects.isEmpty()) {
+            if (container.getEssentiaAmount(Direction.UP) >= BASE_AMOUNT) {
+                if (level.isClientSide()) {
                     player.swing(hand);
                     return InteractionResult.SUCCESS;
                 }
                 Holder<IAspect> aspect = container.getEssentiaType(Direction.UP);
-                if (container.takeEssentia(aspect,BASE_AMOUNT,Direction.UP) == BASE_AMOUNT){
+                if (container.takeEssentia(aspect, BASE_AMOUNT, Direction.UP) == BASE_AMOUNT) {
                     if (!player.getAbilities().instabuild) stack.shrink(1);
                     ItemStack phial = makeFilled(aspect);
-                    if (!player.addItem(phial)){
-                        player.drop(phial,false);
+                    if (!player.addItem(phial)) {
+                        player.drop(phial, false);
                     }
-                    level.playSound(null, pos, TCSounds.JAR.get(), SoundSource.BLOCKS,0.25f,1.0f);
+                    level.playSound(null, pos, TCSounds.JAR.get(), SoundSource.BLOCKS, 0.25f, 1.0f);
                     return InteractionResult.SUCCESS;
                 }
             }
         } else if (canDeposit) {
             AspectInstance first = aspects.entries().getFirst();
             if (container.getEssentiaAmount(Direction.UP) + first.amount() <= BlockEntityJar.CAPACITY) {
-                if (level.isClientSide()){
+                if (level.isClientSide()) {
                     player.swing(hand);
                     return InteractionResult.SUCCESS;
                 }
-                if (container.addEssentia(first.aspect(),first.amount(),Direction.UP) == first.amount()) {
+                if (container.addEssentia(first.aspect(), first.amount(), Direction.UP) == first.amount()) {
                     if (!player.getAbilities().instabuild) {
                         stack.shrink(1);
                         ItemStack empty = new ItemStack(TCItems.PHIAL.get());
                         if (!player.addItem(empty)) {
-                            player.drop(empty,false);
+                            player.drop(empty, false);
                         }
                     }
                     level.playSound(null, pos, TCSounds.JAR.get(), SoundSource.BLOCKS, 0.25F, 1.0F);
