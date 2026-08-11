@@ -8,6 +8,7 @@ import com.leclowndu93150.thaumaturge.content.essentia.smeltery.BlockSmelterAux;
 import com.leclowndu93150.thaumaturge.content.essentia.smeltery.BlockSmelterVent;
 import com.leclowndu93150.thaumaturge.content.infusion.BlockInfusionMatrix;
 import com.leclowndu93150.thaumaturge.content.infusion.BlockPedestal;
+import com.leclowndu93150.thaumaturge.content.alchemy.BlockLiquidDeath;
 import com.leclowndu93150.thaumaturge.content.aura.BlockRechargePedestal;
 import com.leclowndu93150.thaumaturge.content.infusion.BlockPillar;
 import com.leclowndu93150.thaumaturge.content.decor.BlockAmber;
@@ -360,6 +361,19 @@ public final class TCBlocks {
                     .strength(100.0F)
                     .pushReaction(PushReaction.DESTROY)
                     .lightLevel(state -> 5)
+                    .noLootTable()
+                    .liquid()
+    );
+
+    public static final DeferredBlock<BlockLiquidDeath> LIQUID_DEATH = BLOCKS.registerBlock(
+            "liquid_death",
+            props -> new BlockLiquidDeath(TCFluids.LIQUID_DEATH_SOURCE.get(), props),
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_PURPLE)
+                    .replaceable()
+                    .noCollission()
+                    .strength(100.0F)
+                    .pushReaction(PushReaction.DESTROY)
                     .noLootTable()
                     .liquid()
     );

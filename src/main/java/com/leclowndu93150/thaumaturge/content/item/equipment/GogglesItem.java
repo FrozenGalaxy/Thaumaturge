@@ -3,6 +3,7 @@ package com.leclowndu93150.thaumaturge.content.item.equipment;
 import com.leclowndu93150.thaumaturge.api.items.IGoggles;
 import com.leclowndu93150.thaumaturge.api.items.IRevealer;
 import com.leclowndu93150.thaumaturge.api.items.IVisDiscountGear;
+import com.leclowndu93150.thaumaturge.registry.TCItems;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -49,6 +50,12 @@ public final class GogglesItem extends Item implements IGoggles, IRevealer, IVis
     @Override
     public int getVisDiscount(ItemStack stack) {
         return 5;
+    }
+
+    // Not a TieredItem/ArmorItem, so the enchantment value has to come from here or the table offers nothing.
+    @Override
+    public int getEnchantmentValue() {
+        return TCItems.GOGGLES_ENCHANTMENT_VALUE;
     }
 
 }

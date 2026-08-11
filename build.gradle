@@ -120,12 +120,6 @@ tasks.register('generateData', Exec) {
     }
 }
 
-if (!project.hasProperty('datagenPass')) {
-    tasks.named('processResources') {
-        dependsOn 'generateData'
-    }
-}
-
 jar {
     exclude("com/leclowndu93150/thaumaturge/debug/**")
 }

@@ -1265,11 +1265,20 @@ public final class TCRecipeProvider extends RecipeProvider {
                 .unlockedBy("has", has(Items.BUCKET))
                 .save(output, TCIds.MODID + ":crucible/lava_bucket");
 
+        new CrucibleRecipeBuilder(aspects, RecipeCategory.MISC, new ItemStack(TCItems.BUCKET_LIQUID_DEATH.get()),
+                Ingredient.of(Items.BUCKET))
+                .aspect(TCAspects.MORTUUS, 100)
+                .aspect(TCAspects.PERDITIO, 50)
+                .aspect(TCAspects.ALKIMIA, 20)
+                .gate(gate("liquid_death", 0))
+                .unlockedBy("has", has(Items.BUCKET))
+                .save(output, TCIds.MODID + ":crucible/liquid_death");
+
         new CrucibleRecipeBuilder(aspects, RecipeCategory.MISC, new ItemStack(TCItems.INGOT_BRASS.get()),
-                Ingredient.of(Tags.Items.INGOTS_IRON))
+                Ingredient.of(Tags.Items.INGOTS_COPPER))
                 .aspect(TCAspects.INSTRUMENTUM, 5)
                 .gate(gate("metallurgy", 0))
-                .unlockedBy("has", has(Tags.Items.INGOTS_IRON))
+                .unlockedBy("has", has(Tags.Items.INGOTS_COPPER))
                 .save(output);
 
         new CrucibleRecipeBuilder(aspects, RecipeCategory.MISC, new ItemStack(TCItems.INGOT_THAUMIUM.get()),

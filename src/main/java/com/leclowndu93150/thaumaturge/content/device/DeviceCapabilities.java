@@ -1,6 +1,7 @@
 package com.leclowndu93150.thaumaturge.content.device;
 
 import com.leclowndu93150.thaumaturge.TCIds;
+import com.leclowndu93150.thaumaturge.api.aspect.AspectCapabilities;
 import com.leclowndu93150.thaumaturge.api.essentia.EssentiaCapabilities;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -74,6 +75,11 @@ public final class DeviceCapabilities {
                 Capabilities.ItemHandler.BLOCK,
                 TCBlockEntities.THAUMATORIUM.get(),
                 (be, side) -> be.catalyst()
+        );
+        event.registerBlockEntity(
+                AspectCapabilities.CONTAINER,
+                TCBlockEntities.MIRROR_ESSENTIA.get(),
+                (be, side) -> be
         );
     }
 }

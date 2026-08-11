@@ -160,6 +160,11 @@ public final class TCItems {
     public static final DeferredItem<BlockItem> TAINT_FEATURE = ITEMS.registerSimpleBlockItem(TCBlocks.TAINT_FEATURE);
     public static final DeferredItem<BlockItem> TAINT_FIBRE = ITEMS.registerSimpleBlockItem(TCBlocks.TAINT_FIBRE);
 
+    public static final DeferredItem<BucketItem> BUCKET_LIQUID_DEATH = ITEMS.registerItem(
+            "liquid_death_bucket",
+            props -> new BucketItem(TCFluids.LIQUID_DEATH_SOURCE.get(), props),
+            new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1).rarity(Rarity.RARE));
+
     public static final DeferredItem<JarBraceItem> JAR_BRACE = ITEMS.registerItem(
             "jar_brace",
             JarBraceItem::new
@@ -804,6 +809,8 @@ public final class TCItems {
     // 
 
     public static final int GOGGLES_DURABILITY = 350;
+
+    public static final int GOGGLES_ENCHANTMENT_VALUE = 25;
 
     public static final ResourceLocation GOGGLES_REVEALING_ID = TCIds.rl("goggles_revealing");
 

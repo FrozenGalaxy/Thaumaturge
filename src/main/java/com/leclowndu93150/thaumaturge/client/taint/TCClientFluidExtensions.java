@@ -15,5 +15,6 @@ public final class TCClientFluidExtensions {
     public static void onRegisterClientExtensions(RegisterClientExtensionsEvent event) {
         event.registerFluidType(new FluxGooClientExtensions(), TCFluidTypes.FLUX_GOO.get());
         event.registerFluidType(new PurifyingClientExtensions(), TCFluidTypes.PURIFYING.get());
+        event.registerFluidType(new LiquidDeathClientExtensions(), TCFluidTypes.LIQUID_DEATH.get());
     }
 }

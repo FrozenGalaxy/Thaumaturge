@@ -21,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -42,13 +43,27 @@ public final class ThaumometerItem extends Item {
         super(properties);
     }
 
+    // Runs before the block's own use handler so scanning a container doesn't open its screen instead.
+    @Override
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        Player player = context.getPlayer();
+        if (player == null || player.isShiftKeyDown()) {
+            return InteractionResult.PASS;
+        }
+        return beginScan(context.getLevel(), player, context.getHand());
+    }
+
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        return new InteractionResultHolder<>(beginScan(level, player, hand), player.getItemInHand(hand));
+    }
+
+    private InteractionResult beginScan(Level level, Player player, InteractionHand hand) {
         if (!ScanningManager.isThingStillScannable(player, resolveTarget(level, player))) {
-            return InteractionResultHolder.pass(player.getItemInHand(hand));
+            return InteractionResult.PASS;
         }
         player.startUsingItem(hand);
-        return InteractionResultHolder.consume(player.getItemInHand(hand));
+        return InteractionResult.CONSUME;
     }
 
     @Override
