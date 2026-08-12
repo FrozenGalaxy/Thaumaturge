@@ -205,8 +205,8 @@ public final class KnightArmorModel extends AbstractTCArmorModel {
     static MeshDefinition emptyMesh() {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
-        PartDefinition head = root.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
-        head.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
+        root.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
+        root.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
         PartDefinition body = root.addOrReplaceChild("body", CubeListBuilder.create(), PartPose.ZERO);
         emptyChild(body, "frontcloth1");
         emptyChild(body, "frontcloth2");
