@@ -1290,24 +1290,6 @@ public final class TCBlocks {
         flowerPot.addPlant(PLANT_VISHROOM.getId(), POTTED_VISHROOM);
     }
 
-    private static DeferredBlock<FlowerPotBlock> pottedPlant(String name, DeferredBlock<? extends Block> plant) {
-        return BLOCKS.registerBlock(
-                name,
-                properties -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, plant, properties),
-                BlockBehaviour.Properties.ofFullCopy(Blocks.POTTED_OAK_SAPLING));
-    }
-
-    private static void registerPottedPlants() {
-        FlowerPotBlock flowerPot = (FlowerPotBlock) Blocks.FLOWER_POT;
-        flowerPot.addPlant(SAPLING_GREATWOOD.getId(), POTTED_SAPLING_GREATWOOD);
-        flowerPot.addPlant(SAPLING_SILVERWOOD.getId(), POTTED_SAPLING_SILVERWOOD);
-        flowerPot.addPlant(PLANT_SHIMMERLEAF.getId(), POTTED_SHIMMERLEAF);
-        flowerPot.addPlant(PLANT_CINDERPEARL.getId(), POTTED_CINDERPEARL);
-        flowerPot.addPlant(PLANT_VISHROOM.getId(), POTTED_VISHROOM);
-    }
-
-    //
-
     public static final DeferredBlock<BlockMetalTC> ALCHEMICAL_CONSTRUCT = BLOCKS.registerBlock(
             "alchemical_construct",
             BlockMetalTC::new,
