@@ -23,14 +23,22 @@ final class JadeComponents {
     private JadeComponents() {}
 
     static void addAspectLines(ITooltip tooltip, String key, AspectList aspects) {
+        addAspectLines(tooltip, key, aspects, false);
+    }
+
+    static void addColoredAspectLines(ITooltip tooltip, String key, AspectList aspects) {
+        addAspectLines(tooltip, key, aspects, true);
+    }
+
+    private static void addAspectLines(ITooltip tooltip, String key, AspectList aspects, boolean colorAspects) {
         List<AspectInstance> entries = aspects.entries();
         int start = 0;
         boolean firstLine = true;
         while (start < entries.size()) {
             int end = start + 1;
-            Component line = aspectLine(key, entries, start, end, firstLine);
+            Component line = aspectLine(key, entries, start, end, firstLine, colorAspects);
             while (end < entries.size()) {
-                Component candidate = aspectLine(key, entries, start, end + 1, firstLine);
+                Component candidate = aspectLine(key, entries, start, end + 1, firstLine, colorAspects);
                 if (IElementHelper.get().text(candidate).getSize().x > MAX_ASPECT_LINE_WIDTH) break;
                 line = candidate;
                 end++;
@@ -42,15 +50,21 @@ final class JadeComponents {
     }
 
     private static Component aspectLine(
-            String key, List<AspectInstance> entries, int start, int end, boolean firstLine) {
+            String key, List<AspectInstance> entries, int start, int end, boolean firstLine, boolean colorAspects) {
         MutableComponent list = Component.empty();
         for (int i = start; i < end; i++) {
             if (i > start) {
                 list.append(Component.translatable("jade.thaumaturge.aspect_separator"));
             }
             AspectInstance entry = entries.get(i);
-            list.append(Component.translatable(
-                    "jade.thaumaturge.aspect_amount", AspectComponents.name(entry.aspect()), entry.amount()));
+            Component name = AspectComponents.name(entry.aspect());
+            Component amount = Component.literal(Integer.toString(entry.amount()));
+            if (colorAspects) {
+                int color = entry.aspect().value().color();
+                name = name.copy().withStyle(style -> style.withColor(color));
+                amount = amount.copy().withStyle(style -> style.withColor(color));
+            }
+            list.append(Component.translatable("jade.thaumaturge.aspect_amount", name, amount));
         }
         return firstLine
                 ? Component.translatable(key, list)

@@ -90,7 +90,6 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
     private static final float BRIGHTEN_FLUX_LIMIT = 0.1F;
     private static final float BRIGHTEN_FILL_FRACTION = 0.9F;
     private static final int BRIGHTEN_CHANCE = 50;
-    private static final double HUNGRY_RAY_START_OFFSET = 0.25;
     private static final double HUNGRY_PULL_RANGE = 15.0;
     private static final double HUNGRY_ITEM_PULL_MARGIN = 0.5;
     private static final double HUNGRY_EAT_RANGE_SQ = 4.0;
@@ -649,6 +648,22 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         return true;
     }
 
+    protected boolean consumesDarkSpawnAspects() {
+        return false;
+    }
+
+    protected int taintedEffectIntervalFactor() {
+        return 1;
+    }
+
+    protected float taintedFluxOutputFactor() {
+        return 1.0F;
+    }
+
+    protected boolean shouldGainDevouredAspects(RandomSource random) {
+        return true;
+    }
+
     private boolean handleDischarge(ServerLevel serverLevel, BlockPos pos, boolean change) {
         if (nodeModifier == NodeModifier.FADING || !allowDischarge() || lock > 0) {
             return change;
@@ -722,7 +737,7 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
             return change;
         }
         RandomSource random = serverLevel.getRandom();
-        if (nodeType == NodeType.UNSTABLE && random.nextBoolean()) {
+        if (nodeType == NodeType.UNSTABLE && allowTypeBehavior() && random.nextBoolean()) {
             if (lock == 0) {
                 Holder<IAspect> primal = randomStoredPrimal(random);
                 if (primal != null && takeFromContainer(primal, 1)) {
@@ -773,7 +788,7 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
             nodeChange();
         }
 
-        if (count % BIOME_SPREAD_INTERVAL != 0) {
+        if (count % (BIOME_SPREAD_INTERVAL * taintedEffectIntervalFactor()) != 0) {
             return;
         }
         if (nodeType == NodeType.TAINTED) {
@@ -781,14 +796,25 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         } else if (nodeType == NodeType.DARK) {
             spreadBiomeColumn(serverLevel, pos, DARK_BIOME_SPREAD_RANGE, TCBiomes.EERIE);
         } else if (nodeType == NodeType.PURE) {
-            BlockPos target = randomBiomeTarget(serverLevel, pos, PURE_BIOME_SPREAD_RANGE);
+            int range = pureBiomeSpreadRange();
+            if (range <= 0) {
+                return;
+            }
+            BlockPos target = randomBiomeTarget(serverLevel, pos, range);
             if (target != null && TaintBiomeManager.isTainted(serverLevel, target)) {
                 // Pure Nodes reclaim Tainted Lands specifically into Magical Forest.
                 TaintBiomeManager.replaceColumn(serverLevel, target, TCBiomes.MAGICAL_FOREST);
             } else if (nearSilverwood(serverLevel, pos)) {
-                spreadBiomeColumn(serverLevel, pos, PURE_BIOME_SPREAD_RANGE, TCBiomes.MAGICAL_FOREST);
+                spreadBiomeColumn(serverLevel, pos, range, TCBiomes.MAGICAL_FOREST);
             }
         }
+    }
+
+    private int pureBiomeSpreadRange() {
+        if (this instanceof BlockEntityJarNode jarNode && jarNode.areEffectsRunning()) {
+            return ThaumaturgeCommonConfig.JAR_PURE_NODE_BIOME_RANGE.get();
+        }
+        return PURE_BIOME_SPREAD_RANGE;
     }
 
     private static void spreadTaintedBiomeColumn(ServerLevel serverLevel, BlockPos origin, int range) {
@@ -848,7 +874,8 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
             }
             return change;
         }
-        if (count % BEHAVIOR_INTERVAL != 0) {
+        int behaviorInterval = BEHAVIOR_INTERVAL * (nodeType == NodeType.TAINTED ? taintedEffectIntervalFactor() : 1);
+        if (count % behaviorInterval != 0) {
             return change;
         }
         switch (nodeType) {
@@ -864,7 +891,8 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
                     float base = Math.max(1.0F, AuraHelper.getAuraBase(serverLevel, pos));
                     float saturation = AuraHelper.getFlux(serverLevel, pos) / base;
                     if (random.nextFloat() > saturation * 0.8F) {
-                        AuraHelper.polluteAura(serverLevel, pos, taintedFluxStrength(), true);
+                        AuraHelper.polluteAura(
+                                serverLevel, pos, taintedFluxStrength() * taintedFluxOutputFactor(), true);
                     }
                 }
             }
@@ -976,6 +1004,10 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         if (serverLevel.getEntitiesOfClass(EntityBrainyZombie.class, box).size() > DARK_SPAWN_CAP) {
             return;
         }
+        Map<Holder<IAspect>, Integer> spawnCost = darkSpawnCostAspects();
+        if (spawnCost == null) {
+            return;
+        }
         double x = pos.getX() + (random.nextDouble() - random.nextDouble()) * 5.0;
         double y = pos.getY() + random.nextInt(3) - 1;
         double z = pos.getZ() + (random.nextDouble() - random.nextDouble()) * 5.0;
@@ -985,11 +1017,35 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         }
         zombie.moveTo(x, y, z, random.nextFloat() * 360.0F, 0.0F);
         if (zombie.checkSpawnRules(serverLevel, MobSpawnType.EVENT)) {
-            serverLevel.addFreshEntity(zombie);
+            boolean spawned = serverLevel.addFreshEntity(zombie);
+            if (spawned && !spawnCost.isEmpty()) {
+                for (Map.Entry<Holder<IAspect>, Integer> cost : spawnCost.entrySet()) {
+                    aspects = reduce(aspects, cost.getKey(), cost.getValue());
+                }
+                syncContents();
+            }
             serverLevel.levelEvent(2004, pos, 0);
         } else {
             zombie.discard();
         }
+    }
+
+    private @Nullable Map<Holder<IAspect>, Integer> darkSpawnCostAspects() {
+        if (!consumesDarkSpawnAspects()) {
+            return Map.of();
+        }
+        int amountPerAspect = ThaumaturgeCommonConfig.JAR_DARK_NODE_ASPECT_COST_PER_SPAWN.get();
+        if (amountPerAspect == 0) {
+            return Map.of();
+        }
+        Map<Holder<IAspect>, Integer> cost = new HashMap<>(aspectsBase.entries().size());
+        for (AspectInstance aspect : aspectsBase.entries()) {
+            if (aspects.amountOf(aspect.aspect()) < amountPerAspect) {
+                return null;
+            }
+            cost.put(aspect.aspect(), amountPerAspect);
+        }
+        return cost.isEmpty() ? null : cost;
     }
 
     private boolean handleHungryNode(ServerLevel serverLevel, BlockPos pos, boolean change) {
@@ -1056,6 +1112,9 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
             return;
         }
         RandomSource random = serverLevel.getRandom();
+        if (!shouldGainDevouredAspects(random)) {
+            return;
+        }
         List<ResourceKey<IAspect>> keys = new ArrayList<>(primals.keySet());
         ResourceKey<IAspect> chosen = keys.get(random.nextInt(keys.size()));
         Holder<IAspect> holder =
@@ -1117,7 +1176,22 @@ public class BlockEntityNode extends BlockEntity implements IAspectContainer {
         if (direction.lengthSqr() < 1.0E-7) {
             return BlockHitResult.miss(to, Direction.UP, pos);
         }
-        Vec3 from = center.add(direction.normalize().scale(HUNGRY_RAY_START_OFFSET));
+        direction = direction.normalize();
+        AABB sourceShape = level.getBlockState(pos)
+                .getShape(level, pos, CollisionContext.empty())
+                .bounds()
+                .move(pos);
+        double exitDistance = Double.POSITIVE_INFINITY;
+        if (direction.x > 0.0) exitDistance = Math.min(exitDistance, (sourceShape.maxX - center.x) / direction.x);
+        else if (direction.x < 0.0) exitDistance = Math.min(exitDistance, (sourceShape.minX - center.x) / direction.x);
+        if (direction.y > 0.0) exitDistance = Math.min(exitDistance, (sourceShape.maxY - center.y) / direction.y);
+        else if (direction.y < 0.0) exitDistance = Math.min(exitDistance, (sourceShape.minY - center.y) / direction.y);
+        if (direction.z > 0.0) exitDistance = Math.min(exitDistance, (sourceShape.maxZ - center.z) / direction.z);
+        else if (direction.z < 0.0) exitDistance = Math.min(exitDistance, (sourceShape.minZ - center.z) / direction.z);
+        if (!Double.isFinite(exitDistance) || exitDistance < 0.0) {
+            exitDistance = 0.25;
+        }
+        Vec3 from = center.add(direction.scale(exitDistance + 1.0E-4));
         return level.clip(
                 new ClipContext(from, to, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, CollisionContext.empty()));
     }

@@ -1,0 +1,39 @@
+{
+  "category": "thaumaturge:auromancy",
+  "name": "research.thaumaturge.jar_node_effects.title",
+  "parents": [
+    "thaumaturge:node_jar"
+  ],
+  "column": -8,
+  "row": 7,
+  "icons": [
+    "thaumaturge:jar_node"
+  ],
+  "stages": [
+    {
+      "text": "research.thaumaturge.jar_node_effects.stage_0",
+      "required_knowledge": [
+        {
+          "type": "theory",
+          "category": "thaumaturge:auromancy",
+          "amount": 1
+        }
+      ]
+    }
+  ],
+  "note_aspects": [
+    {
+      "aspect": "thaumaturge:auram",
+      "amount": 4
+    },
+    {
+      "aspect": "thaumaturge:ordo",
+      "amount": 3
+    },
+    {
+      "aspect": "thaumaturge:praemunio",
+      "amount": 2
+    }
+  ],
+  "complexity": 2
+}

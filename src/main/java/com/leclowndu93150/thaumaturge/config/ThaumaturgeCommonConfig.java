@@ -43,6 +43,16 @@ public final class ThaumaturgeCommonConfig {
     public static final ModConfigSpec.IntValue FLUX_SCRUBBER_ESSENTIA_PER_ROLL;
     public static final ModConfigSpec.IntValue FLUX_SCRUBBER_ESSENTIA_CAPACITY;
 
+    public static final ModConfigSpec.BooleanValue JAR_NODE_EFFECTS_ENABLED;
+    public static final ModConfigSpec.BooleanValue JAR_DARK_NODE_EFFECTS_ENABLED;
+    public static final ModConfigSpec.BooleanValue JAR_TAINTED_NODE_EFFECTS_ENABLED;
+    public static final ModConfigSpec.BooleanValue JAR_HUNGRY_NODE_EFFECTS_ENABLED;
+    public static final ModConfigSpec.BooleanValue JAR_PURE_NODE_EFFECTS_ENABLED;
+    public static final ModConfigSpec.IntValue JAR_NODE_EFFECTS_ACTIVATION_VIS_COST;
+    public static final ModConfigSpec.DoubleValue JAR_HUNGRY_NODE_ASPECT_GAIN_CHANCE;
+    public static final ModConfigSpec.IntValue JAR_DARK_NODE_ASPECT_COST_PER_SPAWN;
+    public static final ModConfigSpec.IntValue JAR_PURE_NODE_BIOME_RANGE;
+
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
@@ -144,6 +154,35 @@ public final class ThaumaturgeCommonConfig {
                 .define("noSleep", false);
 
         builder.pop();
+        builder.push("jarredNodes");
+
+        JAR_NODE_EFFECTS_ENABLED = builder.comment(
+                        "Enables special node behaviors inside jars and the research used to awaken them.")
+                .define("effectsEnabled", true);
+        JAR_DARK_NODE_EFFECTS_ENABLED = builder.comment("Allows dark nodes in jars to summon their guardians.")
+                .define("darkNodeEffectsEnabled", true);
+        JAR_TAINTED_NODE_EFFECTS_ENABLED = builder.comment("Allows tainted nodes in jars to spread taint.")
+                .define("taintedNodeEffectsEnabled", true);
+        JAR_HUNGRY_NODE_EFFECTS_ENABLED = builder.comment(
+                        "Allows hungry nodes in jars to pull in and devour nearby entities.")
+                .define("hungryNodeEffectsEnabled", true);
+        JAR_PURE_NODE_EFFECTS_ENABLED = builder.comment(
+                        "Allows pure nodes in jars to purify tainted biomes and spread Magical Forest near Silverwood.")
+                .define("pureNodeEffectsEnabled", true);
+        JAR_NODE_EFFECTS_ACTIVATION_VIS_COST = builder.comment(
+                        "Aura Vis required to awaken a node's effects in a jar. Deactivating effects is free; 0 makes activation free.")
+                .defineInRange("effectsActivationVisCost", 20, 0, 1000);
+        JAR_HUNGRY_NODE_ASPECT_GAIN_CHANCE = builder.comment(
+                        "Chance (%) that a hungry node in a jar gains aspects from something it devours. Default: 10% of its normal rate.")
+                .defineInRange("hungryNodeAspectGainChance", 10.0, 0.0, 100.0);
+        JAR_DARK_NODE_ASPECT_COST_PER_SPAWN = builder.comment(
+                        "Amount of each stored aspect consumed when a dark node in a jar summons a guardian. 0 makes summons free.")
+                .defineInRange("darkNodeAspectCostPerSpawn", 1, 0, 64);
+        JAR_PURE_NODE_BIOME_RANGE = builder.comment(
+                        "Biome purification range in blocks for pure nodes in jars. 0 disables their biome purification.")
+                .defineInRange("pureNodeBiomeRange", 8, 0, 64);
+
+        builder.pop();
         builder.push("sounds");
 
         NO_STRESS = builder.comment("Disables anxiety effects such as heartbeat sounds and Warp-event jump scares.")
@@ -177,4 +216,12 @@ public final class ThaumaturgeCommonConfig {
     }
 
     private ThaumaturgeCommonConfig() {}
+
+    public static boolean hasJarNodeEffectsEnabled() {
+        return JAR_NODE_EFFECTS_ENABLED.get()
+                && (JAR_DARK_NODE_EFFECTS_ENABLED.get()
+                        || JAR_TAINTED_NODE_EFFECTS_ENABLED.get()
+                        || JAR_HUNGRY_NODE_EFFECTS_ENABLED.get()
+                        || JAR_PURE_NODE_EFFECTS_ENABLED.get());
+    }
 }

@@ -198,6 +198,11 @@ public final class TCDataComponents {
                     "node_data",
                     builder -> builder.persistent(NodeData.CODEC).networkSynchronized(NodeData.STREAM_CODEC));
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> JAR_NODE_EFFECTS_ACTIVE =
+            DATA_COMPONENTS.registerComponentType(
+                    "jar_node_effects_active",
+                    builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<WandParts>> WAND_PARTS =
             DATA_COMPONENTS.registerComponentType(
                     "wand_parts",

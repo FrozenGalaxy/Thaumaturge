@@ -1020,6 +1020,8 @@ public final class TCEnglishProvider extends LanguageProvider {
                 "tc.jar.structure",
                 "The ritual fails - the node must be sealed in glass on all sides and capped with a roof of wooden slabs");
         add("tc.jar.vis", "The ritual fails - it demands %s vis of each primal aspect from wands in your hotbar");
+        add("tc.jar.effects.vis", "You lack the vis to awaken this node's effects");
+        add("jade.thaumaturge.node.jar_effects_awakened", "Node effects awakened");
         add("tc.dust.noresearch", "The dust sparkles with promise, but you lack the knowledge to direct it");
         add("tc.workbench.staff", "A staff is too unwieldy to use at the workbench");
         add("tooltip.thaumaturge.wand.capacity", "Capacity %s");

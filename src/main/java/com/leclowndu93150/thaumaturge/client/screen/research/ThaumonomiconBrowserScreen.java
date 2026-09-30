@@ -18,6 +18,8 @@ import com.leclowndu93150.thaumaturge.client.render.research.EntryIconRenderer;
 import com.leclowndu93150.thaumaturge.client.screen.AbstractTCScreen;
 import com.leclowndu93150.thaumaturge.client.screen.TCScreenTextures;
 import com.leclowndu93150.thaumaturge.client.screen.tooltip.TCTooltipRenderer;
+import com.leclowndu93150.thaumaturge.config.ThaumaturgeCommonConfig;
+import com.leclowndu93150.thaumaturge.content.aura.node.BlockJarNode;
 import com.leclowndu93150.thaumaturge.network.ServerboundClearResearchFlagsPayload;
 import com.leclowndu93150.thaumaturge.network.ServerboundUnlockResearchPayload;
 import com.leclowndu93150.thaumaturge.registry.TCSounds;
@@ -389,6 +391,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
     }
 
     private boolean isVisible(IPlayerKnowledge knowledge, EntryNode node) {
+        if (!isEntryEnabled(node)) return false;
         if (knowledge.isResearchKnown(node.id)) return true;
         if (invisibleEntries.contains(node.id)) return false;
         boolean hidden = node.entry.hasMeta(ResearchEntryMeta.HIDDEN);
@@ -402,6 +405,10 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
             }
         }
         return true;
+    }
+
+    private boolean isEntryEnabled(EntryNode node) {
+        return !node.id.equals(BlockJarNode.EFFECTS_RESEARCH) || ThaumaturgeCommonConfig.hasJarNodeEffectsEnabled();
     }
 
     private boolean conditionsPass(IPlayerKnowledge knowledge, EntryNode node) {
@@ -439,7 +446,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         }
         for (ResourceLocation known : knowledge.researchList()) {
             EntryNode node = findGlobalNode(known);
-            if (node == null) continue;
+            if (node == null || !isEntryEnabled(node)) continue;
             String entryName = Component.translatable(node.entry.nameKey()).getString();
             if (entryName.toLowerCase(Locale.ROOT).contains(needle)) {
                 searchResults.add(SearchResult.entry(entryName, node));
@@ -1071,6 +1078,7 @@ public final class ThaumonomiconBrowserScreen extends AbstractTCScreen {
         int rt = 0;
         int rco = 0;
         for (EntryNode node : nodes) {
+            if (!isEntryEnabled(node)) continue;
             if (node.entry.hasMeta(ResearchEntryMeta.AUTOUNLOCK)) continue;
             rt++;
             if (knowledge.isResearchKnown(node.id)) rco++;

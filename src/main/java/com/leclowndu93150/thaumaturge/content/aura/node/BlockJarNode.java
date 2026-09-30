@@ -1,12 +1,19 @@
 package com.leclowndu93150.thaumaturge.content.aura.node;
 
+import com.leclowndu93150.thaumaturge.TCIds;
+import com.leclowndu93150.thaumaturge.api.capability.KnowledgeAccess;
 import com.leclowndu93150.thaumaturge.api.casters.ICaster;
+import com.leclowndu93150.thaumaturge.config.ThaumaturgeCommonConfig;
+import com.leclowndu93150.thaumaturge.content.misc.TCActionBar;
 import com.leclowndu93150.thaumaturge.registry.TCBlockEntities;
 import com.leclowndu93150.thaumaturge.registry.TCBlocks;
+import com.leclowndu93150.thaumaturge.registry.TCSounds;
 import com.mojang.serialization.MapCodec;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -27,6 +34,7 @@ import org.jspecify.annotations.Nullable;
 
 public final class BlockJarNode extends Block implements EntityBlock {
     public static final MapCodec<BlockJarNode> CODEC = simpleCodec(BlockJarNode::new);
+    public static final ResourceLocation EFFECTS_RESEARCH = TCIds.rl("jar_node_effects");
 
     private static final VoxelShape SHAPE = box(3.0, 0.0, 3.0, 13.0, 12.0, 13.0);
 
@@ -53,11 +61,32 @@ public final class BlockJarNode extends Block implements EntityBlock {
             Player player,
             InteractionHand hand,
             BlockHitResult hit) {
-        if (stack.getItem() instanceof ICaster) {
+        if (stack.getItem() instanceof ICaster caster) {
             if (!(level instanceof ServerLevel serverLevel)) {
                 return ItemInteractionResult.SUCCESS;
             }
             if (serverLevel.getBlockEntity(pos) instanceof BlockEntityJarNode jar) {
+                if (player.isShiftKeyDown()
+                        && ThaumaturgeCommonConfig.hasJarNodeEffectsEnabled()
+                        && KnowledgeAccess.of(player).isResearchComplete(EFFECTS_RESEARCH)) {
+                    boolean active = !jar.areEffectsActive();
+                    if (active) {
+                        if (!jar.canAwakenEffects()) {
+                            return ItemInteractionResult.SUCCESS;
+                        }
+                        int activationVisCost = ThaumaturgeCommonConfig.JAR_NODE_EFFECTS_ACTIVATION_VIS_COST.get();
+                        if (activationVisCost > 0
+                                && !caster.consumeVis(stack, player, activationVisCost, false, false)) {
+                            TCActionBar.sendPurple(player, "tc.jar.effects.vis");
+                            return ItemInteractionResult.SUCCESS;
+                        }
+                    }
+                    jar.setEffectsActive(active);
+                    serverLevel.playSound(
+                            null, pos, TCSounds.WAND.get(), SoundSource.BLOCKS, 0.7F, active ? 0.8F : 1.2F);
+                    return ItemInteractionResult.SUCCESS;
+                }
+
                 NodeData data = new NodeData(
                         jar.getNodeType(),
                         Optional.ofNullable(jar.getNodeModifier()),
@@ -85,8 +114,11 @@ public final class BlockJarNode extends Block implements EntityBlock {
     @Override
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(
             Level level, BlockState state, BlockEntityType<T> type) {
-        if (level.isClientSide() || type != TCBlockEntities.JAR_NODE.get()) {
+        if (type != TCBlockEntities.JAR_NODE.get()) {
             return null;
+        }
+        if (level.isClientSide()) {
+            return (tickLevel, pos, tickState, node) -> ((BlockEntityJarNode) node).clientTick(tickLevel, pos);
         }
         return (tickLevel, pos, tickState, node) -> ((BlockEntityJarNode) node).serverTick(tickLevel, pos);
     }

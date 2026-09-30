@@ -58,9 +58,12 @@ public enum NodeComponentProvider implements IBlockComponentProvider {
             }
             tooltip.add(type);
         }
+        if (node instanceof BlockEntityJarNode jar && jar.areEffectsRunning()) {
+            tooltip.add(Component.translatable("jade.thaumaturge.node.jar_effects_awakened"));
+        }
         AspectList aspects = node.getAspects();
         if (!aspects.isEmpty()) {
-            JadeComponents.addAspectLines(tooltip, "jade.thaumaturge.node.aspects", aspects);
+            JadeComponents.addColoredAspectLines(tooltip, "jade.thaumaturge.node.aspects", aspects);
         }
         if (node.isEnergized()) {
             tooltip.add(
@@ -72,7 +75,7 @@ public enum NodeComponentProvider implements IBlockComponentProvider {
                             : "jade.thaumaturge.node.feeds_aura"));
             AspectList original = node.getAspectsBaseOriginal();
             if (original != null && !original.isEmpty()) {
-                JadeComponents.addAspectLines(tooltip, "jade.thaumaturge.node.reverts_to", original);
+                JadeComponents.addColoredAspectLines(tooltip, "jade.thaumaturge.node.reverts_to", original);
             }
         }
     }
